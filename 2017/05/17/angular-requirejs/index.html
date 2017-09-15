@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>angularjs + requirjs前端架构 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="angularjs + requirjs前端架构">
+<meta name="keywords" content="angular, requirejs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="angularjs + requirjs前端架构">
+<meta property="og:url" content="http://yoursite.com/2017/05/17/angular-requirejs/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="angularjs + requirjs前端架构">
+<meta property="og:updated_time" content="2017-09-14T02:19:36.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="angularjs + requirjs前端架构">
+<meta name="twitter:description" content="angularjs + requirjs前端架构">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-angular-requirejs" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/05/17/angular-requirejs/" class="article-date">
+  <time datetime="2017-05-17T07:52:11.000Z" itemprop="datePublished">2017-05-17</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/angularjs/">angularjs</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      angularjs + requirjs前端架构
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在决定使用angularJS开发项目时，考虑到多人协作，模块化，扩展等等因素，决定引入requirJS实现js文件的异步加载，解决模块之间的依赖关系。</p>
+<p>参考了一些关于angularJS项目的前端架构，都觉得不甚理想，幸运的是最终看到一篇关于angularJS如何集成requireJS的文章：</p>
+<p>原文地址：<a href="http://www.cnblogs.com/cunjieliu/p/4021121.html" target="_blank" rel="external">如何将angularJS项目与requireJS集成</a></p>
+<p>一、项目组织目录：</p>
+<ul>
+<li><p>css 文件夹</p>
+</li>
+<li><p>img 文件夹</p>
+</li>
+<li><p>js 文件夹</p>
+</li>
+</ul>
+<p> – appIndex 文件夹</p>
+<p>  — api文件夹</p>
+<p>  — controller 文件夹</p>
+<p>     —- ctlModule.js</p>
+<p>     —- mainController.js</p>
+<p>     —- homeController.js</p>
+<p>  — directives 文件夹</p>
+<p>  — services 文件夹</p>
+<p>  — app.js</p>
+<p>  — index_main.js</p>
+<p>  — router.js</p>
+<p> – appLogin 文件夹</p>
+<p>  — …</p>
+<p>  — 与appIndex类似</p>
+<p>  — …</p>
+<ul>
+<li>lib 文件夹</li>
+</ul>
+<p> – angular 文件夹</p>
+<p>  — angular.js</p>
+<p>  — angular-ui-router.js</p>
+<p>  — …</p>
+<p> – bootstrap 文件夹</p>
+<p> – jquery 文件夹</p>
+<p> – require 文件夹</p>
+<p> – php 文件夹</p>
+<p> – template 文件夹</p>
+<p>  — common 文件夹</p>
+<p>  — tplIndex 文件夹</p>
+<p>  — tplLogin文件夹</p>
+<ul>
+<li><p>404.html</p>
+</li>
+<li><p>favicon.ico</p>
+</li>
+<li><p>humans.txt</p>
+</li>
+<li><p>index.html</p>
+</li>
+<li><p>LICENSE.txt</p>
+</li>
+<li><p>login.html</p>
+</li>
+<li><p>server.js</p>
+</li>
+</ul>
+<p>二、组织目录说明</p>
+<p>两个大的模块，一个appIndex，代表前台展示模块；一个appLogin，代表登录模块。appLogin与appIndex类似，以appIndex为例：</p>
+<p>appIndex下的文件夹：</p>
+<p>api: 与后端交互</p>
+<p>controllers： 控制器</p>
+<p>directives: 指令</p>
+<p>services: 服务</p>
+<p>appIndex下的文件：</p>
+<p>app.js 定义整个项目的module</p>
+<p>index_main.js 配置脚本文件，启动angular</p>
+<p>router.js 定义路由</p>
+<p>api下的文件：</p>
+<p>apiModule.js 定义api的module</p>
+<p>mainApi.js 加载所有的api文件</p>
+<p>homeApi.js 一个普通的api文件</p>
+<p>controllers下的文件：</p>
+<p>ctlModule.js 定义控制器的module</p>
+<p>mainController.js 加载所有的控制器文件</p>
+<p>homeController.js 一个普通的控制器文件</p>
+<p>directives下的文件：</p>
+<p>dirModule.js 定义指令的module</p>
+<p>mainDirective.js 加载所有的指令文件</p>
+<p>headerDirective.js 一个普通的指令文件</p>
+<p>services下的文件：</p>
+<p>serModule.js 定义服务的module</p>
+<p>mainService.js 加载所有的服务文件</p>
+<p>homeService.js 一个普通的服务文件</p>
+<p>三、命名约定</p>
+<p>$stateProvider.state(‘home’,{<br>    url: ‘/home’,<br>   templateUrl:’../../template/tplIndex/home.html’,<br>   controller:’homeCtl’<br>})<br>以homeController为例：</p>
+<p>对应的模板为home.html</p>
+<p>控制器名字：homeCtl</p>
+<p>return ctl.controller(‘homeCtl’,function($scope,person,serGetTitle,testData){</p>
+<p> …<br>});<br>})</p>
+<p>homeCtl里使用的服务，看到ser开头的，如serGetTitle，对应到homeService.js里查找，看到Data结尾的，如testData，对应到homeApi.js里查找<br>四、代码分析</p>
+<p>1、index.html 主要代码如下：</p>
+<p>&lt;!doctype html&gt;</p>
+<p><html class="no-js" lang=""><br>    <head><br>        <script data-main="js/appIndex/index_main" src="lib/require/require.js"></script><br>    </head><br>    <body><br>        <rabbit-header></rabbit-header></body></html></p>
+<pre><code>    &lt;div&gt;
+        &lt;ul&gt;
+            &lt;li&gt;&lt;a href=&quot;#/home&quot;&gt;home&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/div&gt;
+
+    &lt;div ui-view&gt;&lt;/div&gt;
+
+    &lt;rabbit-footer&gt;&lt;/rabbit-footer&gt;
+
+&lt;/body&gt;
+</code></pre><p><br>在首页index.html只需要引入requireJs库文件，并且指明入口函数main.js，采用手动启动angularjs应用，所以这里不用为首页添加ng-app=’rabbit’。</p>
+<p>2、index_main.js 主要代码如下：</p>
+<p>require.config({<br>    baseUrl:’js’,<br>    paths:{<br>        jquery:’../lib/jquery/jquery-1.9.1’,<br>        angular:’../lib/angular/angular’,<br>        angularUiRouter:’../lib/angular/angular-ui-router’,<br>        Restangular:’../lib/angular/restangular-1.5.2’,<br>        lodash:’../lib/angular/lodash-1.8.3’,<br>        app:’appIndex/app’,<br>        router:’appIndex/router’,<br>        mainController:’appIndex/controllers/mainController’,<br>        ctlModule:’appIndex/controllers/ctlModule’,<br>        homeController:’appIndex/controllers/homeController’,<br>        …<br>    },<br>    shim:{<br>        ‘angular’:{<br>            exports:’angular’<br>        },<br>        ‘angularUiRouter’:{<br>            deps: [‘angular’],<br>            exports:’angularUiRouter’<br>        },<br>        …<br>    },<br>    urlArgs:”bust=” + (new Date()).getTime()  //防止读取缓存，调试用<br>});</p>
+<p>require([<br>    ‘jquery’,<br>    ‘angular’,<br>    ‘angularUiRouter’,<br>    ‘app’,<br>    ‘router’<br>], function ($,angular,angularUiRouter,app,router) {<br>   $(document).ready(function(){<br>        //采用手动启动angularjs应用，所以这里不用为首页添加ng-app=’rabbit’<br>        angular.bootstrap(document, [‘rabbit’]);<br>    });<br>});<br>3、两个重要的文件app.js和router.js</p>
+<p>app.js 主要代码如下：</p>
+<p>define([“angular”,’mainController’,’mainDirective’,’mainService’,’mainApi’],function(angular){<br>        return angular.module(“rabbit”,[‘ui.router’,’app.ctlModule’,’app.dirModule’,’app.serModule’,’app.apiModule’]);<br>    })<br>定义匿名模块:依赖的mainController和mainDirective主要是用来加载angular的控制器和指令</p>
+<p>ui.router:一个基于ngRoute开发的第三方路由，作为框架额外的附加功能，它们都将以模块依赖的形式被引入</p>
+<p>rabbit为自定义的模块名，依赖第三方路由模块ui.router,以及自定义的控制器模块，自定义的指令模块</p>
+<p>这样做的目的是：在程序启动(bootstrap)的时候，加载依赖模块(如：ui.router)，将所有挂载在该模块的服务(provider)，指令(directive)，过滤器(filter)等都进行注册，那么在后面的程序中便可以调用了。</p>
+<p>router.js 主要代码如下：</p>
+<p>define([‘app’],function(app){<br>        return app.run([‘$rootScope’, ‘$log’, function($rootScope, $log){<br>                        $rootScope.$on(‘$stateChangeSuccess’, function(event, toState, toParams, fromState, fromParams){<br>                            $log.debug(‘successfully changed states’) ;<br>                        });<br>                    }])<br>                  .config(function($stateProvider, $urlRouterProvider, $locationProvider, $uiViewScrollProvider){<br>                        // 默认进入重定向<br>                        //$urlRouterProvider.otherwise(‘/index’);<br>                        $stateProvider.state(‘home’,{<br>                            url: ‘/home’,<br>                            templateUrl:’../../template/tplIndex/home.html’,<br>                            controller:’homeCtl’<br>                        })<br>                })<br>});<br>配置了一个指定 /home 的路由。</p>
+<p>4、控制器</p>
+<p>mainController.js 主要代码如下：</p>
+<p>define([‘homeController’,’indexController’], function() {});<br>主要用来加载各个控制器（所有的控制器都将在这个文件中被加载），我们可以有很多个控制器文件，按照具体需要进行添加。</p>
+<p>homeController.js 主要代码如下：</p>
+<p>define([‘ctlModule’,’jquery’],function(ctl,$){<br>    return ctl.controller(‘homeCtl’,function($scope,serGetTitle,testData){<br>        $scope.title = serGetTitle.title;<br>        $scope.projects = testData.getMessages();<br>    })<br>})<br>控制器homeCtl依赖于ctlModule模块，其实可以理解为app.ctlModule模块下的一个“方法”。</p>
+<p>ctlModule.js 主要代码如下：</p>
+<p>define([‘angular’], function (angular) {<br>    ‘use strict’;<br>    return angular.module(‘app.ctlModule’, []);<br> });<br>声明一个叫作app.ctlModule的模块，app.js里的模块rabbit，依赖于这个模块，并调用这个模块下的所有“方法”</p>
+<p>5、指令，服务，接口</p>
+<p>同控制器的定义方法完全类似。</p>
+<p>五、说明</p>
+<p>php文件夹放了一些php文件，可以用apache建一个站点，模拟与服务器端的数据交互。</p>
+<p>server.js是一个静态文件服务器，mac下进入目录，执行node server，即可创建一个简单的nodejs服务器。</p>
+<p>个人感觉这样设计一个前端架构，虽然会让开发变得繁琐，但功能划分比较明确，提供了一个开发标准，适合于多人协同作业，总体上来说利大于弊。</p>
+<p>源码下载地址：angularJS集成requireJS</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/05/17/angular-requirejs/" data-id="cj7l9gqy9000okcp3r5emuk69" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/08/14/hello-world/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Hello World
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/05/18/Soccer-Superstars/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">时光飞逝 传奇谢幕</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/angular/" style="font-size: 20px;">angular</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/09/14/css-grid/">网格布局</a>
+          </li>
+        
+          <li>
+            <a href="/2017/09/14/bootstrap-notes/">bootstrap笔记</a>
+          </li>
+        
+          <li>
+            <a href="/2017/09/14/angular-apply/">理解数据绑定过程 - `$watch`, `$apply`和`$digest`</a>
+          </li>
+        
+          <li>
+            <a href="/2017/09/14/angular-directive/">angularJS中的指令directive</a>
+          </li>
+        
+          <li>
+            <a href="/2017/09/14/angular-errors/">angular应用中常见问题记录</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
