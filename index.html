@@ -48,9 +48,9 @@
       </nav>
       <nav id="sub-nav">
         
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="Flux RSS"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Rechercher"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
@@ -60,6 +60,613 @@
 </header>
       <div class="outer">
         <section id="main">
+  
+    <article id="post-thread-communication" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/12/18/thread-communication/" class="article-date">
+  <time datetime="2017-12-18T08:42:27.000Z" itemprop="datePublished">2017-12-18</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/18/thread-communication/">thread-communication</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="一、多线程通信"><a href="#一、多线程通信" class="headerlink" title="一、多线程通信"></a>一、多线程通信</h4><p>多个线程在处理同一资源，但是任务不同。</p>
+<h4 id="1、示例"><a href="#1、示例" class="headerlink" title="1、示例"></a>1、示例</h4><p>input类：输入</p>
+<p>resource类： name、sex</p>
+<p>output类：输出</p>
+<p>input和output作为两个线程，处理同一个资源resource。</p>
+<pre><code>class Resource{
+    String name;
+    String sex;
+}
+
+class Input implements Runnable{
+    Resource r;
+    Input(Resource r){
+        this.r = r;
+    }
+    public void run(){
+        int x = 0;
+        while(true){
+            synchronized(r){//同步锁r与output保持一致
+                if(x == 0){
+                    r.name = &quot;张三&quot;;
+                    r.sex = &quot;男&quot;;
+                }else{
+                    r.name = &quot;李四&quot;;
+                    r.sex = &quot;女&quot;;
+                }
+            }
+            x = (x+1)%2;
+        }
+    }
+}
+
+class Output implements Runnable{
+    Resource r;
+    Input(Resource r){
+        this.r = r;
+    }
+    public void run(){
+        while(true){                    
+            synchronized(r){
+                System.out.println(r.name+&quot;....&quot;+r.sex);
+            }
+        }
+    }
+}
+
+class ResourceDemo{
+    public static void main(String[] args){
+        Resource r = new Resource();
+        Input in = new Input(r);
+        Output out = new Output(r);
+        Thread t1 = new Thread(in);
+        Thread t2 = new Thread(out);
+        t1.start();
+        t2.start();
+    }
+}
+</code></pre><p>线程分析：</p>
+<p>input拿到执行权后，输入张三男，output拿到执行权，输出张三、男，input再拿到执行输入李四女，还是input拿到执行权，输入张三男，覆盖了李四女，output拿到执行权还是输出张三男。因此，无法实现input输入一次，output就输出一次的需求。</p>
+<h4 id="2、多线程通信-等待唤醒机制"><a href="#2、多线程通信-等待唤醒机制" class="headerlink" title="2、多线程通信-等待唤醒机制"></a>2、多线程通信-等待唤醒机制</h4><p>实现input输入一次，output就紧接着输出一次。</p>
+<p>等待唤醒机制涉及的方法：</p>
+<p>1、wait()：让线程处于冻结状态，被wait的线程会被存储到线程池中。</p>
+<p>2、notify()：唤醒线程池中一个线程（任意）。</p>
+<p>3、notifyAll()：唤醒线程池中的所有线程。</p>
+<p>4、以上方法都必须定义在同步中。因为这些方法都是用于操作线程状态的方法。必须要明确到底操作的是哪个锁上的线程。</p>
+<p>5、r锁即为线程input和output的监视器。</p>
+<p>6、为什么操作线程的方法wait、notify、notifyAll定义在了Object类中，而没有定义在Thread类中。因为这些方法是监视器的方法。监视器就是锁。锁可以是任意对象，任意对象都继承自Object类。</p>
+<pre><code>class Resource{
+    String name;
+    String sex;
+    boolean flag = false;
+}
+
+class Input implements Runnable{
+    Resource r;
+    Input(Resource r){
+        this.r = r;
+    }
+    public void run(){
+        int x = 0;
+        while(true){
+            synchronized(r){//同步锁r与output保持一致
+                if(r.flag)
+                    try{
+                        r.wait()
+                    }catch(InterruptedException e){
+                        //...
+                    }
+                if(x == 0){
+                    r.name = &quot;张三&quot;;
+                    r.sex = &quot;男&quot;;
+                }else{
+                    r.name = &quot;李四&quot;;
+                    r.sex = &quot;女&quot;;
+                }
+                r.flag = true;
+                r.notify();
+            }
+            x = (x+1)%2;
+        }
+    }
+}
+
+class Output implements Runnable{
+    Resource r;
+    Input(Resource r){
+        this.r = r;
+    }
+    public void run(){
+        while(true){                    
+            synchronized(r){
+                if(!r.flag)
+                    try{
+                        r.wait()
+                    }catch(InterruptedException e){
+                        //...
+                    }
+                    System.out.println(r.name+&quot;....&quot;+r.sex);
+                    r.flag = false;
+                    r.notify();
+            }
+        }
+    }
+}
+
+class ResourceDemo{
+    public static void main(String[] args){
+        Resource r = new Resource();
+        Input in = new Input(r);
+        Output out = new Output(r);
+        Thread t1 = new Thread(in);
+        Thread t2 = new Thread(out);
+        t1.start();
+        t2.start();
+    }
+}
+</code></pre><p>线程分析：input和output分别取得执行权，并相互唤醒对方。</p>
+<p>代码优化：不要直接访问Resource中的变量，提高安全性。</p>
+<pre><code>class Resource{
+    private String name;
+    private String sex;
+    private boolean flag = false;
+    public synchronized void set(String name, String sex){
+        if(flag){
+            try{
+                    this.wait()
+                }catch(InterruptedException e){
+                    //...
+                }
+            this.name = name;
+            this.sex = sex;
+            flag = true;
+            this.notify();//同步函数的锁是this
+        }
+    }
+    public synchronized void out(){
+        if(!flag){
+            try{
+                    this.wait()
+                }catch(InterruptedException e){
+                    //...
+                }
+        }
+        System.out.println(name+&quot;....&quot;+sex);
+        flag = false;
+        this.notify();
+    }
+}
+
+class Input implements Runnable{
+    Resource r;
+    Input(Resource r){
+        this.r = r;
+    }
+    public void run(){
+        int x = 0;
+        while(true){
+            if(x == 0){
+                r.set(&quot;张三&quot;,&quot;男&quot;);
+            }else{
+                r.set(&quot;张三&quot;,&quot;女&quot;);
+            }
+            x = (x+1)%2;
+        }
+    }
+}
+
+class Output implements Runnable{
+    Resource r;
+    Input(Resource r){
+        this.r = r;
+    }
+    public void run(){
+        while(true){                    
+            r.out();
+        }
+    }
+}
+
+class ResourceDemo{
+    public static void main(String[] args){
+        Resource r = new Resource();
+        Input in = new Input(r);
+        Output out = new Output(r);
+        Thread t1 = new Thread(in);
+        Thread t2 = new Thread(out);
+        t1.start();
+        t2.start();
+    }
+}
+</code></pre><h4 id="3、多线程通信-多生产者多消费者问题"><a href="#3、多线程通信-多生产者多消费者问题" class="headerlink" title="3、多线程通信-多生产者多消费者问题"></a>3、多线程通信-多生产者多消费者问题</h4><pre><code>class Resource{
+    private String name;
+    private int count = 1;
+    private boolean flag = false;
+    public synchronized void set(String name){
+        if(flag)
+            try{
+                this.wait()
+            }catch(InterruptedException e){
+                //...
+            }
+        this.name = name + count;
+        count++;
+        System.out.println(Thread.currentThread().getName()+&quot;...生产者...&quot;+this.name);
+        flag = true;
+        this.notify();//同步函数的锁是this
+    }
+    public synchronized void out(){
+        if(!flag)
+            try{
+                this.wait()
+            }catch(InterruptedException e){
+                //...
+            }
+        System.out.println(Thread.currentThread().getName()+&quot;...消费者...&quot;+this.name);
+        flag = false;
+        this.notify();
+    }
+}
+
+class Producer implements Runnable{
+    private Resource r;
+    Producer(Resource r){
+        this.r = r;
+    }
+    public void run(){
+        while(true){
+            r.set(&quot;烤鸭&quot;);
+        }
+    }
+}
+
+class Consumer implements Runnable{
+    private Resource r;
+    Producer(Resource r){
+        this.r = r;
+    }
+    public void run(){
+        while(true){
+            r.out();
+        }
+    }
+}
+
+//只有一个生产者和一个消费者，安全
+class ProducerConsumerDemo{
+    public static void main(String[] args){
+        Resource r = new Resource();
+        Producer pro = new Producer();
+        Consumer con = new Consumer();
+        Thread t1 = new Thread(pro);
+        Thread t2 = new Thread(con);
+        t1.start();
+        t2.start();
+    }
+}
+
+//存在多个生产者和多个消费者，存在安全隐患
+class ProducerConsumerDemo{
+    public static void main(String[] args){
+        Resource r = new Resource();
+        Producer pro = new Producer();
+        Consumer con = new Consumer();
+        Thread t1 = new Thread(pro);
+        Thread t2 = new Thread(pro);
+        Thread t3 = new Thread(con);
+        Thread t4 = new Thread(con);
+        t1.start();
+        t2.start();
+        t3.start();
+        t4.start();
+    }
+}
+</code></pre><p>线程分析：只有一个生产者，一个消费者时，没有问题。但是当有多个生产者和多个消费者是会存在安全隐患，甚至死锁。</p>
+<h5 id="隐患分析："><a href="#隐患分析：" class="headerlink" title="隐患分析："></a>隐患分析：</h5><p>t0,t1,t2,t3都有执行资格。</p>
+<p>线程t0拿到执行权，生产烤鸭1，flag为true。</p>
+<p>t0再次拿到执行权被冻结。</p>
+<p>t1拿到执行权也被冻结。此时，t0和t1都进入线程池。</p>
+<p>t2拿到执行权，消费了烤鸭1，flag为false。唤醒线程池中被冻结的线程t0或t1。假设唤醒了t0。此时，t0,t2,t3有执行资格。</p>
+<p>t2继续拿到执行权被冻结，进入线程池（t1,t2）。</p>
+<p>t3拿到执行权也被冻结，进入线程池（t1,t2,t3）。</p>
+<p>被唤醒的t0拿到执行权，没有判断if(flag)，直接往下执行，生产烤鸭2，flag为true。唤醒线程池中的一个线程。</p>
+<p>如果t1被唤醒，此时t0和t1有执行资格，线程池中还有t2和t3。</p>
+<p>t0拿到执行权，被冻结进入线程池。</p>
+<p>被唤醒的t1拿到执行权，还是没有判断if(flag)，从被冻结的位置，直接往下执行，又生产了烤鸭3。</p>
+<p>问题出现，烤鸭2没有被消费的情况下，生产了烤鸭3。</p>
+<h5 id="隐患解决方法：t1拿到执行权后，要判断flag为true，不要再生产烤鸭3。"><a href="#隐患解决方法：t1拿到执行权后，要判断flag为true，不要再生产烤鸭3。" class="headerlink" title="隐患解决方法：t1拿到执行权后，要判断flag为true，不要再生产烤鸭3。"></a>隐患解决方法：t1拿到执行权后，要判断flag为true，不要再生产烤鸭3。</h5><p>因此要将if改为while</p>
+<pre><code>public synchronized void set(String name){
+    while(flag)
+        try{
+            this.wait()
+        }catch(InterruptedException e){
+            //...
+        }
+    ...
+}
+
+public synchronized void out(){
+    while(!flag)
+        try{
+            this.wait()
+        }catch(InterruptedException e){
+            //...
+        }
+    ...
+}
+</code></pre><h5 id="死锁分析："><a href="#死锁分析：" class="headerlink" title="死锁分析："></a>死锁分析：</h5><p>t0和t1被冻结进入线程池。</p>
+<p>t2拿到执行权，消费烤鸭1，flag为false，唤醒t0。</p>
+<p>t2和t3先后拿到执行权被冻结进入线程池。</p>
+<p>t0拿到执行权，生产烤鸭，flag变为true，唤醒线程池中的任意一个线程。此时，线程池中有t1,t2,t3。</p>
+<p>如果唤醒的是t1，此时有执行资格的为t0和t1。先后拿到执行权，由于flag为true，都被冻结进入线程池。此时，t0,t1,t2,t3都被冻结在线程池中。</p>
+<p>没有线程被唤醒，没有线程有执行资格，没有线程能拿到执行权，死锁。</p>
+<h5 id="死锁解决："><a href="#死锁解决：" class="headerlink" title="死锁解决："></a>死锁解决：</h5><p>t0拿到执行权，生产烤鸭，flag变为true，唤醒线程池中的线程时，全部唤醒。</p>
+<pre><code>public synchronized void set(String name){
+    ...
+    this.notifyAll();
+}
+
+public synchronized void out(String name){
+    ...
+    this.notifyAll();
+}
+</code></pre><h4 id="4、多线程通信-多生产者多消费者问题-JDK1-5新特性-Lock"><a href="#4、多线程通信-多生产者多消费者问题-JDK1-5新特性-Lock" class="headerlink" title="4、多线程通信-多生产者多消费者问题-JDK1.5新特性-Lock"></a>4、多线程通信-多生产者多消费者问题-JDK1.5新特性-Lock</h4><p>Lock接口是1.5版本对synchronized的替代。</p>
+<p>同步代码块和同步函数对于锁的操作是隐式的。</p>
+<p>jdk1.5以后将同步和锁封装成了对象，并将操作锁的隐式方式定义到了该对象中，将隐式动作变成了显式动作。</p>
+<pre><code>Object obj = new Object();
+void show(){
+    synchronized(obj){
+        //...
+    }
+}
+
+Lock lock = new ReentrantLock();
+void show(){
+    try{
+        lock.lock();//获取锁
+        //...
+    }catch(){
+        //...
+    }finally{
+        lock.unlock();
+    }
+}
+</code></pre><h4 id="5、多线程通信-多生产者多消费者问题-JDK1-5新特性-Condition"><a href="#5、多线程通信-多生产者多消费者问题-JDK1-5新特性-Condition" class="headerlink" title="5、多线程通信-多生产者多消费者问题-JDK1.5新特性-Condition"></a>5、多线程通信-多生产者多消费者问题-JDK1.5新特性-Condition</h4><pre><code>Object obj = new Object();
+void show(){
+    synchronized(obj){
+        //...
+    }
+}
+
+同步代码块中的锁对象，只有一组操作线程的方法，就是继承自object的wait(),notify(),notifyAll()。
+
+Lock lock = new ReentrantLock();
+void show(){
+    try{
+        lock.lock();//获取锁
+        //...
+    }catch(){
+        //...
+    }finally{
+        lock.unlock();
+    }
+}
+
+jdk1.5以后将操作线程的方法封装为了对象即为condition接口。
+
+Lock替代的是synchronized的方法和语句的使用，Condition替代了Object监视器（即锁）的方法（wait,notify,notifyAll）的使用。
+
+通过Lock接口的newCondition方法，就可以使一个实现了Lock接口的锁对象生成多组监视器方法。
+
+interface Condition{
+    await();
+    signal();
+    signalAll();
+}
+
+Lock lock = new ReentrantLock();
+Condition c1 = lock.newCondition();
+Condition c2 = lock.newCondition();
+</code></pre><h5 id="优化烤鸭示例代码"><a href="#优化烤鸭示例代码" class="headerlink" title="优化烤鸭示例代码"></a>优化烤鸭示例代码</h5><pre><code>import java.util.concurrent.locks.*
+
+class Resource{
+    private ...
+    ...
+    //创建一个锁对象
+    Lock lock = new ReentrantLock();
+    //通过已有的锁获取该锁上的监视器对象
+    Condition con = lock.newCondition();
+    public void set(String name){
+        lock.lock();
+        try{
+            while(flag)
+                //try{this.wait();}catch(...){}
+                try{con.await();}catch(...){}
+                ...
+                //notifyAll();
+                con.signalAll();
+        }finally{
+            lock.unlock();
+        }
+    }
+    public void out(){
+        lock.lock();
+        try{
+            while(!flag)
+                //try{this.wait();}catch(...){}
+                try{con.await();}catch(...){}
+                ...
+                //notifyAll();
+                con.signalAll();
+        }finally{
+            lock.unlock();
+        }
+    }
+}
+</code></pre><h5 id="notifyAll解决方法缺点"><a href="#notifyAll解决方法缺点" class="headerlink" title="notifyAll解决方法缺点"></a>notifyAll解决方法缺点</h5><p>唤醒了所有的线程，t1还有可能优于t2和t2拿到执行权，降低了效率。</p>
+<p>应该想办法做到：set的线程t0和t1只唤醒out的t2和t3，而out的线程t2和t3只唤醒t0和t1。</p>
+<p>lock和condition满足条件，四个线程共用一把锁lock，但是一把锁有两个监视器，一个监视器用来监视set，另一个监视器用来监视out。</p>
+<h5 id="优化烤鸭示例代码-1"><a href="#优化烤鸭示例代码-1" class="headerlink" title="优化烤鸭示例代码"></a>优化烤鸭示例代码</h5><pre><code>Lock lock = new ReentrantLock();
+Condition producer_con = lock.newCondition();
+Condition consumer_con = lock.newCondition();
+public void set(String name){
+    lock.lock();
+    try{
+        while(flag)
+            //try{this.wait();}catch(...){}
+            //try{con.await();}catch(...){}
+            try{producer_con();}catch(...){}
+            ...
+            //notifyAll();
+            //con.signalAll();
+            //唤醒消费者的线程的一个线程即可
+            consumer_con.signal();
+    }finally{
+        lock.unlock();
+    }
+}
+public void out(){
+    lock.lock();
+    try{
+        while(!flag)
+            //try{this.wait();}catch(...){}
+            //try{con.await();}catch(...){}
+            try{consumer_con.await();}catch(...){}
+            ...
+            //notifyAll();
+            //con.signalAll();
+            producer_con.signal();
+    }finally{
+        lock.unlock();
+    }
+}
+</code></pre><h5 id="lock-amp-condition"><a href="#lock-amp-condition" class="headerlink" title="lock &amp; condition"></a>lock &amp; condition</h5><p>Lock接口：替代了同步代码块或者同步函数。将同步的隐式锁操作变成显式操作。同时更为灵活。可以给一个锁加上多组监视器。</p>
+<pre><code>lock():获取锁
+
+unlock():释放锁
+</code></pre><p>Condition接口：替代了Object中的wait，notify，notifyAll方法。将这些监视器的方法进行了封装，变成Condition监视器对象。可以任意锁进行组合。</p>
+<pre><code>await():相当于wait()方法
+signal():相当于notify()方法
+signalAll():相当于notifyAll()方法
+</code></pre><h4 id="6、wait和sleep的区别"><a href="#6、wait和sleep的区别" class="headerlink" title="6、wait和sleep的区别"></a>6、wait和sleep的区别</h4><p>1、wait可以指定时间，也可以不指定时间。sleep必须指定时间。</p>
+<p>2、在同步中，对cpu的执行权和锁的处理不同。<br>    wait：释放执行权，也释放锁。<br>    sleep：释放执行权，不释放锁。</p>
+<h4 id="7、停止线程方式-定义标记"><a href="#7、停止线程方式-定义标记" class="headerlink" title="7、停止线程方式 - 定义标记"></a>7、停止线程方式 - 定义标记</h4><p>1、stop方法。已过时。</p>
+<p>2、run方法结束</p>
+<p>任务中都有循环结构，只要控制住循环就可以结束任务。</p>
+<p>控制循环通常就用定义标记来完成。</p>
+<pre><code>class StopThread implements Runnable{
+    private boolean flag = true;
+    public void run(){
+        while(flag){
+            System.out.println(Thread.currentThread().getName()+&quot;...&quot;);
+        }
+    }
+    public void setFlag(){
+        flag = false;
+    }
+}
+
+class StopThreadDemo{
+    public static void main(String[] args){
+        StopThread st = new StopThread();
+        Thread t1 = new Thread(st);
+        Thread t2 = new Thread(st);
+        t1.start();
+        t2.start();
+
+        int num = 1;
+        for(;;){
+            if(++num == 50){
+                st.setFlag(0;
+                break;
+            }
+            System.out.println(&quot;main...&quot;+num);
+        }
+        System.out.println(&quot;over&quot;);
+    }
+}
+</code></pre><p>如果线程处于冻结状态，无法读取标记，可以用Thread类中的interrupt方法将线程从冻结状态强制恢复到运行状态中来，让线程具备cpu的执行资格。</p>
+<p>强制动作会发生中断异常，需要处理。</p>
+<pre><code>class StopThread implements Runnable{
+    private boolean flag = true;
+    public void run(){
+        while(flag){
+            try{
+                wait();
+            }catch(InterruptedException e){
+                System.out.printlin(Thread.currentThread().getName()+&quot;...&quot;+e);
+            }
+            System.out.printlin(Thread.currentThread().getName()+&quot;...+++&quot;);
+        }
+    }
+    public void setFlag(){
+        flag = false;
+    }
+}
+
+class StopThreadDemo{
+    public static void main(String[] args){
+        StopThread st = new StopThread();
+        Thread t1 = new Thread(st);
+        Thread t2 = new Thread(st);
+        t1.start();
+        t2.start();
+
+        int num = 1;
+        for(;;){
+            if(++num == 50){
+                //st.setFlag(0;
+                t1.interrupt();
+                t2.interrupt();
+                break;
+            }
+            System.out.println(&quot;main...&quot;+num);
+        }
+        System.out.println(&quot;over&quot;);
+    }
+}
+</code></pre><h4 id="8、多线程-守护线程"><a href="#8、多线程-守护线程" class="headerlink" title="8、多线程 - 守护线程"></a>8、多线程 - 守护线程</h4><p>setDaemon：后台线程，守护线程，用户线程。</p>
+<p>运行时，跟前台线程一样，争夺cpu资源。</p>
+<p>前台线程需要手动结束，后台线程当前台线程全部结束后自动结束。</p>
+<p>setDaemon在线程开启之前调用。</p>
+<pre><code>t1.setDaemon(true);
+t1.start();
+t2.setDaemon(true);
+t2.start();
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/12/18/thread-communication/" data-id="cjbftbgey000xghp32w298usk" class="article-share-link">Partager</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/thread/">thread</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
   
     <article id="post-java-thread" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
@@ -321,7 +928,7 @@ class DeadLockTest{
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/15/java-thread/" data-id="cjbbxgvum0000uop31z4r108o" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/12/15/java-thread/" data-id="cjbftbgg1001ighp3o2pksjpj" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/thread/">thread</a></li></ul>
@@ -984,7 +1591,7 @@ class DeadLockTest{
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/css-grid/" data-id="cjbbxg0t5000vujp3euaswfui" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/09/14/css-grid/" data-id="cjbftbgej000lghp3e128ps0x" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/css-grid/">css-grid</a></li></ul>
@@ -1223,7 +1830,7 @@ class DeadLockTest{
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/bootstrap-notes/" data-id="cjbbxg0sk000gujp3mxlsl8eh" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/09/14/bootstrap-notes/" data-id="cjbftbgdw0006ghp35qkfvm2v" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/bootstrap/">bootstrap</a></li></ul>
@@ -1552,7 +2159,7 @@ app.controller(&apos;MainCtrl&apos;, function($scope) {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/angular-apply/" data-id="cjbbxg0rs0004ujp3jb5nuu0g" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/09/14/angular-apply/" data-id="cjbftbgdi0001ghp3615qgk99" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
@@ -1930,7 +2537,7 @@ app.directive(&apos;rabbitHeader&apos;, function() {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/angular-directive/" data-id="cjbbxg0ru0005ujp3bplavvne" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/09/14/angular-directive/" data-id="cjbftbgec000dghp3zjt6f25g" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
@@ -2002,7 +2609,7 @@ app.directive(&apos;rabbitHeader&apos;, function() {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/angular-errors/" data-id="cjbbxg0rh0001ujp3de07ryi1" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/09/14/angular-errors/" data-id="cjbftbgep000sghp3idw1nvob" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
@@ -2365,7 +2972,7 @@ export default Enhance(MyComponent); // Enhanced component
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/08/17/react-native-es5-es6/" data-id="cjbbxg0sy000rujp3ajdhano4" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/08/17/react-native-es5-es6/" data-id="cjbftbgen000qghp3by31xz9c" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/react/">react</a></li></ul>
@@ -2661,7 +3268,7 @@ hexo d -g
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/08/14/github-hexo-blog/" data-id="cjbbxg0sv000oujp3b933osnl" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/08/14/github-hexo-blog/" data-id="cjbftbgfw001hghp3g1l83vll" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/github/">github</a></li></ul>
@@ -2708,182 +3315,9 @@ hexo d -g
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/08/14/hello-world/" data-id="cjbbxg0sp000jujp39uf38n6m" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/08/14/hello-world/" data-id="cjbftbgeg000ighp3bxdhojfs" class="article-share-link">Partager</a>
       
       
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-angular-requirejs" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/05/17/angular-requirejs/" class="article-date">
-  <time datetime="2017-05-17T07:52:11.000Z" itemprop="datePublished">2017-05-17</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/angularjs/">angularjs</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/05/17/angular-requirejs/">angularjs + requirjs前端架构</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>在决定使用angularJS开发项目时，考虑到多人协作，模块化，扩展等等因素，决定引入requirJS实现js文件的异步加载，解决模块之间的依赖关系。</p>
-<p>参考了一些关于angularJS项目的前端架构，都觉得不甚理想，幸运的是最终看到一篇关于angularJS如何集成requireJS的文章：</p>
-<p>原文地址：<a href="http://www.cnblogs.com/cunjieliu/p/4021121.html" target="_blank" rel="external">如何将angularJS项目与requireJS集成</a></p>
-<p>一、项目组织目录：</p>
-<ul>
-<li><p>css 文件夹</p>
-</li>
-<li><p>img 文件夹</p>
-</li>
-<li><p>js 文件夹</p>
-</li>
-</ul>
-<p> – appIndex 文件夹</p>
-<p>  — api文件夹</p>
-<p>  — controller 文件夹</p>
-<p>     —- ctlModule.js</p>
-<p>     —- mainController.js</p>
-<p>     —- homeController.js</p>
-<p>  — directives 文件夹</p>
-<p>  — services 文件夹</p>
-<p>  — app.js</p>
-<p>  — index_main.js</p>
-<p>  — router.js</p>
-<p> – appLogin 文件夹</p>
-<p>  — …</p>
-<p>  — 与appIndex类似</p>
-<p>  — …</p>
-<ul>
-<li>lib 文件夹</li>
-</ul>
-<p> – angular 文件夹</p>
-<p>  — angular.js</p>
-<p>  — angular-ui-router.js</p>
-<p>  — …</p>
-<p> – bootstrap 文件夹</p>
-<p> – jquery 文件夹</p>
-<p> – require 文件夹</p>
-<p> – php 文件夹</p>
-<p> – template 文件夹</p>
-<p>  — common 文件夹</p>
-<p>  — tplIndex 文件夹</p>
-<p>  — tplLogin文件夹</p>
-<ul>
-<li><p>404.html</p>
-</li>
-<li><p>favicon.ico</p>
-</li>
-<li><p>humans.txt</p>
-</li>
-<li><p>index.html</p>
-</li>
-<li><p>LICENSE.txt</p>
-</li>
-<li><p>login.html</p>
-</li>
-<li><p>server.js</p>
-</li>
-</ul>
-<p>二、组织目录说明</p>
-<p>两个大的模块，一个appIndex，代表前台展示模块；一个appLogin，代表登录模块。appLogin与appIndex类似，以appIndex为例：</p>
-<p>appIndex下的文件夹：</p>
-<p>api: 与后端交互</p>
-<p>controllers： 控制器</p>
-<p>directives: 指令</p>
-<p>services: 服务</p>
-<p>appIndex下的文件：</p>
-<p>app.js 定义整个项目的module</p>
-<p>index_main.js 配置脚本文件，启动angular</p>
-<p>router.js 定义路由</p>
-<p>api下的文件：</p>
-<p>apiModule.js 定义api的module</p>
-<p>mainApi.js 加载所有的api文件</p>
-<p>homeApi.js 一个普通的api文件</p>
-<p>controllers下的文件：</p>
-<p>ctlModule.js 定义控制器的module</p>
-<p>mainController.js 加载所有的控制器文件</p>
-<p>homeController.js 一个普通的控制器文件</p>
-<p>directives下的文件：</p>
-<p>dirModule.js 定义指令的module</p>
-<p>mainDirective.js 加载所有的指令文件</p>
-<p>headerDirective.js 一个普通的指令文件</p>
-<p>services下的文件：</p>
-<p>serModule.js 定义服务的module</p>
-<p>mainService.js 加载所有的服务文件</p>
-<p>homeService.js 一个普通的服务文件</p>
-<p>三、命名约定</p>
-<p>$stateProvider.state(‘home’,{<br>    url: ‘/home’,<br>   templateUrl:’../../template/tplIndex/home.html’,<br>   controller:’homeCtl’<br>})<br>以homeController为例：</p>
-<p>对应的模板为home.html</p>
-<p>控制器名字：homeCtl</p>
-<p>return ctl.controller(‘homeCtl’,function($scope,person,serGetTitle,testData){</p>
-<p> …<br>});<br>})</p>
-<p>homeCtl里使用的服务，看到ser开头的，如serGetTitle，对应到homeService.js里查找，看到Data结尾的，如testData，对应到homeApi.js里查找<br>四、代码分析</p>
-<p>1、index.html 主要代码如下：</p>
-<p>&lt;!doctype html&gt;</p>
-<p><html class="no-js" lang=""><br>    <head><br>        <script data-main="js/appIndex/index_main" src="lib/require/require.js"></script><br>    </head><br>    <body><br>        <rabbit-header></rabbit-header></body></html></p>
-<pre><code>    &lt;div&gt;
-        &lt;ul&gt;
-            &lt;li&gt;&lt;a href=&quot;#/home&quot;&gt;home&lt;/a&gt;&lt;/li&gt;
-        &lt;/ul&gt;
-    &lt;/div&gt;
-
-    &lt;div ui-view&gt;&lt;/div&gt;
-
-    &lt;rabbit-footer&gt;&lt;/rabbit-footer&gt;
-
-&lt;/body&gt;
-</code></pre><p><br>在首页index.html只需要引入requireJs库文件，并且指明入口函数main.js，采用手动启动angularjs应用，所以这里不用为首页添加ng-app=’rabbit’。</p>
-<p>2、index_main.js 主要代码如下：</p>
-<p>require.config({<br>    baseUrl:’js’,<br>    paths:{<br>        jquery:’../lib/jquery/jquery-1.9.1’,<br>        angular:’../lib/angular/angular’,<br>        angularUiRouter:’../lib/angular/angular-ui-router’,<br>        Restangular:’../lib/angular/restangular-1.5.2’,<br>        lodash:’../lib/angular/lodash-1.8.3’,<br>        app:’appIndex/app’,<br>        router:’appIndex/router’,<br>        mainController:’appIndex/controllers/mainController’,<br>        ctlModule:’appIndex/controllers/ctlModule’,<br>        homeController:’appIndex/controllers/homeController’,<br>        …<br>    },<br>    shim:{<br>        ‘angular’:{<br>            exports:’angular’<br>        },<br>        ‘angularUiRouter’:{<br>            deps: [‘angular’],<br>            exports:’angularUiRouter’<br>        },<br>        …<br>    },<br>    urlArgs:”bust=” + (new Date()).getTime()  //防止读取缓存，调试用<br>});</p>
-<p>require([<br>    ‘jquery’,<br>    ‘angular’,<br>    ‘angularUiRouter’,<br>    ‘app’,<br>    ‘router’<br>], function ($,angular,angularUiRouter,app,router) {<br>   $(document).ready(function(){<br>        //采用手动启动angularjs应用，所以这里不用为首页添加ng-app=’rabbit’<br>        angular.bootstrap(document, [‘rabbit’]);<br>    });<br>});<br>3、两个重要的文件app.js和router.js</p>
-<p>app.js 主要代码如下：</p>
-<p>define([“angular”,’mainController’,’mainDirective’,’mainService’,’mainApi’],function(angular){<br>        return angular.module(“rabbit”,[‘ui.router’,’app.ctlModule’,’app.dirModule’,’app.serModule’,’app.apiModule’]);<br>    })<br>定义匿名模块:依赖的mainController和mainDirective主要是用来加载angular的控制器和指令</p>
-<p>ui.router:一个基于ngRoute开发的第三方路由，作为框架额外的附加功能，它们都将以模块依赖的形式被引入</p>
-<p>rabbit为自定义的模块名，依赖第三方路由模块ui.router,以及自定义的控制器模块，自定义的指令模块</p>
-<p>这样做的目的是：在程序启动(bootstrap)的时候，加载依赖模块(如：ui.router)，将所有挂载在该模块的服务(provider)，指令(directive)，过滤器(filter)等都进行注册，那么在后面的程序中便可以调用了。</p>
-<p>router.js 主要代码如下：</p>
-<p>define([‘app’],function(app){<br>        return app.run([‘$rootScope’, ‘$log’, function($rootScope, $log){<br>                        $rootScope.$on(‘$stateChangeSuccess’, function(event, toState, toParams, fromState, fromParams){<br>                            $log.debug(‘successfully changed states’) ;<br>                        });<br>                    }])<br>                  .config(function($stateProvider, $urlRouterProvider, $locationProvider, $uiViewScrollProvider){<br>                        // 默认进入重定向<br>                        //$urlRouterProvider.otherwise(‘/index’);<br>                        $stateProvider.state(‘home’,{<br>                            url: ‘/home’,<br>                            templateUrl:’../../template/tplIndex/home.html’,<br>                            controller:’homeCtl’<br>                        })<br>                })<br>});<br>配置了一个指定 /home 的路由。</p>
-<p>4、控制器</p>
-<p>mainController.js 主要代码如下：</p>
-<p>define([‘homeController’,’indexController’], function() {});<br>主要用来加载各个控制器（所有的控制器都将在这个文件中被加载），我们可以有很多个控制器文件，按照具体需要进行添加。</p>
-<p>homeController.js 主要代码如下：</p>
-<p>define([‘ctlModule’,’jquery’],function(ctl,$){<br>    return ctl.controller(‘homeCtl’,function($scope,serGetTitle,testData){<br>        $scope.title = serGetTitle.title;<br>        $scope.projects = testData.getMessages();<br>    })<br>})<br>控制器homeCtl依赖于ctlModule模块，其实可以理解为app.ctlModule模块下的一个“方法”。</p>
-<p>ctlModule.js 主要代码如下：</p>
-<p>define([‘angular’], function (angular) {<br>    ‘use strict’;<br>    return angular.module(‘app.ctlModule’, []);<br> });<br>声明一个叫作app.ctlModule的模块，app.js里的模块rabbit，依赖于这个模块，并调用这个模块下的所有“方法”</p>
-<p>5、指令，服务，接口</p>
-<p>同控制器的定义方法完全类似。</p>
-<p>五、说明</p>
-<p>php文件夹放了一些php文件，可以用apache建一个站点，模拟与服务器端的数据交互。</p>
-<p>server.js是一个静态文件服务器，mac下进入目录，执行node server，即可创建一个简单的nodejs服务器。</p>
-<p>个人感觉这样设计一个前端架构，虽然会让开发变得繁琐，但功能划分比较明确，提供了一个开发标准，适合于多人协同作业，总体上来说利大于弊。</p>
-<p>源码下载地址：angularJS集成requireJS</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/17/angular-requirejs/" data-id="cjbbxg0s7000aujp3edoirk02" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
-
     </footer>
   </div>
   
@@ -2902,7 +3336,7 @@ hexo d -g
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Categories</h3>
+    <h3 class="widget-title">Catégories</h3>
     <div class="widget">
       <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
     </div>
@@ -2912,7 +3346,7 @@ hexo d -g
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Tags</h3>
+    <h3 class="widget-title">Mot-clés</h3>
     <div class="widget">
       <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
     </div>
@@ -2922,9 +3356,9 @@ hexo d -g
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Tag Cloud</h3>
+    <h3 class="widget-title">Nuage de mot-clés</h3>
     <div class="widget tagcloud">
-      <a href="/tags/angular/" style="font-size: 20px;">angular</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/thread/" style="font-size: 10px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+      <a href="/tags/angular/" style="font-size: 20px;">angular</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/thread/" style="font-size: 15px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
     </div>
   </div>
 
@@ -2941,9 +3375,13 @@ hexo d -g
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
+    <h3 class="widget-title">Articles récents</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2017/12/18/thread-communication/">thread-communication</a>
+          </li>
         
           <li>
             <a href="/2017/12/15/java-thread/">java多线程</a>
@@ -2961,10 +3399,6 @@ hexo d -g
             <a href="/2017/09/14/angular-apply/">理解数据绑定过程 - `$watch`, `$apply`和`$digest`</a>
           </li>
         
-          <li>
-            <a href="/2017/09/14/angular-directive/">angularJS中的指令directive</a>
-          </li>
-        
       </ul>
     </div>
   </div>
@@ -2978,7 +3412,7 @@ hexo d -g
   <div class="outer">
     <div id="footer-info" class="inner">
       &copy; 2017 John Doe<br>
-      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+      Propulsé by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
 </footer>
