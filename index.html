@@ -48,9 +48,9 @@
       </nav>
       <nav id="sub-nav">
         
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="Flux RSS"></a>
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Rechercher"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
@@ -60,6 +60,308 @@
 </header>
       <div class="outer">
         <section id="main">
+  
+    <article id="post-java-stringBuffer" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/12/22/java-stringBuffer/" class="article-date">
+  <time datetime="2017-12-22T06:58:18.000Z" itemprop="datePublished">2017-12-22</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/22/java-stringBuffer/">常用对象API-StringBuffer类</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>StringBuffer就是字符串缓冲区，用于存储数据的容器，初始被容量16个字符。</p>
+<h4 id="1、特点"><a href="#1、特点" class="headerlink" title="1、特点"></a>1、特点</h4><p>(1)、长度是可变的</p>
+<p>(2)、可以存储不同类型的数据</p>
+<p>(3)、最终转成字符串进行使用</p>
+<p>(4)、可以对字符串进行插入修改</p>
+<h4 id="2、方法"><a href="#2、方法" class="headerlink" title="2、方法"></a>2、方法</h4><p>(1)、添加 返回StringBuffer类型的对象</p>
+<pre><code>StringBuffer append(data)
+
+StringBuffer sb = new StringBuffer();
+sb.append(4);
+sb.append(true);
+sb.insert(1, false);
+System.out.println(sb); //4falsetrue输出字符串
+</code></pre><p>(2)、指定位置插入</p>
+<pre><code>insert(index, data) 
+</code></pre><p>(3)、删除 返回StringBuffer类型的对象</p>
+<pre><code>StringBuffer delete(start, end)，包含头，不包含尾
+
+StringBuffer deleteCharAt(int index)，删除指定位置元素
+
+StringBuffer sb = new StringBuffer(&quot;abce&quot;);
+sb.delete(1, 3);
+System.out.println(sb);//ae
+</code></pre><p>(4)、查找</p>
+<pre><code>char charAt(index);
+int indexOf(stirng);
+int lastIndexOf(string);
+</code></pre><p>(5)、修改</p>
+<pre><code>StringBuffer replace(int start, int end, string str)
+
+void setCharAt(index, char);    
+
+sb.replace(1,3,&quot;nba&quot;);//anbae
+
+sb.setCharAt(2, &apos;1&apos;);//abqe    
+</code></pre><h4 id="3、StringBuilder类"><a href="#3、StringBuilder类" class="headerlink" title="3、StringBuilder类"></a>3、StringBuilder类</h4><p>jdk1.5以后出现了功能和StringBuffer一样的对象。就是StringBuilder。</p>
+<p>不同的是：</p>
+<p>StringBuffer是线程同步的，通常用于多线程。</p>
+<p>StringBuilder是线程不同步的，通常用于单线程，提高效率。</p>
+<pre><code>public class StringBuilderTest {
+
+    public static void main(String[] args) {
+        int[] arr = {3,1,5,1,2};
+        String s = arrayToString(arr);
+        System.out.println(s);
+    }
+
+    public static String arrayToString(int[] arr) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(&quot;[&quot;);
+        for(int i= 0; i&lt;arr.length; i++) {
+            if(i!=arr.length - 1)
+                sb.append(arr[i]+&quot;, &quot;);
+            else
+                sb.append(&quot;]&quot;);
+        }
+        return sb.toString();
+    }
+
+    public static String arrayToString2(int[] arr)         {
+        String str = &quot;[&quot;;
+        for(int i=0; i&lt;arr.length; i++) {
+            if(i!=arr.length - 1)
+                str+=arr[i]+&quot;, &quot;;
+            else
+                str+=arr[i]+&quot;]&quot;;
+        }
+        return str;
+    }
+}
+</code></pre><p>字符串拼接的方式会在字符串常量池中生成多个字符串。因此，推荐用缓冲区容器的方式。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/12/22/java-stringBuffer/" data-id="cjbip8o6k0013i6p35bqglwda" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/api/">api</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-api-string" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/12/21/api-string/" class="article-date">
+  <time datetime="2017-12-21T01:39:07.000Z" itemprop="datePublished">2017-12-21</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/21/api-string/">api-string</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="String类"><a href="#String类" class="headerlink" title="String类"></a>String类</h3><h4 id="1、创建对象"><a href="#1、创建对象" class="headerlink" title="1、创建对象"></a>1、创建对象</h4><pre><code>String s = &quot;abc&quot;;//常量池中创建一个对象
+
+String s1 = new String(&quot;abc&quot;);//堆内存中创建两个对象，一个string类型的对象，一个“abc”对象
+
+System.out.println(s == s1);//false，比较地址
+
+System.out.println(s.equals(s1));//true,object中的equals方法比较的是地址，但object类中equals方法比较的是内容。
+</code></pre><h4 id="2、构造函数"><a href="#2、构造函数" class="headerlink" title="2、构造函数"></a>2、构造函数</h4><p>通过数组创建字符串</p>
+<pre><code>byte[] arr = {64, 66, 67, 68};
+String s = new String(arr);
+System.out.println(s);//ABCD
+</code></pre><p>截取数组中的一部分，创建字符串</p>
+<pre><code>char[] arr = {&apos;a&apos;, &apos;b&apos;, &apos;c&apos;, &apos;d&apos;}；
+String s = new String(arr, 1, 3);
+System.out.println(s);//bcd
+</code></pre><h4 id="3、获取"><a href="#3、获取" class="headerlink" title="3、获取"></a>3、获取</h4><p>1、length() 长度</p>
+<p>2、charAt(int index) 根据索引获取字符</p>
+<p>3、根据字符获取索引</p>
+<pre><code>indexOf(int ch) 
+
+indexOf(int ch, int fromIndex)
+
+indexOf(String str)
+
+indexOf(String str, fromIndex)
+
+lastIndexOf(int ch)
+
+lastIndexOf(int ch, int fromIndex)
+
+lastIndexOf(String str)
+
+lastIndexOf(String str, int fromIndex)
+</code></pre><h4 id="4、获取字符串中的一部分字符串"><a href="#4、获取字符串中的一部分字符串" class="headerlink" title="4、获取字符串中的一部分字符串"></a>4、获取字符串中的一部分字符串</h4><pre><code>subString(int beginIndex, int endIndex)//包括开始，不包括结束
+
+subString(int beginIndex)
+</code></pre><h4 id="5、转换"><a href="#5、转换" class="headerlink" title="5、转换"></a>5、转换</h4><p>(1)、String[] split 切割，将字符串转为字符串数组</p>
+<pre><code>split(String regex)//切割，正则，将字符串转为数组
+
+String str = &quot;张三.李四.王五&quot;;
+
+String[] arr = s.split(&quot;\\.&quot;);
+</code></pre><p>(2)、char[] toCharArray 切割，将字符串转为字符数组</p>
+<p>(3)、byte[] getBytes 将字符串变成字节数组</p>
+<p>(4)、字符串中的字母大小写转换</p>
+<pre><code>String toUpperCase(): 大写
+String toLowerCase(): 小写
+</code></pre><p>(5)、将字符串中的内容进行替换</p>
+<pre><code>String replace(char oldch, char newch)
+
+String replace(String s1, String s2)
+</code></pre><p>(6)、去掉字符串两端空格</p>
+<pre><code>String trim()
+</code></pre><p>(7)、将字符串进行连接</p>
+<pre><code>String concat(String);
+</code></pre><p>(8)、将基本数据类型转换为字符串</p>
+<pre><code>String valueOf(int short byte long double float)
+</code></pre><h4 id="6、判断"><a href="#6、判断" class="headerlink" title="6、判断"></a>6、判断</h4><p>(1)、两个字符串内容是否相同</p>
+<pre><code>boolean equals(Object obj)
+
+boolean equalsIgnoreCase(String str);//忽略大小写
+</code></pre><p>(2)、字符串中是否包含指定字符串</p>
+<pre><code>boolean contains(String str)
+</code></pre><p>(3)、字符串是否以指定字符串开头/结尾</p>
+<pre><code>boolean startsWith(String str);
+
+boolean endsWith(String str);
+</code></pre><h4 id="7、比较"><a href="#7、比较" class="headerlink" title="7、比较"></a>7、比较</h4><p>int compareTo(String anotherString)</p>
+<p>比较两个字符串中各个字符的Unicode值。</p>
+<p>此字符串按字典顺序小于字符串参数，返回小于0的值，大于的话，返回一个大于0的值，相等的话，返回0。</p>
+<h4 id="8、练习"><a href="#8、练习" class="headerlink" title="8、练习"></a>8、练习</h4><p>(1)、字符串数组排序</p>
+<pre><code>public static void main(String[] args){
+    String[] arr = {&quot;nba&quot;,&quot;abc&quot;,&quot;hjk&quot;,&quot;efs&quot;,&quot;wyn&quot;,};
+    printArray(arr);
+    sortString(arr);
+    printArray(arr);
+}
+
+public static void printArray(String[] arr){
+    System.out.print(&quot;[&quot;);
+    for(int i=0; i&lt;arr.length; i++){
+        System.out.print(arr[i]+&quot;, &quot;);
+    }
+    System.out.print(&quot;]&quot;);
+}
+
+public static void sortString(String[] arr){
+    for(int i=0; i&lt; arr.length-1; i++){
+        for(int j=i+1; j&lt; arr.length; j++){
+            if(arr[i].compareTo(arr[j])&gt;0)//字符串比较 用compareTo方法
+                swap(arr,i,j);
+        }
+    }
+}
+
+public static void swap(String[] arr, int i, int j){
+    String temp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = temp;    
+}
+</code></pre><p>(2)、一个子串在整串中出现的次数</p>
+<p>方法一：</p>
+<p>通过indexOf获取第一次出现的位置。</p>
+<p>记录出现的位置，通过subString在剩余的字符串中继续查找子串。</p>
+<p>循环查找，直到indexOf返回-1。</p>
+<pre><code>public static int getKeyStringCount(String str, String key){
+    int count = 0;
+    int index = 0;
+    while((index = str.indexOf(key)) &gt; 0){
+        str = str.subString(index+key.length());
+        count++;
+    }
+    return count;
+}
+</code></pre><p>缺点：每次取子串，字符串常量池中都会增加字符串。</p>
+<p>方法二：</p>
+<p>记录每一次出现的位置，下一次查找，通过indexOf(String str, fromindex)方法，从该位置继续往下查找，直到返回-1。</p>
+<pre><code>public static int getKeyStringCount(String str, String key){
+    int count = 0;
+    int index = 0;
+    while((index = str.indexOf(key,index)) &gt; 0){
+        index = index + key.length();
+        count++;
+    }
+    return count;
+}
+</code></pre><p>(3)、两个字符串中最大相同的子串</p>
+<pre><code>public static void main(String[] args){
+    String s1 = &quot;jskkskabcdlslslsl&quot;;
+    String s2 = &quot;xjxabcdjas&quot;;
+    String s = getMaxSubstring(s1, s2);
+    System.out.println(&quot;s=&quot;+s);
+}
+
+public static String getMaxSubstring(String s1, String s2){
+    String max = null, min = null;
+    max = (s1.length()&gt;s2.length())?s1:s2;
+    min = max.equals(s1)?s2:s1;
+    for(int i=0; i&lt;min.length(); i++){
+        for(int a=0, b=s2.length()-i; b!=s2.length()+1, a++, b++){
+            String sub = s2.subString(a, b);
+            if(s1.contains(sub))
+                return sub;
+        }
+    }
+    return null;
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/12/21/api-string/" data-id="cjbip8o53000ai6p39bs5smxi" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/api/">api</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
   
     <article id="post-thread-communication" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
@@ -656,7 +958,7 @@ t2.start();
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/18/thread-communication/" data-id="cjbftbgey000xghp32w298usk" class="article-share-link">Partager</a>
+      <a data-url="http://yoursite.com/2017/12/18/thread-communication/" data-id="cjbip8o63000xi6p39cxy82it" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/thread/">thread</a></li></ul>
@@ -928,7 +1230,7 @@ class DeadLockTest{
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/15/java-thread/" data-id="cjbftbgg1001ighp3o2pksjpj" class="article-share-link">Partager</a>
+      <a data-url="http://yoursite.com/2017/12/15/java-thread/" data-id="cjbip8o5t000pi6p3ubws1v5m" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/thread/">thread</a></li></ul>
@@ -1591,7 +1893,7 @@ class DeadLockTest{
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/css-grid/" data-id="cjbftbgej000lghp3e128ps0x" class="article-share-link">Partager</a>
+      <a data-url="http://yoursite.com/2017/09/14/css-grid/" data-id="cjbip8o6v0018i6p3uwveu9zz" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/css-grid/">css-grid</a></li></ul>
@@ -1830,7 +2132,7 @@ class DeadLockTest{
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/bootstrap-notes/" data-id="cjbftbgdw0006ghp35qkfvm2v" class="article-share-link">Partager</a>
+      <a data-url="http://yoursite.com/2017/09/14/bootstrap-notes/" data-id="cjbip8o71001bi6p3gnx5b6gz" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/bootstrap/">bootstrap</a></li></ul>
@@ -2159,7 +2461,7 @@ app.controller(&apos;MainCtrl&apos;, function($scope) {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/angular-apply/" data-id="cjbftbgdi0001ghp3615qgk99" class="article-share-link">Partager</a>
+      <a data-url="http://yoursite.com/2017/09/14/angular-apply/" data-id="cjbip8o4b0001i6p3dbhhhc5z" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
@@ -2537,7 +2839,7 @@ app.directive(&apos;rabbitHeader&apos;, function() {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/angular-directive/" data-id="cjbftbgec000dghp3zjt6f25g" class="article-share-link">Partager</a>
+      <a data-url="http://yoursite.com/2017/09/14/angular-directive/" data-id="cjbip8o4n0004i6p3nf3homgi" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
@@ -2609,7 +2911,7 @@ app.directive(&apos;rabbitHeader&apos;, function() {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/angular-errors/" data-id="cjbftbgep000sghp3idw1nvob" class="article-share-link">Partager</a>
+      <a data-url="http://yoursite.com/2017/09/14/angular-errors/" data-id="cjbip8o5k000hi6p3ynt6ul6n" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
@@ -2972,352 +3274,11 @@ export default Enhance(MyComponent); // Enhanced component
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/08/17/react-native-es5-es6/" data-id="cjbftbgen000qghp3by31xz9c" class="article-share-link">Partager</a>
+      <a data-url="http://yoursite.com/2017/08/17/react-native-es5-es6/" data-id="cjbip8o5z000ui6p3e5ydkmkz" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/react/">react</a></li></ul>
 
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-github-hexo-blog" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/08/14/github-hexo-blog/" class="article-date">
-  <time datetime="2017-08-14T02:34:20.000Z" itemprop="datePublished">2017-08-14</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/github/">github</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/08/14/github-hexo-blog/">github+hexo博客并备份</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="一、hexo"><a href="#一、hexo" class="headerlink" title="一、hexo"></a>一、hexo</h3><p>1、官方网址：<a href="https://hexo.io/" target="_blank" rel="external">https://hexo.io/</a></p>
-<p>2、常用命令</p>
-<pre><code>npm install hexo -g #安装  
-npm update hexo -g #升级  
-hexo init #初始化
-</code></pre><p>3、简写</p>
-<pre><code>hexo n &quot;我的博客&quot; == hexo new &quot;我的博客&quot; #新建文章
-hexo p == hexo publish #草稿
-hexo g == hexo generate #生成
-hexo s == hexo server #启动服务预览
-hexo d == hexo deploy #部署
-</code></pre><p>4、布署</p>
-<p>修改_config.yml</p>
-<pre><code># Deployment
-## Docs: http://hexo.io/docs/deployment.html
-deploy:
-      type: git
-      repository: git@***.github.com:***/***.github.io.git
-      branch: master
-</code></pre><h3 id="二、Github"><a href="#二、Github" class="headerlink" title="二、Github"></a>二、Github</h3><p>1、摘抄</p>
-<p><a href="http://www.ruanyifeng.com/blog/2015/12/git-cheat-sheet.html" target="_blank" rel="external">常用 Git 命令清单</a></p>
-<p><a href="http://www.ruanyifeng.com/blog/2014/06/git_remote.html" target="_blank" rel="external">Git远程操作详解</a></p>
-<p><img src="http://image.beekka.com/blog/2014/bg2014061202.jpg" alt="MacDown Screenshot"></p>
-<ul>
-<li>Workspace：工作区</li>
-<li>Index / Stage：暂存区</li>
-<li>Repository：仓库区（或本地仓库）</li>
-<li>Remote：远程仓库</li>
-</ul>
-<p>2、常用命令</p>
-<p>a、新建本地仓库</p>
-<pre><code># 在当前目录新建一个Git代码库
-$ git init
-
-# 新建一个目录，将其初始化为Git代码库
-$ git init [project-name]
-
-# 下载一个项目和它的整个代码历史
-$ git clone [url]    
-</code></pre><p>b、增加/删除文件</p>
-<pre><code># 添加指定文件到暂存区
-$ git add [file1] [file2] ...
-
-# 添加指定目录到暂存区，包括子目录
-$ git add [dir]
-
-# 添加当前目录的所有文件到暂存区
-$ git add .
-
-# 删除工作区文件，并且将这次删除放入暂存区
-$ git rm [file1] [file2] ...
-
-# 改名文件，并且将这个改名放入暂存区
-$ git mv [file-original] [file-renamed]
-</code></pre><p>c、代码提交</p>
-<pre><code># 提交暂存区到仓库区
-$ git commit -m [message]
-
-# 提交暂存区的指定文件到仓库区
-$ git commit [file1] [file2] ... -m [message]
-
-# 提交时显示所有diff信息
-$ git commit -v
-</code></pre><p>d、分支</p>
-<pre><code># 列出所有本地分支
-$ git branch
-
-# 列出所有远程分支
-$ git branch -r
-
-# 列出所有本地分支和远程分支
-$ git branch -a
-
-# 新建一个分支，但依然停留在当前分支
-$ git branch [branch-name]
-
-# 新建一个分支，并切换到该分支
-$ git checkout -b [branch]
-
-# 新建一个分支，与指定的远程分支建立追踪关系
-$ git branch --track [branch] [remote-branch]
-
-# 切换到指定分支，并更新工作区
-$ git checkout [branch-name]
-
-# 切换到上一个分支
-$ git checkout -
-
-# 建立追踪关系，在现有分支与指定的远程分支之间
-$ git branch --set-upstream [branch] [remote-branch]
-
-# 合并指定分支到当前分支
-$ git merge [branch]
-
-# 删除分支
-$ git branch -d [branch-name]
-
-# 删除远程分支
-$ git push origin --delete [branch-name]
-$ git branch -dr [remote/branch]    
-</code></pre><p>e、查看信息</p>
-<pre><code># 显示有变更的文件
-$ git status
-
-# 显示当前分支的版本历史
-$ git log
-
-# 显示暂存区和工作区的差异
-$ git diff
-</code></pre><p>f、远程同步</p>
-<pre><code># 下载远程仓库的所有变动
-$ git fetch [remote]
-
-# 显示所有远程仓库
-$ git remote -v
-
-# 显示某个远程仓库的信息
-$ git remote show [remote]
-
-# 上传本地指定分支到远程仓库
-$ git push [remote] [branch]
-
-# 强行推送当前分支到远程仓库，即使有冲突
-$ git push [remote] --force
-
-# 推送所有分支到远程仓库
-$ git push [remote] --all
-</code></pre><p>g、撤销</p>
-<pre><code># 恢复暂存区的指定文件到工作区
-$ git checkout [file]
-
-# 恢复某个commit的指定文件到暂存区和工作区
-$ git checkout [commit] [file]
-
-# 恢复暂存区的所有文件到工作区
-$ git checkout .
-
-# 重置暂存区的指定文件，与上一次commit保持一致，但工作区不变
-$ git reset [file]
-
-# 重置暂存区与工作区，与上一次commit保持一致
-$ git reset --hard
-</code></pre><p>3、Git远程操作详解</p>
-<p>a、git clone</p>
-<pre><code>#从远程主机克隆一个版本库
-$ git clone &lt;版本库的网址&gt;    
-</code></pre><p>b、git remote</p>
-<pre><code>#列出所有的主机
-$ git remote
-origin
-
-#查看远程主机的网址
-$ git remote -v
-origin  git@github.com:jquery/jquery.git (fetch)
-origin  git@github.com:jquery/jquery.git (push)
-
-#克隆版本库的时候，所使用的远程主机自动被Git命名为origin
-$ git remote show &lt;主机名&gt;
-
-#git remote add命令用于添加远程主机。
-$ git remote add &lt;主机名&gt; &lt;网址&gt;
-
-#git remote rm命令用于删除远程主机
-$ git remote rm &lt;主机名&gt;
-
-#git remote rename命令用于远程主机的改名。
-$ git remote rename &lt;原主机名&gt; &lt;新主机名&gt;
-</code></pre><p>c、git fetch</p>
-<p>git fetch 取回到本地的是远程主机版本库的更新</p>
-<p>git fetch命令通常用来查看其他人的进程，因为它取回的代码对你本地的开发代码没有影响。</p>
-<p>默认情况下，git fetch取回所有分支（branch）的更新。如果只想取回特定分支的更新，可以指定分支名。</p>
-<pre><code>$ git fetch &lt;远程主机名&gt; &lt;分支名&gt;
-</code></pre><p>比如，取回origin主机的master分支。</p>
-<pre><code>$ git fetch origin master
-</code></pre><p>d、git pull</p>
-<p>git pull命令的作用是，取回远程主机某个分支的更新，再与本地的指定分支合并。它的完整格式稍稍有点复杂。</p>
-<pre><code>$ git pull &lt;远程主机名&gt; &lt;远程分支名&gt;:&lt;本地分支名&gt;
-</code></pre><p>比如，取回origin主机的next分支，与本地的master分支合并，需要写成下面这样</p>
-<pre><code>$ git pull origin next:master
-</code></pre><p>如果远程分支是与当前分支合并，则冒号后面的部分可以省略。</p>
-<pre><code>$ git pull origin next
-</code></pre><p>上面命令表示，取回origin/next分支，再与当前分支合并。实质上，这等同于先做git fetch，再做git merge。</p>
-<p>$ git fetch origin<br>$ git merge origin/next</p>
-<p>在某些场合，Git会自动在本地分支与远程分支之间，建立一种追踪关系（tracking）。比如，在git clone的时候，所有本地分支默认与远程主机的同名分支，建立追踪关系，也就是说，本地的master分支自动”追踪”origin/master分支。</p>
-<p>Git也允许手动建立追踪关系。</p>
-<pre><code>git branch --set-upstream master origin/next
-</code></pre><p>上面命令指定master分支追踪origin/next分支。</p>
-<p>e、git push</p>
-<p>git push命令用于将本地分支的更新，推送到远程主机。它的格式与git pull命令相仿。</p>
-<pre><code>$ git push &lt;远程主机名&gt; &lt;本地分支名&gt;:&lt;远程分支名&gt;
-</code></pre><p>如果省略远程分支名，则表示将本地分支推送与之存在”追踪关系”的远程分支（通常两者同名），如果该远程分支不存在，则会被新建。</p>
-<pre><code>$ git push origin master
-</code></pre><p>上面命令表示，将本地的master分支推送到origin主机的master分支。如果后者不存在，则会被新建。</p>
-<p>如果省略本地分支名，则表示删除指定的远程分支，因为这等同于推送一个空的本地分支到远程分支。</p>
-<pre><code>$ git push origin :master
-# 等同于
-$ git push origin --delete master
-</code></pre><p>上面命令表示删除origin主机的master分支。</p>
-<p>三、hexo多个终端同步</p>
-<p>1、在其中一个终端操作，push本地文件夹Hexo中的必要文件到yourname.github.io的hexo分支上</p>
-<pre><code>//初始化本地仓库
-git init  
-
-//将本地与Github项目对接
-git remote add origin git@github.com:yourname/yourname.github.io.git
-
-//将必要的文件依次添加，有些文件夹如npm install产生的node_modules由于路径过长不好处理，所以这里没有用`git add .`命令了，而是依次添加必要文件，如下图所示
-git add source scaffolds themes .npmignore _config.yml package.json
-git commit -m &quot;Blog Source Hexo&quot;
-
-//新建hexo分支
-git branch hexo 
-
-//切换到hexo分支上
-git checkout hexo   
-
-//push到Github项目的hexo分支上
-git push origin hexo   
-</code></pre><p>2、在另一终端完成clone和push更新</p>
-<pre><code>//将Github中hexo分支clone到本地
-git clone -b hexo git@github.com:yourname/yourname.github.io.git  
-
-//切换到刚刚clone的文件夹内
-cd  yourname.github.io
-
-//注意，这里一定要切换到刚刚clone的文件夹内执行，安装必要的所需组件，不用再init  
-npm install    
-
-//新建一个.md文件，并编辑完成自己的博客内容
-hexo new post &quot;new blog name&quot;   
-
-//经测试每次只要更新source中的文件到Github中即可，因为只是新建了一篇新博客
-git add source 
-
-git commit -m &quot;XX&quot;
-
-//更新分支
-git push origin hexo  
-
-//push更新完分支之后将自己写的博客对接到自己搭的博客网站上，同时同步了Github中的master
-hexo d -g
-</code></pre><p>3、不同终端更新博客</p>
-<pre><code>//先pull完成本地与远端的融合
-git pull origin hexo  
-
-hexo new post &quot; new blog name&quot;
-
-git add source
-
-git commit -m &quot;XX&quot;
-
-git push origin hexo
-
-hexo d -g
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/08/14/github-hexo-blog/" data-id="cjbftbgfw001hghp3g1l83vll" class="article-share-link">Partager</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/github/">github</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/08/14/hello-world/" class="article-date">
-  <time datetime="2017-08-14T02:32:17.000Z" itemprop="datePublished">2017-08-14</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/08/14/hello-world/">Hello World</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/08/14/hello-world/" data-id="cjbftbgeg000ighp3bxdhojfs" class="article-share-link">Partager</a>
-      
-      
     </footer>
   </div>
   
@@ -3336,7 +3297,7 @@ hexo d -g
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Catégories</h3>
+    <h3 class="widget-title">Categories</h3>
     <div class="widget">
       <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
     </div>
@@ -3346,9 +3307,9 @@ hexo d -g
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Mot-clés</h3>
+    <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
     </div>
   </div>
 
@@ -3356,9 +3317,9 @@ hexo d -g
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Nuage de mot-clés</h3>
+    <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/angular/" style="font-size: 20px;">angular</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/thread/" style="font-size: 15px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+      <a href="/tags/angular/" style="font-size: 20px;">angular</a> <a href="/tags/api/" style="font-size: 15px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/thread/" style="font-size: 15px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
     </div>
   </div>
 
@@ -3375,9 +3336,17 @@ hexo d -g
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Articles récents</h3>
+    <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2017/12/22/java-stringBuffer/">常用对象API-StringBuffer类</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/21/api-string/">api-string</a>
+          </li>
         
           <li>
             <a href="/2017/12/18/thread-communication/">thread-communication</a>
@@ -3389,14 +3358,6 @@ hexo d -g
         
           <li>
             <a href="/2017/09/14/css-grid/">网格布局</a>
-          </li>
-        
-          <li>
-            <a href="/2017/09/14/bootstrap-notes/">bootstrap笔记</a>
-          </li>
-        
-          <li>
-            <a href="/2017/09/14/angular-apply/">理解数据绑定过程 - `$watch`, `$apply`和`$digest`</a>
           </li>
         
       </ul>
@@ -3412,7 +3373,7 @@ hexo d -g
   <div class="outer">
     <div id="footer-info" class="inner">
       &copy; 2017 John Doe<br>
-      Propulsé by <a href="http://hexo.io/" target="_blank">Hexo</a>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
 </footer>
