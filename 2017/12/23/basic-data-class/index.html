@@ -3,19 +3,19 @@
 <head>
   <meta charset="utf-8">
   
-  <title>常用对象API-StringBuffer类 | Hexo</title>
+  <title>基本数据类型包装类 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="java api StringBuffer类">
-<meta name="keywords" content="java, api, stringBuffer">
+  <meta name="description" content="基本数据类型包装类">
+<meta name="keywords" content="java, api">
 <meta property="og:type" content="article">
-<meta property="og:title" content="常用对象API-StringBuffer类">
-<meta property="og:url" content="http://yoursite.com/2017/12/22/java-stringBuffer/index.html">
+<meta property="og:title" content="基本数据类型包装类">
+<meta property="og:url" content="http://yoursite.com/2017/12/23/basic-data-class/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="java api StringBuffer类">
-<meta property="og:updated_time" content="2017-12-23T01:58:41.899Z">
+<meta property="og:description" content="基本数据类型包装类">
+<meta property="og:updated_time" content="2017-12-24T02:09:53.553Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="常用对象API-StringBuffer类">
-<meta name="twitter:description" content="java api StringBuffer类">
+<meta name="twitter:title" content="基本数据类型包装类">
+<meta name="twitter:description" content="基本数据类型包装类">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -64,10 +64,10 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-java-stringBuffer" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-basic-data-class" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2017/12/22/java-stringBuffer/" class="article-date">
-  <time datetime="2017-12-22T06:58:18.000Z" itemprop="datePublished">2017-12-22</time>
+    <a href="/2017/12/23/basic-data-class/" class="article-date">
+  <time datetime="2017-12-23T03:28:25.000Z" itemprop="datePublished">2017-12-23</time>
 </a>
     
   <div class="article-category">
@@ -82,7 +82,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      常用对象API-StringBuffer类
+      基本数据类型包装类
     </h1>
   
 
@@ -90,82 +90,154 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>StringBuffer就是字符串缓冲区，用于存储数据的容器，初始被容量16个字符。</p>
-<h4 id="1、特点"><a href="#1、特点" class="headerlink" title="1、特点"></a>1、特点</h4><p>(1)、长度是可变的</p>
-<p>(2)、可以存储不同类型的数据</p>
-<p>(3)、最终转成字符串进行使用</p>
-<p>(4)、可以对字符串进行插入修改</p>
-<h4 id="2、方法"><a href="#2、方法" class="headerlink" title="2、方法"></a>2、方法</h4><p>(1)、添加 返回StringBuffer类型的对象</p>
-<pre><code>StringBuffer append(data)
+        <h4 id="1、为了方便操作基本数据类型值，将其封装成了对象，在对象中定义属性和行为，丰富了该数据的操作。"><a href="#1、为了方便操作基本数据类型值，将其封装成了对象，在对象中定义属性和行为，丰富了该数据的操作。" class="headerlink" title="1、为了方便操作基本数据类型值，将其封装成了对象，在对象中定义属性和行为，丰富了该数据的操作。"></a>1、为了方便操作基本数据类型值，将其封装成了对象，在对象中定义属性和行为，丰富了该数据的操作。</h4><table>
+<thead>
+<tr>
+<th>数据类型</th>
+<th>包装类</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>byte</td>
+<td>Byte</td>
+</tr>
+<tr>
+<td>short</td>
+<td>Short</td>
+</tr>
+<tr>
+<td>int</td>
+<td>Integer</td>
+</tr>
+<tr>
+<td>long</td>
+<td>Long</td>
+</tr>
+<tr>
+<td>flot</td>
+<td>Float</td>
+</tr>
+<tr>
+<td>double</td>
+<td>Double</td>
+</tr>
+<tr>
+<td>char</td>
+<td>Character</td>
+</tr>
+<tr>
+<td>boolean</td>
+<td>Boolean</td>
+</tr>
+</tbody>
+</table>
+<h4 id="2、基本数据类型和字符串之间的转换"><a href="#2、基本数据类型和字符串之间的转换" class="headerlink" title="2、基本数据类型和字符串之间的转换"></a>2、基本数据类型和字符串之间的转换</h4><p>基本类型–&gt;字符串</p>
+<p>(1)、基本类型数值+””</p>
+<p>(2)、用String类中的静态方法valueOf(基本类型数值)</p>
+<p>字符串–&gt;基本类型</p>
+<p>(1)、静态方法 parseInt, parseLong, parseBoolean。。。。</p>
+<p>8种基本数据类型中，只有Character没有parse的用法。</p>
+<p>(2)、如果字符串被Integer进行了对象的封装。可以使用别一个非静态方法intValue()将一个Integer对象转成基本数据类型值。</p>
+<pre><code>Integer i = new Integer(&quot;123&quot;);
+System.out.println(i.intValue());
+</code></pre><h4 id="3、进制转换"><a href="#3、进制转换" class="headerlink" title="3、进制转换"></a>3、进制转换</h4><p>十进制–&gt;其它进制</p>
+<pre><code>//转二进制
+System.out.println(Integer.toBinaryString(60));
+System.out.println(Integer.toString(60,2));
 
-StringBuffer sb = new StringBuffer();
-sb.append(4);
-sb.append(true);
-sb.insert(1, false);
-System.out.println(sb); //4falsetrue输出字符串
-</code></pre><p>(2)、指定位置插入</p>
-<pre><code>insert(index, data) 
-</code></pre><p>(3)、删除 返回StringBuffer类型的对象</p>
-<pre><code>StringBuffer delete(start, end)，包含头，不包含尾
+//转八进制
+System.out.println(Integer.toOctalString(60));
+System.out.println(Integer.toString(60,8));
 
-StringBuffer deleteCharAt(int index)，删除指定位置元素
+//转十六进制
+System.out.println(Integer.toHexString(60));
+System.out.println(Integer.toString(60,16));
+</code></pre><p>其它进制–&gt;十进制 parseInt(“string”, radix)</p>
+<pre><code>//二进制转十进制
+System.out.println(Integer.parseInt(&quot;110&quot;,2));
 
-StringBuffer sb = new StringBuffer(&quot;abce&quot;);
-sb.delete(1, 3);
-System.out.println(sb);//ae
-</code></pre><p>(4)、查找</p>
-<pre><code>char charAt(index);
-int indexOf(stirng);
-int lastIndexOf(string);
-</code></pre><p>(5)、修改</p>
-<pre><code>StringBuffer replace(int start, int end, string str)
+//八进制转十进制
+System.out.println(Integer.parseInt(&quot;74&quot;,8));
 
-void setCharAt(index, char);    
+//十六进制转十进制
+System.out.println(Integer.parseInt(&quot;3c&quot;,16));
+</code></pre><h4 id="4、自动装箱拆箱"><a href="#4、自动装箱拆箱" class="headerlink" title="4、自动装箱拆箱"></a>4、自动装箱拆箱</h4><pre><code>Integer i = new Integer(4);
+jdk1.4以后简写为Integer i = 4; //自动装箱
 
-sb.replace(1,3,&quot;nba&quot;);//anbae
+i = i + 6;
+是i = new Integer(i.intValue()+6)的简写，自动拆箱。
+</code></pre><h4 id="5、小结"><a href="#5、小结" class="headerlink" title="5、小结"></a>5、小结</h4><p>Integer a = new Integer(127);<br>Integer b = new Integer(127);</p>
+<p>System.out.println(a==b);//fasle,对象比较地址<br>System.out.println(a.equals(b));//true，比较内容</p>
+<p>Integer x = 129;<br>Integer y = 129;</p>
+<p>System.out.println(x==y);//fasle<br>System.out.println(x.equals(y));//true</p>
+<p>Integer x = 127;<br>Integer y = 127;</p>
+<p>System.out.println(x==y);//true<br>System.out.println(x.equals(y));//true</p>
+<p>x,y都为127时，x==y为true，都为129时，x==y为false</p>
+<p>是因为jdk1.5以后，自动装箱时，如果装箱的在一个字节空间内（-128~127）,那么该数据会被共享，不会重新开辟空间，因此都为127时，比较x==y时，实际上是一个地址。</p>
+<h4 id="6、练习"><a href="#6、练习" class="headerlink" title="6、练习"></a>6、练习</h4><p>对字符串中的数值排序</p>
+<pre><code>import java.util.Arrays;
 
-sb.setCharAt(2, &apos;1&apos;);//abqe    
-</code></pre><h4 id="3、StringBuilder类"><a href="#3、StringBuilder类" class="headerlink" title="3、StringBuilder类"></a>3、StringBuilder类</h4><p>jdk1.5以后出现了功能和StringBuffer一样的对象。就是StringBuilder。</p>
-<p>不同的是：</p>
-<p>StringBuffer是线程同步的，通常用于多线程。</p>
-<p>StringBuilder是线程不同步的，通常用于单线程，提高效率。</p>
-<pre><code>public class StringBuilderTest {
+public class WrapperTest {
+    private static final String SPACE_SEPARATOR = &quot; &quot;;
 
     public static void main(String[] args) {
-        int[] arr = {3,1,5,1,2};
-        String s = arrayToString(arr);
-        System.out.println(s);
+        String numStr = &quot;20 83 32     11 -7 50&quot;;
+        System.out.println(numStr);
+        numStr = sortStringNumber(numStr);
+        System.out.println(numStr);
     }
 
-    public static String arrayToString(int[] arr) {
+    private static String sortStringNumber(String numStr) {
+        //字符串变成字符串数组
+        String[] str_arr = stringToArray(numStr);
+
+        //字符串数组变成int数组
+        int[] num_arr = toIntArray(str_arr);
+
+        //int数组排序
+        mySortArray(num_arr);
+
+        //排序后的int数组变成字符串
+        String temp = arrayToString(num_arr);
+
+        return temp;
+    }
+
+    private static String arrayToString(int[] num_arr) {
         StringBuilder sb = new StringBuilder();
-        sb.append(&quot;[&quot;);
-        for(int i= 0; i&lt;arr.length; i++) {
-            if(i!=arr.length - 1)
-                sb.append(arr[i]+&quot;, &quot;);
+        for(int i=0; i&lt;num_arr.length; i++) {
+            if(i!=num_arr.length-1)
+                sb.append(num_arr[i]+SPACE_SEPARATOR);
             else
-                sb.append(&quot;]&quot;);
+                sb.append(num_arr[i]);
         }
         return sb.toString();
     }
 
-    public static String arrayToString2(int[] arr)         {
-        String str = &quot;[&quot;;
-        for(int i=0; i&lt;arr.length; i++) {
-            if(i!=arr.length - 1)
-                str+=arr[i]+&quot;, &quot;;
-            else
-                str+=arr[i]+&quot;]&quot;;
-        }
-        return str;
+    private static void mySortArray(int[] num_arr) {
+        Arrays.sort(num_arr);
     }
-}
-</code></pre><p>字符串拼接的方式会在字符串常量池中生成多个字符串。因此，推荐用缓冲区容器的方式。</p>
 
+    private static int[] toIntArray(String[] str_arr) {
+        int[] arr = new int[str_arr.length];
+        for(int i=0; i&lt;arr.length; i++) {
+            arr[i] = Integer.parseInt(str_arr[i]);
+        }
+        return arr;
+    }
+
+    public static String[] stringToArray(String numStr) {
+        String[] str_arr = numStr.split(SPACE_SEPARATOR+&quot;+&quot;);
+        return str_arr;
+    }
+
+}
+</code></pre>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/22/java-stringBuffer/" data-id="cjc0aj3w7000wzsp3hln83xri" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/12/23/basic-data-class/" data-id="cjc0aj3vp000izsp3eb05bb5e" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/api/">api</a></li></ul>
@@ -176,19 +248,19 @@ sb.setCharAt(2, &apos;1&apos;);//abqe
     
 <nav id="article-nav">
   
-    <a href="/2017/12/23/basic-data-class/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2017/12/27/java-collection-framework/" id="article-nav-newer" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Newer</strong>
       <div class="article-nav-title">
         
-          基本数据类型包装类
+          集合框架
         
       </div>
     </a>
   
   
-    <a href="/2017/12/21/api-string/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/2017/12/22/java-stringBuffer/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">api-string</div>
+      <div class="article-nav-title">常用对象API-StringBuffer类</div>
     </a>
   
 </nav>

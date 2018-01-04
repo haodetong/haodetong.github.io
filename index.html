@@ -61,6 +61,816 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-java-collection-framework" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/12/27/java-collection-framework/" class="article-date">
+  <time datetime="2017-12-27T03:35:39.000Z" itemprop="datePublished">2017-12-27</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/27/java-collection-framework/">集合框架</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="集合框架的构成和分类"><a href="#集合框架的构成和分类" class="headerlink" title="集合框架的构成和分类"></a>集合框架的构成和分类</h3><p>java中集合类的关系图</p>
+<p><a href="http://blog.csdn.net/real_neu/article/details/52821491" target="_blank" rel="external">http://blog.csdn.net/real_neu/article/details/52821491</a></p>
+<h3 id="一、概述"><a href="#一、概述" class="headerlink" title="一、概述"></a>一、概述</h3><h4 id="1、特点-："><a href="#1、特点-：" class="headerlink" title="1、特点 ："></a>1、特点 ：</h4><ul>
+<li><p>用于存储对象的容器。</p>
+</li>
+<li><p>集合的长度可变。</p>
+</li>
+<li><p>集合中不能存储基本数据类型值。</p>
+</li>
+</ul>
+<h4 id="2、体系-amp-共性功能"><a href="#2、体系-amp-共性功能" class="headerlink" title="2、体系&amp;共性功能"></a>2、体系&amp;共性功能</h4><p>框架的顶层Collection接口：</p>
+<p>1、添加 </p>
+<pre><code>boolean add(Object obj)
+
+boolean addAll(Collection coll);
+</code></pre><p>2、删除</p>
+<pre><code>boolean remove(Object)
+boolean removeAll(Collection coll)
+void clear()
+</code></pre><p>3、判断</p>
+<pre><code>boolean contains(Object obj)
+boolean containsAll(Collection coll)
+boolean isEmpty();
+</code></pre><p>4、获取</p>
+<pre><code>int size();
+Iterator iterator(): 取出元素的方式：迭代器
+</code></pre><p>5、其它</p>
+<pre><code>boolean retainAll(Collection coll): 取交集
+Object toArray(): 将集合转为数组
+</code></pre><h4 id="3、方法演示"><a href="#3、方法演示" class="headerlink" title="3、方法演示"></a>3、方法演示</h4><pre><code>import java.util.ArrayList;
+import java.util.Collection;
+
+public class CollectionDemo {
+
+    public static void main(String[] args) {
+        Collection coll = new ArrayList();
+        //show(coll);
+
+        Collection c1 = new ArrayList();
+        Collection c2 = new ArrayList();
+        show(c1,c2);
+    }
+
+    public static void show(Collection c1, Collection c2) {
+        //给c1添加元素
+        c1.add(&quot;abc1&quot;);
+        c1.add(&quot;abc2&quot;);
+        c1.add(&quot;abc3&quot;);
+        c1.add(&quot;abc4&quot;);
+
+        //给c2添加元素
+        c2.add(&quot;abc2&quot;);
+        c2.add(&quot;abc6&quot;);
+        c2.add(&quot;abc7&quot;);
+
+        System.out.println(&quot;c1:&quot;+c1);
+        System.out.println(&quot;c2:&quot;+c2);
+
+        //演示addAll
+        c1.addAll(c2);
+        System.out.println(&quot;c1:&quot;+c1);
+
+        //演示removeAll，将两个集合中的相同元素从调用removeAll的集合中删除
+        //boolean b = c1.removeAll(c2);
+        //System.out.println(&quot;removeAll:&quot;+b);
+        //System.out.println(&quot;c1:&quot;+c1);
+
+        //演示containsAll
+        boolean c = c1.contains(c2);
+        System.out.println(&quot;containsAll:&quot;+c);
+
+        //演示retainAll
+        System.out.println(&quot;c1:&quot;+c1);
+        System.out.println(&quot;c2:&quot;+c2);
+        boolean d = c1.retainAll(c2);
+        System.out.println(d);
+        System.out.println(&quot;c1:&quot;+c1);
+    }
+
+    public static void show(Collection coll) {
+        //添加
+        coll.add(&quot;abc1&quot;);
+        coll.add(&quot;abc2&quot;);
+        coll.add(&quot;abc3&quot;);
+        System.out.println(coll);
+
+        //删除，会改变集合的长度
+        coll.remove(&quot;abc2&quot;);
+        System.out.println(coll);
+
+        //清空
+        coll.clear();
+        System.out.println(coll);
+
+        //判断
+        System.out.println(coll.contains(&quot;abc3&quot;));
+    }
+
+}
+</code></pre><h4 id="4、迭代器"><a href="#4、迭代器" class="headerlink" title="4、迭代器"></a>4、迭代器</h4><p>使用方法</p>
+<pre><code>import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+
+public class IteratorDemo {
+
+    public static void main(String[] args) {
+        Collection coll = new ArrayList();
+        coll.add(&quot;abc1&quot;);
+        coll.add(&quot;abc2&quot;);
+        coll.add(&quot;abc3&quot;);
+        coll.add(&quot;abc4&quot;);
+        System.out.println(coll);
+        //调用集合中的迭代器方法，是为了获取集合中的迭代器对象
+//        Iterator it = coll.iterator();
+//        while(it.hasNext()) {
+//            System.out.println(it.next());
+//        }
+
+        for(Iterator it = coll.iterator(); it.hasNext(); ) {
+            System.out.println(it.next());
+        }
+
+    }
+
+}
+</code></pre><p>原理</p>
+<pre><code>Iterator iterator(): 取出元素的方式：迭代器
+
+该对象必须依赖于具体容器，因为每一个容器的数据结构都不同。
+
+所以该迭代器对象是在容器内部实现的。
+
+对于使用容器者而言，具体的实现方式不重要，只要通过容器获取到实现的迭代器的对象即可，也就是iterator方法。
+
+Iterator接口就是对所有的Collection容器进行元素取出的公共接口。
+</code></pre><h4 id="5、List和Set的特点"><a href="#5、List和Set的特点" class="headerlink" title="5、List和Set的特点"></a>5、List和Set的特点</h4><pre><code>Collection
+
+|--    List：有序（存入和取出的顺序一致），元素都有索引，元素可以重复。
+
+|-- Set：元素不能重复。
+</code></pre><p>List：特有的常见方法</p>
+<p>1、添加</p>
+<pre><code>void add(index,element)
+void add(index,collection)
+</code></pre><p>2、删除</p>
+<pre><code>Object remove(index)
+</code></pre><p>3、修改</p>
+<pre><code>Object set(index,element)
+</code></pre><p>4、获取</p>
+<pre><code>Object get(index)
+int indexOf(Object)
+int lastIndexOf(object)
+List subList(fromIndex,toIndex)
+</code></pre><p>list集合是可以完成对元素的增删改查的。</p>
+<p>方法演示</p>
+<pre><code>public class listDemo2 {
+
+    public static void main(String[] args) {
+        List list = new ArrayList();
+        show(list);
+    }
+
+    private static void show(List list) {
+        list.add(&quot;abc1&quot;);
+        list.add(&quot;abc2&quot;);
+        list.add(&quot;abc3&quot;);
+        list.add(&quot;abc4&quot;);
+
+        Iterator it = list.iterator();
+        while(it.hasNext()) {
+            System.out.println(&quot;next:&quot;+it.next());
+        }
+
+        //list特有的取出元素的方式，set只能通过迭代器方式取出元素
+        for(int x=0; x&lt;list.size(); x++) {
+            System.out.println(&quot;get:&quot;+list.get(x));
+        }
+    }
+
+}
+</code></pre><p>演示2</p>
+<pre><code>public class listDemo3 {
+
+    public static void main(String[] args) {
+        List list = new ArrayList();
+        list.add(&quot;abc1&quot;);
+        list.add(&quot;abc2&quot;);
+        list.add(&quot;abc3&quot;);
+
+        Iterator it = list.iterator();
+        while(it.hasNext()) {
+            Object obj = it.next();
+            if(obj.equals(&quot;abc2&quot;)) {
+                list.add(&quot;abc9&quot;);
+            }else {                
+                System.out.println(&quot;next:&quot;+obj);
+            }            
+        }
+
+        System.out.println(it.next());
+    }
+
+}
+
+执行时，抛出并发修改的异常。
+Exception in thread &quot;main&quot;         
+java.util.ConcurrentModificationException
+
+原因：
+Iterator it = list.iterator();迭代器检查list集合长度为3。
+当list.add(&quot;abc9&quot;)，修改了集合长度时，迭代器不知道。
+
+解决方案：使用Iterator接口的子接口listIterator来完成在迭代中对元素进修改。
+
+public class listDemo3 {
+
+    public static void main(String[] args) {
+        List list = new ArrayList();
+        list.add(&quot;abc1&quot;);
+        list.add(&quot;abc2&quot;);
+        list.add(&quot;abc3&quot;);
+
+        //获取列表迭代器对象，它可以实现在迭代过程中对元素的增删改查，注意只有list集合具备该迭代功能
+        ListIterator it = list.listIterator();
+
+        while(it.hasNext()) {
+            Object obj = it.next();
+            if(obj.equals(&quot;abc2&quot;)) {
+                //it.add(&quot;abc9&quot;);
+                it.set(&quot;abc9&quot;);
+            }
+        }
+
+        System.out.println(list);
+
+        while(it.hasPrevious()) {
+            System.out.println(&quot;previous:&quot;+it.previous());
+        }
+
+    }
+
+}
+</code></pre><h4 id="6、List常用子类的特点"><a href="#6、List常用子类的特点" class="headerlink" title="6、List常用子类的特点"></a>6、List常用子类的特点</h4><p>List:</p>
+<p>|– Vector：内部是数组数据结构，是同步的。增删，查询都很慢。</p>
+<p>|– ArrayList：内部是数组数据结构，是不同步的。替代了Vector。查询的速度快。</p>
+<p>|– LinkedList：内部是链表数据结构，是不同步的。增删元素的速度很快。</p>
+<p>– addFirst()</p>
+<p>– addLast()</p>
+<p>– getFirst() 获取但不移除，如果链表为空，抛出NoSuchElement异常</p>
+<p>– getLast()</p>
+<p>– removeFirst() 获取并移除，如果链表为空，抛出NoSuchElement异常</p>
+<p>– removeLast()</p>
+<p>jdk1.6</p>
+<p>– offerFirst()</p>
+<p>– offerLast()</p>
+<p>– peekFirst() 获取但不移除，如果链表为空，返回null</p>
+<p>– peekLast()</p>
+<p>– pollFirst() 获取并移除，如果链接为空，返回null</p>
+<p>– pollLast()</p>
+<pre><code>/**
+ * 请使用LinkedList来模拟一个堆栈或者队列数据结构
+ * 堆栈：先进后出
+ * 队列：先进先出
+ */
+public class linkedListDemo {
+    public static void main(String[] args) {
+
+        DuiLie dl = new DuiLie();
+        dl.myAdd(&quot;abc1&quot;);
+        dl.myAdd(&quot;abc2&quot;);
+        dl.myAdd(&quot;abc3&quot;);
+        dl.myAdd(&quot;abc4&quot;);
+
+        while(!dl.isNull()) {
+            System.out.println(dl.myGet());
+        }
+    }
+}
+
+class DuiLie{
+    private LinkedList link;
+
+    public DuiLie() {
+        link = new LinkedList();
+    }
+
+    public void myAdd(Object obj) {
+        link.addLast(obj);
+    }
+
+    public Object myGet() {
+        return link.removeFirst();
+    }
+
+    public boolean isNull() {
+        return link.isEmpty();
+    }
+}
+</code></pre><h4 id="7、ArrayList集合存储自定义对象"><a href="#7、ArrayList集合存储自定义对象" class="headerlink" title="7、ArrayList集合存储自定义对象"></a>7、ArrayList集合存储自定义对象</h4><pre><code>public class arrayListTest {
+
+    public static void main(String[] args) {
+
+        ArrayList al = new ArrayList();
+        al.add(new Person(&quot;lisi1&quot;,21));
+        al.add(new Person(&quot;lisi2&quot;,22));
+        al.add(new Person(&quot;lisi3&quot;,23));
+        al.add(new Person(&quot;lisi4&quot;,24));
+
+        Iterator it = al.iterator();
+        while(it.hasNext()) {
+            //System.out.println(((Person) it.next()).getName());
+            Person p = (Person) it.next();
+            System.out.println(p.getName()+&quot;--&quot;+p.getAge());
+        }
+
+    }
+
+}
+
+class Person{
+    private String name;
+    private int age;
+
+    public Person() {
+        super();
+    }
+
+    public Person(String name, int age) {
+        super();
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+}    
+</code></pre><h3 id="集合框架-HashSet集合"><a href="#集合框架-HashSet集合" class="headerlink" title="集合框架-HashSet集合"></a>集合框架-HashSet集合</h3><p>Set：元素不可以重复，是无序的。</p>
+<p>Set接口中的方法和Collection一致。</p>
+<p>|– HashSet：内部数据结构是Hash表，是不同步的。</p>
+<p>|– TreeSet：</p>
+<pre><code>public static void main(String[] args) {
+        HashSet hs = new HashSet();
+
+        hs.add(&quot;aaa&quot;);
+        hs.add(&quot;bbb&quot;);
+        hs.add(&quot;ccc&quot;);
+        hs.add(&quot;ddd&quot;);
+
+        Iterator it = hs.iterator();
+
+        while(it.hasNext()) {
+            System.out.println(it.next());
+        }
+
+    }
+</code></pre><p>集合框架 - 哈希表</p>
+<p>HashSet集合数据结构是哈希表，所以存储元素的时候，首先使用元素的hashCode方法来确定位置，如果位置相同，在通过元素的equals方法来确定内容是否相同。    </p>
+<pre><code>class Person{
+
+    ...
+
+    public int hashCode() {
+        //System.out.println(this);
+        return name.hashCode()+age*27;
+    }
+
+    public boolean equals(Object obj) {
+    if(this == obj)
+            return true;
+
+    if(!(obj instanceof Person))
+        throw new ClassCastException(&quot;类型不对&quot;);
+
+    Person p = (Person)obj;
+
+    System.out.println(this.name+&quot;...&quot;+this.age+&quot;...equals...&quot;+p.name+&quot;...&quot;+p.age);
+
+    return this.name.equals(p.name) &amp;&amp; this.age == p.age;
+}
+
+    ...
+
+}    
+
+public class hashSetDemo2 {
+
+    public static void main(String[] args) {
+
+        HashSet hs = new HashSet();
+
+        hs.add(new Person(&quot;lisi1&quot;,21));
+        hs.add(new Person(&quot;lisi2&quot;,22));
+        hs.add(new Person(&quot;lisi3&quot;,23));
+        hs.add(new Person(&quot;lisi4&quot;,24));
+        hs.add(new Person(&quot;lisi4&quot;,24));
+
+        Iterator it = hs.iterator();
+
+        while(it.hasNext()) {
+            Person p = (Person)it.next();
+            System.out.println(p.getName()+&quot;...&quot;+p.getAge());
+        }
+
+    }
+
+}
+</code></pre><h4 id="8、删除ArrayList集合中的重复元素"><a href="#8、删除ArrayList集合中的重复元素" class="headerlink" title="8、删除ArrayList集合中的重复元素"></a>8、删除ArrayList集合中的重复元素</h4><pre><code>public class arrayListPractice {
+
+    public static void main(String[] args) {
+        ArrayList al = new ArrayList();
+        al.add(&quot;abc1&quot;);
+        al.add(&quot;abc2&quot;);
+        al.add(&quot;abc3&quot;);
+        al.add(&quot;abc4&quot;);
+        al.add(&quot;abc1&quot;);
+        al.add(&quot;abc3&quot;);
+
+        System.out.println(al);
+
+        al = getSingleElement(al);
+
+        System.out.println(al);
+    }
+
+    private static ArrayList getSingleElement(ArrayList al) {
+        //1、定义临时容器
+        ArrayList temp = new ArrayList();
+        //2、迭代al集合
+        Iterator it = al.iterator();
+        while(it.hasNext()) {
+            Object obj = it.next();
+            //3、判断是否重复
+            if(!(temp.contains(obj))) {
+                temp.add(obj);
+            }
+        }
+        return temp;
+    }
+
+}
+
+输出结果：
+[abc1, abc2, abc3, abc4, abc1, abc3]
+[abc1, abc2, abc3, abc4]
+
+换成自定义对象测试：
+
+    public static void main(String[] args) {
+        ArrayList al = new ArrayList();
+        al.add();
+        al.add(&quot;abc2&quot;);
+        al.add(&quot;abc3&quot;);
+        al.add(&quot;abc4&quot;);
+        al.add(&quot;abc1&quot;);
+        al.add(&quot;abc3&quot;);
+
+        System.out.println(al);
+
+        al = getSingleElement(al);
+
+        System.out.println(al);
+    }
+
+输出结果：
+[lisi1:21, lisi2:22, lisi3:23, lisi4:24, lisi2:22, lisi3:23]
+[lisi1:21, lisi2:22, lisi3:23, lisi4:24, lisi2:22, lisi3:23]
+
+原因分析：
+contains方法是用的equals方法来比较两个元素是否相同。
+equals方法是自定义类继承的object中的方法，所以比较的是对象的内存地址。
+
+所以，要到Person类中对equals方法进行重写覆盖，就像String类对equals方法进行了重写一样，只要内容相同，即视为元素相同。
+
+public boolean equals(Object obj) {
+    if(this == obj)
+            return true;
+
+    if(!(obj instanceof Person))
+        throw new ClassCastException(&quot;类型不对&quot;);
+
+    Person p = (Person)obj;
+
+    //System.out.println(this.name+&quot;...&quot;+this.age+&quot;...equals...&quot;+p.name+&quot;...&quot;+p.age);
+
+    return this.name.equals(p.name) &amp;&amp; this.age == p.age;
+}
+</code></pre><h4 id="9、集合框架-LinkedHashSet集合"><a href="#9、集合框架-LinkedHashSet集合" class="headerlink" title="9、集合框架-LinkedHashSet集合"></a>9、集合框架-LinkedHashSet集合</h4><p>HashSet保证了唯一，但是无序。</p>
+<p>LinkedHashSet用链表进行了扩展。</p>
+<pre><code>public static void main(String[] args) {
+    HashSet hs = new LinkedHashSet();
+
+    hs.add(&quot;abc2&quot;);
+    hs.add(&quot;abc1&quot;);
+    hs.add(&quot;abc3&quot;);
+    hs.add(&quot;abc4&quot;);
+
+    Iterator it = hs.iterator();
+    while(it.hasNext()) {
+        System.out.println(it.next());
+    }
+}
+
+输出结果：
+abc2
+abc1
+abc3
+abc4
+
+保证了集合既有序且唯一。
+</code></pre><h4 id="10、集合框架-TreeSet集合"><a href="#10、集合框架-TreeSet集合" class="headerlink" title="10、集合框架 - TreeSet集合"></a>10、集合框架 - TreeSet集合</h4><p>TreeSet：可以对Set集合中的元素进行排序。是不同步的。</p>
+<p>判断元素唯一性的方式：就是根据比较方法的返回结果是否为0，是0，就是相同元素，不存。</p>
+<p>TreeSet对元素进行排序的方式一：</p>
+<p>让元素自身具备比较功能，元素就需要实现Comparable接口，重写覆盖compareTo方法。</p>
+<pre><code>public static void main(String[] args) {
+    TreeSet ts = new TreeSet();
+
+    ts.add(&quot;abc&quot;);
+    ts.add(&quot;aaa&quot;);
+    ts.add(&quot;abbc&quot;);
+    ts.add(&quot;acsw&quot;);
+
+    Iterator it = ts.iterator();
+
+    while(it.hasNext()) {
+        System.out.println(it.next());
+    }
+
+}
+
+输出结果：    
+aaa
+abbc
+abc
+acsw
+</code></pre><p>String类已经实现了Comparable接口，重写了compareTo方法，所以添加时对元素进行了排序。自定义的类，需要按需求自定义排序方式。</p>
+<pre><code>class Person implements Comparable{
+    ...
+    //按年龄排序，年龄相同的按姓名排序
+    public int compareTo(Object o) {
+        Person p = (Person)o;
+        int temp = this.age - p.age;
+        return temp == 0?this.name.compareTo(p.name):temp;
+    }
+    ...
+}
+
+public class TreeSetDemo {
+    public static void main(String[] args) {
+        TreeSet ts = new TreeSet();
+
+        ts.add(new Person(&quot;zhangsan&quot;,28));
+        ts.add(new Person(&quot;wangwu&quot;,21));
+        ts.add(new Person(&quot;lisi&quot;,26));
+        ts.add(new Person(&quot;zhaoliu&quot;,28));        
+
+        Iterator it = ts.iterator();
+
+        while(it.hasNext()) {
+            System.out.println(it.next());
+        }
+
+    }
+}
+
+输出结果：
+wangwu:21
+lisi:26
+zhangsan:28
+zhaoliu:28
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/12/27/java-collection-framework/" data-id="cjc0aj3w1000tzsp3n69oah6k" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/api/">api</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-basic-data-class" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/12/23/basic-data-class/" class="article-date">
+  <time datetime="2017-12-23T03:28:25.000Z" itemprop="datePublished">2017-12-23</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/23/basic-data-class/">基本数据类型包装类</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="1、为了方便操作基本数据类型值，将其封装成了对象，在对象中定义属性和行为，丰富了该数据的操作。"><a href="#1、为了方便操作基本数据类型值，将其封装成了对象，在对象中定义属性和行为，丰富了该数据的操作。" class="headerlink" title="1、为了方便操作基本数据类型值，将其封装成了对象，在对象中定义属性和行为，丰富了该数据的操作。"></a>1、为了方便操作基本数据类型值，将其封装成了对象，在对象中定义属性和行为，丰富了该数据的操作。</h4><table>
+<thead>
+<tr>
+<th>数据类型</th>
+<th>包装类</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>byte</td>
+<td>Byte</td>
+</tr>
+<tr>
+<td>short</td>
+<td>Short</td>
+</tr>
+<tr>
+<td>int</td>
+<td>Integer</td>
+</tr>
+<tr>
+<td>long</td>
+<td>Long</td>
+</tr>
+<tr>
+<td>flot</td>
+<td>Float</td>
+</tr>
+<tr>
+<td>double</td>
+<td>Double</td>
+</tr>
+<tr>
+<td>char</td>
+<td>Character</td>
+</tr>
+<tr>
+<td>boolean</td>
+<td>Boolean</td>
+</tr>
+</tbody>
+</table>
+<h4 id="2、基本数据类型和字符串之间的转换"><a href="#2、基本数据类型和字符串之间的转换" class="headerlink" title="2、基本数据类型和字符串之间的转换"></a>2、基本数据类型和字符串之间的转换</h4><p>基本类型–&gt;字符串</p>
+<p>(1)、基本类型数值+””</p>
+<p>(2)、用String类中的静态方法valueOf(基本类型数值)</p>
+<p>字符串–&gt;基本类型</p>
+<p>(1)、静态方法 parseInt, parseLong, parseBoolean。。。。</p>
+<p>8种基本数据类型中，只有Character没有parse的用法。</p>
+<p>(2)、如果字符串被Integer进行了对象的封装。可以使用别一个非静态方法intValue()将一个Integer对象转成基本数据类型值。</p>
+<pre><code>Integer i = new Integer(&quot;123&quot;);
+System.out.println(i.intValue());
+</code></pre><h4 id="3、进制转换"><a href="#3、进制转换" class="headerlink" title="3、进制转换"></a>3、进制转换</h4><p>十进制–&gt;其它进制</p>
+<pre><code>//转二进制
+System.out.println(Integer.toBinaryString(60));
+System.out.println(Integer.toString(60,2));
+
+//转八进制
+System.out.println(Integer.toOctalString(60));
+System.out.println(Integer.toString(60,8));
+
+//转十六进制
+System.out.println(Integer.toHexString(60));
+System.out.println(Integer.toString(60,16));
+</code></pre><p>其它进制–&gt;十进制 parseInt(“string”, radix)</p>
+<pre><code>//二进制转十进制
+System.out.println(Integer.parseInt(&quot;110&quot;,2));
+
+//八进制转十进制
+System.out.println(Integer.parseInt(&quot;74&quot;,8));
+
+//十六进制转十进制
+System.out.println(Integer.parseInt(&quot;3c&quot;,16));
+</code></pre><h4 id="4、自动装箱拆箱"><a href="#4、自动装箱拆箱" class="headerlink" title="4、自动装箱拆箱"></a>4、自动装箱拆箱</h4><pre><code>Integer i = new Integer(4);
+jdk1.4以后简写为Integer i = 4; //自动装箱
+
+i = i + 6;
+是i = new Integer(i.intValue()+6)的简写，自动拆箱。
+</code></pre><h4 id="5、小结"><a href="#5、小结" class="headerlink" title="5、小结"></a>5、小结</h4><p>Integer a = new Integer(127);<br>Integer b = new Integer(127);</p>
+<p>System.out.println(a==b);//fasle,对象比较地址<br>System.out.println(a.equals(b));//true，比较内容</p>
+<p>Integer x = 129;<br>Integer y = 129;</p>
+<p>System.out.println(x==y);//fasle<br>System.out.println(x.equals(y));//true</p>
+<p>Integer x = 127;<br>Integer y = 127;</p>
+<p>System.out.println(x==y);//true<br>System.out.println(x.equals(y));//true</p>
+<p>x,y都为127时，x==y为true，都为129时，x==y为false</p>
+<p>是因为jdk1.5以后，自动装箱时，如果装箱的在一个字节空间内（-128~127）,那么该数据会被共享，不会重新开辟空间，因此都为127时，比较x==y时，实际上是一个地址。</p>
+<h4 id="6、练习"><a href="#6、练习" class="headerlink" title="6、练习"></a>6、练习</h4><p>对字符串中的数值排序</p>
+<pre><code>import java.util.Arrays;
+
+public class WrapperTest {
+    private static final String SPACE_SEPARATOR = &quot; &quot;;
+
+    public static void main(String[] args) {
+        String numStr = &quot;20 83 32     11 -7 50&quot;;
+        System.out.println(numStr);
+        numStr = sortStringNumber(numStr);
+        System.out.println(numStr);
+    }
+
+    private static String sortStringNumber(String numStr) {
+        //字符串变成字符串数组
+        String[] str_arr = stringToArray(numStr);
+
+        //字符串数组变成int数组
+        int[] num_arr = toIntArray(str_arr);
+
+        //int数组排序
+        mySortArray(num_arr);
+
+        //排序后的int数组变成字符串
+        String temp = arrayToString(num_arr);
+
+        return temp;
+    }
+
+    private static String arrayToString(int[] num_arr) {
+        StringBuilder sb = new StringBuilder();
+        for(int i=0; i&lt;num_arr.length; i++) {
+            if(i!=num_arr.length-1)
+                sb.append(num_arr[i]+SPACE_SEPARATOR);
+            else
+                sb.append(num_arr[i]);
+        }
+        return sb.toString();
+    }
+
+    private static void mySortArray(int[] num_arr) {
+        Arrays.sort(num_arr);
+    }
+
+    private static int[] toIntArray(String[] str_arr) {
+        int[] arr = new int[str_arr.length];
+        for(int i=0; i&lt;arr.length; i++) {
+            arr[i] = Integer.parseInt(str_arr[i]);
+        }
+        return arr;
+    }
+
+    public static String[] stringToArray(String numStr) {
+        String[] str_arr = numStr.split(SPACE_SEPARATOR+&quot;+&quot;);
+        return str_arr;
+    }
+
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/12/23/basic-data-class/" data-id="cjc0aj3vp000izsp3eb05bb5e" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/api/">api</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-java-stringBuffer" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2017/12/22/java-stringBuffer/" class="article-date">
@@ -162,7 +972,7 @@ sb.setCharAt(2, &apos;1&apos;);//abqe
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/22/java-stringBuffer/" data-id="cjbip8o6k0013i6p35bqglwda" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/12/22/java-stringBuffer/" data-id="cjc0aj3w7000wzsp3hln83xri" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/api/">api</a></li></ul>
@@ -351,7 +1161,7 @@ public static String getMaxSubstring(String s1, String s2){
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/21/api-string/" data-id="cjbip8o53000ai6p39bs5smxi" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/12/21/api-string/" data-id="cjc0aj3vs000lzsp3gh9qto6i" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/api/">api</a></li></ul>
@@ -958,7 +1768,7 @@ t2.start();
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/18/thread-communication/" data-id="cjbip8o63000xi6p39cxy82it" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/12/18/thread-communication/" data-id="cjc0aj3x4001mzsp3fopzd6vb" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/thread/">thread</a></li></ul>
@@ -1230,7 +2040,7 @@ class DeadLockTest{
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/15/java-thread/" data-id="cjbip8o5t000pi6p3ubws1v5m" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/12/15/java-thread/" data-id="cjc0aj3wf0014zsp3tao8638q" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/thread/">thread</a></li></ul>
@@ -1893,7 +2703,7 @@ class DeadLockTest{
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/css-grid/" data-id="cjbip8o6v0018i6p3uwveu9zz" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/09/14/css-grid/" data-id="cjc0aj3wm0019zsp3vdk3kec5" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/css-grid/">css-grid</a></li></ul>
@@ -2132,7 +2942,7 @@ class DeadLockTest{
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/bootstrap-notes/" data-id="cjbip8o71001bi6p3gnx5b6gz" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/09/14/bootstrap-notes/" data-id="cjc0aj3vx000qzsp34ydkwpcv" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/bootstrap/">bootstrap</a></li></ul>
@@ -2461,7 +3271,7 @@ app.controller(&apos;MainCtrl&apos;, function($scope) {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/angular-apply/" data-id="cjbip8o4b0001i6p3dbhhhc5z" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/09/14/angular-apply/" data-id="cjc0aj3ui0000zsp3gpsodwju" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
@@ -2839,445 +3649,10 @@ app.directive(&apos;rabbitHeader&apos;, function() {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/angular-directive/" data-id="cjbip8o4n0004i6p3nf3homgi" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/09/14/angular-directive/" data-id="cjc0aj3v20005zsp3619mqzeb" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-angular-errors" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/09/14/angular-errors/" class="article-date">
-  <time datetime="2017-09-14T01:23:54.000Z" itemprop="datePublished">2017-09-14</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/angularjs/">angularjs</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/09/14/angular-errors/">angular应用中常见问题记录</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h5 id="1、问题：Template-for-directive-‘rabbitFooter’-must-have-exactly-one-root-element"><a href="#1、问题：Template-for-directive-‘rabbitFooter’-must-have-exactly-one-root-element" class="headerlink" title="1、问题：Template for directive ‘rabbitFooter’ must have exactly one root element"></a>1、问题：Template for directive ‘rabbitFooter’ must have exactly one root element</h5><p>控制台报错：angular.js?bust=1463908350577:13550 Error: [$compile:tplrt] Template for directive ‘rabbitFooter’ must have exactly one root element. ../../../template/tplIndex/rabbitFooter.html</p>
-<p>指令rabbitFooter对应的模板：</p>
-<pre><code>&lt;!--s footer--&gt;
-&lt;div class=&quot;footerbox&quot;&gt;
-    &lt;div class=&quot;footercon&quot;&gt;
-        ...
-    &lt;/div&gt;
-    &lt;div class=&quot;copybox&quot;&gt;
-        ...
-    &lt;/div&gt;
-    &lt;!--
-    &lt;div class=&quot;authpics&quot;&gt;
-        ...
-    &lt;/div&gt;--&gt;
-&lt;/div&gt;
-&lt;!--e footer--&gt;
-</code></pre><p>解决方案：保证模板的所有代码要有一个最外层的DIV，最外层注释也不要有。</p>
-<pre><code>&lt;div class=&quot;footerbox&quot;&gt;
-    &lt;div class=&quot;footercon&quot;&gt;
-        ...
-    &lt;/div&gt;
-    &lt;div class=&quot;copybox&quot;&gt;
-        ...
-    &lt;/div&gt;
-    &lt;!--
-    &lt;div class=&quot;authpics&quot;&gt;
-        ...
-    &lt;/div&gt;
-    --&gt;
-&lt;/div&gt;
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/angular-errors/" data-id="cjbip8o5k000hi6p3ynt6ul6n" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-react-native-es5-es6" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/08/17/react-native-es5-es6/" class="article-date">
-  <time datetime="2017-08-17T06:54:33.000Z" itemprop="datePublished">2017-08-17</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/react/">react</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/08/17/react-native-es5-es6/">React/React Native的ES5 ES6写法对照表</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>摘抄：<a href="http://bbs.reactnative.cn/topic/15/react-react-native-%E7%9A%84es5-es6%E5%86%99%E6%B3%95%E5%AF%B9%E7%85%A7%E8%A1%A8" target="_blank" rel="external">React/React Native 的ES5 ES6写法对照表</a></p>
-<p>###一、模块</p>
-<p>#####1、引用</p>
-<p>在ES5里，如果使用CommonJS标准，引入React包基本通过require进行，代码类似这样：</p>
-<pre><code>//ES5
-var React = require(&quot;react-native&quot;);
-var {
-    Image,
-    Text,
-    PropTypes
-} = React;  //引用不同的React Native组件
-</code></pre><p>在ES6里，import写法更为标准</p>
-<pre><code>//ES6
-import React, {
-    Image, 
-    Text,
-    PropTypes
-} from &apos;react-native&apos;;
-</code></pre><p>#####2、导出单个类</p>
-<p>在ES5里，要导出一个类给别的模块用，一般通过module.exports来导出</p>
-<pre><code>//ES5
-var MyComponent = React.createClass({
-    ...
-});
-module.exports = MyComponent;
-</code></pre><p>在ES6里，通常用export default来实现相同的功能：</p>
-<pre><code>//ES6
-export default class MyComponent extends React.Component{
-    ...
-}
-</code></pre><p>引用的时候也类似：</p>
-<pre><code>//ES5
-var MyComponent = require(&apos;./MyComponent.js&apos;);
-
-//ES6
-import MyComponent from &apos;./MyComponent.js&apos;;
-</code></pre><p>###二、组件</p>
-<p>#####1、定义组件</p>
-<p>在ES5里，通常通过React.createClass来定义一个组件类，像这样：</p>
-<pre><code>//ES5
-var Photo = React.createClass({
-    render: function() {
-        return (
-            &lt;Image source={this.props.source} /&gt;
-        );
-    },
-});
-</code></pre><p>在ES6里，我们通过定义一个继承自React.Component的class来定义一个组件类，像这样：</p>
-<pre><code>//ES6
-class Photo extends React.Component {
-    render() {
-        return (
-            &lt;Image source={this.props.source} /&gt;
-        );
-    }
-}    
-</code></pre><p>#####2、给组件定义方法</p>
-<p>从上面的例子里可以看到，给组件定义方法不再用 名字: function()的写法，而是直接用名字()，在方法的最后也不能有逗号了。</p>
-<p>//ES5</p>
-<pre><code>var Photo = React.createClass({
-    componentWillMount: function(){
-
-    },
-    render: function() {
-        return (
-            &lt;Image source={this.props.source} /&gt;
-        );
-    },
-});
-</code></pre><p>//ES6</p>
-<p>class Photo extends React.Component {<br>    componentWillMount() {</p>
-<pre><code>}
-render() {
-    return (
-        &lt;Image source={this.props.source} /&gt;
-    );
-}
-</code></pre><p>}</p>
-<p>#####3、定义组件的属性类型和默认属性</p>
-<p>在ES5里，属性类型和默认属性分别通过propTypes成员和getDefaultProps方法来实现</p>
-<pre><code>//ES5 
-var Video = React.createClass({
-    getDefaultProps: function() {
-        return {
-            autoPlay: false,
-            maxLoops: 10,
-        };
-    },
-    propTypes: {
-        autoPlay: React.PropTypes.bool.isRequired,
-        maxLoops: React.PropTypes.number.isRequired,
-        posterFrameSrc: React.PropTypes.string.isRequired,
-        videoSrc: React.PropTypes.string.isRequired,
-    },
-    render: function() {
-        return (
-            &lt;View /&gt;
-        );
-    },
-});
-</code></pre><p>在ES6里，可以统一使用static成员来实现</p>
-<pre><code>//ES6
-class Video extends React.Component {
-    static defaultProps = {
-        autoPlay: false,
-        maxLoops: 10,
-    };  // 注意这里有分号
-    static propTypes = {
-        autoPlay: React.PropTypes.bool.isRequired,
-        maxLoops: React.PropTypes.number.isRequired,
-        posterFrameSrc: React.PropTypes.string.isRequired,
-        videoSrc: React.PropTypes.string.isRequired,
-    };  // 注意这里有分号
-    render() {
-        return (
-            &lt;View /&gt;
-        );
-    } // 注意这里既没有分号也没有逗号
-}
-</code></pre><p>也有人这么写，虽然不推荐，但读到代码的时候你应当能明白它的意思：</p>
-<pre><code>//ES6
-class Video extends React.Component {
-    render() {
-        return (
-            &lt;View /&gt;
-        );
-    }
-}
-Video.defaultProps = {
-    autoPlay: false,
-    maxLoops: 10,
-};
-Video.propTypes = {
-    autoPlay: React.PropTypes.bool.isRequired,
-    maxLoops: React.PropTypes.number.isRequired,
-    posterFrameSrc: React.PropTypes.string.isRequired,
-    videoSrc: React.PropTypes.string.isRequired,
-};
-</code></pre><p>注意: 对React开发者而言，static成员在IE10及之前版本不能被继承，而在IE11和其它浏览器上可以，这有时候会带来一些问题。React Native开发者可以不用担心这个问题。</p>
-<p>#####4、初始化state</p>
-<p>ES5下情况类似，</p>
-<pre><code>//ES5 
-var Video = React.createClass({
-    getInitialState: function() {
-        return {
-            loopsRemaining: this.props.maxLoops,
-        };
-    },
-})
-</code></pre><p>ES6下，有两种写法：</p>
-<pre><code>//ES6
-class Video extends React.Component {
-    state = {
-        loopsRemaining: this.props.maxLoops,
-    }
-}
-</code></pre><p>不过我们推荐更易理解的在构造函数中初始化（这样你还可以根据需要做一些计算）：</p>
-<pre><code>//ES6
-class Video extends React.Component {
-    constructor(props){
-        super(props);
-        this.state = {
-            loopsRemaining: this.props.maxLoops,
-        };
-    }
-}
-</code></pre><p>###三、把方法作为回调提供</p>
-<p>#####1、写法</p>
-<p>在ES5下，React.createClass会把所有的方法都bind一遍，这样可以提交到任意的地方作为回调函数，而this不会变化。但官方现在逐步认为这反而是不标准、不易理解的。</p>
-<pre><code>//ES5
-var PostInfo = React.createClass({
-    handleOptionsButtonClick: function(e) {
-        // Here, &apos;this&apos; refers to the component instance.
-        this.setState({showOptionsModal: true});
-    },
-    render: function(){
-        return (
-            &lt;TouchableHighlight onPress={this.handleOptionsButtonClick}&gt;
-                &lt;Text&gt;{this.props.label}&lt;/Text&gt;
-            &lt;/TouchableHighlight&gt;
-        )
-    },
-});
-</code></pre><p>在ES6下，你需要通过bind来绑定this引用，或者使用箭头函数（它会绑定当前scope的this引用）来调用。</p>
-<pre><code>//ES6
-class PostInfo extends React.Component
-{
-    handleOptionsButtonClick(e){
-        this.setState({showOptionsModal: true});
-    }
-    render(){
-        return (
-            &lt;TouchableHighlight 
-                onPress={this.handleOptionsButtonClick.bind(this)}
-                onPress={e=&gt;this.handleOptionsButtonClick(e)}
-                &gt;
-                &lt;Text&gt;{this.props.label}&lt;/Text&gt;
-            &lt;/TouchableHighlight&gt;
-        )
-    },
-}
-</code></pre><p>#####2、箭头函数</p>
-<p>箭头函数实际上是在这里定义了一个临时的函数，箭头函数的箭头=&gt;之前是一个空括号、单个的参数名、或用括号括起的多个参数名，而箭头之后可以是一个表达式（作为函数的返回值），或者是用花括号括起的函数体（需要自行通过return来返回值，否则返回的是undefined）。</p>
-<pre><code>// 箭头函数的例子
-()=&gt;1
-v=&gt;v+1
-(a,b)=&gt;a+b
-()=&gt;{
-    alert(&quot;foo&quot;);
-}
-e=&gt;{
-    if (e == 0){
-        return 0;
-    }
-    return 1000/e;
-}
-</code></pre><p>需要注意的是，不论是bind还是箭头函数，每次被执行都返回的是一个新的函数引用，因此如果你还需要函数的引用去做一些别的事情（譬如卸载监听器），那么你必须自己保存这个引用。</p>
-<p>//错误的做法</p>
-<pre><code>class PauseMenu extends React.Component{
-    componentWillMount(){
-        AppStateIOS.addEventListener(&apos;change&apos;, this.onAppPaused.bind(this));
-    }
-    componentDidUnmount(){
-        AppStateIOS.removeEventListener(&apos;change&apos;, this.onAppPaused.bind(this));
-    }
-    onAppPaused(event){
-    }
-}
-</code></pre><p>//正确的做法</p>
-<pre><code>class PauseMenu extends React.Component{
-    constructor(props){
-        super(props);
-        this._onAppPaused = this.onAppPaused.bind(this);
-    }
-    componentWillMount(){
-        AppStateIOS.addEventListener(&apos;change&apos;, this._onAppPaused);
-    }
-    componentDidUnmount(){
-        AppStateIOS.removeEventListener(&apos;change&apos;, this._onAppPaused);
-    }
-    onAppPaused(event){
-    }
-}
-</code></pre><p>从这个帖子中我们还学习到一种新的做法：</p>
-<p>// 正确的做法</p>
-<pre><code>class PauseMenu extends React.Component{
-    componentWillMount(){
-        AppStateIOS.addEventListener(&apos;change&apos;, this.onAppPaused);
-    }
-    componentDidUnmount(){
-        AppStateIOS.removeEventListener(&apos;change&apos;, this.onAppPaused);
-    }
-    onAppPaused = (event) =&gt; {
-        //把方法直接作为一个arrow function的属性来定义，初始化的时候就绑定好了this指针
-    }
-}
-</code></pre><p>###四、在es6中Mixins不再推荐使用</p>
-<p>在ES5下，我们经常使用mixin来为我们的类添加一些新的方法，譬如PureRenderMixin</p>
-<pre><code>var PureRenderMixin = require(&apos;react-addons-pure-render-mixin&apos;);
-React.createClass({
-  mixins: [PureRenderMixin],
-
-  render: function() {
-    return &lt;div className={this.props.className}&gt;foo&lt;/div&gt;;
-  }
-});
-</code></pre><p>然而现在官方已经不再打算在ES6里继续推行Mixin。</p>
-<p>对于库编写者而言，应当尽快放弃Mixin的编写方式，推荐一种新的编码方式。</p>
-<pre><code>//Enhance.js
-import { Component } from &quot;React&quot;;
-
-export var Enhance = ComposedComponent =&gt; class extends Component {
-    constructor() {
-        this.state = { data: null };
-    }
-    componentDidMount() {
-        this.setState({ data: &apos;Hello&apos; });
-    }
-    render() {
-        return &lt;ComposedComponent {...this.props} data={this.state.data} /&gt;;
-    }
-};
-
-//HigherOrderComponent.js
-import { Enhance } from &quot;./Enhance&quot;;
-
-class MyComponent {
-    render() {
-        if (!this.data) return &lt;div&gt;Waiting...&lt;/div&gt;;
-        return &lt;div&gt;{this.data}&lt;/div&gt;;
-    }
-}
-
-export default Enhance(MyComponent); // Enhanced component
-</code></pre><p>用一个“增强函数”，来为某个类增加一些方法，并且返回一个新类，这无疑能实现mixin所实现的大部分需求。</p>
-<p>###五、es6+带来的其它好处</p>
-<p>解构&amp;属性延展</p>
-<p>结合使用ES6+的解构和属性延展，我们给孩子传递一批属性更为方便。</p>
-<p>这个例子把className以外的所有属性传递给了div标签：</p>
-<pre><code>class AutoloadingPostsGrid extends React.Component {
-    render() {
-        var {
-            className,
-            ...others,  // contains all properties of this.props except for className
-        } = this.props;
-        return (
-            &lt;div className={className}&gt;
-                &lt;PostsGrid {...others} /&gt;
-                &lt;button onClick={this.handleLoadMoreClick}&gt;Load more&lt;/button&gt;
-            &lt;/div&gt;
-        );
-    }
-}
-</code></pre><p>下面这种写法，则是传递所有属性的同时，用override来覆盖属性中的className值：</p>
-<pre><code>&lt;div {...this.props} className=&quot;override&quot;&gt;
-    …
-&lt;/div&gt;
-</code></pre><p>这个例子则相反，如果属性中没有包含className，则提供默认的值，而如果属性中已经包含了，则使用属性中的值</p>
-<pre><code>&lt;div className=&quot;base&quot; {...this.props}&gt;
-    …
-&lt;/div&gt;    
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/08/17/react-native-es5-es6/" data-id="cjbip8o5z000ui6p3e5ydkmkz" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/react/">react</a></li></ul>
 
     </footer>
   </div>
@@ -3319,7 +3694,7 @@ export default Enhance(MyComponent); // Enhanced component
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/angular/" style="font-size: 20px;">angular</a> <a href="/tags/api/" style="font-size: 15px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/thread/" style="font-size: 15px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+      <a href="/tags/angular/" style="font-size: 20px;">angular</a> <a href="/tags/api/" style="font-size: 16.67px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/thread/" style="font-size: 13.33px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
     </div>
   </div>
 
@@ -3341,6 +3716,14 @@ export default Enhance(MyComponent); // Enhanced component
       <ul>
         
           <li>
+            <a href="/2017/12/27/java-collection-framework/">集合框架</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/23/basic-data-class/">基本数据类型包装类</a>
+          </li>
+        
+          <li>
             <a href="/2017/12/22/java-stringBuffer/">常用对象API-StringBuffer类</a>
           </li>
         
@@ -3350,14 +3733,6 @@ export default Enhance(MyComponent); // Enhanced component
         
           <li>
             <a href="/2017/12/18/thread-communication/">thread-communication</a>
-          </li>
-        
-          <li>
-            <a href="/2017/12/15/java-thread/">java多线程</a>
-          </li>
-        
-          <li>
-            <a href="/2017/09/14/css-grid/">网格布局</a>
           </li>
         
       </ul>
@@ -3372,7 +3747,7 @@ export default Enhance(MyComponent); // Enhanced component
   
   <div class="outer">
     <div id="footer-info" class="inner">
-      &copy; 2017 John Doe<br>
+      &copy; 2018 John Doe<br>
       Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
