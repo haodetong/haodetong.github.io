@@ -3,19 +3,14 @@
 <head>
   <meta charset="utf-8">
   
-  <title>angularJS服务器通信之http | Hexo</title>
+  <title>Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="angularJS服务器通信之：$http">
-<meta name="keywords" content="angular, http">
-<meta property="og:type" content="article">
-<meta property="og:title" content="angularJS服务器通信之http">
-<meta property="og:url" content="http://yoursite.com/2016/05/15/angular-http/index.html">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://yoursite.com/page/3/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="angularJS服务器通信之：$http">
-<meta property="og:updated_time" content="2017-09-14T02:19:57.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="angularJS服务器通信之http">
-<meta name="twitter:description" content="angularJS服务器通信之：$http">
+<meta name="twitter:title" content="Hexo">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -64,7 +59,85 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-angular-http" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main">
+  
+    <article id="post-angular-jsonp" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/05/16/angular-jsonp/" class="article-date">
+  <time datetime="2016-05-16T07:39:59.000Z" itemprop="datePublished">2016-05-16</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/angularjs/">angularjs</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/05/16/angular-jsonp/">angularJS使用.jsonp方法</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>angularJS与服务器通信中的$http中有一个$http.jsonp方法，在网上偶然间看到一篇文章，对此解释得非常清楚。</p>
+<p>原文地址：<a href="JSONP跨域访问数据传输">【AngularJs】 – JSONP跨域访问数据传输</a></p>
+<p>json:数据存储格式.</p>
+<p>jsonp:一种非官方的跨域数据交互协议.</p>
+<p>AngularJS在http服务中的jsonp函数如下所示：</p>
+<pre><code>$http.jsonp(&quot;https://api.github.com?callback=JSON_CALLBACK&quot;).success(function(data) {
+    //执行回调
+})
+</code></pre><p>1、当请求被发送时，AngularJS会在DOM中生成一个如下所示的<code>&lt;script&gt;</code>标签：</p>
+<pre><code>&lt;script src=&quot;https://api.github.com?callback=angular.callbacks._0&quot; type=&quot;text/javascript&quot;&gt;
+</code></pre><p>2、当支持JSONP的服务器返回数据时，数据会被包装在由AngularJS生成的具名函数angular.callbacks._0中。</p>
+<p>3、在这个例子中，Github服务器响应如下：</p>
+<pre><code>angular.callbacks._0({ 
+    &apos;meta&apos;: {
+        &apos;X-RateLimit-Limit&apos;: &apos;60&apos;, 
+        &apos;status&apos;: 200 
+    },
+    &apos;data&apos;: {
+        &apos;current_user_url&apos;: &apos;https://api.github.com/user&apos; 
+    } 
+}) 
+</code></pre><p>4、angularJS中jsonp的使用</p>
+<pre><code>myUrl = &quot;http://localhost:8090/api/test?callback=JSON_CALLBACK&quot;;
+
+$http.jsonp(myUrl).success(
+　　function(data){
+　　　　alert(data);
+　　}
+);
+</code></pre><p>1.angularJS中使用$http.jsonp函数</p>
+<p>2.指定callback和回调函数名，函数名为JSON_CALLBACK时，会调用success回调函数，JSON_CALLBACK必须全为大写。</p>
+<p>3.也可以指定其它回调函数，但必须是定义在window下的全局函数。</p>
+<p>4.url中必须加上callback</p>
+<p>5.当callback为JSON_CALLBACK时，只会调用success，即使window中有JSON_CALLBACK函数，也不会调用该函数。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2016/05/16/angular-jsonp/" data-id="cjc79xqig000aqtp300ooan01" class="article-share-link">Partager</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-angular-http" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2016/05/15/angular-http/" class="article-date">
   <time datetime="2016-05-15T08:27:40.000Z" itemprop="datePublished">2016-05-15</time>
@@ -81,8 +154,8 @@
       <header class="article-header">
         
   
-    <h1 class="article-title" itemprop="name">
-      angularJS服务器通信之http
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/05/15/angular-http/">angularJS服务器通信之http</a>
     </h1>
   
 
@@ -393,29 +466,205 @@ app.config(function($httpProvider) {
     </footer>
   </div>
   
-    
-<nav id="article-nav">
-  
-    <a href="/2016/05/16/angular-jsonp/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Récent</strong>
-      <div class="article-nav-title">
-        
-          angularJS使用.jsonp方法
-        
-      </div>
-    </a>
-  
-  
-    <a href="/2016/05/13/restangular/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Ancien</strong>
-      <div class="article-nav-title">Restangular:专门用来与外界通信的angularjs库</div>
-    </a>
-  
-</nav>
+</article>
 
+
+  
+    <article id="post-restangular" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/05/13/restangular/" class="article-date">
+  <time datetime="2016-05-13T07:14:59.000Z" itemprop="datePublished">2016-05-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/angularjs/">angularjs</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/05/13/restangular/">Restangular:专门用来与外界通信的angularjs库</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>####一、安装restangular</p>
+<p>restangular依赖Lo-Dash或Underscore，需要引入这两个库中的任意一个。</p>
+<pre><code>&lt;script type=&quot;text/javascript&quot; src=&quot;restangular.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;lodash.js&quot;&gt;&lt;/script&gt;
+</code></pre><p>通过Bower安装Restangular，Lo-Dash会同时被自动下载。</p>
+<pre><code>$ bower install restangular
+</code></pre><p>将restangular当作依赖加载进应用模块。</p>
+<pre><code>var app = angular.module(&apos;app&apos;, [&apos;restangular&apos;]);
+</code></pre><p>完成后，就可以把Restangular服务注入到angularjs对象中。</p>
+<pre><code>app.factory(&apos;UserService&apos;, [&apos;Restangular&apos;, function(Restangular) {
+    //现在我们已经在UserService中访问了Restangular 
+}])
+</code></pre><p>####二、Restangular对象简介</p>
+<p>Restangular有两种方式创建拉取数据的对象：</p>
+<p>1、.all方法</p>
+<pre><code>var User = Restangular.all(&apos;users&apos;);
+var allUsers = User.getList(); 
+</code></pre><p>这样设置Restangular服务会让所有的HTTP请求将/users路径作为根路径来拉取数据，getList()方法会从 /users 拉取数据。</p>
+<p>2、.one方法</p>
+<pre><code>var oneUser = Restangular.one(&apos;users&apos;, &apos;abc123&apos;);
+oneUser.get().then(function(user) {
+     user.getList(&apos;inboxes&apos;);
+});
+</code></pre><p>调用oneUser上的get()时向 /users/abc123/inboxes 发送请求。</p>
+<p>####三、使用Restangular</p>
+<p>当Restangular将初始化的对象返回给我们后，可以通过几种不同的方法与后端API进行交互。</p>
+<p>1、getList() 获取信息</p>
+<pre><code>var message = Restangular.all(&apos;message&apos;);
+var allMessages = message.getList();
+</code></pre><p>2、post() 创建信息</p>
+<pre><code>var message = Restangular.all(&apos;message&apos;);
+var newMessage = {
+    body:&apos;Hello World&apos;
+}
+message.post(newMessage);
+</code></pre><p>3、Restangular返回的是增强过的promise,因此除了可以调用then方法,还可以调用一些特殊的方法,比如$object。$object会立即返回一个空数组（或对象），在服务器返回信息后，数组会被新数据填充。 这对更新一个集合后，在作用域中立即重新获取集合时很有用：</p>
+<pre><code>message.post(newMessage).then(function(newMsg){
+    $scope.message = message.getList().$object;
+}, function(errorReason){
+    //错误
+})
+</code></pre><p>4、remove() 发送一个delete http请求给后端</p>
+<pre><code>var message = message.get(123);
+message.remove();
+</code></pre><p>5、put() 支持对象的更新和存储</p>
+<ul>
+<li><p>要更新一个对象，首先要查询这个对象，然后在实例中设置新属性值，再调用对象的put()方法将更新保存到后端。</p>
+</li>
+<li><p>在更新一个对象前对其进行复制，然后对复制的对象进行修改和保存。Restangular.copy()支持复制功能。</p>
+</li>
+</ul>
+<p>6、嵌套资源查询</p>
+<pre><code>var author = Restangular.one(&apos;authors&apos;,&apos;abc123&apos;);    //构建一个GET到/authors/abc123/books的请求
+var books = author.getList(&apos;books&apos;);    
+</code></pre><p>7、自定义函数 customMETHORD()</p>
+<p>METHORD可以被以下方法替换：GET,GETLIST,DELETE,POST,PUT,HEAD,OPTIONS,PATCH,TRACE.</p>
+<p>举例：</p>
+<pre><code>author.customGET(&apos;aaa&apos;);
+</code></pre><p>或</p>
+<pre><code>auto.customPOST(
+    {body: &apos;bbbbb&apos;}, //post body
+    &apos;aaa&apos;, //路由
+    {}, //自定义参数
+    {}, //自定义头部
+)    
+</code></pre><p>####四、设置Restangular</p>
+<p>1、设置baseUrl</p>
+<p>给所有后端API请求设置baseUrl:</p>
+<pre><code>angular.module(&apos;myApp&apos;, [&apos;restangular&apos;])
+     .config(function(RestangularProvider) {
+         RestangularProvider.setBaseUrl(&apos;/api/v1&apos;);
+     });
+</code></pre><p>2、添加元素转换</p>
+<p>elementTransformers 这个方法会在资源被加载后当做回调函数使用，在AngularJS对象中使用这些资源前，可以对其进行更新或修改。</p>
+<pre><code>angular.module(&apos;myApp&apos;, [&apos;restangular&apos;])
+    .config(function(RestangularProvider) {    
+         //3个参数：第一个路由、第二个不详、第三个回调
+        RestangularProvider.addElementTransformer(&apos;authors&apos;, false, function(element) {
+            element.fetchedAt = new Date();
+            return element;
+        });
+});
+</code></pre><p>扩展数据模型或集合</p>
+<pre><code>angular.module(‘myApp’, [‘restangular’])
+
+.config(function(RestangularProvider) {   
+     RestangularProvider.extendModel(&apos;authors&apos;, function(element) {
+         element.getFullName = function() {
+             return element.name + &apos; &apos; + element.lastName;
+         };
+         return element;
+     });
+});
+</code></pre><p>3、响应拦截器 responseInterceptors</p>
+<p>即为在响应从服务器返回时调用，调用时传入以下参数：</p>
+<ul>
+<li>data:从服务器返回的数据</li>
+<li>operation:使用的HTTP方法</li>
+<li>what:所请求的数据模型</li>
+<li>url:请求的相对URL</li>
+<li>response:完整的服务器响应，包括响应头</li>
+<li>deferred:请求的promise对象</li>
+</ul>
+<p>下面的设置会使getList()返回一个带有元信息的数据。例如：向 /customers 发送get请求会返回一个像{customers: []}这样的数据</p>
+<pre><code>angular.module(&apos;myApp&apos;, [&apos;restangular&apos;])
+.config(function(RestangularProvider) {
+    RestangularProvider.setResponseInterceptor(function(data, operation, what) { 
+        if (operation == &apos;getList&apos;) {
+            var list = data[what];
+            list.metadata = data.metadata;
+            return list;
+        }
+        return data;
+    });
+});
+</code></pre><p>4、请求拦截器 requestInterceptors</p>
+<p>即为在向服务器发送请求之前进行操作。</p>
+<p>tips:响应拦截器和请求拦截器应用小实例：我们可以同时使用他们来实现全页面范围内的加载提示。在每个请求之前开始加载提示，在收到请求后停止加载提示</p>
+<p>传入以下参数：</p>
+<ul>
+<li>element:发送给服务器的资源</li>
+<li>operation:使用的HTTP方法</li>
+<li>what:所请求的数据模型</li>
+<li>url:请求的相对URL</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">angular.module(&apos;myApp&apos;, [&apos;restangular&apos;])</div><div class="line">.config(function(RestangularProvider) &#123;</div><div class="line">       RestangularProvider.setRequestInterceptor(function(elem, operation, what) &#123; </div><div class="line">           if (operation === &apos;put&apos;) &#123;</div><div class="line">            elem._id = undefined;</div><div class="line">            return elem;</div><div class="line">        &#125;</div><div class="line">        return elem;</div><div class="line">    &#125;);</div><div class="line">   &#125;);</div></pre></td></tr></table></figure>
+<p>5、errorInterceptors 捕获错误</p>
+<p>如果errorInterceptor返回false，promise链就会被中断，并且我们永远不需要处理错误。</p>
+<p>例如，此时是处理验证失败的好时机，任何请求如果返回了401，可以通过errorInterceptor将其捕获并将用户重定向到登录页面。</p>
+<pre><code>angular.module(&apos;myApp&apos;, [&apos;restangular&apos;])
+    .config(function(RestangularProvider) {
+        RestangularProvider.setErrorInterceptor(function(resp) { 
+            displayError();
+            return false; //停止promise链  
+        });
+    });
+</code></pre><p>五、建议将restangular封装在一个自定义的服务对象内。通过将restangular服务注入到自定义服务中，就可以方便的对restangular进行封装。在函数内部，使用withConfig()函数来创建自定义设置。</p>
+<pre><code>angular.module(&apos;myApp&apos;, [&apos;restangular&apos;]).factory(&apos;MessageService&apos;, [&apos;Restangular&apos;, function(Restangular) {
+    var restAngular = Restangular.withConfig(function(Configurer) { 
+            Configurer.setBaseUrl(&apos;/api/v2/messages&apos;);
+    });
+    var _messageService = restAngular.all(&apos;messages&apos;);
+    return {
+        getMessages: function() {
+            return _messageService.getList();
+        }
+    }; 
+}]);
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2016/05/13/restangular/" data-id="cjc79xqkt001rqtp3iwaovlqw" class="article-share-link">Partager</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
+
+    </footer>
+  </div>
   
 </article>
 
+
+  
+
+
+  <nav id="page-nav">
+    <a class="extend prev" rel="prev" href="/page/2/">&laquo; __('prev')</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span>
+  </nav>
 </section>
         
           <aside id="sidebar">

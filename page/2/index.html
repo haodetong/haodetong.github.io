@@ -48,9 +48,9 @@
       </nav>
       <nav id="sub-nav">
         
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="Flux RSS"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Rechercher"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
@@ -60,6 +60,1615 @@
 </header>
       <div class="outer">
         <section id="main">
+  
+    <article id="post-css-grid" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/09/14/css-grid/" class="article-date">
+  <time datetime="2017-09-14T02:43:24.000Z" itemprop="datePublished">2017-09-14</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/转载/">转载</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/09/14/css-grid/">网格布局</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>原文地址：<a href="http://www.w3cplus.com/css3/a-complete-guide-css-grid-layout.html" target="_blank" rel="external">CSS Grid布局指南</a></p>
+<p>英文出处：<a href="http://chris.house/blog/a-complete-guide-css-grid-layout/" target="_blank" rel="external">A Complete Guide to CSS Grid Layout</a></p>
+<h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><p>CSS Grid布局 （又名”网格”），是一个基于二维网格布局的系统，主要目的是改变我们基于网格设计的用户接口方式。如我们所知，CSS 总是用于网页的样式设置，但它并没有起到很好的作用。刚开始的时候我们使用表格(table)，然后使用浮动(float)、 定位(position)和内联块(inline-block)，但所有这些方法本质上来讲都是hacks，存留了很多需要实现的重要功能问题(例如，<a href="http://www.w3cplus.com/blog/tags/357.html" target="_blank" rel="external">垂直居中</a>)。虽然<a href="http://www.w3cplus.com/blog/tags/157.html" target="_blank" rel="external">Flexbox</a>可以起到一定的补救作用，但是它只可以实现简单的一维布局，并不适用于复杂的二维布局(实际上 Flexbox 和 Grid 可以一起结合使用起到最佳效果)。网格是 CSS 第一次专门创建的模块，用来解决我们之前在制作网站时使用hacks处理布局问题。</p>
+<p>这里有两件事情启发我创建本指南。第一个是 Rachel Andrew 的令人敬畏的书–<a href="http://abookapart.com/products/get-ready-for-css-grid-layout" target="_blank" rel="external">为 CSS Grid 布局做好准备</a>。这本书很详尽明确的的介绍了Grid，如果你想很好的掌握Grid的基础知识，我强烈建议你去购买。另外一个很大的灵感来自于 Chris Coyier 的– <a href="http://www.w3cplus.com/css3/a-guide-to-flexbox-new.html" target="_blank" rel="external">Flexbox完整指南</a>，这本书是我了解Flebox的一个很优秀的资源。这里，我还想补充一句，当你使用谷歌搜索”flexbox”时，会出现很多类似的资源，但是为什么不直接利用最好的资源呢？</p>
+<p>我书写此指南的目的是基于目前最新版本，规范其网格概念。所以我不会再次提及过时的 IE 语法，并且随着规范的成熟，我会尽力定期更新此指南。</p>
+<h4 id="基础知识与浏览器支持"><a href="#基础知识与浏览器支持" class="headerlink" title="基础知识与浏览器支持"></a>基础知识与浏览器支持</h4><p>Grid 的入门是很容易的。你只需要定义一个容器元素并设置display：grid，使用grid-template-columns 和 grid-template-rows属性设置网格的列与 行的大小，然后使用grid-column 和 grid-row属性将其子元素放入网格之中。与flexbox类似，网格项的源顺序无关紧要。为了更好地使你的网格与媒体查询相结合使用，你可以在 CSS 中任意放置。想象一下你定义的整个页面布局，然后如果想要完全重新布局以适应不同的屏幕宽度，这时仅仅使用几行 CSS 代码就可以实现。Grid是曾经介绍过的最强大 CSS 模块之一。</p>
+<p>关于 Grid 一件很重要的事情就是它现在还不适用于项目使用。目前还处于 <a href="https://www.w3.org/TR/css-grid-1/" target="_blank" rel="external">W3C 的工作草案</a>之中，并且默认情况下，还不被所有的浏览器所支持。Internet Explorer 10 和 11 已经可以实现支持，但也是利用一种过时的语法实现的。现在出于示例演示，我建议你使用启用了特殊标志的 Chrome, Opera 或者 Firefox 。在 Chrome，导航到chrome://flags 并启用” web 实验平台功能”。该方法同样适用于 Opera (opera://flags)。在Firefox中，启用 layout.css.grid.enabled 标志。</p>
+<iframe src="http://caniuse.com/css-grid/embed" frameborder="0" width="100%" height="413px"></iframe>
+
+<p>除了Microsoft，浏览器厂商似乎想要等到Grid规范成熟后再加以推广。这是一件好事，因为这意味着我们就不需要担心学习多个语法。</p>
+<p>等待 Grid 的使用，只是时间的问题。但是现在你需要开始学习它了。</p>
+<h4 id="重要术语"><a href="#重要术语" class="headerlink" title="重要术语"></a>重要术语</h4><p>在深入研究Grid之前，我们需要理解其相关术语概念。因为这里涉及到的术语在概念上都有点类似，如果你没有首先记住Grid规范中的相关定义，你就会很容易将其与另一个概念相混淆。但是不需要担心，这里的属性并不是很多。</p>
+<p>网格容器(Grid Container)</p>
+<p>当一个元素设置display: grid属性时，它就会成为所有网格项(Grid Items)的父元素。在下面的示例中，container就是网格容器。</p>
+<pre><code>&lt;div class=&quot;container&quot;&gt;
+    &lt;div class=&quot;item item-1&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;item item-2&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;item item-3&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+</code></pre><h4 id="网格项-Grid-Item"><a href="#网格项-Grid-Item" class="headerlink" title="网格项(Grid Item)"></a>网格项(Grid Item)</h4><p>网格容器的孩子(e.g. 子元素)。这里item元素都是网格项，但是sub-item不包含其中。</p>
+<pre><code>&lt;div class=&quot;container&quot;&gt;
+    &lt;div class=&quot;item&quot;&gt;&lt;/div&gt; 
+    &lt;div class=&quot;item&quot;&gt;
+        &lt;p class=&quot;sub-item&quot;&gt;&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;item&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+</code></pre><h4 id="网格线-Grid-Line"><a href="#网格线-Grid-Line" class="headerlink" title="网格线(Grid Line)"></a>网格线(Grid Line)</h4><p>分界线构成了网格的结构。他们可以是垂直的(“列网格线”)也可以是水平的(“行网格线”)，并且存在于一行或一列的任一侧。下面图片中的黄线就是列网格线的一个例子。</p>
+<p><img src="http://cdn.w3cplus.com/cdn/farfuture/gKpvc25w95A-Rw4rzvxuvooFq21vgQLTMvLHI9d9I9k/mtime:1460132248/sites/default/files/blogs/2016/1604/grid-line.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<h4 id="网格轨道-Grid-Track"><a href="#网格轨道-Grid-Track" class="headerlink" title="网格轨道(Grid Track)"></a>网格轨道(Grid Track)</h4><p>两个相邻网格线之间的空间。你可以把它们想像成网格的行或列。下图所示的是第二行和第三行网格线之间的网格轨道。</p>
+<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/gOiQ2Q-w5thxu5hsyw5c9UiGQq7RmnTs-qNKEfnSQxI/mtime:1460132250/sites/default/files/blogs/2016/1604/grid-track.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<h4 id="网格单元格-Grid-Cell"><a href="#网格单元格-Grid-Cell" class="headerlink" title="网格单元格(Grid Cell)"></a>网格单元格(Grid Cell)</h4><p>两个相邻的行和两个相邻的列之间的网格线空间。它是网格的一个”单位”。下面图片所示的是行网格线 1 和 2 与列网格线 2 和 3 之间的网格单元格。</p>
+<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/seD6LEaaFyvVwPATSrWehDkUrCdsHApObOg12OlXNm4/mtime:1460132245/sites/default/files/blogs/2016/1604/grid-cell.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<h4 id="网格区域-Grid-Area"><a href="#网格区域-Grid-Area" class="headerlink" title="网格区域(Grid Area)"></a>网格区域(Grid Area)</h4><p>四条网格线所包围的所有空间。网格区域可由任意数量的网格单元格组成。下面图片所示的是行网格线 1 和 3 和列网格线 1 和 3 之间的网格区域。</p>
+<p><img src="http://cdn.w3cplus.com/cdn/farfuture/t4WyvkNvPqgPU-Jly_aF7ZGgDaM6AxgAedTXkfx4L74/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-area.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<h4 id="网格容器属性-Grid-Container"><a href="#网格容器属性-Grid-Container" class="headerlink" title="网格容器属性(Grid Container)"></a>网格容器属性(Grid Container)</h4><h5 id="display"><a href="#display" class="headerlink" title="display"></a>display</h5><p>定义一个元素成为网格容器，并对其内容建立一个网格格式的上下文。</p>
+<h5 id="属性值"><a href="#属性值" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><p>grid: 产生一个块级的网格</p>
+</li>
+<li><p>inline-grid: 产生内联级网格</p>
+<pre><code>.container{
+    display: grid | inline-grid   
+}
+</code></pre></li>
+</ul>
+<p>注: column, float, clear, 和 vertical-align 元素对网格容器不起作用。</p>
+<h4 id="grid-template-rows"><a href="#grid-template-rows" class="headerlink" title="grid-template-rows"></a>grid-template-rows</h4><p>利用以空格分隔的值定义网格的列和行。值的大小代表轨道的大小，并且它们之间的空格表示网格线。</p>
+<h5 id="属性值-1"><a href="#属性值-1" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><p><track-size>: 可以是一个长度、百分比或者是网格中自由空间的一小部分(使用fr单位)</track-size></p>
+</li>
+<li><p><line-name>: 你选择的任意名称</line-name></p>
+</li>
+<li><p>subgrid - 如果你的网格容器本身就是一个网格项(即嵌套网格)，你可以使用此属性指定行和列的大小继承于父元素而不是自身指定。</p>
+<pre><code>.container{
+    grid-template-columns: &lt;track-size&gt; ... | &lt;line-name&gt; &lt;track-size&gt; ... | subgrid;
+    grid-template-rows: &lt;track-size&gt; ... | &lt;line-name&gt; &lt;track-size&gt; ... | subgrid;
+}
+</code></pre></li>
+</ul>
+<h4 id="示例"><a href="#示例" class="headerlink" title="示例:"></a>示例:</h4><p>当你在值之间留有空格时，网络线就会自动分配数值名称:</p>
+<pre><code>.container{
+    grid-template-columns: 40px 50px auto 50px 40px;
+    grid-template-rows: 25% 100px auto;
+}
+</code></pre><p><img src="http://cdn2.w3cplus.com/cdn/farfuture/X_DM7Y2QqrzK1H9w41DkpyGLmZeMkaq5pbyVZevlgBg/mtime:1460132249/sites/default/files/blogs/2016/1604/grid-numbers.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<p>但是你也可以显示命名，请参考下面括号语法中的名称命名方式:</p>
+<pre><code>.container{
+    grid-template-columns: [first] 40px [line2] 50px [line3] auto [col4-start] 50px [five] 40px [end];
+    grid-template-rows: [row1-start] 25% [row1-end] 100% [third-line] auto [last-line];
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/TeK_YrqYf9wK7TYBGo00d8vzqb0ErZkCLNVZrRWSRdM/mtime:1460132249/sites/default/files/blogs/2016/1604/grid-names.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<p>请注意，一条网格线可以具有有多个名称。例如，这里的第二行将有两个名字: row1-end 和 row2-start:</p>
+<pre><code>.container{
+    grid-template-rows: [row1-start] 25% [row1-end row2-start] 25% [row2-end];
+}
+</code></pre><p>如果你的定义中包含重复的部分，你可以使用 repeat() 表示法进行精简:</p>
+<pre><code>.container{
+    grid-template-columns: repeat(3, 20px [col-start]) 5%;
+}
+</code></pre><p>等效于:</p>
+<pre><code>.container{
+    grid-template-columns: 20px [col-start] 20px [col-start] 20px [col-start] 5%;
+}
+</code></pre><p>fr 单位允许你将一个轨道大小设置为网格容器内自由空间的一小部分。如下所示，每个网格项就会占据网格容器宽度的三分之一:</p>
+<pre><code>.container{
+    grid-template-columns: 1fr 1fr 1fr;
+}
+</code></pre><p>这里自由空间表示除去非弹性项以后剩余的空间。在此示例中的 fr 单位的可用空间表示减去50px以后的空间大小:</p>
+<pre><code>.container{
+    grid-template-columns: 1fr 50px 1fr 1fr;
+}
+</code></pre><h4 id="grid-template-areas"><a href="#grid-template-areas" class="headerlink" title="grid-template-areas"></a>grid-template-areas</h4><p>使用grid-area属性定义网格区域名称，从而定义网格模板。网格区域重复的名称就会导致内容跨越这些单元格。句点表示一个空单元格。语法本身提供了一种可视化的网格结构。</p>
+<h5 id="属性值-2"><a href="#属性值-2" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><p><grid-area-name>: 使用grid-area属性定义网格区域名称</grid-area-name></p>
+</li>
+<li><p>.: 句点表示一个空单元格</p>
+</li>
+<li><p>none: 无网格区域被定义</p>
+<pre><code>.container{
+    grid-template-areas: &quot;&lt;grid-area-name&gt; | . | none | ...&quot;
+                      &quot;...&quot;
+}
+</code></pre></li>
+</ul>
+<h5 id="示例-1"><a href="#示例-1" class="headerlink" title="示例:"></a>示例:</h5><pre><code>.item-a{
+    grid-area: header;
+}
+.item-b{
+    grid-area: main;
+}
+.item-c{
+    grid-area: sidebar;
+}
+.item-d{
+    grid-area: footer;
+}
+.container{
+    grid-template-columns: 50px 50px 50px 50px;
+    grid-template-rows: auto;
+    grid-template-areas: &quot;header header header header&quot;
+                         &quot;main main . sidebar&quot;
+                         &quot;footer footer footer footer&quot;
+}
+</code></pre><p>这将创建一个四列三行的网格。最上面的一行为header区域。中间一行由两个main区域，一个空单元格和一个sidebar区域。最后一行是footer区域。</p>
+<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/p5O591xAPbyGPVI0pepIgQIQyo25GEzXJc4FqPnkCgI/mtime:1460132550/sites/default/files/blogs/2016/1604/grid-template-areas.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<p>你所声明的每一行都需要具有相同数目的单元格。</p>
+<p>你可以使用任意数量的句点(.)声明单个空单元格。只要句点之间没有空格就表示一个空单元格。</p>
+<p>注意，你只是使用此语法进行网格区域命名，而不是网格线命名。当你使用此语法时，区域两边的线就会得到自动命名。如果网格区域名称为foo,则其行线和列线的名称就将为foo-start，最后一行线及其最后一列线的名字就会为foo-end。这意味着一些线就可能具有多个名称，如上面示例中所示，拥有三个名称: header-start, main-start, 以及footer-start。</p>
+<h4 id="grid-column-gap和grid-row-gap"><a href="#grid-column-gap和grid-row-gap" class="headerlink" title="grid-column-gap和grid-row-gap"></a>grid-column-gap和grid-row-gap</h4><p>指定网格线的大小。你可以把它想像成在行/列之间设置间距宽度。</p>
+<h5 id="属性值-3"><a href="#属性值-3" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><code>&lt;line-size&gt;</code>: 一个长度值</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    grid-column-gap: &lt;line-size&gt;;</div><div class="line">    grid-row-gap: &lt;line-size&gt;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="示例-2"><a href="#示例-2" class="headerlink" title="示例:"></a>示例:</h5><pre><code>.container{
+    grid-template-columns: 100px 50px 100px;
+    grid-template-rows: 80px auto 80px; 
+    grid-column-gap: 10px;
+    grid-row-gap: 15px;
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/NkH6E9Mt_yBnhLMcuOO2bvijzL-d1dr4PcHROe1jQTw/mtime:1460132245/sites/default/files/blogs/2016/1604/grid-column-row-gap.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<p>间距仅仅在列/行之间产生，而不会在边缘区。</p>
+<h4 id="grid-gap"><a href="#grid-gap" class="headerlink" title="grid-gap"></a>grid-gap</h4><p>grid-column-gap 和 grid-row-gap的简写值。</p>
+<h5 id="属性值-4"><a href="#属性值-4" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><grid-column-gap> <grid-row-gap>: 长度值</grid-row-gap></grid-column-gap></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    grid-gap: &lt;grid-column-gap&gt; &lt;grid-row-gap&gt;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="示例-3"><a href="#示例-3" class="headerlink" title="示例:"></a>示例:</h5><pre><code>.container{
+    grid-template-columns: 100px 50px 100px;
+    grid-template-rows: 80px auto 80px; 
+    grid-gap: 10px 15px;
+}
+</code></pre><p>如果没有指定grid-row-gap属性的值，默认与grid-column-gap属性值相同</p>
+<h4 id="justify-items"><a href="#justify-items" class="headerlink" title="justify-items"></a>justify-items</h4><p>沿列轴对齐网格项中的内容(相反于align-item属性定义的沿行轴对齐)。此值适用于容器内所有的网格项。</p>
+<h5 id="属性值-5"><a href="#属性值-5" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><p>start: 内容与网格区域的左端对齐</p>
+</li>
+<li><p>end: 内容与网格区域的右端对齐</p>
+</li>
+<li><p>center: 内容处于网格区域的中间位置</p>
+</li>
+<li><p>stretch: 内容宽度占据整个网格区域空间(默认值)</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    justify-items: start | end | center | stretch;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="示例-4"><a href="#示例-4" class="headerlink" title="示例:"></a>示例:</h5><pre><code>.container{
+    justify-items: start;
+}
+</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/DeEsJc9aJ197-ygaKH5umTPYax9LHpKqb6UNjOz87AE/mtime:1460132247/sites/default/files/blogs/2016/1604/grid-justify-items-start.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    justify-items: end;
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/Z3ZWMZKBOshRlLnyD_ezkqsI_MswMPWela1e_HJzAH8/mtime:1460132247/sites/default/files/blogs/2016/1604/grid-justify-items-end.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    justify-items: center;
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/VxU0G7HhPCZ9mXhfkuCGrXXjGsvV-JKGdNQ-OzSe6b8/mtime:1460132247/sites/default/files/blogs/2016/1604/grid-justify-items-center.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    justify-items: stretch;
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/k4EK27vIfTqh5nmhucLhomEhun0LTJqUckrTctj41Ag/mtime:1460132248/sites/default/files/blogs/2016/1604/grid-justify-items-stretch.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<p>这也可以使用justify-self属性对各个网格项进行设置。</p>
+<h4 id="align-items"><a href="#align-items" class="headerlink" title="align-items"></a>align-items</h4><p>沿行轴对齐网格项中的内容(相反于justify-item属性定义的沿列轴对齐)。此值适用于容器内所有的网格项。</p>
+<h5 id="属性值-6"><a href="#属性值-6" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><p>start: 内容与网格区域的顶端对齐</p>
+</li>
+<li><p>end: 内容与网格区域的底部对齐</p>
+</li>
+<li><p>center: 内容处于网格区域的中间位置</p>
+</li>
+<li><p>stretch: 内容高度占据整个网格区域空间(默认值)</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    align-items: start | end | center | stretch;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="示例-5"><a href="#示例-5" class="headerlink" title="示例:"></a>示例:</h5><pre><code>.container{
+    align-items: start;
+}
+</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/SBt28c71z4UWwWCA6VMBJUPVUk5XLccB8-c2gB5RWlQ/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-align-items-start.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    align-items: end;
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/aVcTwfxWM3eKLHtrVECcY0PH-YrinUfDm4m3_eN5lXs/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-align-items-end.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    align-items: center;
+}
+</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/DYCXxtNsb_VN7Yz5qL8qDro-cRnENpRSl7irBEd3vTE/mtime:1460132243/sites/default/files/blogs/2016/1604/grid-align-items-center.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    align-items: stretch;
+}
+</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/fGHKY7-aeOfgpniLoTxQmsgCbLDRt1GiPaVXAl-4LOM/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-align-items-stretch.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<p>这也可以使用align-self属性对各个网格项进行设置。</p>
+<h4 id="justify-content"><a href="#justify-content" class="headerlink" title="justify-content"></a>justify-content</h4><p>当你使用px这种非响应式的单位对你的网格项进行大小设置时，就有可能出现一种情况–你的网格大小可能小于其网格容器的大小。在这种情况下，你就可以设置网格容器内网格的对齐方式。此属性会将网格沿列轴进行对齐(相反于align-content属性定义的沿行轴对齐)。</p>
+<h5 id="属性值-7"><a href="#属性值-7" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><p>start: 网格与网格容器的左端对齐</p>
+</li>
+<li><p>end: 网格与网格容器的右端对齐</p>
+</li>
+<li><p>center: 网格处于网格容器的中间</p>
+</li>
+<li><p>stretch: 调整网格项的大小，使其宽度填充整个网格容器</p>
+</li>
+<li><p>space-around: 在网格项之间设置偶数个空格间隙，其最边缘间隙大小为中间空格间隙大小的一半</p>
+</li>
+<li><p>space-between: 在网格项之间设置偶数个空格间隙，其最边缘不存在空格间隙</p>
+</li>
+<li><p>space-evenly: 在网格项之间设置偶数个空格间隙，同样适用于最边缘区域</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    justify-content: start | end | center | stretch | space-around | space-between | space-evenly;    </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>示例:</p>
+<pre><code>.container{
+    justify-content: start;
+}
+</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/V86BK0l5PPe8ypiC_ewHQnFOJGsHzAJFq81nEvaIzh0/mtime:1460132246/sites/default/files/blogs/2016/1604/grid-justify-content-start.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    justify-content: end; 
+}
+</code></pre><p><img src="http://cdn2.w3cplus.com/cdn/farfuture/OT3tWVLBz8oPeolOD2q01eBHPgyRPay198nZsNyplOw/mtime:1460132245/sites/default/files/blogs/2016/1604/grid-justify-content-end.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    justify-content: center;  
+}
+</code></pre><p><img src="http://cdn2.w3cplus.com/cdn/farfuture/x02TnVK7AWfQrBFo3BmtUW5-9ZdOLp2eBQKShftkYnM/mtime:1460132245/sites/default/files/blogs/2016/1604/grid-justify-content-center.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    justify-content: stretch; 
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/KhGlUpKr2znYjX26PmOrTvEXgf5SfBjuysXm0UwzxYk/mtime:1460132247/sites/default/files/blogs/2016/1604/grid-justify-content-stretch.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    justify-content: space-around;    
+}
+</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/0hwm5rYzTdMYuZV4dTK6ROAEgdxZsoKG0w9Z1utQoIQ/mtime:1460132246/sites/default/files/blogs/2016/1604/grid-justify-content-space-around.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    justify-content: space-between;   
+}
+</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/-Z5SERN8i6b_AFz-KvfhRxP-cHoaIeIYn9G4V5i31F0/mtime:1460132246/sites/default/files/blogs/2016/1604/grid-justify-content-space-between.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+  justify-content: space-evenly;    
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/akDy0eshtzxnti20ICE8V3JyJmotAXjkgLGyMa2HMic/mtime:1460132246/sites/default/files/blogs/2016/1604/grid-justify-content-space-evenly.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<h4 id="align-content"><a href="#align-content" class="headerlink" title="align-content"></a>align-content</h4><p>当你使用px这种非响应式的单位对你的网格项进行大小设置时，就有可能出现一种情况–你的网格大小可能小于其网格容器的大小。在这种情况下，你就可以设置网格容器内网格的对齐方式。此属性会将网格沿行轴进行对齐(相反于justify-content属性定义的沿列轴对齐)。</p>
+<h5 id="属性值-8"><a href="#属性值-8" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><p>start: 网格与网格容器的顶端对齐</p>
+</li>
+<li><p>end: 网格与网格容器的底部对齐</p>
+</li>
+<li><p>center: 网格处于网格容器的中间</p>
+</li>
+<li><p>stretch: 调整网格项的大小，使其高度填充整个网格容器</p>
+</li>
+<li><p>space-around: 在网格项之间设置偶数个空格间隙，其最边缘间隙大小为中间空格空隙大小的一半</p>
+</li>
+<li><p>space-between: 在网格项之间设置偶数个空格间隙，其最边缘不存在空格间隙</p>
+</li>
+<li><p>space-evenly: 在网格项之间设置偶数个空格间隙，同样适用于最边缘区域</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    align-content: start | end | center | stretch | space-around | space-between | space-evenly;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>#####示例:</p>
+<pre><code>.container{
+    align-content: start; 
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/hojdd_caTcpZcB5rA6bf9yu1nd-VzBCviKhKWdNlzmU/mtime:1460132243/sites/default/files/blogs/2016/1604/grid-align-content-start.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    align-content: end;   
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/Z4qpR9QCYog6YQuroNQV1MllyNGMaXdIJkwBmO9-FgE/mtime:1460132243/sites/default/files/blogs/2016/1604/grid-align-content-end.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    align-content: center;    
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/wgXMAOUrFkvw1g5JcA9hlb_d9gb3b_WWAAUxmnIUwMY/mtime:1460132242/sites/default/files/blogs/2016/1604/grid-align-content-center.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    align-content: stretch;   
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/vg-a2_oeUlNgPGVXTeKL-4N5UJlTH2x77cR3fmAgaqI/mtime:1460132243/sites/default/files/blogs/2016/1604/grid-align-content-stretch.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    align-content: space-around;  
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/O4UjhRmD81HKp0JycpbCreC1n59MuMZbLqq-U5ZGT10/mtime:1460132242/sites/default/files/blogs/2016/1604/grid-align-content-space-around.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    align-content: space-between; 
+}
+</code></pre><p><img src="http://cdn2.w3cplus.com/cdn/farfuture/ebLV62oCnLHL9gL8q0h3j44aXZGd-6jJnTGk3Zx9Fe0/mtime:1460132242/sites/default/files/blogs/2016/1604/grid-align-content-space-between.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    align-content: space-evenly;  
+}
+</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/14tRJmA8NGCIZ7UUAksJfSU2cot8Eyiwjw9Sgx7R0r4/mtime:1460132242/sites/default/files/blogs/2016/1604/grid-align-content-space-evenly.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<h4 id="grid-auto-columns和grid-auto-rows"><a href="#grid-auto-columns和grid-auto-rows" class="headerlink" title="grid-auto-columns和grid-auto-rows"></a>grid-auto-columns和grid-auto-rows</h4><p>指定任何自动生成的网格轨道(隐式网格跟踪)的大小。当你显式定位行或列(使用 grid-template-rows/grid-template-columns属性)时,就会产生超出定义范围内的隐式网格轨道。</p>
+<h5 id="属性值-9"><a href="#属性值-9" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><code>&lt;track-siz&gt;</code>: 可以是长度、 百分比或网格自由空间的一小部分(使用fr单位)</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    grid-auto-columns: &lt;track-size&gt; ...;</div><div class="line">    grid-auto-rows: &lt;track-size&gt; ...;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>为了说明隐式网格轨道是如何被创造出来的，请思考如下代码:</p>
+<pre><code>.container{
+    grid-template-columns: 60px 60px;
+    grid-template-rows: 90px 90px
+}
+</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/Dqn09IqXrYUqk3YP5ALD5KsauBp-8VFeVe0nO0U-Nqk/mtime:1460132245/sites/default/files/blogs/2016/1604/grid-auto.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<p>这里创建了一个2 x 2 的网格。</p>
+<p>但是现在你想象你使用grid-column 和 grid-row 来定位网格项，如下所示:</p>
+<pre><code>.item-a{
+    grid-column: 1 / 2;
+    grid-row: 2 / 3;
+}
+.item-b{
+    grid-column: 5 / 6;
+    grid-row: 2 / 3;
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/5cMq7ShQn3RVBpbPAIz_5V7m05azOp_8HNZAE3QmB_I/mtime:1460132250/sites/default/files/blogs/2016/1604/implicit-tracks.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<p>这里我们定义.item b开始于列线 5 并结束于在列线 6，但是我们从来没有定义列线 5 或 6。因为我们引用不存在的线，宽度为0的隐式轨道的就会被创建用来填补空白。我们可以使用grid-auto-columns 和 grid-auto-rows属性来设置这些隐式轨道的宽度:</p>
+<pre><code>.container{
+    grid-auto-columns: 60px;
+}
+</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/IS-UCPIfqtPIuj_V24vZqOXgiJbsSusPwIzbzg56yIM/mtime:1460132250/sites/default/files/blogs/2016/1604/implicit-tracks-with-widths.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<h4 id="grid-auto-flow"><a href="#grid-auto-flow" class="headerlink" title="grid-auto-flow"></a>grid-auto-flow</h4><p>如果你不显式的在网格中放置网格项，自动布局算法就会自动踢出此网格项。此属性用来控制自动布局算法的工作原理。</p>
+<h5 id="属性值-10"><a href="#属性值-10" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><p>row: 告诉自动布局算法填充每一行，必要时添加新行</p>
+</li>
+<li><p>column: 告诉自动布局算法填充每一列，必要时添加新列</p>
+</li>
+<li><p>dense: 告诉自动布局算法试图填补网格中之前较小的网格项留有的空白</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    grid-auto-flow: row | column | row dense | column dense</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>注意:dense值可能会导致更改网格项的顺序。</p>
+<h5 id="示例-6"><a href="#示例-6" class="headerlink" title="示例:"></a>示例:</h5><p>考虑如下HTMl代码:</p>
+<pre><code>&lt;section class=&quot;container&quot;&gt;
+    &lt;div class=&quot;item-a&quot;&gt;item-a&lt;/div&gt;
+    &lt;div class=&quot;item-b&quot;&gt;item-b&lt;/div&gt;
+    &lt;div class=&quot;item-c&quot;&gt;item-c&lt;/div&gt;
+    &lt;div class=&quot;item-d&quot;&gt;item-d&lt;/div&gt;
+    &lt;div class=&quot;item-e&quot;&gt;item-e&lt;/div&gt;
+&lt;/section&gt;
+</code></pre><p>这里定义了一个两列五行的网格，并将 grid-auto-flow属性设置为row(即默认值):</p>
+<pre><code>.container{
+    display: grid;
+    grid-template-columns: 60px 60px 60px 60px 60px;
+    grid-template-rows: 30px 30px;
+    grid-auto-flow: row;
+}
+</code></pre><p>将网格项放置在网格中时只需要其中的两个网格项:</p>
+<pre><code>.item-a{
+    grid-column: 1;
+    grid-row: 1 / 3;
+}
+.item-e{
+    grid-column: 5;
+    grid-row: 1 / 3;
+}
+</code></pre><p>因为我们将grid-auto-flow属性设置为了row，所以我们的网格看起来会像这个样子。注意我们我们没有对其进行设置的三个网格项(item-b, item-c and item-d),会沿行轴进行布局。</p>
+<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/DBQZgbw82BJwGw7Q61UdcDRlRANo-_2iJW2wQlUcDrw/mtime:1460132245/sites/default/files/blogs/2016/1604/grid-auto-flow-row.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<p>如果我们将grid-auto-flow属性设置为 column,item-b, item-c 和 item-d 就会沿列轴进行布局。</p>
+<pre><code>.container{
+    display: grid;
+    grid-template-columns: 60px 60px 60px 60px 60px;
+    grid-template-rows: 30px 30px;
+    grid-auto-flow: column;
+}
+</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/TPY1m3jC4Lir0oDl8aASuAUOwn5lJmAyiQdkzHJwg54/mtime:1460132245/sites/default/files/blogs/2016/1604/grid-auto-flow-column.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<h4 id="grid"><a href="#grid" class="headerlink" title="grid"></a>grid</h4><p>在一行声明中设置一下所有属性的简写形式:grid-template-rows, grid-template-columns, grid-template-areas, grid-auto-rows, grid-auto-columns, 以及 grid-auto-flow。它将 grid-column-gap 和 grid-row-gap属性设置为初始值，即使它们不能显示的设置此属性。</p>
+<h5 id="属性值-11"><a href="#属性值-11" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><p>none: 将所有的子属性设置为初始值</p>
+</li>
+<li><p>subgrid: 将grid-template-rows 和 grid-template-columns属性值设置为subgrid,其余子属性设置为初始值</p>
+</li>
+<li><p><code>&lt;grid-template-rows&gt;</code> / <code>&lt;grid-template-columns&gt;</code>: 将grid-template-rows 和 grid-template-columns属性值设置为指定值，其余子属性设置为初始值</p>
+</li>
+<li><p><code>&lt;grid-auto-flow&gt;</code>[<code>&lt;grid-auto-rows&gt;</code> [ / <code>&lt;grid-auto-columns&gt;</code>] ] : grid-auto-flow, grid-auto-rows 和 grid-auto-columns属性分别接受相同的值,如果省略了grid-auto-columns属性，它将设置为grid-auto-rows属性的值。如果两者均被忽略，那么都将被设置为初始值。</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    grid: none | subgrid | &lt;grid-template-rows&gt; / &lt;grid-template-columns&gt; | &lt;grid-auto-flow&gt; [&lt;grid-auto-rows&gt; [/ &lt;grid-auto-columns&gt;]];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="示例-7"><a href="#示例-7" class="headerlink" title="示例:"></a>示例:</h5><p>下面两个代码块是等效的:</p>
+<pre><code>.container{
+    grid: 200px auto / 1fr auto 1fr;
+}
+
+.container{
+    grid-template-rows: 200px auto;
+    grid-template-columns: 1fr auto 1fr;
+    grid-template-areas: none;
+}
+</code></pre><p>同样，下面的两个代码块也是等效的:</p>
+<pre><code>.container{
+    grid: column 1fr / auto;
+}
+
+.container{
+    grid-auto-flow: column;
+    grid-auto-rows: 1fr;
+    grid-auto-columns: auto;
+}
+</code></pre><p>它还接受一次性设置所有属性，更复杂但非常方便的语法。指定grid-template-areas, grid-auto-rows 和 grid-auto-columns属性，其他所有子属性都将设置为其初始值。你现在所做的是在其网格区域内，指定网格线名称和内联轨道大小。下面是最简单的描述:</p>
+<pre><code>.container{
+    grid: [row1-start] &quot;header header header&quot; 1fr [row1-end]
+          [row2-start] &quot;footer footer footer&quot; 25px [row2-end]
+          / auto 50px auto;
+}
+</code></pre><p>等效于:</p>
+<pre><code>.container{
+    grid-template-areas: &quot;header header header&quot;
+                         &quot;footer footer footer&quot;;
+    grid-template-rows: [row1-start] 1fr [row1-end row2-start] 25px [row2-end];
+    grid-template-columns: auto 50px auto;    
+}
+</code></pre><h4 id="网格项属性-Grid-Items"><a href="#网格项属性-Grid-Items" class="headerlink" title="网格项属性(Grid Items)"></a>网格项属性(Grid Items)</h4><h5 id="grid-column-start-grid-column-end-grid-row-start-grid-row-end"><a href="#grid-column-start-grid-column-end-grid-row-start-grid-row-end" class="headerlink" title="grid-column-start/grid-column-end/grid-row-start/grid-row-end"></a>grid-column-start/grid-column-end/grid-row-start/grid-row-end</h5><p>使用特定的网格线确定网格项在网格内的位置。grid-column-start/grid-row-start 属性表示网格项的网格线的起始位置，grid-column-end/grid-row-end属性表示网格项的网格线的终止位置。</p>
+<h5 id="属性值-12"><a href="#属性值-12" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><p><code>&lt;line&gt;</code>: 可以是一个数字来引用相应编号的网格线，或者使用名称引用相应命名的网格线</p>
+</li>
+<li><p>span <code>&lt;number&gt;</code>: 网格项包含指定数量的网格轨道</p>
+</li>
+<li><p>span <code>&lt;name&gt;</code>: 网格项包含指定名称网格项的网格线之前的网格轨道</p>
+</li>
+<li><p>auto: 表明自动定位，自动跨度或者默认跨度之一</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">.item&#123;</div><div class="line">    grid-column-start: &lt;number&gt; | &lt;name&gt; | span &lt;number&gt; | span &lt;name&gt; | auto</div><div class="line">    grid-column-end: &lt;number&gt; | &lt;name&gt; | span &lt;number&gt; | span &lt;name&gt; | auto</div><div class="line">    grid-row-start: &lt;number&gt; | &lt;name&gt; | span &lt;number&gt; | span &lt;name&gt; | auto</div><div class="line">    grid-row-end: &lt;number&gt; | &lt;name&gt; | span &lt;number&gt; | span &lt;name&gt; | auto</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>示例:</p>
+<pre><code>.item-a{
+    grid-column-start: 2;
+    grid-column-end: five;
+    grid-row-start: row1-start
+    grid-row-end: 3
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/_qe1h2tf7kOnbma7mv0npHmPxuqdtgBhz-ue5plGF7s/mtime:1460132249/sites/default/files/blogs/2016/1604/grid-start-end-a.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.item-b{
+    grid-column-start: 1;
+    grid-column-end: span col4-start;
+    grid-row-start: 2
+    grid-row-end: span 2
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/alQ0HIXYmT5gbNObM3SG329ddcjN0R53iwUYRx7mxu4/mtime:1460132249/sites/default/files/blogs/2016/1604/grid-start-end-b.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<p>如果没有声明grid-column-end/grid-row-end属性，默认情况下网格项的跨度为1。</p>
+<p>网格项可以互相重叠。可以使用z-index属性控制堆叠顺序。</p>
+<h4 id="grid-column-grid-row"><a href="#grid-column-grid-row" class="headerlink" title="grid-column/grid-row"></a>grid-column/grid-row</h4><h5 id="grid-column-start-grid-column-end-和-grid-row-start-grid-row-end属性分别的简写形式。"><a href="#grid-column-start-grid-column-end-和-grid-row-start-grid-row-end属性分别的简写形式。" class="headerlink" title="grid-column-start + grid-column-end, 和 grid-row-start + grid-row-end属性分别的简写形式。"></a>grid-column-start + grid-column-end, 和 grid-row-start + grid-row-end属性分别的简写形式。</h5><h5 id="属性值-13"><a href="#属性值-13" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><code>&lt;start-line&gt;</code> / <code>&lt;end-line&gt;</code>： 每一个属性均接收一个相同值，包括跨度。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">.item&#123;</div><div class="line">    grid-column: &lt;start-line&gt; / &lt;end-line&gt; | &lt;start-line&gt; / span &lt;value&gt;;</div><div class="line">    grid-row: &lt;start-line&gt; / &lt;end-line&gt; | &lt;start-line&gt; / span &lt;value&gt;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="示例-8"><a href="#示例-8" class="headerlink" title="示例:"></a>示例:</h5><pre><code>.item-c{
+    grid-column: 3 / span 2;
+    grid-row: third-line / 4;
+}
+</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/9cHMaarlw9Q6EUB4uXNHygG6E2jez75tLEKURdJ6byc/mtime:1460132250/sites/default/files/blogs/2016/1604/grid-start-end-c.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<p>如果没有声明结束网格线值，默认网格轨道跨度为1.</p>
+<h4 id="grid-area"><a href="#grid-area" class="headerlink" title="grid-area"></a>grid-area</h4><p>给网格项进行命名以便于模板使用grid-template-areas属性创建时可以加以引用。另外也可以被grid-row-start + grid-column-start + grid-row-end + grid-column-end属性更为简洁的加以引用。</p>
+<h5 id="属性值-14"><a href="#属性值-14" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><p><code>&lt;name&gt;</code>: 你所定义的名称</p>
+</li>
+<li><p><code>&lt;row-start&gt;</code> / <code>&lt;column-start&gt;</code> / <code>&lt;row-end&gt;</code> / <code>&lt;column-end&gt;</code>: 可以为数字或者名称</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item&#123;</div><div class="line">    grid-area: &lt;name&gt; | &lt;row-start&gt; / &lt;column-start&gt; / &lt;row-end&gt; / &lt;column-end&gt;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="示例-9"><a href="#示例-9" class="headerlink" title="示例:"></a>示例:</h5><p>对网格项进行命名的一种方式:</p>
+<pre><code>.item-d{
+    grid-area: header
+}
+</code></pre><p>grid-row-start + grid-column-start + grid-row-end + grid-column-end属性的一种简写方式:</p>
+<pre><code>.item-d{
+    grid-area: 1 / col4-start / last-line / 6
+}
+</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/KPiJbq66MU7EYvSn5VTCzBseoZJIX5DKxJ1EiTYcEQM/mtime:1460132250/sites/default/files/blogs/2016/1604/grid-start-end-d.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<h4 id="justify-self"><a href="#justify-self" class="headerlink" title="justify-self"></a>justify-self</h4><p>沿列轴对齐网格项中的内容(相反于align-item属性定义的沿行轴对齐)。此值适用于单一网格项中的内容。</p>
+<h5 id="属性值-15"><a href="#属性值-15" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><p>start: 内容与网格区域的左端对齐</p>
+</li>
+<li><p>end: 内容与网格区域的右端对齐</p>
+</li>
+<li><p>center: 内容处于网格区域的中间位置</p>
+</li>
+<li><p>stretch: 内容宽度占据整个网格区域空间(默认值)</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item&#123;</div><div class="line">    justify-self: start | end | center | stretch;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="示例-10"><a href="#示例-10" class="headerlink" title="示例"></a>示例</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item-a&#123;</div><div class="line">    justify-self: start;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/FAa3UWcKAWEOIkPH8lXG5jfZE8OuistoRRDCRctpTbQ/mtime:1460132248/sites/default/files/blogs/2016/1604/grid-justify-self-start.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.item-a{
+    justify-self: end;
+}
+</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/wGYKmY8P1ZXvDQ-7hZD5PpaQNqx7DRcXJX8sJWoHqOQ/mtime:1460132248/sites/default/files/blogs/2016/1604/grid-justify-self-end.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.item-a{
+    justify-self: center;
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/ucq6X4Lajn6Nc9er0fx6XvcvZTFlD9fFfo_Otls8rP4/mtime:1460132248/sites/default/files/blogs/2016/1604/grid-justify-self-center.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.item-a{
+    justify-self: stretch;
+}
+</code></pre><p><img src="http://cdn2.w3cplus.com/cdn/farfuture/fIfcjkknWhPK0DrPTKv-0Klh8Lb1_JiiaY--htE70Vc/mtime:1460132249/sites/default/files/blogs/2016/1604/grid-justify-self-stretch.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<p>设置网格中所有网格项的对齐方式，可以使用网格容器上的justify-items属性。</p>
+<h4 id="align-self"><a href="#align-self" class="headerlink" title="align-self"></a>align-self</h4><p>沿行轴对齐网格项中的内容(相反于justify-item属性定义的沿列轴对齐)。此值适用于单一网格项中的内容。</p>
+<h5 id="属性值-16"><a href="#属性值-16" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><p>start: 内容与网格区域的顶端对齐</p>
+</li>
+<li><p>end: 内容与网格区域的底部对齐</p>
+</li>
+<li><p>center: 内容处于网格区域的中间位置</p>
+</li>
+<li><p>stretch: 内容高度占据整个网格区域空间(默认值)</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item&#123;</div><div class="line">    align-self: start | end | center | stretch;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>示例:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item-a&#123;</div><div class="line">    align-self: start;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><img src="http://cdn.w3cplus.com/cdn/farfuture/jQeKs_UnuosaBK6-eJDD9pMd9FBBr7PCs67KCOCz3iE/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-align-self-start.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item-a&#123;</div><div class="line">    align-self: end;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/abkBl5xW-qmCOAc1lSdD6GnsmO8Ngi2wjBcnbFp1_Nk/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-align-self-end.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item-a&#123;</div><div class="line">    align-self: center;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/A8Or3mJI9h3CLZ6JZ0iMk3SHp3vWsnlAHGSlVic3uO4/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-align-self-center.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item-a&#123;</div><div class="line">    align-self: stretch;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/pl7ZPQIMBPLDqNIjZQXxIfmBEqIjhPhh8GQcG9Ec0aA/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-align-self-stretch.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<p>使网格中所有的网格项对齐，可以使用网格容器上的align-items属性。</p>
+<p>特别声明：本文来自于<a href="http://chris.house/blog/a-complete-guide-css-grid-layout/" target="_blank" rel="external">Chris House写的指南</a>，此份指南由Chris himself所写，并且会不断的保持更新。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/09/14/css-grid/" data-id="cjc79xqjj0011qtp3j92uzzf0" class="article-share-link">Partager</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/css-grid/">css-grid</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-bootstrap-notes" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/09/14/bootstrap-notes/" class="article-date">
+  <time datetime="2017-09-14T02:21:19.000Z" itemprop="datePublished">2017-09-14</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/bootstrap/">bootstrap</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/09/14/bootstrap-notes/">bootstrap笔记</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><a href="http://v3.bootcss.com/" target="_blank" rel="external">Bootstrap</a>：最受欢迎的HTML、CSS和JS框架，用于开发响应式布局、移动设备优先的WEB项目。</p>
+<h4 id="启步"><a href="#启步" class="headerlink" title="启步"></a>启步</h4><p>1、响应式布局标签：</p>
+<pre><code>&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+</code></pre><p>2、为了让最新浏览器运行在最新的渲染模式下，建议将此 <meta> 标签加入到页面中：</p>
+<pre><code>&lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
+</code></pre><p>3、让部分国产浏览器如360采用高速模式渲染页面：</p>
+<pre><code>&lt;meta name=&quot;renderer&quot; content=&quot;webkit&quot;&gt;
+</code></pre><h4 id="全局CSS样式"><a href="#全局CSS样式" class="headerlink" title="全局CSS样式"></a>全局CSS样式</h4><h5 id="一、概览"><a href="#一、概览" class="headerlink" title="一、概览"></a>一、概览</h5><p>1、移动设备优先</p>
+<p>在移动设备浏览器上，通过为视口（viewport）设置 meta 属性为 user-scalable=no 可以禁用其缩放（zooming）功能。</p>
+<pre><code>&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no&quot;&gt;
+</code></pre><p>2、布局容器</p>
+<p>.container 类用于固定宽度并支持响应式布局的容器。</p>
+<pre><code>&lt;div class=&quot;container&quot;&gt;
+  ...
+&lt;/div&gt;
+</code></pre><p>.container-fluid 类用于 100% 宽度，占据全部视口（viewport）的容器。</p>
+<pre><code>&lt;div class=&quot;container-fluid&quot;&gt;
+  ...
+&lt;/div&gt;
+</code></pre><h5 id="二、栅格系统"><a href="#二、栅格系统" class="headerlink" title="二、栅格系统"></a>二、栅格系统</h5><p>1、媒体查询</p>
+<p>Less文件中使用以下媒体查询（media query）来创建关键的分界点阈值。</p>
+<pre><code>/* 超小屏幕（手机，小于 768px） */
+/* 没有任何媒体查询相关的代码，因为这在 Bootstrap 中是默认的（还记得 Bootstrap 是移动设备优先的吗？） */
+
+/* 小屏幕（平板，大于等于 768px） */
+@media (min-width: @screen-sm-min) { ... }
+
+/* 中等屏幕（桌面显示器，大于等于 992px） */
+@media (min-width: @screen-md-min) { ... }
+
+/* 大屏幕（大桌面显示器，大于等于 1200px） */
+@media (min-width: @screen-lg-min) { ... }
+</code></pre><p>2、栅格参数</p>
+<pre><code>| 超小屏幕 手机（&lt;768px） 
+| 小屏幕 平板（&gt;=768px） 
+| 中等屏幕 显示器（&gt;=992px） 
+| 大屏幕 大显示器（&gt;=1200px）
+</code></pre><table>
+<thead>
+<tr>
+<th>.container 最大宽度</th>
+<th>自动</th>
+<th>750px</th>
+<th>970px</th>
+<th>1170px</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>类前缀</td>
+<td>.col-xs-</td>
+<td>.col-sm-</td>
+<td>.col-md-</td>
+<td>.col-lg-</td>
+</tr>
+<tr>
+<td>槽宽</td>
+<td>30px（每列左右各15px）</td>
+<td>30px</td>
+<td>30px</td>
+<td>30px</td>
+</tr>
+</tbody>
+</table>
+<p>实例：使用单一的一组 .col-md-* 栅格类，就可以创建一个基本的栅格系统，在手机和平板设备上一开始是堆叠在一起的（超小屏幕到小屏幕这一范围），在桌面（中等）屏幕设备上变为水平排列。所有“列（column）必须放在 ” .row 内。</p>
+<p><img src="../../public/css/images/column.png" alt=".col-md"></p>
+<center>grid demo</center>
+
+<pre><code>&lt;div class=&quot;row&quot;&gt;
+  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
+  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
+  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
+  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
+  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
+  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
+  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
+  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
+  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
+  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
+  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
+  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;row&quot;&gt;
+  &lt;div class=&quot;col-md-8&quot;&gt;.col-md-8&lt;/div&gt;
+  &lt;div class=&quot;col-md-4&quot;&gt;.col-md-4&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;row&quot;&gt;
+  &lt;div class=&quot;col-md-4&quot;&gt;.col-md-4&lt;/div&gt;
+  &lt;div class=&quot;col-md-4&quot;&gt;.col-md-4&lt;/div&gt;
+  &lt;div class=&quot;col-md-4&quot;&gt;.col-md-4&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;row&quot;&gt;
+  &lt;div class=&quot;col-md-6&quot;&gt;.col-md-6&lt;/div&gt;
+  &lt;div class=&quot;col-md-6&quot;&gt;.col-md-6&lt;/div&gt;
+&lt;/div&gt;
+</code></pre><p>3、实例：移动设备和桌面屏幕</p>
+<p>是否不希望在小屏幕设备上所有列都堆叠在一起？那就使用针对超小屏幕和中等屏幕设备所定义的类吧，即 .col-xs- 和 .col-md-。请看下面的实例，研究一下这些是如何工作的。</p>
+<pre><code>&lt;!-- Stack the columns on mobile by making one full-width and the other half-width --&gt;
+&lt;div class=&quot;row&quot;&gt;
+  &lt;div class=&quot;col-xs-12 col-md-8&quot;&gt;.col-xs-12 .col-md-8&lt;/div&gt;
+  &lt;div class=&quot;col-xs-6 col-md-4&quot;&gt;.col-xs-6 .col-md-4&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- Columns start at 50% wide on mobile and bump up to 33.3% wide on desktop --&gt;
+&lt;div class=&quot;row&quot;&gt;
+  &lt;div class=&quot;col-xs-6 col-md-4&quot;&gt;.col-xs-6 .col-md-4&lt;/div&gt;
+  &lt;div class=&quot;col-xs-6 col-md-4&quot;&gt;.col-xs-6 .col-md-4&lt;/div&gt;
+  &lt;div class=&quot;col-xs-6 col-md-4&quot;&gt;.col-xs-6 .col-md-4&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- Columns are always 50% wide, on mobile and desktop --&gt;
+&lt;div class=&quot;row&quot;&gt;
+  &lt;div class=&quot;col-xs-6&quot;&gt;.col-xs-6&lt;/div&gt;
+  &lt;div class=&quot;col-xs-6&quot;&gt;.col-xs-6&lt;/div&gt;
+&lt;/div&gt;
+</code></pre><p>4、列偏移</p>
+<p>使用 .col-md-offset- 类可以将列向右侧偏移。这些类实际是通过使用 选择器为当前元素增加了左侧的边距（margin）。例如，.col-md-offset-4 类将 .col-md-4 元素向右侧偏移了4个列（column）的宽度。</p>
+<pre><code>&lt;div class=&quot;row&quot;&gt;
+  &lt;div class=&quot;col-md-4&quot;&gt;.col-md-4&lt;/div&gt;
+  &lt;div class=&quot;col-md-4 col-md-offset-4&quot;&gt;.col-md-4 .col-md-offset-4&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;row&quot;&gt;
+  &lt;div class=&quot;col-md-3 col-md-offset-3&quot;&gt;.col-md-3 .col-md-offset-3&lt;/div&gt;
+  &lt;div class=&quot;col-md-3 col-md-offset-3&quot;&gt;.col-md-3 .col-md-offset-3&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;row&quot;&gt;
+  &lt;div class=&quot;col-md-6 col-md-offset-3&quot;&gt;.col-md-6 .col-md-offset-3&lt;/div&gt;
+&lt;/div&gt;
+</code></pre><p>5、列排序</p>
+<p>通过使用 .col-md-push- 和 .col-md-pull- 类就可以很容易的改变列（column）的顺序。</p>
+<pre><code>&lt;div class=&quot;row&quot;&gt;
+  &lt;div class=&quot;col-md-9 col-md-push-3&quot;&gt;.col-md-9 .col-md-push-3&lt;/div&gt;
+  &lt;div class=&quot;col-md-3 col-md-pull-9&quot;&gt;.col-md-3 .col-md-pull-9&lt;/div&gt;
+&lt;/div&gt;
+</code></pre><h5 id="三、排版"><a href="#三、排版" class="headerlink" title="三、排版"></a>三、排版</h5><p>1、标题</p>
+<p>h1到h6做为主标题 samll做为副标题</p>
+<pre><code>&lt;h1&gt;h1. Bootstrap heading &lt;small&gt;Secondary text&lt;/small&gt;&lt;/h1&gt;
+</code></pre><p>2、对齐</p>
+<pre><code>&lt;p class=&quot;text-left&quot;&gt;Left aligned text.&lt;/p&gt;
+&lt;p class=&quot;text-center&quot;&gt;Center aligned text.&lt;/p&gt;
+&lt;p class=&quot;text-right&quot;&gt;Right aligned text.&lt;/p&gt;
+&lt;p class=&quot;text-justify&quot;&gt;Justified text.&lt;/p&gt;
+&lt;p class=&quot;text-nowrap&quot;&gt;No wrap text.&lt;/p&gt;
+</code></pre><p>3、地址</p>
+<pre><code>&lt;address&gt;
+  &lt;strong&gt;Twitter, Inc.&lt;/strong&gt;&lt;br&gt;
+  795 Folsom Ave, Suite 600&lt;br&gt;
+  San Francisco, CA 94107&lt;br&gt;
+  &lt;abbr title=&quot;Phone&quot;&gt;P:&lt;/abbr&gt; (123) 456-7890
+&lt;/address&gt;
+
+&lt;address&gt;
+  &lt;strong&gt;Full Name&lt;/strong&gt;&lt;br&gt;
+  &lt;a href=&quot;mailto:#&quot;&gt;first.last@example.com&lt;/a&gt;
+&lt;/address&gt;
+</code></pre><p>4、内联列表</p>
+<pre><code>&lt;ul class=&quot;list-inline&quot;&gt;
+  &lt;li&gt;...&lt;/li&gt;
+&lt;/ul&gt;
+</code></pre><p>5、水平排列的描述</p>
+<pre><code>&lt;dl class=&quot;dl-horizontal&quot;&gt;
+  &lt;dt&gt;...&lt;/dt&gt;
+  &lt;dd&gt;...&lt;/dd&gt;
+&lt;/dl&gt;
+</code></pre><p>四、表格</p>
+<p>1、响应式表格</p>
+<p>将任何 .table 元素包裹在 .table-responsive 元素内，即可创建响应式表格，其会在小屏幕设备上（小于768px）水平滚动。当屏幕大于 768px 宽度时，水平滚动条消失。</p>
+<pre><code>&lt;div class=&quot;table-responsive&quot;&gt;
+  &lt;table class=&quot;table&quot;&gt;
+    ...
+  &lt;/table&gt;
+&lt;/div&gt;
+</code></pre><p>五、表单</p>
+<p>1、基本实例</p>
+<p>单独的表单控件会被自动赋予一些全局样式。所有设置了 .form-control 类的 <code>&lt;input&gt;</code>、<code>&lt;textarea&gt;</code> 和 <code>&lt;select&gt;</code> 元素都将被默认设置宽度属性为 width: 100%;。 将 label 元素和前面提到的控件包裹在 .form-group 中可以获得最好的排列。</p>
+<pre><code>&lt;form&gt;
+  &lt;div class=&quot;form-group&quot;&gt;
+    &lt;label for=&quot;exampleInputEmail1&quot;&gt;Email address&lt;/label&gt;
+    &lt;input type=&quot;email&quot; class=&quot;form-control&quot; id=&quot;exampleInputEmail1&quot; placeholder=&quot;Email&quot;&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;form-group&quot;&gt;
+    &lt;label for=&quot;exampleInputPassword1&quot;&gt;Password&lt;/label&gt;
+    &lt;input type=&quot;password&quot; class=&quot;form-control&quot; id=&quot;exampleInputPassword1&quot; placeholder=&quot;Password&quot;&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;form-group&quot;&gt;
+    &lt;label for=&quot;exampleInputFile&quot;&gt;File input&lt;/label&gt;
+    &lt;input type=&quot;file&quot; id=&quot;exampleInputFile&quot;&gt;
+    &lt;p class=&quot;help-block&quot;&gt;Example block-level help text here.&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;checkbox&quot;&gt;
+    &lt;label&gt;
+      &lt;input type=&quot;checkbox&quot;&gt; Check me out
+    &lt;/label&gt;
+  &lt;/div&gt;
+  &lt;button type=&quot;submit&quot; class=&quot;btn btn-default&quot;&gt;Submit&lt;/button&gt;
+&lt;/form&gt;
+</code></pre><p>2、…</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/09/14/bootstrap-notes/" data-id="cjc79xqj3000oqtp3uzyo4cq1" class="article-share-link">Partager</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/bootstrap/">bootstrap</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-angular-apply" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/09/14/angular-apply/" class="article-date">
+  <time datetime="2017-09-14T01:54:51.000Z" itemprop="datePublished">2017-09-14</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/angularjs/">angularjs</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/09/14/angular-apply/">理解数据绑定过程 - `$watch`, `$apply`和`$digest`</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>项目开发过程中，在自定义指令里，用jquery捕捉到事件后改变scope里的变量，模板里的变量没有发生变化。幸运的是，从中文社区找到一篇关于数据绑定过程的文章，不仅解决了这个问题，对angular的理解也更加深了一层。</p>
+<p>博文地址：<a href="http://www.angularjs.cn/A0a6" target="_blank" rel="external">理解$watch ，$apply 和 $digest — 理解数据绑定过程</a></p>
+<p>英文地址：<a href="http://angular-tips.com/blog/2013/08/watch-how-the-apply-runs-a-digest/" target="_blank" rel="external">$watch How the $apply Runs a $digest</a></p>
+<h4 id="一、浏览器循环事件和Angular-js扩展"><a href="#一、浏览器循环事件和Angular-js扩展" class="headerlink" title="一、浏览器循环事件和Angular.js扩展"></a>一、浏览器循环事件和Angular.js扩展</h4><p>我们的浏览器一直在等待事件，比如用户交互。假如你点击一个按钮或者在输入框里输入东西，事件的回调函数就会在javascript解释器里执行，然后你就可以做任何DOM操作，等回调函数执行完毕时，浏览器就会相应地对DOM做出变化。 Angular拓展了这个事件循环，生成一个<font color="#d44950">angular context</font>的执行环境（记住，这是个重要的概念），为了解释什么是<font color="#d44950">context</font>以及它如何工作，我们还需要解释更多的概念。</p>
+<h4 id="二、-watch队列（-watch-list）"><a href="#二、-watch队列（-watch-list）" class="headerlink" title="二、$watch队列（$watch list）"></a>二、$watch队列（$watch list）</h4><p>页面上绑定一个model就会向$watch队列里插入一条 $watch 。$watch 检测它监视的model是否发生了变化。</p>
+<h5 id="1、demo"><a href="#1、demo" class="headerlink" title="1、demo"></a>1、demo</h5><font color="#d44950">index.html</font>
+
+<pre><code>User: &lt;input type=&quot;text&quot; ng-model=&quot;user&quot; /&gt;
+Password: &lt;input type=&quot;password&quot; ng-model=&quot;pass&quot; /&gt;
+</code></pre><p>页面绑定了两个scope的变量，所以$watch list里面加入了两个$watch。</p>
+<h5 id="2、demo"><a href="#2、demo" class="headerlink" title="2、demo"></a>2、demo</h5><font color="#d44950">controllers.js</font>
+
+<pre><code>app.controller(&apos;MainCtrl&apos;, function($scope) {
+  $scope.foo = &quot;Foo&quot;;
+  $scope.world = &quot;World&quot;;
+});
+</code></pre><font color="#d44950">index.html</font>
+
+<pre><code>Hello, {{ World }}
+</code></pre><p>这里，即便我们在$scope上添加了两个东西，但是只有一个绑定在了UI上，因此在这里只生成了一个$watch.</p>
+<h5 id="3、demo"><a href="#3、demo" class="headerlink" title="3、demo"></a>3、demo</h5><font color="#d44950">controllers.js</font>
+
+<pre><code>app.controller(&apos;MainCtrl&apos;, function($scope) {
+  $scope.people = [...];
+});
+</code></pre><font color="#d44950">index.html</font>
+
+<pre><code>&lt;ul&gt;
+  &lt;li ng-repeat=&quot;person in people&quot;&gt;
+      {{person.name}} - {{person.age}}
+  &lt;/li&gt;
+&lt;/ul&gt;
+</code></pre><p>这里又生成了多少个$watch呢？每个person有两个（一个name，一个age），然后ng-repeat又有一个，因此10个person一共是(2 * 10) +1,也就是说有21个$watch。</p>
+<h5 id="4、总结"><a href="#4、总结" class="headerlink" title="4、总结"></a>4、总结</h5><p>因此，每一个绑定到了UI上的数据都会生成一个$watch。</p>
+<p>那这些$watch是什么时候生成的呢？</p>
+<p>当我们的模版加载完毕时，也就是在linking阶段（Angular分为compile阶段和linking阶段—译者注），Angular解释器会寻找每个directive，然后生成每个需要的$watch。</p>
+<h4 id="三、-digest循环"><a href="#三、-digest循环" class="headerlink" title="三、$digest循环"></a>三、$digest循环</h4><p>还记得我前面提到的扩展的事件循环吗？当浏览器接收到可以被angular context处理的事件时，$digest循环就会触发</p>
+<p>这个循环是由两个更小的循环组合起来的：</p>
+<p>一个处理evalAsync队列。</p>
+<p>另一个处理$watch队列，这个也是本篇博文的主题。 这个是处理什么的呢？$digest将会遍历我们的$watch</p>
+<ul>
+<li><p>嘿，$watch，你的值是什么？</p>
+<ul>
+<li>是9。</li>
+</ul>
+</li>
+<li><p>好的，它改变过吗？</p>
+<ul>
+<li>没有，先生。</li>
+</ul>
+</li>
+</ul>
+<p>*（这个变量没变过，那下一个）</p>
+<ul>
+<li><p>你呢，你的值是多少？</p>
+<ul>
+<li>报告，是Foo。</li>
+</ul>
+</li>
+<li><p>刚才改变过没？</p>
+<ul>
+<li>改变过，刚才是Bar。</li>
+</ul>
+</li>
+<li><p>（很好，我们有DOM需要更新了）</p>
+</li>
+<li><p>继续询问直到$watch队列都检查过。</p>
+</li>
+</ul>
+<p>这就是所谓的dirty-checking。</p>
+<p>既然所有的$watch都检查完了，那就要问了：有没有$watch更新过？如果有至少一个更新过，这个循环就会再次触发，直到所有的$watch都没有变化。这样就能够保证每个model都已经不会再变化。</p>
+<p>记住如果循环超过10次的话，它将会抛出一个异常，防止无限循环。</p>
+<p>当$digest循环结束时，DOM相应地变化。</p>
+<h5 id="1、demo-1"><a href="#1、demo-1" class="headerlink" title="1、demo"></a>1、demo</h5><font color="#d44950">controllers.js</font>
+
+<pre><code>app.controller(&apos;MainCtrl&apos;, function() {
+  $scope.name = &quot;Foo&quot;;
+
+  $scope.changeFoo = function() {
+      $scope.name = &quot;Bar&quot;;
+  }
+});
+</code></pre><font color="#d44950">index.html</font>
+
+<pre><code>{{ name }}
+&lt;button ng-click=&quot;changeFoo()&quot;&gt;Change the name&lt;/button&gt;
+</code></pre><p>这里我们只有一个$watch，因为ng-click不生成$watch（函数是不会变的）。</p>
+<ul>
+<li><p>按下按钮</p>
+</li>
+<li><p>浏览器接收到一个事件，进入angular context（后面会解释为什么）。</p>
+</li>
+<li><p>$digest循环开始执行，查询每个$watch是否变化。</p>
+</li>
+<li><p>由于监视$scope.name的$watch报告了变化，它会强制再执行一次$digest循环。</p>
+</li>
+<li><p>新的$digest循环没有检测到变化。</p>
+</li>
+<li><p>浏览器拿回控制权，更新与$scope.name新值相应部分的DOM。</p>
+</li>
+</ul>
+<h4 id="四、通过-apply进入angular-context"><a href="#四、通过-apply进入angular-context" class="headerlink" title="四、通过$apply进入angular context"></a>四、通过$apply进入angular context</h4><p>谁来决定什么事件可以进入angular context，而哪些又不能进入呢？$apply！</p>
+<ul>
+<li><p>如果当事件触发时，你调用$apply，它会进入angular context，如果没有调用就不会进入。</p>
+</li>
+<li><p>现在你可能会问：刚才的例子里我也没有调用$apply啊，为什么？Angular为了做了！</p>
+</li>
+<li><p>当你点击带有ng-click的元素时，事件就会被封装到一个$apply调用。</p>
+</li>
+<li><p>例如你有一个ng-model=”foo”的输入框，然后你敲一个f，事件就会这样调用$apply(“foo = ‘f’;”)。</p>
+</li>
+</ul>
+<h4 id="五、Angular什么时候不会自动为我们-apply呢？"><a href="#五、Angular什么时候不会自动为我们-apply呢？" class="headerlink" title="五、Angular什么时候不会自动为我们$apply呢？"></a>五、Angular什么时候不会自动为我们$apply呢？</h4><p>这是Angular新手共同的痛处。为什么我的jQuery不会更新我绑定的东西呢？因为jQuery没有调用$apply，事件没有进入angular context，$digest循环永远没有执行。</p>
+<h5 id="1、demo-2"><a href="#1、demo-2" class="headerlink" title="1、demo"></a>1、demo</h5><font color="#d44950">app.js</font>
+
+<pre><code>app.directive(‘clickable’, function() {
+
+return {
+  restrict: &quot;E&quot;,
+  scope: {
+    foo: &apos;=&apos;,//通过 &apos;=&apos; 双向绑定，隔离的scope得以与controller里的父scope通信
+    bar: &apos;=&apos;//双向绑定
+  },
+  template: &apos;&lt;ul style=&quot;background-color: lightblue&quot;&gt;&lt;li&gt;{{foo}}&lt;/li&gt;&lt;li&gt;{{bar}}&lt;/li&gt;&lt;/ul&gt;&apos;,
+  link: function(scope, element, attrs) {
+    element.bind(&apos;click&apos;, function() {
+      scope.foo++;
+      scope.bar++;
+    });
+  }
+}
+
+});
+
+app.controller(&apos;MainCtrl&apos;, function($scope) {
+  $scope.foo = 0;
+  $scope.bar = 0;
+});
+</code></pre><p>代码意图：将foo和bar从controller里绑定到一个list里面，每次点击这个元素的时候，foo和bar都会自增1。</p>
+<p>但是当我们点击元素ul时，发现元素没有变化还是0。</p>
+<p>这是因为点击事件是一个没有封装到$apply里的事件。虽然如此，但是scope里的变量（foo和bar）确实是自增了的，只是因为没能通过$apply进入angular context，所以模板里的dom没能得到更新。</p>
+<p>也就是说，如果我们自己执行一次$apply，那么这些$watch就会看到变化，然后根据需要更新dom。</p>
+<p>试试看看这个例子：<a href="http://jsbin.com/opimat/2/" target="_blank" rel="external">http://jsbin.com/opimat/2/</a></p>
+<ul>
+<li><p>当我们先点击ul时，像上面所讲的，虽然scope里的foo和bar都自增了，但由于element.bind(‘clilck’)事件没有封装到$apply里，所以dom没有得到更新，模板里看不到变化。</p>
+</li>
+<li><p>但当我们点击 change hello按钮时，由于ng-click事件被封装到了$apply里，所以进入了angular context里，$digest循环执行，询问每个$watch时，发现不仅$sopce.hello的值发生了变化，scope.foo和scope.bar也发生了变化。</p>
+</li>
+<li><p>浏览器更新dom时，就可以看到三处变化了。</p>
+</li>
+</ul>
+<h5 id="2、demo-1"><a href="#2、demo-1" class="headerlink" title="2、demo"></a>2、demo</h5><p>现在你在想那并不是你想要的，你想要的是点击蓝色区域的时候就更新点击数。</p>
+<p>a、很简单，执行一下$apply就可以了：</p>
+<pre><code>element.bind(&apos;click&apos;, function() {
+  scope.foo++;
+  scope.bar++;
+
+  scope.$apply();
+});
+</code></pre><p>$apply是我们的$scope（或者是direcvie里的link函数中的scope）的一个函数，调用它会强制一次$digest循环（除非当前正在执行循环，这种情况下会抛出一个异常，这是我们不需要在那里执行$apply的标志）。</p>
+<p>试试看：<a href="http://jsbin.com/opimat/3/edit" target="_blank" rel="external">http://jsbin.com/opimat/3/edit</a></p>
+<p>b、有用啦，但是有一种更好的使用$apply的方法：</p>
+<pre><code>element.bind(&apos;click&apos;, function() {
+  scope.$apply(function() {
+      scope.foo++;
+      scope.bar++;
+  });
+})
+</code></pre><p>有什么不一样的？差别就是在第一个版本中，我们是在angular context的外面更新的数据，如果有发生错误，Angular永远不知道。很明显在这个像个小玩具的例子里面不会出什么大错，但是想象一下我们如果有个alert框显示错误给用户，然后我们有个第三方的库进行一个网络调用然后失败了，如果我们不把它封装进$apply里面，Angular永远不会知道失败了，alert框就永远不会弹出来了。</p>
+<h4 id="六、使用-watch-来监视你自己的东西"><a href="#六、使用-watch-来监视你自己的东西" class="headerlink" title="六、使用 $watch 来监视你自己的东西"></a>六、使用 $watch 来监视你自己的东西</h4><p>你已经知道了我们设置的任何绑定都有一个它自己的$watch，当需要时更新DOM，但是我们如果要自定义自己的watches呢？简单</p>
+<h5 id="1、demo-3"><a href="#1、demo-3" class="headerlink" title="1、demo"></a>1、demo</h5><font color="#d44950">app.js</font>
+
+<pre><code>app.controller(&apos;MainCtrl&apos;, function($scope) {
+  $scope.name = &quot;Angular&quot;;
+
+  $scope.updated = -1;
+
+  $scope.$watch(&apos;name&apos;, function() {
+    $scope.updated++;
+  });
+});
+</code></pre><font color="#d44950">index.html</font>
+
+<pre><code>&lt;body ng-controller=&quot;MainCtrl&quot;&gt;
+  &lt;input ng-model=&quot;name&quot; /&gt;
+  Name updated: {{updated}} times.
+&lt;/body&gt;
+</code></pre><p>这就我们创造的一个新的$watch方法。</p>
+<ul>
+<li><p>第一个参数是一个字符串或函数，在这里只是一个字符串，就是我们要监视的变量的名字。</p>
+</li>
+<li><p>第二个参数是一个回调函数，当变量发生变化时被调用。</p>
+</li>
+<li><p>我们要知道的第一件事就是当controller执行到这个 $watch 时，它会立即执行一次，困此我们设置updated为 -1 。</p>
+</li>
+</ul>
+<p>试试看：<a href="http://jsbin.com/ucaxan/1/edit" target="_blank" rel="external">http://jsbin.com/ucaxan/1/edit</a></p>
+<h5 id="2、demo-2"><a href="#2、demo-2" class="headerlink" title="2、demo"></a>2、demo</h5><font color="#d44950">app.js</font>
+
+<pre><code>app.controller(&apos;MainCtrl&apos;, function($scope) {
+  $scope.name = &quot;Angular&quot;;
+
+  $scope.updated = 0;
+
+  $scope.$watch(&apos;name&apos;, function(newValue, oldValue) {
+    if (newValue === oldValue) { return; } // AKA first run
+    $scope.updated++;
+  });
+});
+</code></pre><font color="#d44950">index.html</font>
+
+<pre><code>&lt;body ng-controller=&quot;MainCtrl&quot;&gt;
+  &lt;input ng-model=&quot;name&quot; /&gt;
+  Name updated: {{updated}} times.
+&lt;/body&gt;
+</code></pre><ul>
+<li><p>watch的第二个参数接受两个参数，新值和旧值。</p>
+</li>
+<li><p>我们可以用他们来略过第一次的执行。</p>
+</li>
+<li><p>通常你不需要略过第一次执行，但在这个例子里面你是需要的。灵活点嘛少年。</p>
+</li>
+</ul>
+<h5 id="3、demo-1"><a href="#3、demo-1" class="headerlink" title="3、demo"></a>3、demo</h5><font color="#d44950">app.js</font>
+
+<pre><code>app.controller(&apos;MainCtrl&apos;, function($scope) {
+  $scope.user = { name: &quot;Fox&quot; };
+
+  $scope.updated = 0;
+
+  $scope.$watch(&apos;user&apos;, function(newValue, oldValue) {
+    if (newValue === oldValue) { return; }
+    $scope.updated++;
+  });
+});
+</code></pre><font color="#d44950">index.html</font>
+
+<pre><code>&lt;body ng-controller=&quot;MainCtrl&quot;&gt;
+  &lt;input ng-model=&quot;user.name&quot; /&gt;
+  Name updated: {{updated}} times.
+&lt;/body&gt;
+</code></pre><p>我们想要监视$scope.user对象里的任何变化，和以前一样这里只是用一个对象来代替前面的字符串。</p>
+<p>试试看：<a href="http://jsbin.com/ucaxan/3/edit" target="_blank" rel="external">http://jsbin.com/ucaxan/3/edit</a></p>
+<ul>
+<li><p>没用，为啥？</p>
+</li>
+<li><p>因为$watch默认是比较两个对象所引用的是否相同，在例子1和2里面，每次更改$scope.name都会创建一个新的基本变量，因此$watch会执行，因为对这个变量的引用已经改变了。</p>
+</li>
+<li><p>在上面的例子里，我们在监视$scope.user，当我们改变$scope.user.name时，对$scope.user的引用是不会改变的，我们只是每次创建了一个新的$scope.user.name，但是$scope.user永远是一样的。</p>
+</li>
+</ul>
+<h5 id="4、demo"><a href="#4、demo" class="headerlink" title="4、demo"></a>4、demo</h5><font color="#d44950">app.js</font>
+
+<pre><code>app.controller(&apos;MainCtrl&apos;, function($scope) {
+  $scope.user = { name: &quot;Fox&quot; };
+
+  $scope.updated = 0;
+
+  $scope.$watch(&apos;user&apos;, function(newValue, oldValue) {
+    if (newValue === oldValue) { return; }
+    $scope.updated++;
+  }, true);
+});
+</code></pre><font color="#d44950">index.html</font>
+
+<pre><code>&lt;body ng-controller=&quot;MainCtrl&quot;&gt;
+  &lt;input ng-model=&quot;user.name&quot; /&gt;
+  Name updated: {{updated}} times.
+&lt;/body&gt;
+</code></pre><p>试试看：<a href="http://jsbin.com/ucaxan/4/edit" target="_blank" rel="external">http://jsbin.com/ucaxan/4/edit</a></p>
+<ul>
+<li><p>现在有用了吧！因为我们对$watch加入了第三个参数，它是一个bool类型的参数，表示的是我们比较的是对象的值而不是引用。</p>
+</li>
+<li><p>由于当我们更新$scope.user.name时$scope.user也会改变，所以能够正确触发。</p>
+</li>
+</ul>
+<h4 id="七、总结"><a href="#七、总结" class="headerlink" title="七、总结"></a>七、总结</h4><p>1、好吧，我希望你们已经学会了在Angular中数据绑定是如何工作的。我猜想你的第一印象是dirty-checking很慢，好吧，其实是不对的。它像闪电般快。但是，是的，如果你在一个模版里有2000-3000个watch，它会开始变慢。但是我觉得如果你达到这个数量级，就可以找个用户体验专家咨询一下了</p>
+<p>2、无论如何，随着ECMAScript6的到来，在Angular未来的版本里我们将会有Object.observe那样会极大改善$digest循环的速度。同时未来的文章也会涉及一些tips&amp;tricks。</p>
+<p>3、另一方面，这个主题并不容易，如果你发现我落下了什么重要的东西或者有什么东西完全错了，请在github上提交问题或提交修正。</p>
+<h4 id="八、回到总题"><a href="#八、回到总题" class="headerlink" title="八、回到总题"></a>八、回到总题</h4><p>总结：数据绑定机制：</p>
+<p>1、angular发现一个model就会向$watch list里插入一个$watch，用来监测这个model是否发生了变化 。</p>
+<p>2、当事件触发后，比如ng-click，事件就会被封装到一个$apply。$apply决定了哪些事件触发后可以进入angular context，哪些事件触发后不会进入到angular context。</p>
+<p>3、$apply调用后，进入到angular context。</p>
+<p>4、$digest循环执行，询问每个$watch，看看它监测的model有没有发生变化。</p>
+<p>5、有变化再循环，直到没有发现变化为止。</p>
+<p>6、浏览器拿回控制权，更新相应的dom。</p>
+<p>这也就解释了为什么jquery改变scope的变量时，为什么dom没有更新。因为jQuery没有调用$apply，事件没有进入angular context，$digest循环永远没有执行。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/09/14/angular-apply/" data-id="cjc79xqht0001qtp35rp46s76" class="article-share-link">Partager</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-angular-directive" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/09/14/angular-directive/" class="article-date">
+  <time datetime="2017-09-14T01:30:09.000Z" itemprop="datePublished">2017-09-14</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/angularjs/">angularjs</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/09/14/angular-directive/">angularJS中的指令directive</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>原文：</p>
+<p><a href="http://blog.jobbole.com/62249/" target="_blank" rel="external">AngularJS 指令实践指南（一）</a></p>
+<p><a href="http://blog.jobbole.com/62999/" target="_blank" rel="external">AngularJS 指令实践指南（二）</a></p>
+<h4 id="一、创建自定义指令"><a href="#一、创建自定义指令" class="headerlink" title="一、创建自定义指令"></a>一、创建自定义指令</h4><pre><code>var app = angular.module(&apos;myapp&apos;, []);
+
+app.directive(&apos;rabbitHeader&apos;, function() {
+  return {
+      restrict: &apos;AE&apos;,
+      replace: &apos;true&apos;,
+      template: &apos;&lt;h3&gt;Hello World!!&lt;/h3&gt;&apos;
+  };
+});
+</code></pre><h5 id="1、表现形式"><a href="#1、表现形式" class="headerlink" title="1、表现形式"></a>1、表现形式</h5><ul>
+<li><p>html元素名</p>
+<pre><code>&lt;rabbit-header&gt;&lt;/rabbit-header&gt;
+</code></pre></li>
+<li><p>元素的属性</p>
+<pre><code>&lt;div rabbit-header&gt;&lt;/div&gt;
+</code></pre></li>
+<li><p>类名        </p>
+<pre><code>&lt;div class=&quot;rabbit-header&quot;&gt;&lt;/div&gt;    
+</code></pre></li>
+<li><p>注释</p>
+<pre><code>&lt;!-- directive: rabbit-header --&gt;
+</code></pre></li>
+</ul>
+<h5 id="2、属性"><a href="#2、属性" class="headerlink" title="2、属性"></a>2、属性</h5><p><em>restrict:</em></p>
+<ul>
+<li><p>A：只限属性使用</p>
+</li>
+<li><p>C：只限类名使用</p>
+</li>
+<li><p>E：只限元素名使用</p>
+</li>
+<li><p>M：只限注释使用</p>
+</li>
+</ul>
+<p><em>template | templateUrl</em></p>
+<ul>
+<li><p>template: 不一定要是简单的字符串，可以包含其它指令或表达式{} 等</p>
+</li>
+<li><p>templateUrl: 指向模板的一个地址</p>
+</li>
+</ul>
+<p><em>replace</em></p>
+<ul>
+<li><p>true: 生成的html内容会替换掉定义此指令的html</p>
+</li>
+<li><p>false: 生成的html内容会插入到定义此指令的元素中</p>
+</li>
+</ul>
+<h5 id="3、Link函数和Scope"><a href="#3、Link函数和Scope" class="headerlink" title="3、Link函数和Scope"></a>3、Link函数和Scope</h5><ul>
+<li><p>默认情况下指令不会创建新的子scope。</p>
+</li>
+<li><p>如果指令存在于一个controller下，它会使用这个contoller的scope。</p>
+</li>
+<li><p>指令的scope在link函数中使用。</p>
+</li>
+</ul>
+<p>index.html</p>
+<pre><code>&lt;body ng-controller=&quot;MainCtrl&quot;&gt;
+  &lt;input type=&quot;text&quot; ng-model=&quot;color&quot; placeholder=&quot;Enter a color&quot; /&gt;
+  &lt;hello-world&gt;&lt;/hello-world&gt;
+&lt;/body&gt;
+</code></pre><p>app.js</p>
+<pre><code>app.directive(&apos;helloWorld&apos;, function() {
+  return {
+    restrict: &apos;AE&apos;,
+    replace: true,
+    template: &apos;&lt;p style=&quot;background-color:{{color}}&quot;&gt;Hello World&apos;,
+    link: function(scope, elem, attrs) {
+      elem.bind(&apos;click&apos;, function() {
+        elem.css(&apos;background-color&apos;, &apos;white&apos;);
+        scope.$apply(function() {
+          scope.color = &quot;white&quot;;
+        });
+      });
+      elem.bind(&apos;mouseover&apos;, function() {
+        elem.css(&apos;cursor&apos;, &apos;pointer&apos;);
+      });
+    }
+  };
+});
+</code></pre><p>link函数中的三个参数：</p>
+<ul>
+<li><p>scope - 在这个例子中，指令的scope就是controller的scope。</p>
+</li>
+<li><p>ele - 指令的jQLite(jQuery的子集)包装DOM元素。如果你在引入AngularJS之前引入了jQuery，那么这个元素就是jQuery元素，而不是jQLite元素。由于这个元素已经被jQuery/jQLite包装了，所以我们就在进行DOM操作的时候就不需要再使用 $()来进行包装。</p>
+</li>
+<li><p>attr - 一个包含了指令所在元素的属性的标准化的参数对象。举个例子，你给一个HTML元素添加了一些属性：，那么可以在 link 函数中通过 attrs.someAttribute 来使用它。</p>
+</li>
+</ul>
+<p>link函数主要用来为DOM元素添加事件监听、监视模型属性变化、以及更新DOM。</p>
+<p>在上面的指令代码片段中，我们添加了两个事件， click，和 mouseover。click 处理函数用来重置的背景色，而 mouseover 处理函数改变鼠标为 pointer。在模板中有一个表达式 {color}，当父scope中的 color 发生变化时，它用来改变 Hello World 文字的背景色。 这个plunker演示了这些概念</p>
+<h5 id="4、compile函数"><a href="#4、compile函数" class="headerlink" title="4、compile函数"></a>4、compile函数</h5><p>compile 函数在 link 函数被执行之前用来做一些DOM改造。它接收下面的参数：</p>
+<ul>
+<li>tElement – 指令所在的元素</li>
+<li>attrs – 元素上赋予的参数的标准化列表</li>
+</ul>
+<p>要注意的是 compile 函数不能访问 scope，并且必须返回一个 link 函数。但是如果没有设置 compile 函数，你可以正常地配置 link 函数，（有了compile，就不能用link，link函数由compile返回）。compile函数可以写成如下的形式：</p>
+<pre><code>app.directive(&apos;test&apos;, function() {
+  return {
+    compile: function(tElem,attrs) {
+      //do optional DOM transformation here
+      return function(scope,elem,attrs) {
+        //linking function here
+      };
+    }
+  };
+});
+</code></pre><p>大多数的情况下，你只需要使用 link 函数。这是因为大部分的指令只需要考虑注册事件监听、监视模型、以及更新DOM等，这些都可以在 link 函数中完成。 但是对于像 ng-repeat 之类的指令，需要克隆和重复 DOM 元素多次，在 link 函数执行之前由 compile 函数来完成。这就带来了一个问题，为什么我们需要两个分开的函数来完成生成过程，为什么不能只使用一个？要回答好这个问题，我们需要理解指令在Angular中是如何被编译的！</p>
+<h5 id="5、指令是如何被编译的"><a href="#5、指令是如何被编译的" class="headerlink" title="5、指令是如何被编译的"></a>5、指令是如何被编译的</h5><p>1、编译阶段 compile</p>
+<ul>
+<li><p>angular应用启动后，$compile服务遍历所有DOM元素。</p>
+</li>
+<li><p>所有指令都被识别后，angular执行他们的compile方法。</p>
+</li>
+<li><p>compile 方法返回一个 link 函数，被添加到稍后执行的 link 函数列表中。</p>
+</li>
+</ul>
+<p>2、链接阶段 linking</p>
+<ul>
+<li><p>所有收集到的link函数都将被一一执行。</p>
+</li>
+<li><p>指令创造出来的模板会在正确的scope下被解析和处理，然后返回具有事件响应的真实的DOM节点。</p>
+</li>
+</ul>
+<h5 id="6、改变指令的Scope"><a href="#6、改变指令的Scope" class="headerlink" title="6、改变指令的Scope"></a>6、改变指令的Scope</h5><p>默认情况下，指令获取它父节点的controller的scope。</p>
+<p>如果将父controller的scope暴露给指令，那么他们可以随意地修改 scope 的属性。</p>
+<p>在某些情况下，你的指令希望能够添加一些仅限内部使用的属性和方法。但是如果我们在父的scope中添加，会污染父scope。</p>
+<p>所以我们可以选择以下两种方式：</p>
+<ul>
+<li><p>一个子scope – 这个scope原型继承子父scope。</p>
+<pre><code>app.directive(&apos;helloWorld&apos;, function() {
+  return {
+    scope: true,  // use a child scope that inherits from parent
+    restrict: &apos;AE&apos;,
+    replace: &apos;true&apos;,
+    template: &apos;&lt;h3&gt;Hello World!!&lt;/h3&gt;&apos;
+  };
+});
+</code></pre></li>
+<li><p>一个隔离的scope – 一个孤立存在不继承自父scope的scope。</p>
+<pre><code>app.directive(&apos;helloWorld&apos;, function() {
+  return {
+    scope: {},  // use a new isolated scope
+    restrict: &apos;AE&apos;,
+    replace: &apos;true&apos;,
+    template: &apos;&lt;h3&gt;Hello World!!&lt;/h3&gt;&apos;
+  };
+});
+</code></pre></li>
+</ul>
+<p>这个指令使用了一个隔离的scope。</p>
+<p>隔离的scope在我们想要创建可重用的指令的时候是非常有好处的。</p>
+<p>通过使用隔离的scope，我们能够保证我们的指令是自包含的，可以被很容易的插入到HTML应用中。</p>
+<p>它内部不能访问父的scope，所保证了父scope不被污染。</p>
+<p>在我们的 helloWorld 指令例子中，如果我们将 scope 设置成 {}，那么上面的代码将不会工作。 它会创建一个新的隔离的scope，那么相应的表达式 { color } 会指向到这个新的scope中，它的值将是 undefined.</p>
+<p>使用隔离的scope并不意味着我们完全不能访问父scope的属性。其实有一些技术可以允许我们访问父scope的属性，甚至监视他们的变化。</p>
+<h4 id="二、隔离scope与父scope通信"><a href="#二、隔离scope与父scope通信" class="headerlink" title="二、隔离scope与父scope通信"></a>二、隔离scope与父scope通信</h4><h5 id="1、隔离scope与父scope之间的数据绑定"><a href="#1、隔离scope与父scope之间的数据绑定" class="headerlink" title="1、隔离scope与父scope之间的数据绑定"></a>1、隔离scope与父scope之间的数据绑定</h5><p>假设我们已经初始化完成app这个变量所指向的Angular模块。那么我们的 helloWorld 指令如下面代码所示：</p>
+<pre><code>app.directive(&apos;helloWorld&apos;, function() {
+  return {
+    scope: {},
+    restrict: &apos;AE&apos;,
+    replace: true,
+    template: &apos;&lt;p style=&quot;background-color:{{color}}&quot;&gt;Hello World&lt;/p&gt;&apos;,
+    link: function(scope, elem, attrs) {
+      elem.bind(&apos;click&apos;, function() {
+        elem.css(&apos;background-color&apos;,&apos;white&apos;);
+        scope.$apply(function() {
+          scope.color = &quot;white&quot;;
+        });
+      });
+      elem.bind(&apos;mouseover&apos;, function() {
+        elem.css(&apos;cursor&apos;, &apos;pointer&apos;);
+      });
+    }
+  };
+});
+</code></pre><p>使用这个指令的HTML标签如下：</p>
+<pre><code>&lt;body ng-controller=&quot;MainCtrl&quot;&gt;
+  &lt;input type=&quot;text&quot; ng-model=&quot;color&quot; placeholder=&quot;Enter a color&quot;/&gt;
+  &lt;hello-world/&gt;
+&lt;/body&gt;
+</code></pre><p>上面的代码现在是不能工作的。因为我们用了一个隔离的scope，指令内部的 {color} 表达式被隔离在指令内部的scope中(不是父scope)。</p>
+<p>但是外面的输入框元素中的 ng-model 指令是指向父scope中的 color 属性的。</p>
+<p>所以，我们需要一种方式来绑定隔离scope和父scope中的这两个参数。</p>
+<p>在Angular中，这种数据绑定可以通过为指令所在的HTML元素添加属性和在指令定义对象中配置相应的 scope 属性来实现。</p>
+<p>让我们来细究一下建立数据绑定的几种方式。</p>
+<h5 id="选择一：使用-实现单向文本绑定"><a href="#选择一：使用-实现单向文本绑定" class="headerlink" title="选择一：使用 @ 实现单向文本绑定"></a>选择一：使用 @ 实现单向文本绑定</h5><p>在下面的指令定义中，我们指定了隔离scope中的属性 color 绑定到指令所在HTML元素上的参数 colorAttr。</p>
+<p>在HTML标记中，你可以看到 {color}表达式被指定给了 color-attr 参数。当表达式的值发生改变时，color-attr 参数也跟着改变。隔离scope中的 color 属性的值也相应地被改变。</p>
+<pre><code>app.directive(&apos;helloWorld&apos;, function() {
+  return {
+    scope: {
+      color: &apos;@colorAttr&apos;
+    },
+    ....
+    // the rest of the configurations
+  };
+});
+</code></pre><p>更新后的HTML标记代码如下：</p>
+<pre><code>&lt;body ng-controller=&quot;MainCtrl&quot;&gt;
+  &lt;input type=&quot;text&quot; ng-model=&quot;color&quot; placeholder=&quot;Enter a color&quot;/&gt;
+  &lt;hello-world color-attr=&quot;{{color}}&quot;/&gt;
+&lt;/body&gt;
+</code></pre><p>我们称这种方式为单项绑定，是因为在这种方式下，你只能将字符串(使用表达式)传递给参数。</p>
+<p>当父scope的属性变化时，你的隔离scope模型中的属性值跟着变化。你甚至可以在指令内部监控这个scope属性的变化，并且触发一些任务。</p>
+<p>然而，反向的传递并不工作。你不能通过对隔离scope属性的操作来改变父scope的值。</p>
+<p>注意点：<br>当隔离scope属性和指令元素参数的名字一样时，你可以以更简单的方式设置scope绑定：</p>
+<pre><code>app.directive(&apos;helloWorld&apos;, function() {
+  return {
+    scope: {
+      color: &apos;@&apos;
+    },
+    ....
+    // the rest of the configurations
+  };
+});
+</code></pre><p>相应使用指令的HTML代码如下：</p>
+<hello-world color="">
+
+<h5 id="选择二：使用-实现双向绑定"><a href="#选择二：使用-实现双向绑定" class="headerlink" title="选择二：使用 = 实现双向绑定"></a>选择二：使用 = 实现双向绑定</h5><p>让我们将指令的定义改变成下面的样子：</p>
+<pre><code>app.directive(&apos;helloWorld&apos;, function() {
+  return {
+    scope: {
+      color: &apos;=&apos;
+    },
+    ....
+    // the rest of the configurations
+  };
+});
+</code></pre><p>相应的HTML修改如下：</p>
+<pre><code>&lt;body ng-controller=&quot;MainCtrl&quot;&gt;
+  &lt;input type=&quot;text&quot; ng-model=&quot;color&quot; placeholder=&quot;Enter a color&quot;/&gt;
+  &lt;hello-world color=&quot;color&quot;/&gt;
+&lt;/body&gt;
+</code></pre><p>与 @ 不同，这种方式让你能够给属性指定一个真实的scope数据模型，而不是简单的字符串。</p>
+<p>这样你就可以传递简单的字符串、数组、甚至复杂的对象给隔离scope。</p>
+<p>同时，还支持双向的绑定。每当父scope属性变化时，相对应的隔离scope中的属性也跟着改变，反之亦然。</p>
+<p>和之前的一样，你也可以监视这个scope属性的变化。</p>
+<h5 id="选择三：使用-amp-在父scope中执行函数"><a href="#选择三：使用-amp-在父scope中执行函数" class="headerlink" title="选择三：使用 &amp; 在父scope中执行函数"></a>选择三：使用 &amp; 在父scope中执行函数</h5><p>有时候从隔离scope中调用父scope中定义的函数是非常有必要的。为了能够访问外部scope中定义的函数，我们使用 &amp;。</p>
+<p>比如我们想要从指令内部调用 changColor() 方法。下面的代码告诉我们该怎么做：</p>
+<pre><code>app.directive(&apos;helloWorld&apos;,function(){
+  return{
+    scope:{
+      color:&apos;=&apos;,
+      changeColor:&apos;&amp;&apos;,
+    },
+    ...
+  }
+});
+</code></pre><p>相应的HTML代码如下：</p>
+<pre><code>&lt;body ng-controller=&quot;MainCtrl&quot;&gt;
+    &lt;input type=&quot;text&quot; ng-model=&quot;color&quot; placeholder=&quot;Enter a color&quot;/&gt;
+    &lt;hello-world color=&quot;color&quot; change-color=&apos;change()&apos;/&gt;
+&lt;/body&gt;
+</code></pre><p>这个 <a href="http://plnkr.co/edit/k4scWKwtGBJw7lfKGqVJ?p=preview" target="_blank" rel="external">Plunker</a> 例子对上面的概念做了很好的诠释。</p>
+<h5 id="2、父scope、子scope以及隔离scope的区别"><a href="#2、父scope、子scope以及隔离scope的区别" class="headerlink" title="2、父scope、子scope以及隔离scope的区别"></a>2、父scope、子scope以及隔离scope的区别</h5><p>下面的这个原则也许可以帮助你为你的指令选择正确的scope。</p>
+<ul>
+<li><p>父scope(scope: false) – 这是默认情况。如果你的指令不操作父scoe的属性，你就不需要一个新的scope。这种情况下是可以使用父scope的。</p>
+</li>
+<li><p>子scope(scope: true) – 这会为指令创建一个新的scope，并且原型继承自父scope。如果你的指令scope中的属性和方法与其他的指令以及父scope都没有关系的时候，你应该创建一个新scope。在这种方式下，你同样拥有父scope中所定义的属性和方法。</p>
+</li>
+<li><p>隔离scope(scope:{}) – 这就像一个沙箱！当你创建的指令是自包含的并且可重用的，你就需要使用这种scope。你在指令中会创建很多scope属性和方法，它们仅在指令内部使用，永远不会被外部的世界所知晓。如果是这样的话，隔离的scope是更好的选择。隔离的scope不会继承父scope。</p>
+</li>
+</ul>
+<h4 id="三、Transclusion（嵌入）"><a href="#三、Transclusion（嵌入）" class="headerlink" title="三、Transclusion（嵌入）"></a>三、Transclusion（嵌入）</h4><p>Transclusion可以让我们的指令包含任意内容的方法。</p>
+<p>如果你在指令定义中设置 transclude:true，一个新的嵌入的scope会被创建，它原型继承自父scope。</p>
+<p>如果你想要你的指令使用隔离的scope，但是它所包含的内容能够在父scope中执行，transclusion也可以帮忙。</p>
+<h5 id="1、demo"><a href="#1、demo" class="headerlink" title="1、demo"></a>1、demo</h5><p>假设我们注册一个如下的指令：</p>
+<pre><code>app.directive(&apos;outputText&apos;, function() {
+  return {
+    transclude: true,
+    scope: {},
+    template: &apos;&lt;div ng-transclude&gt;&lt;/div&gt;&apos;
+  };
+});
+</code></pre><p>它使用如下：</p>
+<pre><code>&lt;div output-text&gt;
+  &lt;p&gt;Hello {{name}}&lt;/p&gt;
+&lt;/div&gt;
+</code></pre><p>在这个例子中DOM内容 </p><p>Hello {name}</p> 被提取和放置到 <div ng-transclude=""></div> 内部。<p></p>
+<p>表达式{name}所对应的属性是在父scope中被定义的，而非子scope。</p>
+<p>你可以在这个 <a href="http://plnkr.co/edit/YQBPB9cvGgJiYMuIjzTw?p=preview" target="_blank" rel="external">Plunker</a> 例子中做一些实验。</p>
+<h5 id="2、transclude-’element’-和-transclude-true的区别"><a href="#2、transclude-’element’-和-transclude-true的区别" class="headerlink" title="2、transclude:’element’ 和 transclude:true的区别"></a>2、transclude:’element’ 和 transclude:true的区别</h5><p>有时候我我们要嵌入指令元素本身，而不仅仅是它的内容。在这种情况下，我们需要使用 transclude:’element’。</p>
+<p>它和 transclude:true 不同，它将标记了 ng-transclude 指令的元素一起包含到了指令模板中。</p>
+<p>使用transclusion，你的link函数会获得一个名叫 transclude 的链接函数，这个函数绑定了正确的指令scope，并且传入了另一个拥有被嵌入DOM元素拷贝的函数。</p>
+<p>你可以在这个 transclude 函数中执行比如修改元素拷贝或者将它添加到DOM上等操作。 类似 ng-repeat 这样的指令使用这种方式来重复DOM元素。</p>
+<p>仔细研究一下这个Plunker，它使用这种方式复制了DOM元素，并且改变了第二个实例的背景色。</p>
+<p>同样需要注意的是，在使用 transclude:’element’的时候，指令所在的元素会被转换成HTML注释。</p>
+<p>所以，如果你结合使用 transclude:’element’ 和 replace:false，那么指令模板本质上是被添加到了注释的innerHTML中——也就是说其实什么都没有发生！</p>
+<p>相反，如果你选择使用 replace:true，指令模板会替换HTML注释，那么一切就会如果所愿的工作。</p>
+<p>使用 replade:false 和 transclue:’element’有时候也是有用的，比如当你需要重复DOM元素但是并不想保留第一个元素实例（它会被转换成注释）的情况下。对这块还有疑惑的同学可以阅读stackoverflow上的这篇讨论，介绍的比较清晰。</p>
+<h4 id="四、controller-函数和-require"><a href="#四、controller-函数和-require" class="headerlink" title="四、controller 函数和 require"></a>四、controller 函数和 require</h4><p>如果想让指令与指令交互，就要用到controller函数。比如有些情况下，你需要通过组合两个指令来实现一个UI组件。那么你可以通过如下的方式来给指令添加一个 controller 函数。</p>
+<pre><code>app.directive(&apos;outerDirective&apos;, function() {
+  return {
+    scope: {},
+    restrict: &apos;AE&apos;,
+    controller: function($scope, $compile, $http) {
+      // $scope is the appropriate scope for the directive
+      this.addChild = function(nestedDirective) { // this refers to the controller
+        console.log(&apos;Got the message from nested directive:&apos; + nestedDirective.message);
+      };
+    }
+  };
+});
+</code></pre><p>这个代码为一个名叫 outerDirective的指令添加了controller。</p>
+<p>当另一个指令 innerDirective 想要与指令outerDirective交互时，innterDirective 需要声明对 outerDirective 的 controller 实例的引用(require)。</p>
+<p>可以通过如下的方式实现：</p>
+<pre><code>app.directive(&apos;innerDirective&apos;, function() {
+  return {
+    scope: {},
+    restrict: &apos;AE&apos;,
+    require: &apos;^outerDirective&apos;,
+    link: function(scope, elem, attrs, controllerInstance) {
+      //the fourth argument is the controller instance you require
+      scope.message = &quot;Hi, Parent directive&quot;;
+      controllerInstance.addChild(scope);
+    }
+  };
+});
+</code></pre><p>相应的HTML代码如下：</p>
+<pre><code>&lt;outer-directive&gt;
+  &lt;inner-directive&gt;&lt;/inner-directive&gt;
+&lt;/outer-directive&gt;
+</code></pre><p>require: ‘^outerDirective’ 告诉Angular在元素以及它的父元素outerDirective中搜索controller。</p>
+<p>这样被找到的 controller 实例会作为第四个参数controllerInstance被传入到 link 函数中。</p>
+<p>在我们的例子中，我们将嵌入的指令的scope发送给父亲指令。</p>
+<p>如果你想尝试这个代码的话，请在开启浏览器控制台的情况下打开这个<a href="http://plnkr.co/edit/NMWGE6l9p1tBZh3jCfKn?p=preview" target="_blank" rel="external">Plunker</a>。</p>
+<p>同时，<a href="https://docs.angularjs.org/guide/directive" target="_blank" rel="external">这篇Angular官方文档</a>上的最后部分给了一个非常好的关于指令交互的例子，是非常值得一读的。</p>
+<h4 id="五、一个记事本的应用"><a href="#五、一个记事本的应用" class="headerlink" title="五、一个记事本的应用"></a>五、一个记事本的应用</h4><p>这一部分，我们使用Angular指令创建一个简单的记事本应用。我们会使用HTML5的 localStorage 来存储笔记。</p>
+<p>我们会创建一个展现记事本的指令。</p>
+<p>用户可以查看他/她创建过的笔记记录。当他点击 add new 按钮的时候，记事本会进入可编辑状态，并且允许创建新的笔记。当点击 back 按钮的时候，新的笔记会被自动保存。笔记的保存使用了一个名叫 noteFactory 的工厂类，它使用了 localStorage。</p>
+<p>你可以从<a href="https://github.com/jsprodotcom/source/blob/master/AngularJS_Note_Taker-source_code.zip" target="_blank" rel="external">GitHub</a>上下到这个Demo的源代码。</p>
+<h4 id="六、总结"><a href="#六、总结" class="headerlink" title="六、总结"></a>六、总结</h4><p>一个很重要的点需要注意的是，任何使用jQuery能做的事情，我们都能用Angular指令来做到，并且使用更少的代码。</p>
+<p>所以，在使用jQuery之前，请考虑一下我们能否在不进行DOM操作的情况下以更好的方式来完成任务。试着使用Angular来最小化jQuery的使用吧。</p>
+</hello-world>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/09/14/angular-directive/" data-id="cjc79xqi30004qtp30bkcflk4" class="article-share-link">Partager</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
   
     <article id="post-angular-errors" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
@@ -121,7 +1730,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/angular-errors/" data-id="cjc0aj3ux0004zsp3rj1um577" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/09/14/angular-errors/" data-id="cjc79xqi60005qtp3umc935gy" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
@@ -484,7 +2093,7 @@ export default Enhance(MyComponent); // Enhanced component
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/08/17/react-native-es5-es6/" data-id="cjc0aj3wz001gzsp3ddt096xl" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/08/17/react-native-es5-es6/" data-id="cjc79xqkh001kqtp3q6gpimdo" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/react/">react</a></li></ul>
@@ -780,7 +2389,7 @@ hexo d -g
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/08/14/github-hexo-blog/" data-id="cjc0aj3wt001czsp3h6u3t015" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/08/14/github-hexo-blog/" data-id="cjc79xqje000xqtp3gsk3n2ma" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/github/">github</a></li></ul>
@@ -827,7 +2436,7 @@ hexo d -g
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/08/14/hello-world/" data-id="cjc0aj3wb0011zsp3vfxqi0fg" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/08/14/hello-world/" data-id="cjc79xqj6000rqtp3w1gmhp5l" class="article-share-link">Partager</a>
       
       
     </footer>
@@ -998,7 +2607,7 @@ hexo d -g
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/17/angular-requirejs/" data-id="cjc0aj3vl000dzsp3v6jckobf" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/17/angular-requirejs/" data-id="cjc79xqim000cqtp3300zn16a" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
@@ -1047,7 +2656,7 @@ hexo d -g
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/05/18/Soccer-Superstars/" data-id="cjc0aj3uo0001zsp3x0j8udie" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/05/18/Soccer-Superstars/" data-id="cjc79xqhm0000qtp33sqr8r6b" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/足球/">足球</a></li></ul>
@@ -1059,609 +2668,10 @@ hexo d -g
 
 
   
-    <article id="post-angular-jsonp" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2016/05/16/angular-jsonp/" class="article-date">
-  <time datetime="2016-05-16T07:39:59.000Z" itemprop="datePublished">2016-05-16</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/angularjs/">angularjs</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/05/16/angular-jsonp/">angularJS使用.jsonp方法</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>angularJS与服务器通信中的$http中有一个$http.jsonp方法，在网上偶然间看到一篇文章，对此解释得非常清楚。</p>
-<p>原文地址：<a href="JSONP跨域访问数据传输">【AngularJs】 – JSONP跨域访问数据传输</a></p>
-<p>json:数据存储格式.</p>
-<p>jsonp:一种非官方的跨域数据交互协议.</p>
-<p>AngularJS在http服务中的jsonp函数如下所示：</p>
-<pre><code>$http.jsonp(&quot;https://api.github.com?callback=JSON_CALLBACK&quot;).success(function(data) {
-    //执行回调
-})
-</code></pre><p>1、当请求被发送时，AngularJS会在DOM中生成一个如下所示的<code>&lt;script&gt;</code>标签：</p>
-<pre><code>&lt;script src=&quot;https://api.github.com?callback=angular.callbacks._0&quot; type=&quot;text/javascript&quot;&gt;
-</code></pre><p>2、当支持JSONP的服务器返回数据时，数据会被包装在由AngularJS生成的具名函数angular.callbacks._0中。</p>
-<p>3、在这个例子中，Github服务器响应如下：</p>
-<pre><code>angular.callbacks._0({ 
-    &apos;meta&apos;: {
-        &apos;X-RateLimit-Limit&apos;: &apos;60&apos;, 
-        &apos;status&apos;: 200 
-    },
-    &apos;data&apos;: {
-        &apos;current_user_url&apos;: &apos;https://api.github.com/user&apos; 
-    } 
-}) 
-</code></pre><p>4、angularJS中jsonp的使用</p>
-<pre><code>myUrl = &quot;http://localhost:8090/api/test?callback=JSON_CALLBACK&quot;;
-
-$http.jsonp(myUrl).success(
-　　function(data){
-　　　　alert(data);
-　　}
-);
-</code></pre><p>1.angularJS中使用$http.jsonp函数</p>
-<p>2.指定callback和回调函数名，函数名为JSON_CALLBACK时，会调用success回调函数，JSON_CALLBACK必须全为大写。</p>
-<p>3.也可以指定其它回调函数，但必须是定义在window下的全局函数。</p>
-<p>4.url中必须加上callback</p>
-<p>5.当callback为JSON_CALLBACK时，只会调用success，即使window中有JSON_CALLBACK函数，也不会调用该函数。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/05/16/angular-jsonp/" data-id="cjc0aj3ve000azsp31f1tq3ck" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-angular-http" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2016/05/15/angular-http/" class="article-date">
-  <time datetime="2016-05-15T08:27:40.000Z" itemprop="datePublished">2016-05-15</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/angularjs/">angularjs</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/05/15/angular-http/">angularJS服务器通信之http</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>搜索angularJS通信时，看到一篇对$http通信解释得很是详细的文章，更难得的是文章的最后有一个对$http的封装，正好用在自己的angularJS项目的架构中。</p>
-<p>原来地址：<a href="http://www.cnblogs.com/wujie520303/p/4869600.html" target="_blank" rel="external">Angular服务器通信</a></p>
-<p>参考文献：<a href="http://www.linuxidc.com/Linux/2015-01/111429.htm" target="_blank" rel="external">AngularJS权威教程</a></p>
-<p>####一、快速上手</p>
-<p>$http服务只接收一个配置对象作为参数，并且返回一个promise对象，两个回调方法success和error.</p>
-<p>1、使用success()和error()</p>
-<pre><code>$http({
-  method: &apos;GET&apos;,
-  url: &apos;/api/user/1&apos;
-}).success(function(rep) {
-  // ...
-}).error(function(err) {
-  // ...
-});
-</code></pre><p>2、使用then()方法</p>
-<pre><code>$http({
-  method: &apos;GET&apos;,
-  url: &apos;/api/user/1&apos;
-}).then(function(rep) {
-  // 成功
-}, function(err) {
-  // 失败
-});
-</code></pre><p>3、服务器向客户端返回一个json数据，并带有一个状态码。</p>
-<p>状态码约定为：</p>
-<pre><code>var rep_status = [
-  {key: &apos;SUCCESS&apos;, value: 1, desc: &apos;交互成功&apos;},
-  {key: &apos;NOT_LOGIN&apos;, value: 2, desc: &apos;未登录&apos;},
-  {key: &apos;INVALID_REQUEST&apos;, value: 3, desc: &apos;非法请求&apos;},
-  {key: &apos;INVALID_PARAM&apos;, value: 4, desc: &apos;参数错误&apos;},
-  {key: &apos;INNER_ERROR&apos;, value: 5, desc: &apos;服务器内部错误&apos;},
-  {key: &apos;UNKNOWN&apos;, value: 6, desc: &apos;未知错误&apos;}
-]
-</code></pre><p>返回API约定为：</p>
-<pre><code>// 响应成功返回
-{
-  status: 1,
-  message: &apos;ok&apos;,
-  data: {
-    total: 200,
-    object_list: [
-      {
-        // ....
-      }
-    ]
-  }
-}
-
-// 出现错误后端返回
-{
-  status: 4,
-  message: &apos;参数错误&apos;
-}
-</code></pre><p>4、通过success()和error()得到的响应数据只包含服务器响应数据的主体，如果想得到一个完整的对象，需要使用then()方法。一个完整的响应对象或者叫promise对象包含如下字段：</p>
-<p>data - {string | Object} 响应主体 status - {number} 响应状态</p>
-<p>headers - {function([headerName])} 获取响应头部的函数 </p>
-<p>config - {Object} 请求触发时提供的配置对象，后面会详细介绍</p>
-<p>statusText - {string} 响应状态描述*</p>
-<pre><code> var promise = $http({method: &apos;GET&apos;, url: &apos;/api/user/5&apos;});
-promise.then(function(rep) {
-  console.log(rep.data.data.name); // jenemy
-  console.log(rep.status); // 200
-  console.log(rep.statusText); // OK
-  console.log(rep.config.url); // /api/user/5
-  console.log(rep.headers()[&apos;x-powered-by&apos;]); // Express
-});
-</code></pre><p>5、$http配置属性</p>
-<p>// params参数会转化为?name=jenemy&amp;age=25</p>
-<pre><code>$http({
-  method: &apos;GET&apos;,
-  url: &apos;/api/user/5&apos;,
-  params: {
-    name: &apos;jenemy&apos;,
-    age: 25
-  }
-});
-</code></pre><p>// data - {string | object} 在发送POST或PUT时使用</p>
-<pre><code>$http({
-    method: &apos;POST&apos;,
-    url: &apos;/api/user/2&apos;,
-    data: {name: &quot;jenemy&quot;},
-    headers: {
-        &apos;Authorization&apos;: &apos;Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==&apos;,
-        &apos;Content-Type&apos;: &apos;application/x-www-form-urlencoded;charset=utf-8&apos;
-    }
-});
-</code></pre><p>6、cache - {boolean | cache}</p>
-<p>默认情况下，$http服务不会对请求进行本地缓存。启用缓存，需要向$http请求传入一个布尔值或者一个缓存实例。</p>
-<pre><code>$http.get(&apos;/api/user&apos;, { cache: true})
-.success(function(data) {})
-.error(function(data){});
-</code></pre><p>当第一次请求成功后，$http会缓存请求的url，下一次请求时会直接加载缓存中的数据，不会再产生一次$http请求发出。</p>
-<p>由于设置了启用缓存，AngularJS默认会使用$cacheFactory，这个服务是AngularJS在启动时自动创建的。</p>
-<p>如果想要对AngularJS使用的缓存进行更多的自定义控制，可以请求传入一个自定义的缓存实例代替true。</p>
-<p>例如，如果要使用LRU（Least Recently Used，最近最少使用）缓存，可以像这样传入缓存实例对象：</p>
-<pre><code>var lru = $cacheFactory(&apos;lru&apos;,{
-    capacity: 20 //容纳
-});
-// $http请求
-$http.get(&apos;/api/users.json&apos;, { cache: lru }) 
-.success(function(data){}) 
-.error(function(data){});    
-</code></pre><p>现在，最新的20个请求会被缓存。第21个请求会导致lru从缓存中将时间比较老的请求移除。</p>
-<p>通过.config()函数给所有$http请求设置一个默认的缓存：</p>
-<pre><code>angular.module(&apos;myApp&apos;, [])
-    .config(function($httpProvider, $cacheFactory) {
-        $httpProvider.defaults.cache = $cacheFactory(&apos;lru&apos;, {
-             capacity: 20
-        }); 
-    });
-</code></pre><p>7、拦截器</p>
-<p>什么是拦截器？我们将httpProvider对象输出到控制台</p>
-<pre><code>{
-  &quot;defaults&quot;: {
-    &quot;transformResponse&quot;: [null],
-    &quot;transformRequest&quot;: [null],
-    &quot;headers&quot;: {
-      &quot;common&quot;: {
-          &quot;Accept&quot;: &quot;application/json, text/plain, */*&quot;
-      },
-      &quot;post&quot;: {
-          &quot;Content-Type&quot;: &quot;application/json;charset=utf-8&quot;
-      },
-      &quot;put&quot;: {
-          &quot;Content-Type&quot;: &quot;application/json;charset=utf-8&quot;
-      },
-      &quot;patch&quot;: {
-          &quot;Content-Type&quot;: &quot;application/json;charset=utf-8&quot;
-      }
-    },
-    &quot;xsrfCookieName&quot;: &quot;XSRF-TOKEN&quot;,
-    &quot;xsrfHeaderName&quot;: &quot;X-XSRF-TOKEN&quot;,
-    &quot;paramSerializer&quot;: &quot;$httpParamSerializer&quot;
-  },
-  &quot;interceptors&quot;: [],
-  &quot;$get&quot;: [&quot;$httpBackend&quot;, &quot;$$cookieReader&quot;, &quot;$cacheFactory&quot;, &quot;$rootScope&quot;, &quot;$q&quot;, &quot;$injector&quot;, null]
-}
-</code></pre><p>可以看到$httpProvider中有一个interceptors数组，而所谓拦截器也就是一个注入到了该数组中的服务。</p>
-<pre><code>var app = angular.module(&apos;app&apos;, []);
-
-app.factory(&apos;myInterceptor&apos;, function($log) {
-    $log.debug(&apos;$log输出啦。。。&apos;);
-
-    var myInterceptor = {
-      response: function(rep) {
-        console.log(rep);
-        return rep;
-      }
-    }
-  });
-
-app.config(function($httpProvider) {
-  $httpProvider.interceptors.push(&apos;myInterceptor&apos;);
-});
-</code></pre><p>当我们在页面中向后端发起http请求时就可以看控制台中输出了我们的调试信息和服务器返回的数据。</p>
-<p>关于拦截器的知识，见过的大都是理论上的解释。这里有一个关于angularJS拦截器应用实例的文章：angularjs中的interceptor和挺好的例子</p>
-<p>####二、封装$http服务，统一管理请求url</p>
-<p>将项目中所有的数据请求统一管理，无疑是一个非常好的开发体验，在以后开发中会借鉴这个思路，加入到自己的项目中。</p>
-<p>在实际项目中，我们可以对$http服务作一层封装，比如封装成HttpService，将服务器返回的错误信息进行一次拦截处理，提供统一的错误提示。示例如下：</p>
-<pre><code>angular.module(&apos;httpService&apos;, [])
-  .service(&apos;HttpService&apos;, function($http, $q) {
-
-    var service = {
-      get: function(url, config) {
-        return handleRepData(&apos;get&apos;, url, null, config);
-      },
-      post: function(url, data, config) {
-        return handleRepData(&apos;post&apos;, url, data, config);
-      },
-      put: function(url, data, config) {
-        return handleRepData(&apos;post&apos;, url, data, config);
-      },
-      delete: function(url, config) {
-        return handleRepData(&apos;delete&apos;, url, null, config);
-      }
-    }
-
-    function handleRepData(method, url, data, config) {
-      var promise;
-      var defer = $q.defer();
-      switch (method) {
-        case &apos;get&apos;:
-          promise = $http.get(url, config);
-          break;
-        case &apos;post&apos;:
-          promise = $http.post(url, data, config);
-          break;
-        case &apos;put&apos;:
-          promise = $http.put(url, data, config);
-          break;
-        case &apos;delete&apos;:
-          promise = $http.delete(url, config)
-      }
-
-      promise.then(function(rep) {
-        if (rep.data.success || rep.data.status === 1) {
-          defer.resolve(rep.data);
-        } else {
-          var errorMsg = rep.data.message || &apos;哦，出错啦！但是后端没有给任何信息。&apos;;
-          // 弹出错误信息，或者重定向到404页面
-          alert(errorMsg);
-        }
-      }, function() {
-        defer.reject(&apos;出错了&apos;);
-      })
-
-      return defer.promise;
-    }
-
-    return service;
-  });
-</code></pre><p>将所有的请求url模块划分，统一放置在一个服务下面：</p>
-<pre><code>angular.module(&apos;urlService&apos;, [])
-  .factory(&apos;UrlService&apos;, function(HttpService) {
-    var service = {
-      // 数据源
-      cms: {
-        dataSource: {
-          // 新建
-          new: function(params_) {
-            return HttpService.post(&apos;/api/datasource/&apos;, params_).then(function(data_) {
-              return data_;
-            });
-          },
-          // 更新
-          update: function(params_, name_) {
-            return HttpService.put(&apos;/api/datasource/&apos; + name_ +&apos;/&apos;, params_).then(function(data_) {
-              return data_;
-            });
-          },
-          // 详情
-          detail: function(params_, name_) {
-            return HttpService.get(&apos;/api/datasource/&apos;+ name_ +&apos;/&apos;, {params: params_}).then(function(data_) {
-              return data_;
-            });
-          },
-          // 删除
-          delete: function(params_, name_) {
-            return HttpService.delete(&apos;/api/datasource/&apos;+ name_ +&apos;/&apos;, params_).then(function(data_) {
-              return data_;
-            });
-          },
-          {
-            // ...
-          }
-        }
-      },
-      // 店铺管理
-      store: {
-        shop: {
-          // 新建
-          create: function(params_) {
-            return HttpService.post(&apos;/api/shop/create/&apos;, params_).then(function(data_) {
-              return data_;
-            });
-          },
-          // 查重
-          checkDuplicate: function(params_) {
-            return HttpService.post(&apos;/api/shop/search_duplicate/&apos;, params_).then(function(data_) {
-              return data_;
-            });
-          },
-          // 搜索
-          search: function(params_) {
-            return HttpService.get(&apos;/api/shop/search/&apos;, params_).then(function(data_) {
-              return data_;
-            });
-          },
-          {
-            // ...
-          }
-        }
-      },
-      {
-        // ...
-      }
-    };
-
-    return service;
-  });
-</code></pre><p>最后在控制器中引入urlService服务：</p>
-<pre><code>angular.module(&apos;cmsDataSourceController&apos;, [])
-  .controller(&apos;cmsDataSourcePageCtrl&apos;, [&apos;$scope&apos;, &apos;UrlService&apos;, function($scope, UrlService) {
-
-    var params = {name: name, alias: alias, cate: cate, conds: conds, tags: tags};
-
-    UrlService.cms.dataSource.new(params).then(function(rep) {
-      tips(&apos;数据源创建成功!&apos;);
-      $(&apos;.btn-update&apos;).text(&apos;修改数据源&apos;);
-    });
-  }]);
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/05/15/angular-http/" data-id="cjc0aj3va0006zsp3w889mtny" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-restangular" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2016/05/13/restangular/" class="article-date">
-  <time datetime="2016-05-13T07:14:59.000Z" itemprop="datePublished">2016-05-13</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/angularjs/">angularjs</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/05/13/restangular/">Restangular:专门用来与外界通信的angularjs库</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>####一、安装restangular</p>
-<p>restangular依赖Lo-Dash或Underscore，需要引入这两个库中的任意一个。</p>
-<pre><code>&lt;script type=&quot;text/javascript&quot; src=&quot;restangular.js&quot;&gt;&lt;/script&gt;
-&lt;script type=&quot;text/javascript&quot; src=&quot;lodash.js&quot;&gt;&lt;/script&gt;
-</code></pre><p>通过Bower安装Restangular，Lo-Dash会同时被自动下载。</p>
-<pre><code>$ bower install restangular
-</code></pre><p>将restangular当作依赖加载进应用模块。</p>
-<pre><code>var app = angular.module(&apos;app&apos;, [&apos;restangular&apos;]);
-</code></pre><p>完成后，就可以把Restangular服务注入到angularjs对象中。</p>
-<pre><code>app.factory(&apos;UserService&apos;, [&apos;Restangular&apos;, function(Restangular) {
-    //现在我们已经在UserService中访问了Restangular 
-}])
-</code></pre><p>####二、Restangular对象简介</p>
-<p>Restangular有两种方式创建拉取数据的对象：</p>
-<p>1、.all方法</p>
-<pre><code>var User = Restangular.all(&apos;users&apos;);
-var allUsers = User.getList(); 
-</code></pre><p>这样设置Restangular服务会让所有的HTTP请求将/users路径作为根路径来拉取数据，getList()方法会从 /users 拉取数据。</p>
-<p>2、.one方法</p>
-<pre><code>var oneUser = Restangular.one(&apos;users&apos;, &apos;abc123&apos;);
-oneUser.get().then(function(user) {
-     user.getList(&apos;inboxes&apos;);
-});
-</code></pre><p>调用oneUser上的get()时向 /users/abc123/inboxes 发送请求。</p>
-<p>####三、使用Restangular</p>
-<p>当Restangular将初始化的对象返回给我们后，可以通过几种不同的方法与后端API进行交互。</p>
-<p>1、getList() 获取信息</p>
-<pre><code>var message = Restangular.all(&apos;message&apos;);
-var allMessages = message.getList();
-</code></pre><p>2、post() 创建信息</p>
-<pre><code>var message = Restangular.all(&apos;message&apos;);
-var newMessage = {
-    body:&apos;Hello World&apos;
-}
-message.post(newMessage);
-</code></pre><p>3、Restangular返回的是增强过的promise,因此除了可以调用then方法,还可以调用一些特殊的方法,比如$object。$object会立即返回一个空数组（或对象），在服务器返回信息后，数组会被新数据填充。 这对更新一个集合后，在作用域中立即重新获取集合时很有用：</p>
-<pre><code>message.post(newMessage).then(function(newMsg){
-    $scope.message = message.getList().$object;
-}, function(errorReason){
-    //错误
-})
-</code></pre><p>4、remove() 发送一个delete http请求给后端</p>
-<pre><code>var message = message.get(123);
-message.remove();
-</code></pre><p>5、put() 支持对象的更新和存储</p>
-<ul>
-<li><p>要更新一个对象，首先要查询这个对象，然后在实例中设置新属性值，再调用对象的put()方法将更新保存到后端。</p>
-</li>
-<li><p>在更新一个对象前对其进行复制，然后对复制的对象进行修改和保存。Restangular.copy()支持复制功能。</p>
-</li>
-</ul>
-<p>6、嵌套资源查询</p>
-<pre><code>var author = Restangular.one(&apos;authors&apos;,&apos;abc123&apos;);    //构建一个GET到/authors/abc123/books的请求
-var books = author.getList(&apos;books&apos;);    
-</code></pre><p>7、自定义函数 customMETHORD()</p>
-<p>METHORD可以被以下方法替换：GET,GETLIST,DELETE,POST,PUT,HEAD,OPTIONS,PATCH,TRACE.</p>
-<p>举例：</p>
-<pre><code>author.customGET(&apos;aaa&apos;);
-</code></pre><p>或</p>
-<pre><code>auto.customPOST(
-    {body: &apos;bbbbb&apos;}, //post body
-    &apos;aaa&apos;, //路由
-    {}, //自定义参数
-    {}, //自定义头部
-)    
-</code></pre><p>####四、设置Restangular</p>
-<p>1、设置baseUrl</p>
-<p>给所有后端API请求设置baseUrl:</p>
-<pre><code>angular.module(&apos;myApp&apos;, [&apos;restangular&apos;])
-     .config(function(RestangularProvider) {
-         RestangularProvider.setBaseUrl(&apos;/api/v1&apos;);
-     });
-</code></pre><p>2、添加元素转换</p>
-<p>elementTransformers 这个方法会在资源被加载后当做回调函数使用，在AngularJS对象中使用这些资源前，可以对其进行更新或修改。</p>
-<pre><code>angular.module(&apos;myApp&apos;, [&apos;restangular&apos;])
-    .config(function(RestangularProvider) {    
-         //3个参数：第一个路由、第二个不详、第三个回调
-        RestangularProvider.addElementTransformer(&apos;authors&apos;, false, function(element) {
-            element.fetchedAt = new Date();
-            return element;
-        });
-});
-</code></pre><p>扩展数据模型或集合</p>
-<pre><code>angular.module(‘myApp’, [‘restangular’])
-
-.config(function(RestangularProvider) {   
-     RestangularProvider.extendModel(&apos;authors&apos;, function(element) {
-         element.getFullName = function() {
-             return element.name + &apos; &apos; + element.lastName;
-         };
-         return element;
-     });
-});
-</code></pre><p>3、响应拦截器 responseInterceptors</p>
-<p>即为在响应从服务器返回时调用，调用时传入以下参数：</p>
-<ul>
-<li>data:从服务器返回的数据</li>
-<li>operation:使用的HTTP方法</li>
-<li>what:所请求的数据模型</li>
-<li>url:请求的相对URL</li>
-<li>response:完整的服务器响应，包括响应头</li>
-<li>deferred:请求的promise对象</li>
-</ul>
-<p>下面的设置会使getList()返回一个带有元信息的数据。例如：向 /customers 发送get请求会返回一个像{customers: []}这样的数据</p>
-<pre><code>angular.module(&apos;myApp&apos;, [&apos;restangular&apos;])
-.config(function(RestangularProvider) {
-    RestangularProvider.setResponseInterceptor(function(data, operation, what) { 
-        if (operation == &apos;getList&apos;) {
-            var list = data[what];
-            list.metadata = data.metadata;
-            return list;
-        }
-        return data;
-    });
-});
-</code></pre><p>4、请求拦截器 requestInterceptors</p>
-<p>即为在向服务器发送请求之前进行操作。</p>
-<p>tips:响应拦截器和请求拦截器应用小实例：我们可以同时使用他们来实现全页面范围内的加载提示。在每个请求之前开始加载提示，在收到请求后停止加载提示</p>
-<p>传入以下参数：</p>
-<ul>
-<li>element:发送给服务器的资源</li>
-<li>operation:使用的HTTP方法</li>
-<li>what:所请求的数据模型</li>
-<li>url:请求的相对URL</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">angular.module(&apos;myApp&apos;, [&apos;restangular&apos;])</div><div class="line">.config(function(RestangularProvider) &#123;</div><div class="line">       RestangularProvider.setRequestInterceptor(function(elem, operation, what) &#123; </div><div class="line">           if (operation === &apos;put&apos;) &#123;</div><div class="line">            elem._id = undefined;</div><div class="line">            return elem;</div><div class="line">        &#125;</div><div class="line">        return elem;</div><div class="line">    &#125;);</div><div class="line">   &#125;);</div></pre></td></tr></table></figure>
-<p>5、errorInterceptors 捕获错误</p>
-<p>如果errorInterceptor返回false，promise链就会被中断，并且我们永远不需要处理错误。</p>
-<p>例如，此时是处理验证失败的好时机，任何请求如果返回了401，可以通过errorInterceptor将其捕获并将用户重定向到登录页面。</p>
-<pre><code>angular.module(&apos;myApp&apos;, [&apos;restangular&apos;])
-    .config(function(RestangularProvider) {
-        RestangularProvider.setErrorInterceptor(function(resp) { 
-            displayError();
-            return false; //停止promise链  
-        });
-    });
-</code></pre><p>五、建议将restangular封装在一个自定义的服务对象内。通过将restangular服务注入到自定义服务中，就可以方便的对restangular进行封装。在函数内部，使用withConfig()函数来创建自定义设置。</p>
-<pre><code>angular.module(&apos;myApp&apos;, [&apos;restangular&apos;]).factory(&apos;MessageService&apos;, [&apos;Restangular&apos;, function(Restangular) {
-    var restAngular = Restangular.withConfig(function(Configurer) { 
-            Configurer.setBaseUrl(&apos;/api/v2/messages&apos;);
-    });
-    var _messageService = restAngular.all(&apos;messages&apos;);
-    return {
-        getMessages: function() {
-            return _messageService.getList();
-        }
-    }; 
-}]);
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/05/13/restangular/" data-id="cjc0aj3x1001jzsp3f767agjj" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
 
 
   <nav id="page-nav">
-    <a class="extend prev" rel="prev" href="/">&laquo; __('prev')</a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
+    <a class="extend prev" rel="prev" href="/">&laquo; __('prev')</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/3/">__('next') &raquo;</a>
   </nav>
 </section>
         
@@ -1669,7 +2679,7 @@ var books = author.getList(&apos;books&apos;);
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Categories</h3>
+    <h3 class="widget-title">Catégories</h3>
     <div class="widget">
       <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
     </div>
@@ -1679,9 +2689,9 @@ var books = author.getList(&apos;books&apos;);
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Tags</h3>
+    <h3 class="widget-title">Mot-clés</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
     </div>
   </div>
 
@@ -1689,9 +2699,9 @@ var books = author.getList(&apos;books&apos;);
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Tag Cloud</h3>
+    <h3 class="widget-title">Nuage de mot-clés</h3>
     <div class="widget tagcloud">
-      <a href="/tags/angular/" style="font-size: 20px;">angular</a> <a href="/tags/api/" style="font-size: 16.67px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/thread/" style="font-size: 13.33px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+      <a href="/tags/angular/" style="font-size: 20px;">angular</a> <a href="/tags/api/" style="font-size: 15px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 17.5px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/thread/" style="font-size: 12.5px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
     </div>
   </div>
 
@@ -1700,7 +2710,7 @@ var books = author.getList(&apos;books&apos;);
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
     </div>
   </div>
 
@@ -1708,28 +2718,28 @@ var books = author.getList(&apos;books&apos;);
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
+    <h3 class="widget-title">Articles récents</h3>
     <div class="widget">
       <ul>
         
           <li>
-            <a href="/2017/12/27/java-collection-framework/">集合框架</a>
+            <a href="/2018/01/09/java-collection-utilities/">集合框架五 - 工具类</a>
           </li>
         
           <li>
-            <a href="/2017/12/23/basic-data-class/">基本数据类型包装类</a>
+            <a href="/2018/01/09/java-collection-map/">集合框架四 - Map集合</a>
           </li>
         
           <li>
-            <a href="/2017/12/22/java-stringBuffer/">常用对象API-StringBuffer类</a>
+            <a href="/2018/01/09/java-collection-notes/">集合框架三 - 查阅技巧</a>
           </li>
         
           <li>
-            <a href="/2017/12/21/api-string/">api-string</a>
+            <a href="/2018/01/09/java-collection-generic/">集合框架二 - 泛型</a>
           </li>
         
           <li>
-            <a href="/2017/12/18/thread-communication/">thread-communication</a>
+            <a href="/2017/12/27/java-collection-framework/">集合框架一 - Collecion集合</a>
           </li>
         
       </ul>
@@ -1745,7 +2755,7 @@ var books = author.getList(&apos;books&apos;);
   <div class="outer">
     <div id="footer-info" class="inner">
       &copy; 2018 John Doe<br>
-      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+      Propulsé by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
 </footer>

@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>集合框架二 - 泛型 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="java集合框架泛型">
+<meta name="keywords" content="java, api">
+<meta property="og:type" content="article">
+<meta property="og:title" content="集合框架二 - 泛型">
+<meta property="og:url" content="http://yoursite.com/2018/01/09/java-collection-generic/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="java集合框架泛型">
+<meta property="og:updated_time" content="2018-01-09T06:51:29.908Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="集合框架二 - 泛型">
+<meta name="twitter:description" content="java集合框架泛型">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="Flux RSS"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Rechercher"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-java-collection-generic" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/09/java-collection-generic/" class="article-date">
+  <time datetime="2018-01-09T06:36:44.000Z" itemprop="datePublished">2018-01-09</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      集合框架二 - 泛型
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="二、集合框架-泛型"><a href="#二、集合框架-泛型" class="headerlink" title="二、集合框架-泛型"></a>二、集合框架-泛型</h3><pre><code>public class GenericDemo {
+
+    public static void main(String[] args) {
+        ArrayList&lt;String&gt; al = new ArrayList&lt;String&gt;();
+
+        al.add(&quot;abc&quot;);
+        al.add(&quot;abc2&quot;);
+        al.add(&quot;abc3&quot;);
+
+        Iterator&lt;String&gt; it = al.iterator();
+        while(it.hasNext()) {
+            String str = it.next();
+            System.out.println(str);
+        }
+
+    }
+
+}
+</code></pre><h4 id="1、概述："><a href="#1、概述：" class="headerlink" title="1、概述："></a>1、概述：</h4><p>jdk1.5出现的安全机制。</p>
+<p>好处：</p>
+<p>1、将运行时期的问题ClassCastException转到了编译时期。</p>
+<p>2、避免了强制转换的麻烦。</p>
+<p>&lt;&gt;：什么时候用？当操作的引用类型不确定的时候，就使用&lt;&gt;。将要操作的引用数据类型传入即可。</p>
+<p>其实&lt;&gt;就是一个用于接收具体引用数据类型的参数范围。</p>
+<h4 id="2、泛型-擦除-amp-补偿"><a href="#2、泛型-擦除-amp-补偿" class="headerlink" title="2、泛型-擦除&amp;补偿"></a>2、泛型-擦除&amp;补偿</h4><p>泛型技术是给编译器使用的技术，用于编译时期。确保了类型的安全。</p>
+<p>运行时，会将泛型去掉，生成的class文件中是不带泛型的，这个称之为泛型的擦除。</p>
+<p>为什么擦除？是为了兼容运行的类加载器。</p>
+<p>泛型的补偿：在运行时，通过获取元素的类型进行转换。不用使用者再强制转换了。</p>
+<h4 id="3、泛型在集合中的应用"><a href="#3、泛型在集合中的应用" class="headerlink" title="3、泛型在集合中的应用"></a>3、泛型在集合中的应用</h4><pre><code>public class GenericDemo2 {
+
+    public static void main(String[] args) {
+        TreeSet&lt;Person2&gt; ts = new TreeSet&lt;Person2&gt;();
+        ts.add(new Person2(&quot;lisi8&quot;,21));
+        ts.add(new Person2(&quot;lisi2&quot;,23));
+        ts.add(new Person2(&quot;lisi&quot;,21));
+        ts.add(new Person2(&quot;lis0&quot;,20));
+
+        Iterator&lt;Person2&gt; it = ts.iterator();
+        while(it.hasNext()) {
+            Person2 p = it.next();
+            System.out.println(p.getName()+&quot;:&quot;+p.getAge());
+        }
+
+    }
+
+}
+
+public class Person2 implements Comparable&lt;Person2&gt; {
+    private String name;
+    private int age;
+
+    public Person2() {
+        super();
+    }
+
+    public Person2(String name, int age) {
+        super();
+        this.name = name;
+        this.age = age;
+    }
+
+    public int compareTo(Person2 p){
+        int temp = this.age - p.getAge();
+        return temp==0?this.name.compareTo(p.getName()):temp;    
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }    
+
+}
+
+class CompareByname implements Comparator&lt;Person2&gt;{
+    public int compare(Person2 o1, Person2 o2) {
+        int temp = o1.getName().compareTo(o2.getName());
+        return temp == 0?o1.getAge() - o2.getAge():temp;    
+    }
+}
+
+//按年龄排序，输出结果：
+lis0:20
+lisi:21
+lisi8:21
+lisi2:23
+
+//按姓名排序，输出结果：
+lis0:20
+lisi:21
+lisi2:23
+lisi8:21
+</code></pre><h4 id="4、泛型类"><a href="#4、泛型类" class="headerlink" title="4、泛型类"></a>4、泛型类</h4><p>在jdk1.5后，使用泛型来接收类中要操作的引用数据类型</p>
+<p>什么时候用？当类中的操作的引用数据类型不确定的时候，就使用泛型来表示。<br>    public class Student {</p>
+<pre><code>}
+
+public class Worker {
+
+}
+
+public class Tool01&lt;XX&gt; {
+    private XX q;
+
+    public XX getObject() {
+        return q;
+    }
+    public void setObject(XX object) {
+        this.q = object;
+    }
+}
+
+public class GenericDemo3 {
+    public static void main(String[] args) {
+
+        Tool01&lt;Student&gt; tool = new Tool01&lt;Student&gt;();
+        tool.setObject(new Student());
+        Student stu = tool.getObject();
+        System.out.println(stu);
+
+    }
+}
+
+当tool.setObject(new Student());传递Worker对象时tool.setObject(new Worker());编译就会报错。
+</code></pre><h4 id="5、泛型方法"><a href="#5、泛型方法" class="headerlink" title="5、泛型方法"></a>5、泛型方法</h4><pre><code>class Tool02&lt;XX&gt; {//泛型定义在类上
+
+    public void print(XX str) {
+        System.out.println(&quot;print:&quot;+str);
+    }
+
+    /**
+     * 将泛型定义到方法上
+     */
+    public &lt;W&gt; void show(W str) {
+        System.out.println(&quot;show:&quot;+str);
+    }
+
+    /**
+     * 当定义静态方法时，不能访问类上定义的泛型。静态方法只能将泛型定义到方法上才能使用泛型。
+     */
+    public static &lt;Y&gt; void output(Y str) {
+        System.out.println(&quot;output:&quot;+str);
+    }
+}
+
+public class GenericDemo4 {
+
+    public static void main(String[] args) {
+
+        Tool02&lt;String&gt; tool = new Tool02&lt;String&gt;();
+
+        //print方法只能使用生成对象时指定的String类型
+        tool.print(&quot;abc&quot;);
+
+        //泛型定义到了tool方法上，可以传递任意类型对象，编译都不会报错
+        tool.show(new Integer(4));
+        tool.show(&quot;abc&quot;);
+
+        //静态方法的泛型只能定义到静态方法上可以传递任意类型对象
+        Tool02.output(&quot;abc&quot;);
+        Tool02.output(8);
+
+    }
+
+}    
+</code></pre><h4 id="6、泛型的接口"><a href="#6、泛型的接口" class="headerlink" title="6、泛型的接口"></a>6、泛型的接口</h4><pre><code>public class GenericDemo5 {
+
+    public static void main(String[] args) {
+
+        InterImpl in = new InterImpl();
+        in.show(&quot;abc&quot;);
+
+        InterImpl2&lt;Integer&gt; in2 = new InterImpl2&lt;Integer&gt;();
+        in2.show(5);
+
+
+    }
+
+}
+
+interface Inter&lt;T&gt;{
+    public void show(T t);
+}
+
+class InterImpl implements Inter&lt;String&gt;{
+    public void show(String str) {
+        System.out.println(&quot;show:&quot;+str);
+    }
+}
+
+class InterImpl2&lt;X&gt; implements Inter&lt;X&gt;{
+    public void show(X x) {
+        System.out.println(&quot;show:&quot;+x);
+    }
+}
+</code></pre><h4 id="7、泛型限定（上限）"><a href="#7、泛型限定（上限）" class="headerlink" title="7、泛型限定（上限）"></a>7、泛型限定（上限）</h4><p>泛型的通配符：?</p>
+<p>代表未知类型</p>
+<pre><code>public class GenericDemp6 {
+
+    public static void main(String[] args) {
+
+        ArrayList&lt;String&gt; al = new ArrayList&lt;String&gt;();
+        al.add(&quot;abc&quot;);
+        al.add(&quot;ddd&quot;);
+
+        ArrayList&lt;String&gt; al2 = new ArrayList&lt;String&gt;();
+        al.add(&quot;abc2&quot;);
+        al.add(&quot;ddd2&quot;);
+
+        printCollection(al);
+        printCollection(al2);
+
+    }
+
+    public static void printCollection(Collection&lt;?&gt; al) {
+        Iterator&lt;?&gt; it = al.iterator();
+        while(it.hasNext()) {
+            System.out.println(it.next());
+        }
+    }
+
+    public static &lt;X&gt; void printCollection2(Collection&lt;X&gt; al) {
+        Iterator&lt;X&gt; it = al.iterator();
+        while(it.hasNext()) {
+            X str = it.next();
+            System.out.println(str);
+        }
+    }
+
+}
+</code></pre><p>? extends E 限定只能传E或者E的子类</p>
+<pre><code>public class Student extends Person2{
+
+    public Student() {
+        super();
+    }
+
+    public Student(String name, int age) {
+        super(name, age);
+    }
+
+    public String toString() {
+        return &quot;student:&quot;+getName()+&quot;:&quot;+getAge();
+    }
+
+}
+
+public class Worker extends Person2 {
+
+    public Worker() {
+        super();
+    }
+
+    public Worker(String name, int age) {
+        super(name, age);
+    }
+
+    public String toString() {
+        return &quot;worker:&quot;+getName()+&quot;:&quot;+getAge();
+    }
+}
+
+public class GenericDemo7 {
+
+    public static void main(String[] args) {
+
+        ArrayList&lt;Worker&gt; al = new ArrayList&lt;Worker&gt;();
+        al.add(new Worker(&quot;worker01&quot;,30));
+        al.add(new Worker(&quot;worker02&quot;,32));
+
+        ArrayList&lt;Student&gt; al2 = new ArrayList&lt;Student&gt;();
+        al2.add(new Student(&quot;worker01&quot;,10));
+        al2.add(new Student(&quot;worker02&quot;,11));
+
+        printCollection(al);
+        printCollection(al2);
+
+    }
+
+    //限定只能传Person2的对象或者Person2的子类对象
+    private static void printCollection(ArrayList&lt;? extends Person2&gt; al) {
+
+        Iterator&lt;? extends Person2&gt; it = al.iterator();
+
+        while(it.hasNext()) {
+            System.out.println(it.next().toString());
+        }
+
+    }
+
+}
+</code></pre><h4 id="8、泛型限定（下限）"><a href="#8、泛型限定（下限）" class="headerlink" title="8、泛型限定（下限）"></a>8、泛型限定（下限）</h4><p>? super E 限定只能传E或者E的父类</p>
+<pre><code>public class GenericDemo7 {
+
+    public static void main(String[] args) {
+
+        ArrayList&lt;Person2&gt; al = new ArrayList&lt;Person2&gt;();
+        al.add(new Person2(&quot;Person&quot;,30));
+        al.add(new Person2(&quot;Person&quot;,32));
+
+        ArrayList&lt;Student&gt; al2 = new ArrayList&lt;Student&gt;();
+        al2.add(new Student(&quot;worker01&quot;,10));
+        al2.add(new Student(&quot;worker02&quot;,11));
+
+        printCollection(al);
+        printCollection(al2);
+
+    }
+
+    //限定只能传Student的对象或者父类Person2的对象，而不能传Worker对象
+    private static void printCollection(ArrayList&lt;? super Student&gt; al) {
+
+        Iterator&lt;? super Student&gt; it = al.iterator();
+
+        while(it.hasNext()) {
+            System.out.println(it.next());
+        }
+
+    }
+
+}
+</code></pre><h4 id="9、泛型限定-上限的体现"><a href="#9、泛型限定-上限的体现" class="headerlink" title="9、泛型限定-上限的体现"></a>9、泛型限定-上限的体现</h4><p>一般在存储元素时候都是用上限，因为这样取出的时都是按照上限类型来运算的。不会出现类型的安全隐患。</p>
+<pre><code>public class GenericDemo8 {
+
+    public static void main(String[] args) {
+
+        ArrayList&lt;Person2&gt; al = new ArrayList&lt;Person2&gt;();
+        al.add(new Person2(&quot;Person&quot;,30));
+        al.add(new Person2(&quot;Person&quot;,32));
+
+        ArrayList&lt;Student&gt; al2 = new ArrayList&lt;Student&gt;();
+        al2.add(new Student(&quot;studnet01&quot;,10));
+        al2.add(new Student(&quot;studnet02&quot;,11));
+
+        ArrayList&lt;Worker&gt; al3 = new ArrayList&lt;Worker&gt;();
+        al3.add(new Worker(&quot;worker01&quot;,20));
+        al3.add(new Worker(&quot;worker02&quot;,21));
+
+        al.addAll(al2);
+        al.addAll(al3);
+
+    }
+
+}
+
+class MyCollection&lt;E&gt;{
+    public void add(E e) {
+
+    }
+    public void addAll(MyCollection&lt;? extends E&gt; e){
+
+    }
+}
+</code></pre><h4 id="10、泛型限定-下限的体现"><a href="#10、泛型限定-下限的体现" class="headerlink" title="10、泛型限定-下限的体现"></a>10、泛型限定-下限的体现</h4><p>通常对集合中的元素进行取出操作时，可以用下限。</p>
+<pre><code>public class GenericDemo9 {
+
+    public static void main(String[] args) {
+
+        TreeSet&lt;Person2&gt; al = new TreeSet&lt;Person2&gt;(new CompareByName2());
+        al.add(new Person2(&quot;aaa&quot;,30));
+        al.add(new Person2(&quot;bbb&quot;,32));
+        al.add(new Person2(&quot;ccc&quot;,32));
+        al.add(new Person2(&quot;ddd&quot;,34));
+
+        TreeSet&lt;Student&gt; al2 = new TreeSet&lt;Student&gt;();
+        al2.add(new Student(&quot;studnet01&quot;,10));
+        al2.add(new Student(&quot;studnet02&quot;,11));
+
+        al.addAll(al2);
+
+        Iterator&lt;Person2&gt; it = al.iterator();
+
+        while(it.hasNext()) {
+            System.out.println(it.next());
+        }
+
+    }
+
+}
+
+class CompareByName2 implements Comparator&lt;Person2&gt;{
+
+    @Override
+    public int compare(Person2 o1, Person2 o2) {
+        int temp = o1.getName().compareTo(o2.getName());
+        return temp == 0? o1.getAge() - o2.getAge():temp;
+    }
+
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/09/java-collection-generic/" data-id="cjc79xqka001dqtp314q9bhex" class="article-share-link">Partager</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/01/09/java-collection-notes/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Récent</strong>
+      <div class="article-nav-title">
+        
+          集合框架三 - 查阅技巧
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/12/27/java-collection-framework/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Ancien</strong>
+      <div class="article-nav-title">集合框架一 - Collecion集合</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Catégories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Mot-clés</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Nuage de mot-clés</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/angular/" style="font-size: 20px;">angular</a> <a href="/tags/api/" style="font-size: 15px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 17.5px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/thread/" style="font-size: 12.5px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Articles récents</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/01/09/java-collection-utilities/">集合框架五 - 工具类</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/09/java-collection-map/">集合框架四 - Map集合</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/09/java-collection-notes/">集合框架三 - 查阅技巧</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/09/java-collection-generic/">集合框架二 - 泛型</a>
+          </li>
+        
+          <li>
+            <a href="/2017/12/27/java-collection-framework/">集合框架一 - Collecion集合</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Propulsé by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

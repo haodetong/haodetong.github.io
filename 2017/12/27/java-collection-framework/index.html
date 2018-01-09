@@ -3,19 +3,19 @@
 <head>
   <meta charset="utf-8">
   
-  <title>集合框架 | Hexo</title>
+  <title>集合框架一 - Collecion集合 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="java集合框架">
+  <meta name="description" content="java集合框架概述">
 <meta name="keywords" content="java, api">
 <meta property="og:type" content="article">
-<meta property="og:title" content="集合框架">
+<meta property="og:title" content="集合框架一 - Collecion集合">
 <meta property="og:url" content="http://yoursite.com/2017/12/27/java-collection-framework/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="java集合框架">
-<meta property="og:updated_time" content="2018-01-04T09:27:08.581Z">
+<meta property="og:description" content="java集合框架概述">
+<meta property="og:updated_time" content="2018-01-09T06:52:40.495Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="集合框架">
-<meta name="twitter:description" content="java集合框架">
+<meta name="twitter:title" content="集合框架一 - Collecion集合">
+<meta name="twitter:description" content="java集合框架概述">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -53,9 +53,9 @@
       </nav>
       <nav id="sub-nav">
         
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="Flux RSS"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Rechercher"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
@@ -82,7 +82,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      集合框架
+      集合框架一 - Collecion集合
     </h1>
   
 
@@ -92,7 +92,7 @@
       
         <h3 id="集合框架的构成和分类"><a href="#集合框架的构成和分类" class="headerlink" title="集合框架的构成和分类"></a>集合框架的构成和分类</h3><p>java中集合类的关系图</p>
 <p><a href="http://blog.csdn.net/real_neu/article/details/52821491" target="_blank" rel="external">http://blog.csdn.net/real_neu/article/details/52821491</a></p>
-<h3 id="一、概述"><a href="#一、概述" class="headerlink" title="一、概述"></a>一、概述</h3><h4 id="1、特点-："><a href="#1、特点-：" class="headerlink" title="1、特点 ："></a>1、特点 ：</h4><ul>
+<h3 id="一、集合框架-概述"><a href="#一、集合框架-概述" class="headerlink" title="一、集合框架 - 概述"></a>一、集合框架 - 概述</h3><h4 id="1、特点-："><a href="#1、特点-：" class="headerlink" title="1、特点 ："></a>1、特点 ：</h4><ul>
 <li><p>用于存储对象的容器。</p>
 </li>
 <li><p>集合的长度可变。</p>
@@ -615,8 +615,7 @@ abc4
 保证了集合既有序且唯一。
 </code></pre><h4 id="10、集合框架-TreeSet集合"><a href="#10、集合框架-TreeSet集合" class="headerlink" title="10、集合框架 - TreeSet集合"></a>10、集合框架 - TreeSet集合</h4><p>TreeSet：可以对Set集合中的元素进行排序。是不同步的。</p>
 <p>判断元素唯一性的方式：就是根据比较方法的返回结果是否为0，是0，就是相同元素，不存。</p>
-<p>TreeSet对元素进行排序的方式一：</p>
-<p>让元素自身具备比较功能，元素就需要实现Comparable接口，重写覆盖compareTo方法。</p>
+<h5 id="TreeSet对元素进行排序的方式一："><a href="#TreeSet对元素进行排序的方式一：" class="headerlink" title="TreeSet对元素进行排序的方式一："></a>TreeSet对元素进行排序的方式一：</h5><p>让元素自身具备比较功能，元素就需要实现Comparable接口，重写覆盖compareTo方法。</p>
 <pre><code>public static void main(String[] args) {
     TreeSet ts = new TreeSet();
 
@@ -673,14 +672,100 @@ wangwu:21
 lisi:26
 zhangsan:28
 zhaoliu:28
+</code></pre><h5 id="TreeSet对元素进行排序的方式二："><a href="#TreeSet对元素进行排序的方式二：" class="headerlink" title="TreeSet对元素进行排序的方式二："></a>TreeSet对元素进行排序的方式二：</h5><p>让集合自身具备比较功能，自定义一个比较器类，实现Comparator接口，重写覆盖compare方法。将该类对象作为参数传递给TreeSet集合的构造函数。</p>
+<pre><code>//创建比较器
+public class ComparableDemo implements Comparator {
+
+    public int compare(Object o1, Object o2) {
+        Person p1 = (Person)o1;
+        Person p2 = (Person)o2;
+        //按名字排序，名字相同者按年龄排序
+        int temp = p1.getName().compareTo(p2.getName());
+        return temp==0?p1.getAge()-p2.getAge():temp;
+    }
+
+}
+
+public class TreeSetDemo {
+
+    public static void main(String[] args) {
+        //创建集合时传入比较器
+        TreeSet ts = new TreeSet(new ComparableDemo());
+
+        ts.add(new Person(&quot;zhangsan&quot;,28));
+        ts.add(new Person(&quot;wangwu&quot;,21));
+        ts.add(new Person(&quot;lisi&quot;,26));
+        ts.add(new Person(&quot;zhaoliu&quot;,28));        
+
+        Iterator it = ts.iterator();
+
+        while(it.hasNext()) {
+            System.out.println(it.next());
+        }
+
+    }
+
+}
+
+输出结果：
+lisi:26
+wangwu:21
+zhangsan:28
+zhaoliu:28
+
+集合比较器优先于元素比较器，且更为常用。
+</code></pre><h4 id="TreeSet集合练习-字符串长度排序"><a href="#TreeSet集合练习-字符串长度排序" class="headerlink" title="TreeSet集合练习-字符串长度排序"></a>TreeSet集合练习-字符串长度排序</h4><pre><code>public class TreeSetPractice {
+
+    public static void main(String[] args) {
+        TreeSet ts = new TreeSet();
+
+        ts.add(&quot;aaa&quot;);
+        ts.add(&quot;zzzz&quot;);
+        ts.add(&quot;bhjan&quot;);
+        ts.add(&quot;lsdds&quot;);
+        ts.add(&quot;hahaj&quot;);
+
+        Iterator it = ts.iterator();
+
+        while(it.hasNext()) {
+            System.out.println(it.next());
+        }
+    }
+
+}
+输出结果：
+aaa
+bhjan
+hahaj
+lsdds
+zzzz
+</code></pre><p>String类元素默认的是自然排序，想要按字条串长度排序，只能通过修改集合<br>的比较器来实现。</p>
+<pre><code>class ComparatorByLength implements Comparator{
+    public int compare(Object o1, Object o2) {
+        String s1 = (String)o1;
+        String s2 = (String)o2;
+        int temp = s1.length() - s2.length();
+        return temp==0?s1.compareTo(s2):temp;
+    }
+}
+
+public class TreeSetPractice {
+
+    public static void main(String[] args) {
+        TreeSet ts = new TreeSet(new ComparatorByLength());
+
+        ...        
+    }
+
+}
 </code></pre>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/27/java-collection-framework/" data-id="cjc0aj3w1000tzsp3n69oah6k" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/12/27/java-collection-framework/" data-id="cjc79xqjx0017qtp3ju20mz2u" class="article-share-link">Partager</a>
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/api/">api</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li></ul>
 
     </footer>
   </div>
@@ -688,9 +773,18 @@ zhaoliu:28
     
 <nav id="article-nav">
   
+    <a href="/2018/01/09/java-collection-generic/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Récent</strong>
+      <div class="article-nav-title">
+        
+          集合框架二 - 泛型
+        
+      </div>
+    </a>
+  
   
     <a href="/2017/12/23/basic-data-class/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Older</strong>
+      <strong class="article-nav-caption">Ancien</strong>
       <div class="article-nav-title">基本数据类型包装类</div>
     </a>
   
@@ -705,7 +799,7 @@ zhaoliu:28
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Categories</h3>
+    <h3 class="widget-title">Catégories</h3>
     <div class="widget">
       <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
     </div>
@@ -715,9 +809,9 @@ zhaoliu:28
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Tags</h3>
+    <h3 class="widget-title">Mot-clés</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
     </div>
   </div>
 
@@ -725,9 +819,9 @@ zhaoliu:28
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Tag Cloud</h3>
+    <h3 class="widget-title">Nuage de mot-clés</h3>
     <div class="widget tagcloud">
-      <a href="/tags/angular/" style="font-size: 20px;">angular</a> <a href="/tags/api/" style="font-size: 16.67px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/thread/" style="font-size: 13.33px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+      <a href="/tags/angular/" style="font-size: 20px;">angular</a> <a href="/tags/api/" style="font-size: 15px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 17.5px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/thread/" style="font-size: 12.5px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
     </div>
   </div>
 
@@ -736,7 +830,7 @@ zhaoliu:28
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
     </div>
   </div>
 
@@ -744,28 +838,28 @@ zhaoliu:28
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
+    <h3 class="widget-title">Articles récents</h3>
     <div class="widget">
       <ul>
         
           <li>
-            <a href="/2017/12/27/java-collection-framework/">集合框架</a>
+            <a href="/2018/01/09/java-collection-utilities/">集合框架五 - 工具类</a>
           </li>
         
           <li>
-            <a href="/2017/12/23/basic-data-class/">基本数据类型包装类</a>
+            <a href="/2018/01/09/java-collection-map/">集合框架四 - Map集合</a>
           </li>
         
           <li>
-            <a href="/2017/12/22/java-stringBuffer/">常用对象API-StringBuffer类</a>
+            <a href="/2018/01/09/java-collection-notes/">集合框架三 - 查阅技巧</a>
           </li>
         
           <li>
-            <a href="/2017/12/21/api-string/">api-string</a>
+            <a href="/2018/01/09/java-collection-generic/">集合框架二 - 泛型</a>
           </li>
         
           <li>
-            <a href="/2017/12/18/thread-communication/">thread-communication</a>
+            <a href="/2017/12/27/java-collection-framework/">集合框架一 - Collecion集合</a>
           </li>
         
       </ul>
@@ -781,7 +875,7 @@ zhaoliu:28
   <div class="outer">
     <div id="footer-info" class="inner">
       &copy; 2018 John Doe<br>
-      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+      Propulsé by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
 </footer>

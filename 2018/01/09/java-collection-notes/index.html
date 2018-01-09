@@ -3,14 +3,19 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Catégorie: 转载 | Hexo</title>
+  <title>集合框架三 - 查阅技巧 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://yoursite.com/categories/转载/index.html">
+  <meta name="description" content="java集合查阅技巧">
+<meta name="keywords" content="java, api">
+<meta property="og:type" content="article">
+<meta property="og:title" content="集合框架三 - 查阅技巧">
+<meta property="og:url" content="http://yoursite.com/2018/01/09/java-collection-notes/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="java集合查阅技巧">
+<meta property="og:updated_time" content="2018-01-09T06:51:17.820Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hexo">
+<meta name="twitter:title" content="集合框架三 - 查阅技巧">
+<meta name="twitter:description" content="java集合查阅技巧">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -59,39 +64,90 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2017" class="archive-year">2017</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2017/09/14/css-grid/" class="archive-article-date">
-  <time datetime="2017-09-14T02:43:24.000Z" itemprop="datePublished">Sep 14</time>
+        <section id="main"><article id="post-java-collection-notes" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/09/java-collection-notes/" class="article-date">
+  <time datetime="2018-01-09T06:42:46.000Z" itemprop="datePublished">2018-01-09</time>
 </a>
-      
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/09/14/css-grid/">网格布局</a>
+    <h1 class="article-title" itemprop="name">
+      集合框架三 - 查阅技巧
     </h1>
   
 
-    </header>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="三、集合框架-集合查阅的技巧"><a href="#三、集合框架-集合查阅的技巧" class="headerlink" title="三、集合框架-集合查阅的技巧"></a>三、集合框架-集合查阅的技巧</h3><p>唯一性？</p>
+<p>– 需要唯一：Set</p>
+<p>—- 需要顺序？</p>
+<p>—— 需要： TreeSet</p>
+<p>—— 不需要： HashSet</p>
+<p>—— 和存储一致的顺序：LinkedHashSet</p>
+<p>– 不需要唯一：List</p>
+<p>—- 频繁增删？</p>
+<p>—– 需要：LinkedList</p>
+<p>—— 不需要：ArrayList</p>
+<p>结构体系：</p>
+<p>List</p>
+<p>|– ArrayList</p>
+<p>|– LinkedList</p>
+<p>Set </p>
+<p>|– HashSet</p>
+<p>|– TreeSet</p>
+<p>后缀名就是该集合所属的体系。</p>
+<p>前缀名就是该集合的数据结构。</p>
+<p>看到array：就要想到数组，查询快，有角标。</p>
+<p>看到Link：就要想到增删快，想到add get remove+first last的方法。</p>
+<p>看到hash：就要想到hash表，唯一性，元素需要覆盖hashCode方法和equals方法。</p>
+<p>看到tree：就要想到二叉树，排序，两个接口Compareble和Comparator。</p>
+<p>而且这些常用的集合容器都是不同步的。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/09/java-collection-notes/" data-id="cjc79xqk20019qtp3s1olekas" class="article-share-link">Partager</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li></ul>
+
+    </footer>
   </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/01/09/java-collection-map/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Récent</strong>
+      <div class="article-nav-title">
+        
+          集合框架四 - Map集合
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/01/09/java-collection-generic/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Ancien</strong>
+      <div class="article-nav-title">集合框架二 - 泛型</div>
+    </a>
+  
+</nav>
+
+  
 </article>
-  
-  
-    </div></section>
-  
 
 </section>
         
