@@ -12,7 +12,7 @@
 <meta property="og:url" content="http://yoursite.com/2018/01/09/java-collection-utilities/index.html">
 <meta property="og:site_name" content="Hexo">
 <meta property="og:description" content="java集合框架工具类">
-<meta property="og:updated_time" content="2018-01-09T06:50:29.779Z">
+<meta property="og:updated_time" content="2018-01-09T07:08:44.744Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="集合框架五 - 工具类">
 <meta name="twitter:description" content="java集合框架工具类">
@@ -53,9 +53,9 @@
       </nav>
       <nav id="sub-nav">
         
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="Flux RSS"></a>
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Rechercher"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
@@ -152,8 +152,16 @@ public class ComparatorByLength implements Comparator&lt;String&gt; {
 
 }
 </code></pre><p>自定义Collections工具类的static  sort(List<t> list, Comparator&lt;? super T&gt; c) </t></p>
-<p>public static <t> void mySort(List<t> list,Comparator&lt;? super T&gt; comp) {<br>        for (int i = 0; i &lt; list.size()-1; i++) {<br>            for (int j = i+1; j &lt; list.size(); j++) {<br>                if(comp.compare(list.get(i), list.get(j)) &gt; 0) {<br>                    Collections.swap(list, i, j);<br>                }<br>            }<br>        }<br>    }</t></t></p>
-<h4 id="2、Collections-折半-amp-最值"><a href="#2、Collections-折半-amp-最值" class="headerlink" title="2、Collections - 折半&amp;最值"></a>2、Collections - 折半&amp;最值</h4><p>折半查找，必须是对有序元素。</p>
+<pre><code>public static &lt;T&gt; void mySort(List&lt;T&gt; list,Comparator&lt;? super T&gt; comp) {
+        for (int i = 0; i &lt; list.size()-1; i++) {
+            for (int j = i+1; j &lt; list.size(); j++) {
+                if(comp.compare(list.get(i), list.get(j)) &gt; 0) {
+                    Collections.swap(list, i, j);
+                }
+            }
+        }
+    }
+</code></pre><h4 id="2、Collections-折半-amp-最值"><a href="#2、Collections-折半-amp-最值" class="headerlink" title="2、Collections - 折半&amp;最值"></a>2、Collections - 折半&amp;最值</h4><p>折半查找，必须是对有序元素。</p>
 <pre><code>public class Demo2 {
 
     public static void main(String[] args) {
@@ -181,30 +189,32 @@ public class ComparatorByLength implements Comparator&lt;String&gt; {
 [afgds, jlojaio, haljasld, xjvis, afgds]
 0
 </code></pre><p>最值：有没有序都可以。</p>
-<p>public class Demo2 {</p>
-<pre><code>public static void main(String[] args) {
+<pre><code>public class Demo2 {
 
-    List&lt;String&gt; list = new ArrayList&lt;String&gt;();
+    public static void main(String[] args) {
 
-    list.add(&quot;afgds&quot;);
-    list.add(&quot;jlojaio&quot;);
-    list.add(&quot;haljasld&quot;);
-    list.add(&quot;xjvis&quot;);
-    list.add(&quot;afgds&quot;);
+        List&lt;String&gt; list = new ArrayList&lt;String&gt;();
 
-    System.out.println(list);
+        list.add(&quot;afgds&quot;);
+        list.add(&quot;jlojaio&quot;);
+        list.add(&quot;haljasld&quot;);
+        list.add(&quot;xjvis&quot;);
+        list.add(&quot;afgds&quot;);
 
-    //取最大值
-    String max = Collections.max(list);
-    System.out.println(&quot;max:&quot;+max);
+        System.out.println(list);
 
-    //取最长值
-    String longest = Collections.max(list, new ComparatorByLength());
-    System.out.println(&quot;longest:&quot;+longest);
+        //取最大值
+        String max = Collections.max(list);
+        System.out.println(&quot;max:&quot;+max);
+
+        //取最长值
+        String longest = Collections.max(list, new ComparatorByLength());
+        System.out.println(&quot;longest:&quot;+longest);
+
+    }
 
 }
-</code></pre><p>}</p>
-<h4 id="3、Collections-逆序-amp-替换"><a href="#3、Collections-逆序-amp-替换" class="headerlink" title="3、Collections - 逆序&amp;替换"></a>3、Collections - 逆序&amp;替换</h4><p>逆序：reverseOrder方法，返回一个比较器，可以将具备自然排序的集合进行逆序。</p>
+</code></pre><h4 id="3、Collections-逆序-amp-替换"><a href="#3、Collections-逆序-amp-替换" class="headerlink" title="3、Collections - 逆序&amp;替换"></a>3、Collections - 逆序&amp;替换</h4><p>逆序：reverseOrder方法，返回一个比较器，可以将具备自然排序的集合进行逆序。</p>
 <pre><code>public class Demo3 {
 
     public static void main(String[] args) {
@@ -463,7 +473,7 @@ public static String toString(int[] a) {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/09/java-collection-utilities/" data-id="cjc7ae63w0001sqp3cue0ggmm" class="article-share-link">Partager</a>
+      <a data-url="http://yoursite.com/2018/01/09/java-collection-utilities/" data-id="cjc7alxcl001gu0p3m7frbbzg" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li></ul>
@@ -476,7 +486,7 @@ public static String toString(int[] a) {
   
   
     <a href="/2018/01/09/java-collection-map/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Ancien</strong>
+      <strong class="article-nav-caption">Older</strong>
       <div class="article-nav-title">集合框架四 - Map集合</div>
     </a>
   
@@ -491,7 +501,7 @@ public static String toString(int[] a) {
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Catégories</h3>
+    <h3 class="widget-title">Categories</h3>
     <div class="widget">
       <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
     </div>
@@ -501,7 +511,7 @@ public static String toString(int[] a) {
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Mot-clés</h3>
+    <h3 class="widget-title">Tags</h3>
     <div class="widget">
       <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
     </div>
@@ -511,7 +521,7 @@ public static String toString(int[] a) {
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Nuage de mot-clés</h3>
+    <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
       <a href="/tags/angular/" style="font-size: 20px;">angular</a> <a href="/tags/api/" style="font-size: 15px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 17.5px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/thread/" style="font-size: 12.5px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
     </div>
@@ -530,7 +540,7 @@ public static String toString(int[] a) {
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Articles récents</h3>
+    <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
         
@@ -567,7 +577,7 @@ public static String toString(int[] a) {
   <div class="outer">
     <div id="footer-info" class="inner">
       &copy; 2018 John Doe<br>
-      Propulsé by <a href="http://hexo.io/" target="_blank">Hexo</a>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
 </footer>
