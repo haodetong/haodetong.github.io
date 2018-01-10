@@ -1,10 +1,10 @@
 ---
-title: 集合框架
+title: 集合框架一 - Collecion集合
 date: 2017-12-27 11:35:39
-tags: api
+tags: collecionsFramework
 category: java
 keywords: java, api
-description: java集合框架
+description: java集合框架概述
 ---
 
 ### 集合框架的构成和分类
@@ -15,7 +15,7 @@ java中集合类的关系图
 http://blog.csdn.net/real_neu/article/details/52821491
 
 
-### 一、概述
+### 一、集合框架 - 概述
 
 #### 1、特点 ：
 
@@ -625,7 +625,7 @@ TreeSet：可以对Set集合中的元素进行排序。是不同步的。
 
 判断元素唯一性的方式：就是根据比较方法的返回结果是否为0，是0，就是相同元素，不存。
 
-TreeSet对元素进行排序的方式一：
+##### TreeSet对元素进行排序的方式一：
 
 让元素自身具备比较功能，元素就需要实现Comparable接口，重写覆盖compareTo方法。
 
@@ -687,3 +687,110 @@ String类已经实现了Comparable接口，重写了compareTo方法，所以添�
 	lisi:26
 	zhangsan:28
 	zhaoliu:28
+
+##### TreeSet对元素进行排序的方式二：
+
+让集合自身具备比较功能，自定义一个比较器类，实现Comparator接口，重写覆盖compare方法。将该类对象作为参数传递给TreeSet集合的构造函数。
+	
+	//创建比较器
+	public class ComparableDemo implements Comparator {
+	
+		public int compare(Object o1, Object o2) {
+			Person p1 = (Person)o1;
+			Person p2 = (Person)o2;
+			//按名字排序，名字相同者按年龄排序
+			int temp = p1.getName().compareTo(p2.getName());
+			return temp==0?p1.getAge()-p2.getAge():temp;
+		}
+	
+	}
+	
+	public class TreeSetDemo {
+
+		public static void main(String[] args) {
+			//创建集合时传入比较器
+			TreeSet ts = new TreeSet(new ComparableDemo());
+			
+			ts.add(new Person("zhangsan",28));
+			ts.add(new Person("wangwu",21));
+			ts.add(new Person("lisi",26));
+			ts.add(new Person("zhaoliu",28));		
+			
+			Iterator it = ts.iterator();
+			
+			while(it.hasNext()) {
+				System.out.println(it.next());
+			}
+			
+		}
+	
+	}
+	
+	输出结果：
+	lisi:26
+	wangwu:21
+	zhangsan:28
+	zhaoliu:28
+	
+	集合比较器优先于元素比较器，且更为常用。
+
+#### TreeSet集合练习-字符串长度排序
+
+	public class TreeSetPractice {
+	
+		public static void main(String[] args) {
+			TreeSet ts = new TreeSet();
+			
+			ts.add("aaa");
+			ts.add("zzzz");
+			ts.add("bhjan");
+			ts.add("lsdds");
+			ts.add("hahaj");
+			
+			Iterator it = ts.iterator();
+			
+			while(it.hasNext()) {
+				System.out.println(it.next());
+			}
+		}
+	
+	}
+	输出结果：
+	aaa
+	bhjan
+	hahaj
+	lsdds
+	zzzz
+	
+String类元素默认的是自然排序，想要按字条串长度排序，只能通过修改集合
+的比较器来实现。
+
+	class ComparatorByLength implements Comparator{
+		public int compare(Object o1, Object o2) {
+			String s1 = (String)o1;
+			String s2 = (String)o2;
+			int temp = s1.length() - s2.length();
+			return temp==0?s1.compareTo(s2):temp;
+		}
+	}
+	
+	public class TreeSetPractice {
+	
+		public static void main(String[] args) {
+			TreeSet ts = new TreeSet(new ComparatorByLength());
+			
+			...		
+		}
+	
+	}
+
+
+
+
+	
+	
+	
+	
+	
+	
+	

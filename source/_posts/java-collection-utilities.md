@@ -81,15 +81,15 @@ Utilities
 
 自定义Collections工具类的static  sort(List<T> list, Comparator<? super T> c) 
 
-public static <T> void mySort(List<T> list,Comparator<? super T> comp) {
-		for (int i = 0; i < list.size()-1; i++) {
-			for (int j = i+1; j < list.size(); j++) {
-				if(comp.compare(list.get(i), list.get(j)) > 0) {
-					Collections.swap(list, i, j);
+	public static <T> void mySort(List<T> list,Comparator<? super T> comp) {
+			for (int i = 0; i < list.size()-1; i++) {
+				for (int j = i+1; j < list.size(); j++) {
+					if(comp.compare(list.get(i), list.get(j)) > 0) {
+						Collections.swap(list, i, j);
+					}
 				}
 			}
 		}
-	}
 
 #### 2、Collections - 折半&最值
 
@@ -124,31 +124,31 @@ public static <T> void mySort(List<T> list,Comparator<? super T> comp) {
 	
 最值：有没有序都可以。
 
-public class Demo2 {
+	public class Demo2 {
 
-	public static void main(String[] args) {
-
-		List<String> list = new ArrayList<String>();
-		
-		list.add("afgds");
-		list.add("jlojaio");
-		list.add("haljasld");
-		list.add("xjvis");
-		list.add("afgds");
-		
-		System.out.println(list);
-		
-		//取最大值
-		String max = Collections.max(list);
-		System.out.println("max:"+max);
-		
-		//取最长值
-		String longest = Collections.max(list, new ComparatorByLength());
-		System.out.println("longest:"+longest);
-				
+		public static void main(String[] args) {
+	
+			List<String> list = new ArrayList<String>();
+			
+			list.add("afgds");
+			list.add("jlojaio");
+			list.add("haljasld");
+			list.add("xjvis");
+			list.add("afgds");
+			
+			System.out.println(list);
+			
+			//取最大值
+			String max = Collections.max(list);
+			System.out.println("max:"+max);
+			
+			//取最长值
+			String longest = Collections.max(list, new ComparatorByLength());
+			System.out.println("longest:"+longest);
+					
+		}
+	
 	}
-
-}
 	
 #### 3、Collections - 逆序&替换
 
