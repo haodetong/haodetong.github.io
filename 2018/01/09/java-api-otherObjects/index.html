@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>其它对象API | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="java其它对象api">
+<meta name="keywords" content="java, api">
+<meta property="og:type" content="article">
+<meta property="og:title" content="其它对象API">
+<meta property="og:url" content="http://yoursite.com/2018/01/09/java-api-otherObjects/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="java其它对象api">
+<meta property="og:updated_time" content="2018-01-10T03:23:52.712Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="其它对象API">
+<meta name="twitter:description" content="java其它对象api">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="Flux RSS"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Rechercher"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-java-api-otherObjects" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/09/java-api-otherObjects/" class="article-date">
+  <time datetime="2018-01-09T07:16:19.000Z" itemprop="datePublished">2018-01-09</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      其它对象API
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="一、System类"><a href="#一、System类" class="headerlink" title="一、System类"></a>一、System类</h3><p>System类中的方法和属性都是静态的。</p>
+<p>常见方法：</p>
+<p>long currentTimeMillis():获取当前时间的毫秒值</p>
+<p>Properties getProperties():获取当前系统的属性信息    </p>
+<pre><code>public class SystemApi {
+    public static void main(String[] args) {
+
+        long millisTime = System.currentTimeMillis();
+        System.out.println(millisTime);
+
+        Properties prop = System.getProperties();
+
+        Set&lt;String&gt; nameSet = prop.stringPropertyNames();
+
+        for(String name:nameSet) {
+            String value = prop.getProperty(name);
+            System.out.println(name+&quot;::&quot;+value);
+        }
+
+
+    }
+}
+</code></pre><h3 id="二、Runtime类"><a href="#二、Runtime类" class="headerlink" title="二、Runtime类"></a>二、Runtime类</h3><p>Runtime:</p>
+<p>没有构造方法摘要，说明该类不可以创建对象。</p>
+<p>又发现该类有非静态方法，说明该类应该有提供的静态的返回该类对象的方法。</p>
+<p>而且只有一个这种方法，说明Runtime类使用了单例设计模式。</p>
+<pre><code>public class RuntimeApi {
+
+    public static void main(String[] args) throws IOException, InterruptedException {
+
+        Runtime r = Runtime.getRuntime();
+
+        Process p = r.exec(&quot;open -a Safari.app http://www.baidu.com&quot;);
+        Thread.sleep(2000);
+        p.destroy();
+    }
+
+}
+</code></pre><h3 id="三、Math类"><a href="#三、Math类" class="headerlink" title="三、Math类"></a>三、Math类</h3><p>常用方法：</p>
+<p>double ceil():返回大于参数的最小整数。</p>
+<p>double floor():返回小于参数的最大整数。</p>
+<p>double round():返回四舍五入的整数。</p>
+<p>max(a,b):返回最大值</p>
+<p>pow(a,b):a的b次方</p>
+<p>double random():返回大于等于0.0小于1.0的随机double值，与java.util中的Random类相似。</p>
+<h3 id="四、Date类"><a href="#四、Date类" class="headerlink" title="四、Date类"></a>四、Date类</h3><h4 id="（一）、日期对象和毫秒值之间的转换"><a href="#（一）、日期对象和毫秒值之间的转换" class="headerlink" title="（一）、日期对象和毫秒值之间的转换"></a>（一）、日期对象和毫秒值之间的转换</h4><h5 id="毫秒值–-gt-日期对象"><a href="#毫秒值–-gt-日期对象" class="headerlink" title="毫秒值–&gt;日期对象"></a>毫秒值–&gt;日期对象</h5><p>1、通过Date对象的构造方法 new Date(timeMills);</p>
+<p>2、通过setTime方法。</p>
+<p>目的是通过Date对象的方法，对该日期中的年月日等字段进行操作。</p>
+<h5 id="日期对象–-gt-毫秒值"><a href="#日期对象–-gt-毫秒值" class="headerlink" title="日期对象–&gt;毫秒值"></a>日期对象–&gt;毫秒值</h5><p>1、通过getTime方法。</p>
+<p>目的是通过具体的数值进行运算。</p>
+<pre><code>public static void thord1() {
+        //long time = System.currentTimeMillis();//1515489394135
+
+        Date date1 = new Date();//将当前日期和时间封装成Date对象
+        System.out.println(date1);//Tue Jan 09 17:16:34 CST 2018
+
+        Date date2 = new Date(1515489367117l);//将指定毫秒封装成Date对象
+        System.out.println(date2);//Tue Jan 09 17:16:07 CST 2018
+}
+</code></pre><h4 id="（二）、日期对象转成字符串"><a href="#（二）、日期对象转成字符串" class="headerlink" title="（二）、日期对象转成字符串"></a>（二）、日期对象转成字符串</h4><pre><code>public class DateDemo {
+
+    public static void main(String[] args) {
+
+        Date date = new Date();
+
+        //获取日期格式对象。具备着默认的风格
+        DateFormat dateFormat = DateFormat.getDateInstance();
+        String str_date = dateFormat.format(date);
+        System.out.println(str_date); //Jan 9, 2018
+
+        DateFormat dateFormat2 = DateFormat.getDateTimeInstance();
+        String str_date2 = dateFormat2.format(date);
+        System.out.println(str_date2);//Jan 9, 2018 5:48:43 PM
+
+        //其它风格 FULL LONG SHORT MEDIUM
+        //DateFormat dateFormat3 = DateFormat.getDateInstance(DateFormat.FULL);//Tuesday, January 9, 2018
+
+        //DateFormat dateFormat3 = DateFormat.getDateInstance(DateFormat.LONG);//January 9, 2018
+
+        //DateFormat dateFormat3 = DateFormat.getDateInstance(DateFormat.SHORT);//1/9/18
+
+        DateFormat dateFormat3 = DateFormat.getDateInstance(DateFormat.MEDIUM);//Jan 9, 2018
+
+        String str_date3 = dateFormat3.format(date);
+        System.out.println(str_date3);
+
+        //日期和时间
+        DateFormat dateFormat4 = DateFormat.getDateTimeInstance(DateFormat.LONG,DateFormat.LONG);//Jan 9, 2018
+
+        String str_date4 = dateFormat4.format(date);
+        System.out.println(str_date4);
+
+        //自定义风格
+        DateFormat dateFormats = DateFormat.getDateInstance();
+        dateFormats = new SimpleDateFormat(&quot;yyyy-MM-dd&quot;);
+        String str_date5 = dateFormats.format(date);
+        System.out.println(str_date5);//2018-01-09
+
+
+    }
+}
+</code></pre><h4 id="（三）、字符串转成日期对象"><a href="#（三）、字符串转成日期对象" class="headerlink" title="（三）、字符串转成日期对象"></a>（三）、字符串转成日期对象</h4><p>使用的是DateFormat类中的parse方法。</p>
+<pre><code>public class DateFormatDemo {
+
+    public static void main(String[] args) throws ParseException {
+
+        //默认的日期字符串格式转成日期对象
+        String str_date = &quot;Jan 9, 2018 5:48:43 PM&quot;;
+        DateFormat dateFormat = DateFormat.getDateInstance();
+        Date date = dateFormat.parse(str_date);
+        System.out.println(date);
+
+        //将自定义的日期字符串格式转成日期对象
+        String str_date2 = &quot;2018--1--10&quot;;
+        DateFormat dateFormat2 = DateFormat.getDateInstance(DateFormat.LONG);
+        dateFormat2 = new SimpleDateFormat(&quot;yyyy--MM--dd&quot;);
+        Date date2 = dateFormat2.parse(str_date2);
+        System.out.println(date2);
+
+    }
+
+}
+</code></pre><h4 id="（四）、Date类-练习"><a href="#（四）、Date类-练习" class="headerlink" title="（四）、Date类 - 练习"></a>（四）、Date类 - 练习</h4><pre><code>public class Demo1 {
+
+    public static void main(String[] args) throws ParseException {
+
+        /**
+         * 练习：
+         * &quot;2017.12.20&quot;到&quot;2018.1.10&quot;中间相隔多少天
+         * 
+         * 思路：
+         * 1、日期字符串转日期对象
+         * 2、日期对象方法获取毫秒数
+         * 3、毫秒数相减，再计算天数
+         */
+
+        String str_date1 = &quot;2017.12.20&quot;;
+        String str_date2 = &quot;2018.1.10&quot;;
+
+        //DateFormat dateFormat = DateFormat.getDateInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat(&quot;yyyy.MM.dd&quot;);
+        Date date1 = dateFormat.parse(str_date1);
+        Date date2 = dateFormat.parse(str_date2);
+
+        long date1Millis = date1.getTime();
+        long date2millis = date2.getTime();
+
+        int day = (int) Math.abs(date1Millis - date2millis)/1000/60/60/24;
+
+
+        System.out.println(day);
+    }
+
+}
+</code></pre><h3 id="四、Calendar类"><a href="#四、Calendar类" class="headerlink" title="四、Calendar类"></a>四、Calendar类</h3><p>常见方法：</p>
+<p>set()</p>
+<p>get()</p>
+<p>add():偏移</p>
+<h5 id="一、基本演示"><a href="#一、基本演示" class="headerlink" title="一、基本演示"></a>一、基本演示</h5><pre><code>public class CalendarDemo {
+
+    public static void main(String[] args) {
+
+        Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH)+1;
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        int week = c.get(Calendar.DAY_OF_WEEK);
+
+        System.out.println(year+&quot;年&quot;+month+&quot;月&quot;+day+&quot;日&quot;+getWeek(week));
+
+    }
+
+    private static String getWeek(int i) {
+        String[] weeks = {&quot;&quot;,&quot;星期日&quot;,&quot;星期一&quot;,&quot;星期二&quot;,&quot;星期三&quot;,&quot;星期四&quot;,&quot;星期五&quot;,&quot;星期六&quot;};
+        return weeks[i];
+    }
+}
+</code></pre><h5 id="二、练习"><a href="#二、练习" class="headerlink" title="二、练习"></a>二、练习</h5><pre><code>public class CalendarDemo {
+
+    public static void main(String[] args) {
+
+        Calendar c = Calendar.getInstance();
+        //指定日期
+        c.set(2018, 0, 20);
+        showDate(c);
+
+        //日期偏移
+        c.add(Calendar.YEAR, 2);
+        showDate(c);
+
+    }
+
+    public static void showDate(Calendar c) {
+        //Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH)+1;
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        int week = c.get(Calendar.DAY_OF_WEEK);
+
+        System.out.println(year+&quot;年&quot;+month+&quot;月&quot;+day+&quot;日&quot;+getWeek(week));
+    }
+
+    private static String getWeek(int i) {
+        String[] weeks = {&quot;&quot;,&quot;星期日&quot;,&quot;星期一&quot;,&quot;星期二&quot;,&quot;星期三&quot;,&quot;星期四&quot;,&quot;星期五&quot;,&quot;星期六&quot;};
+        return weeks[i];
+    }
+
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/09/java-api-otherObjects/" data-id="cjc8i1vp5000un3p305df0shq" class="article-share-link">Partager</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/api/">api</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2018/01/09/java-collection-utilities/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Ancien</strong>
+      <div class="article-nav-title">集合框架五 - 工具类</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Catégories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Mot-clés</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Nuage de mot-clés</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/angular/" style="font-size: 20px;">angular</a> <a href="/tags/api/" style="font-size: 15px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 17.5px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/thread/" style="font-size: 12.5px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Articles récents</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/01/09/java-api-otherObjects/">其它对象API</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/09/java-collection-utilities/">集合框架五 - 工具类</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/09/java-collection-map/">集合框架四 - Map集合</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/09/java-collection-notes/">集合框架三 - 查阅技巧</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/09/java-collection-generic/">集合框架二 - 泛型</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Propulsé by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

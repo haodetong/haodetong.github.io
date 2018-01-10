@@ -48,9 +48,9 @@
       </nav>
       <nav id="sub-nav">
         
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="Flux RSS"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Rechercher"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
@@ -60,6 +60,256 @@
 </header>
       <div class="outer">
         <section id="main">
+  
+    <article id="post-java-api-otherObjects" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/09/java-api-otherObjects/" class="article-date">
+  <time datetime="2018-01-09T07:16:19.000Z" itemprop="datePublished">2018-01-09</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/09/java-api-otherObjects/">其它对象API</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="一、System类"><a href="#一、System类" class="headerlink" title="一、System类"></a>一、System类</h3><p>System类中的方法和属性都是静态的。</p>
+<p>常见方法：</p>
+<p>long currentTimeMillis():获取当前时间的毫秒值</p>
+<p>Properties getProperties():获取当前系统的属性信息    </p>
+<pre><code>public class SystemApi {
+    public static void main(String[] args) {
+
+        long millisTime = System.currentTimeMillis();
+        System.out.println(millisTime);
+
+        Properties prop = System.getProperties();
+
+        Set&lt;String&gt; nameSet = prop.stringPropertyNames();
+
+        for(String name:nameSet) {
+            String value = prop.getProperty(name);
+            System.out.println(name+&quot;::&quot;+value);
+        }
+
+
+    }
+}
+</code></pre><h3 id="二、Runtime类"><a href="#二、Runtime类" class="headerlink" title="二、Runtime类"></a>二、Runtime类</h3><p>Runtime:</p>
+<p>没有构造方法摘要，说明该类不可以创建对象。</p>
+<p>又发现该类有非静态方法，说明该类应该有提供的静态的返回该类对象的方法。</p>
+<p>而且只有一个这种方法，说明Runtime类使用了单例设计模式。</p>
+<pre><code>public class RuntimeApi {
+
+    public static void main(String[] args) throws IOException, InterruptedException {
+
+        Runtime r = Runtime.getRuntime();
+
+        Process p = r.exec(&quot;open -a Safari.app http://www.baidu.com&quot;);
+        Thread.sleep(2000);
+        p.destroy();
+    }
+
+}
+</code></pre><h3 id="三、Math类"><a href="#三、Math类" class="headerlink" title="三、Math类"></a>三、Math类</h3><p>常用方法：</p>
+<p>double ceil():返回大于参数的最小整数。</p>
+<p>double floor():返回小于参数的最大整数。</p>
+<p>double round():返回四舍五入的整数。</p>
+<p>max(a,b):返回最大值</p>
+<p>pow(a,b):a的b次方</p>
+<p>double random():返回大于等于0.0小于1.0的随机double值，与java.util中的Random类相似。</p>
+<h3 id="四、Date类"><a href="#四、Date类" class="headerlink" title="四、Date类"></a>四、Date类</h3><h4 id="（一）、日期对象和毫秒值之间的转换"><a href="#（一）、日期对象和毫秒值之间的转换" class="headerlink" title="（一）、日期对象和毫秒值之间的转换"></a>（一）、日期对象和毫秒值之间的转换</h4><h5 id="毫秒值–-gt-日期对象"><a href="#毫秒值–-gt-日期对象" class="headerlink" title="毫秒值–&gt;日期对象"></a>毫秒值–&gt;日期对象</h5><p>1、通过Date对象的构造方法 new Date(timeMills);</p>
+<p>2、通过setTime方法。</p>
+<p>目的是通过Date对象的方法，对该日期中的年月日等字段进行操作。</p>
+<h5 id="日期对象–-gt-毫秒值"><a href="#日期对象–-gt-毫秒值" class="headerlink" title="日期对象–&gt;毫秒值"></a>日期对象–&gt;毫秒值</h5><p>1、通过getTime方法。</p>
+<p>目的是通过具体的数值进行运算。</p>
+<pre><code>public static void thord1() {
+        //long time = System.currentTimeMillis();//1515489394135
+
+        Date date1 = new Date();//将当前日期和时间封装成Date对象
+        System.out.println(date1);//Tue Jan 09 17:16:34 CST 2018
+
+        Date date2 = new Date(1515489367117l);//将指定毫秒封装成Date对象
+        System.out.println(date2);//Tue Jan 09 17:16:07 CST 2018
+}
+</code></pre><h4 id="（二）、日期对象转成字符串"><a href="#（二）、日期对象转成字符串" class="headerlink" title="（二）、日期对象转成字符串"></a>（二）、日期对象转成字符串</h4><pre><code>public class DateDemo {
+
+    public static void main(String[] args) {
+
+        Date date = new Date();
+
+        //获取日期格式对象。具备着默认的风格
+        DateFormat dateFormat = DateFormat.getDateInstance();
+        String str_date = dateFormat.format(date);
+        System.out.println(str_date); //Jan 9, 2018
+
+        DateFormat dateFormat2 = DateFormat.getDateTimeInstance();
+        String str_date2 = dateFormat2.format(date);
+        System.out.println(str_date2);//Jan 9, 2018 5:48:43 PM
+
+        //其它风格 FULL LONG SHORT MEDIUM
+        //DateFormat dateFormat3 = DateFormat.getDateInstance(DateFormat.FULL);//Tuesday, January 9, 2018
+
+        //DateFormat dateFormat3 = DateFormat.getDateInstance(DateFormat.LONG);//January 9, 2018
+
+        //DateFormat dateFormat3 = DateFormat.getDateInstance(DateFormat.SHORT);//1/9/18
+
+        DateFormat dateFormat3 = DateFormat.getDateInstance(DateFormat.MEDIUM);//Jan 9, 2018
+
+        String str_date3 = dateFormat3.format(date);
+        System.out.println(str_date3);
+
+        //日期和时间
+        DateFormat dateFormat4 = DateFormat.getDateTimeInstance(DateFormat.LONG,DateFormat.LONG);//Jan 9, 2018
+
+        String str_date4 = dateFormat4.format(date);
+        System.out.println(str_date4);
+
+        //自定义风格
+        DateFormat dateFormats = DateFormat.getDateInstance();
+        dateFormats = new SimpleDateFormat(&quot;yyyy-MM-dd&quot;);
+        String str_date5 = dateFormats.format(date);
+        System.out.println(str_date5);//2018-01-09
+
+
+    }
+}
+</code></pre><h4 id="（三）、字符串转成日期对象"><a href="#（三）、字符串转成日期对象" class="headerlink" title="（三）、字符串转成日期对象"></a>（三）、字符串转成日期对象</h4><p>使用的是DateFormat类中的parse方法。</p>
+<pre><code>public class DateFormatDemo {
+
+    public static void main(String[] args) throws ParseException {
+
+        //默认的日期字符串格式转成日期对象
+        String str_date = &quot;Jan 9, 2018 5:48:43 PM&quot;;
+        DateFormat dateFormat = DateFormat.getDateInstance();
+        Date date = dateFormat.parse(str_date);
+        System.out.println(date);
+
+        //将自定义的日期字符串格式转成日期对象
+        String str_date2 = &quot;2018--1--10&quot;;
+        DateFormat dateFormat2 = DateFormat.getDateInstance(DateFormat.LONG);
+        dateFormat2 = new SimpleDateFormat(&quot;yyyy--MM--dd&quot;);
+        Date date2 = dateFormat2.parse(str_date2);
+        System.out.println(date2);
+
+    }
+
+}
+</code></pre><h4 id="（四）、Date类-练习"><a href="#（四）、Date类-练习" class="headerlink" title="（四）、Date类 - 练习"></a>（四）、Date类 - 练习</h4><pre><code>public class Demo1 {
+
+    public static void main(String[] args) throws ParseException {
+
+        /**
+         * 练习：
+         * &quot;2017.12.20&quot;到&quot;2018.1.10&quot;中间相隔多少天
+         * 
+         * 思路：
+         * 1、日期字符串转日期对象
+         * 2、日期对象方法获取毫秒数
+         * 3、毫秒数相减，再计算天数
+         */
+
+        String str_date1 = &quot;2017.12.20&quot;;
+        String str_date2 = &quot;2018.1.10&quot;;
+
+        //DateFormat dateFormat = DateFormat.getDateInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat(&quot;yyyy.MM.dd&quot;);
+        Date date1 = dateFormat.parse(str_date1);
+        Date date2 = dateFormat.parse(str_date2);
+
+        long date1Millis = date1.getTime();
+        long date2millis = date2.getTime();
+
+        int day = (int) Math.abs(date1Millis - date2millis)/1000/60/60/24;
+
+
+        System.out.println(day);
+    }
+
+}
+</code></pre><h3 id="四、Calendar类"><a href="#四、Calendar类" class="headerlink" title="四、Calendar类"></a>四、Calendar类</h3><p>常见方法：</p>
+<p>set()</p>
+<p>get()</p>
+<p>add():偏移</p>
+<h5 id="一、基本演示"><a href="#一、基本演示" class="headerlink" title="一、基本演示"></a>一、基本演示</h5><pre><code>public class CalendarDemo {
+
+    public static void main(String[] args) {
+
+        Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH)+1;
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        int week = c.get(Calendar.DAY_OF_WEEK);
+
+        System.out.println(year+&quot;年&quot;+month+&quot;月&quot;+day+&quot;日&quot;+getWeek(week));
+
+    }
+
+    private static String getWeek(int i) {
+        String[] weeks = {&quot;&quot;,&quot;星期日&quot;,&quot;星期一&quot;,&quot;星期二&quot;,&quot;星期三&quot;,&quot;星期四&quot;,&quot;星期五&quot;,&quot;星期六&quot;};
+        return weeks[i];
+    }
+}
+</code></pre><h5 id="二、练习"><a href="#二、练习" class="headerlink" title="二、练习"></a>二、练习</h5><pre><code>public class CalendarDemo {
+
+    public static void main(String[] args) {
+
+        Calendar c = Calendar.getInstance();
+        //指定日期
+        c.set(2018, 0, 20);
+        showDate(c);
+
+        //日期偏移
+        c.add(Calendar.YEAR, 2);
+        showDate(c);
+
+    }
+
+    public static void showDate(Calendar c) {
+        //Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH)+1;
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        int week = c.get(Calendar.DAY_OF_WEEK);
+
+        System.out.println(year+&quot;年&quot;+month+&quot;月&quot;+day+&quot;日&quot;+getWeek(week));
+    }
+
+    private static String getWeek(int i) {
+        String[] weeks = {&quot;&quot;,&quot;星期日&quot;,&quot;星期一&quot;,&quot;星期二&quot;,&quot;星期三&quot;,&quot;星期四&quot;,&quot;星期五&quot;,&quot;星期六&quot;};
+        return weeks[i];
+    }
+
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/09/java-api-otherObjects/" data-id="cjc8i1vp5000un3p305df0shq" class="article-share-link">Partager</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/api/">api</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
   
     <article id="post-java-collection-utilities" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
@@ -470,7 +720,7 @@ public static String toString(int[] a) {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/09/java-collection-utilities/" data-id="cjc7alxcl001gu0p3m7frbbzg" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/01/09/java-collection-utilities/" data-id="cjc8i1vqg001nn3p3tz6ob4e7" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li></ul>
@@ -839,7 +1089,7 @@ A(2)C(2)a(5)f(2)j(6)l(6)s(7)
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/09/java-collection-map/" data-id="cjc7alxc50017u0p375wes208" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/01/09/java-collection-map/" data-id="cjc8i1vq00019n3p3ksf7gcqi" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li></ul>
@@ -905,7 +1155,7 @@ A(2)C(2)a(5)f(2)j(6)l(6)s(7)
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/09/java-collection-notes/" data-id="cjc7alxc00013u0p34ox4gjdi" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/01/09/java-collection-notes/" data-id="cjc8i1vq4001dn3p3j24lfdbz" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li></ul>
@@ -1345,7 +1595,7 @@ class CompareByName2 implements Comparator&lt;Person2&gt;{
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/09/java-collection-generic/" data-id="cjc7alxc80019u0p3j0cla3hq" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/01/09/java-collection-generic/" data-id="cjc8i1vpl0013n3p3h8em1ksl" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li></ul>
@@ -2055,7 +2305,7 @@ public class TreeSetPractice {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/27/java-collection-framework/" data-id="cjc7alxbe000vu0p3yn9wcdmd" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/12/27/java-collection-framework/" data-id="cjc8i1vpv0017n3p3c0sm9v5f" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li></ul>
@@ -2240,7 +2490,7 @@ public class WrapperTest {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/23/basic-data-class/" data-id="cjc7alxb4000ou0p38zvujrxz" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/12/23/basic-data-class/" data-id="cjc8i1voc000cn3p3fdd24y7f" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/api/">api</a></li></ul>
@@ -2353,7 +2603,7 @@ sb.setCharAt(2, &apos;1&apos;);//abqe
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/22/java-stringBuffer/" data-id="cjc7alxcg001du0p3afqyuqd1" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/12/22/java-stringBuffer/" data-id="cjc8i1vq7001gn3p30ryih788" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/api/">api</a></li></ul>
@@ -2542,7 +2792,7 @@ public static String getMaxSubstring(String s1, String s2){
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/21/api-string/" data-id="cjc7alxau000gu0p3j1mn9t2r" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/12/21/api-string/" data-id="cjc8i1vok000gn3p3nlu6c2gs" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/api/">api</a></li></ul>
@@ -3149,279 +3399,7 @@ t2.start();
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/18/thread-communication/" data-id="cjc7alxd6001vu0p3u4nr2rxr" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/thread/">thread</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java-thread" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/15/java-thread/" class="article-date">
-  <time datetime="2017-12-15T02:47:02.000Z" itemprop="datePublished">2017-12-15</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/java/">java</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/15/java-thread/">java多线程</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h4 id="创建线程"><a href="#创建线程" class="headerlink" title="创建线程"></a>创建线程</h4><h5 id="创建线程方式一：继承thread类。"><a href="#创建线程方式一：继承thread类。" class="headerlink" title="创建线程方式一：继承thread类。"></a>创建线程方式一：继承thread类。</h5><p>步骤：</p>
-<p>1、定义一个子类继承Thread类。</p>
-<p>2、覆盖Thread类中的run方法。</p>
-<p>3、直接创建Thread的子类对象创建线程。</p>
-<p>4、调用start方法开启线程并调用线程的任务run方法执行。</p>
-<pre><code>class Demo extends Thread{
-    private String name;
-    Demo(String name){
-        this.name = name;
-    }
-    public void run(){
-        for(int x=0; x&lt;10; x++){
-            System.out.println(name+&quot;...x=&quot;+x);
-        }
-    }
-}
-
-class ThreadDemo2{
-    public static void main(String[] args){
-        Demo d1 = new Demo(&quot;张三&quot;);
-        Demo d2 = new Demo(&quot;李四&quot;);
-        d1.start();
-        d2.start();
-    }
-}
-</code></pre><h5 id="创建线程方式二：实现Runnable接口。"><a href="#创建线程方式二：实现Runnable接口。" class="headerlink" title="创建线程方式二：实现Runnable接口。"></a>创建线程方式二：实现Runnable接口。</h5><p>步骤：</p>
-<p>1、定义类实现Runnable接口。</p>
-<p>2、覆盖接口中的run方法，将线程的任务代码封闭到run方法中。</p>
-<p>3、通过Thread类创建线程对象，并将实现Runnable接口的子类对象，作为Thread类的构造函数的参数进行传递。</p>
-<pre><code>为什么？因为线程的任务都封装在Runnable接口子类对象的run方法中。
-所以要
-</code></pre><p>4、调用线程对象的start方法开启线程。</p>
-<pre><code>class Demo implements Runnable{
-    public void run(){
-        show();
-    }
-    public void show(){
-        for(int x=0; x&lt;20; x++){
-            system.out.println(Thread.currentThread().getname()+&quot;........&quot;+x);
-        }
-    }
-}
-
-class TreadDemo{
-    public static void main(sting[] args){
-        Demo d = new Demo();
-        Thread t1 = new Thread(d);
-        Thread t2 = new Thread(d);
-        t1.start;
-        t2.start;
-    }
-}
-</code></pre><h5 id="线程安全隐患排查原则"><a href="#线程安全隐患排查原则" class="headerlink" title="线程安全隐患排查原则"></a>线程安全隐患排查原则</h5><p>1、查找共享数据</p>
-<p>2、共享数据代码的操作不止一条</p>
-<p>事例：两个储户到银行存钱，每次存100，共存三次。银行总数从100到600递增。</p>
-<pre><code>class Bank{
-    private int sum;
-    public void add(int num){
-        sum = sum + num;
-        try{
-            Thread.sleep();
-        }catch(InterruptedException e){
-            //...
-        }
-        System.out.println(&quot;sum=&quot;+sum);
-    }
-}
-
-class Cus implements Runnable{
-    private b = new Bank();
-    public void run(){
-        for(int x=0; x&lt;3; x++){
-            b.add(100);
-        }
-    }
-}
-
-class BankDemo{
-    public static void main(String[] args){
-        Cus c = new Cus();
-        Thread t1 = new Thread(c);
-        Thread t2 = new Thread(c);
-        t1.start();
-        t2.start();
-    }
-}
-</code></pre><h5 id="分析多线程安全隐患："><a href="#分析多线程安全隐患：" class="headerlink" title="分析多线程安全隐患："></a>分析多线程安全隐患：</h5><p>共享数据有：private b</p>
-<p>执行代码有一句：b.add(100);</p>
-<p>b.add里有一个共享数据：private int sum;</p>
-<p>执行语句有两句：sum = sum + num; system.out.printls…;</p>
-<p>此处会产生安全隐患：比如第一次当线程0进来时，sum = 100，但没有执行system.out.println语句，第二次线程1进来，此时sum = 100+100,再执行线程0和线程1的输出语句时，就都成了200。</p>
-<h5 id="解决方式一："><a href="#解决方式一：" class="headerlink" title="解决方式一："></a>解决方式一：</h5><p>用同步代码块把产生线程安全隐患的代码封装，注意要保持多线程用的是同一个锁。</p>
-<pre><code>class Bank{
-    private int sum;
-    private Object obj = new Object();
-    public void add(int num){
-        synchronized(obj){//三个线程共用一个对象锁obj
-            sum = sum + num;
-            try{
-                Thread.sleep();
-            }catch(InterruptedException e){
-                //...
-            }
-            System.out.println(&quot;sum=&quot;+sum);
-        }
-    }
-}
-</code></pre><h5 id="解决方式二："><a href="#解决方式二：" class="headerlink" title="解决方式二："></a>解决方式二：</h5><p>同步函数</p>
-<pre><code>class Bank{
-    private int sum;
-    public synchronized void add(int num){//同步函数
-        sum = sum + num;
-        try{
-            Thread.sleep();
-        }catch(InterruptedException e){
-            //...
-        }
-        System.out.println(&quot;sum=&quot;+sum);
-    }
-}
-</code></pre><h5 id="同步的好处和弊端"><a href="#同步的好处和弊端" class="headerlink" title="同步的好处和弊端"></a>同步的好处和弊端</h5><p>好处：解决了线程的安全问题</p>
-<p>弊端：降低了效率，因为同步外的线程都会判断同步锁。</p>
-<h5 id="同步函数和同步代码块的区别："><a href="#同步函数和同步代码块的区别：" class="headerlink" title="同步函数和同步代码块的区别："></a>同步函数和同步代码块的区别：</h5><p>1、同步函数使用的锁是this，同步代码块的锁是任意的对象。</p>
-<p>2、建议使用同步代码块。</p>
-<h5 id="静态同步函数的锁"><a href="#静态同步函数的锁" class="headerlink" title="静态同步函数的锁"></a>静态同步函数的锁</h5><p>静态同步函数的锁是该函数所属的字节码文件对象</p>
-<p>该对象可以用this.getClass()方法获取，也可以用当前类名.class获取。</p>
-<pre><code>class Bank{
-    private int sum;
-    public static synchronized void add(int num){
-        sum = sum + num;
-        try{
-            Thread.sleep();
-        }catch(InterruptedException e){
-            //...
-        }
-        System.out.println(&quot;sum=&quot;+sum);
-    }
-}
-</code></pre><p>该静态同步函数add的同步锁即为该函数所属的字节码文件对象，即为Bank.class。</p>
-<h5 id="单例模式涉及的多线程问题"><a href="#单例模式涉及的多线程问题" class="headerlink" title="单例模式涉及的多线程问题"></a>单例模式涉及的多线程问题</h5><pre><code>//饿汉式
-class Single{
-    private static final Singles = new Single();
-    private Single(){};
-    public static Single getInstance(){
-        return s;
-    }
-}
-
-//懒汉式
-class Single{
-    private static final Singles = null;
-    private Single(){};
-    public static Single getInstance(){
-        if(s == null)
-            s = new Single();
-            return s;
-    }
-}
-
-class SingleDemo{
-    public static void main(String[] args){
-
-    }
-}
-</code></pre><p>饿汉式多线程安全隐患分析：</p>
-<p>如果把getInstance函数封装为多线程的任务，1、多线程存在共享数据s；2、只有一条语句return s；因此，不会存在安全隐患。</p>
-<p>懒汉式多线程安全隐患分析：</p>
-<p>如果把getInstance函数封装为多线程的任务，1、多线程存在共享数据s；2、有多条语句；因此，存在安全隐患。比如：线程0进来时，s == null，挂住了，线程1双进来了，s == null，挂住了。线程0取得执行权，生成对象并返回。线程1又取得执行权，又生成了对象并返回。就不能保证单例设计模式对象的唯一性了。</p>
-<p>因此，懒汉式需要同步函数。</p>
-<pre><code>public static synchronized Single getInstance(){
-    if(s == null)
-        s = new Single();
-        return s;
-}
-</code></pre><p>解决了安全问题，但是每一次线程进来时都会判断同步锁是否一样，降低了效率。</p>
-<p>同步代码块解决安全问题以及效率问题。</p>
-<pre><code>public static Single getInstance(){
-    if(s == null){ //a处的if
-        synchronized(Single.class){
-            if(s == null) //b处的if
-                s = new Single();
-                return s;
-        }
-    }
-    return s;
-}
-</code></pre><p>分析：线程0进入getInstance，判断a处的s == null,进入if，挂起。线程1进入判断a处的s == null，进入if挂起。线程0取得执行权，判断b处的s == null，生成对象并返回。线程1取得执行权，判断b处的s已经不为null了，跳出if。线程2进入getInstance，判断a处的s已经不为null了，直接return s。</p>
-<h5 id="多线程死锁事例"><a href="#多线程死锁事例" class="headerlink" title="多线程死锁事例"></a>多线程死锁事例</h5><pre><code>class Test implements Runnable{
-    private boolean flag = true;
-    public void run(){
-        if(flag){
-            while(true)
-                synchronized(MyLock.locka){
-                    System.out.prinln(Thread.currentThread().getName()+&quot;if...locka...&quot;);
-                synchronized(MyLock.lockb){
-                        System.out.prinln(Thread.currentThread().getName()+&quot;if...lockb...&quot;);                    
-                    }
-                }
-        }else{
-            while(true)
-                synchronized(MyLock.lockb){
-                    System.out.prinln(Thread.currentThread().getName()+&quot;else...lockb...&quot;);    
-                synchronized(MyLock.locka){
-                        System.out.prinln(Thread.currentThread().getName()+&quot;else...locka...&quot;);    
-                    }
-                }
-        }
-    }
-}
-
-class MyLock{
-    public static final Object locka = new Object();
-    public static final Object lockb = new Object();
-}
-
-class DeadLockTest{
-    public static void main(String[] args){
-        Test a = new Test();
-        Thread t1 = new Thread(a);
-        Thread t2 = new Thread(a);
-        t1.start();
-        try{
-            Thread.sleep(10);//冻结main主线程10毫秒
-        }catch(){
-            //...
-        }
-        a.flag = false;
-        t2.start();
-    }
-}
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/15/java-thread/" data-id="cjc7alxco001lu0p39dgrbmut" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/12/18/thread-communication/" data-id="cjc8i1vr3001yn3p3dxhyp8h5" class="article-share-link">Partager</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/thread/">thread</a></li></ul>
@@ -3444,7 +3422,7 @@ class DeadLockTest{
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Categories</h3>
+    <h3 class="widget-title">Catégories</h3>
     <div class="widget">
       <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
     </div>
@@ -3454,7 +3432,7 @@ class DeadLockTest{
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Tags</h3>
+    <h3 class="widget-title">Mot-clés</h3>
     <div class="widget">
       <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
     </div>
@@ -3464,7 +3442,7 @@ class DeadLockTest{
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Tag Cloud</h3>
+    <h3 class="widget-title">Nuage de mot-clés</h3>
     <div class="widget tagcloud">
       <a href="/tags/angular/" style="font-size: 20px;">angular</a> <a href="/tags/api/" style="font-size: 15px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 17.5px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/thread/" style="font-size: 12.5px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
     </div>
@@ -3483,9 +3461,13 @@ class DeadLockTest{
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
+    <h3 class="widget-title">Articles récents</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2018/01/09/java-api-otherObjects/">其它对象API</a>
+          </li>
         
           <li>
             <a href="/2018/01/09/java-collection-utilities/">集合框架五 - 工具类</a>
@@ -3503,10 +3485,6 @@ class DeadLockTest{
             <a href="/2018/01/09/java-collection-generic/">集合框架二 - 泛型</a>
           </li>
         
-          <li>
-            <a href="/2017/12/27/java-collection-framework/">集合框架一 - Collecion集合</a>
-          </li>
-        
       </ul>
     </div>
   </div>
@@ -3520,7 +3498,7 @@ class DeadLockTest{
   <div class="outer">
     <div id="footer-info" class="inner">
       &copy; 2018 John Doe<br>
-      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+      Propulsé by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
 </footer>
