@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>集合框架五 - 工具类 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="java集合框架工具类">
+<meta name="keywords" content="java, api">
+<meta property="og:type" content="article">
+<meta property="og:title" content="集合框架五 - 工具类">
+<meta property="og:url" content="http://yoursite.com/2018/01/09/java/java-collections/java-collection-utilities/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="java集合框架工具类">
+<meta property="og:updated_time" content="2018-01-09T07:08:44.744Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="集合框架五 - 工具类">
+<meta name="twitter:description" content="java集合框架工具类">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Zoeken"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-java/java-collections/java-collection-utilities" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/09/java/java-collections/java-collection-utilities/" class="article-date">
+  <time datetime="2018-01-09T06:45:51.000Z" itemprop="datePublished">2018-01-09</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      集合框架五 - 工具类
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="五、集合框架-工具类"><a href="#五、集合框架-工具类" class="headerlink" title="五、集合框架 - 工具类"></a>五、集合框架 - 工具类</h3><p>Utilities</p>
+<p>|– Collections</p>
+<p>|– Arrays</p>
+<h4 id="1、Collections-排序"><a href="#1、Collections-排序" class="headerlink" title="1、Collections - 排序"></a>1、Collections - 排序</h4><p>需求：对有重复元素的集合排序。</p>
+<pre><code>public class Demo1 {
+
+    public static void main(String[] args) {
+
+        List&lt;String&gt; list = new ArrayList&lt;String&gt;();
+
+        list.add(&quot;afgds&quot;);
+        list.add(&quot;jlojaio&quot;);
+        list.add(&quot;haljasld&quot;);
+        list.add(&quot;xjvis&quot;);
+        list.add(&quot;afgds&quot;);
+
+        System.out.println(list);
+
+        //对list集合进行指定顺序的排序。
+        Collections.sort(list);
+        System.out.println(list);
+
+        //对list按长度排序，传入自定义比较器
+        Collections.sort(list,new ComparatorByLength());
+        System.out.println(list);
+
+    }
+
+}
+
+public class ComparatorByLength implements Comparator&lt;String&gt; {
+
+    @Override
+    public int compare(String o1, String o2) {
+        int temp = o1.length() - o2.length();
+        return temp == 0 ? o1.compareTo(o2) : temp;
+    }
+
+}
+
+输出结果：
+[afgds, jlojaio, haljasld, xjvis, afgds]
+[afgds, afgds, haljasld, jlojaio, xjvis]    
+</code></pre><p>自定义Collections工具类的static sort(List<t> list) </t></p>
+<pre><code>public static &lt;T extends Comparable&lt;? super T&gt;&gt; void mysort(List&lt;T&gt; list) {
+
+    for (int i = 0; i &lt; list.size()-1; i++) {
+        for (int j = i+1; j &lt; list.size(); j++) {
+            if(list.get(i).compareTo(list.get(j)) &gt; 0) {
+                /*
+                T temp = list.get(i);
+                list.set(i, list.get(j));
+                list.set(j, temp);
+                */
+                Collections.swap(list, i, j);
+            }
+        }
+    }
+
+
+}
+</code></pre><p>自定义Collections工具类的static  sort(List<t> list, Comparator&lt;? super T&gt; c) </t></p>
+<pre><code>public static &lt;T&gt; void mySort(List&lt;T&gt; list,Comparator&lt;? super T&gt; comp) {
+        for (int i = 0; i &lt; list.size()-1; i++) {
+            for (int j = i+1; j &lt; list.size(); j++) {
+                if(comp.compare(list.get(i), list.get(j)) &gt; 0) {
+                    Collections.swap(list, i, j);
+                }
+            }
+        }
+    }
+</code></pre><h4 id="2、Collections-折半-amp-最值"><a href="#2、Collections-折半-amp-最值" class="headerlink" title="2、Collections - 折半&amp;最值"></a>2、Collections - 折半&amp;最值</h4><p>折半查找，必须是对有序元素。</p>
+<pre><code>public class Demo2 {
+
+    public static void main(String[] args) {
+
+        List&lt;String&gt; list = new ArrayList&lt;String&gt;();
+
+        list.add(&quot;afgds&quot;);
+        list.add(&quot;jlojaio&quot;);
+        list.add(&quot;haljasld&quot;);
+        list.add(&quot;xjvis&quot;);
+        list.add(&quot;afgds&quot;);
+
+        System.out.println(list);
+
+        Collections.sort(list);
+
+        int index = Collections.binarySearch(list, &quot;afgds&quot;);
+
+        System.out.println(index);
+
+    }    
+}
+
+输出结果：
+[afgds, jlojaio, haljasld, xjvis, afgds]
+0
+</code></pre><p>最值：有没有序都可以。</p>
+<pre><code>public class Demo2 {
+
+    public static void main(String[] args) {
+
+        List&lt;String&gt; list = new ArrayList&lt;String&gt;();
+
+        list.add(&quot;afgds&quot;);
+        list.add(&quot;jlojaio&quot;);
+        list.add(&quot;haljasld&quot;);
+        list.add(&quot;xjvis&quot;);
+        list.add(&quot;afgds&quot;);
+
+        System.out.println(list);
+
+        //取最大值
+        String max = Collections.max(list);
+        System.out.println(&quot;max:&quot;+max);
+
+        //取最长值
+        String longest = Collections.max(list, new ComparatorByLength());
+        System.out.println(&quot;longest:&quot;+longest);
+
+    }
+
+}
+</code></pre><h4 id="3、Collections-逆序-amp-替换"><a href="#3、Collections-逆序-amp-替换" class="headerlink" title="3、Collections - 逆序&amp;替换"></a>3、Collections - 逆序&amp;替换</h4><p>逆序：reverseOrder方法，返回一个比较器，可以将具备自然排序的集合进行逆序。</p>
+<pre><code>public class Demo3 {
+
+    public static void main(String[] args) {
+        TreeSet&lt;String&gt; ts = new TreeSet&lt;String&gt;(Collections.reverseOrder());
+
+        ts.add(&quot;afgds&quot;);
+        ts.add(&quot;jlojaio&quot;);
+        ts.add(&quot;haljasld&quot;);
+        ts.add(&quot;xjvis&quot;);
+        ts.add(&quot;afgds&quot;);
+
+        System.out.println(ts);
+
+    }
+
+}    
+
+输出结果：倒序排列
+[xjvis, jlojaio, haljasld, afgds]
+</code></pre><p>也可对已有的比较器进行逆转</p>
+<pre><code>public class Demo3 {
+
+    public static void main(String[] args) {
+
+        TreeSet&lt;String&gt; ts = new TreeSet&lt;String&gt;(Collections.reverseOrder(new ComparatorByLength()));
+
+        ts.add(&quot;afgds&quot;);
+        ts.add(&quot;jlojaio&quot;);
+        ts.add(&quot;haljasld&quot;);
+        ts.add(&quot;xjvis&quot;);
+        ts.add(&quot;afgds&quot;);
+
+        System.out.println(ts);
+    }
+
+}
+
+输出结果：从长到短排列
+[haljasld, jlojaio, xjvis, afgds]
+</code></pre><p>static <t> boolean    replaceAll(List<t> list, T oldVal, T newVal) 使用另一个值替换列表中出现的所有某一指定值。</t></t></p>
+<pre><code>public class Demo4 {
+
+    public static void main(String[] args) {
+
+        List&lt;String&gt; list = new ArrayList&lt;String&gt;();
+
+        list.add(&quot;afgds&quot;);
+        list.add(&quot;jloj&quot;);
+        list.add(&quot;halj&quot;);
+
+        System.out.println(list);
+
+        Collections.replaceAll(list, &quot;halj&quot;, &quot;haojie&quot;);
+
+        System.out.println(list);
+    }
+
+}
+
+输出结果：
+[afgds, jloj, halj]
+[afgds, jloj, haojie]
+</code></pre><h4 id="4、Collections-其它方法-amp-将非同步集合转成同步集合的方法"><a href="#4、Collections-其它方法-amp-将非同步集合转成同步集合的方法" class="headerlink" title="4、Collections - 其它方法&amp;将非同步集合转成同步集合的方法"></a>4、Collections - 其它方法&amp;将非同步集合转成同步集合的方法</h4><p>使用指定元素替换指定列表中的所有元素。    </p>
+<pre><code>static &lt;T&gt; void    fill(List&lt;? super T&gt; list, T obj) 
+</code></pre><p>使用默认随机源对指定列表进行置换。随机排序，洗牌</p>
+<pre><code>static void    shuffle(List&lt;?&gt; list) 
+</code></pre><p>返回指定 collection 支持的同步（线程安全的）collection。</p>
+<pre><code>static &lt;T&gt; Collection&lt;T&gt; synchronizedCollection(Collection&lt;T&gt; c) 
+</code></pre><p>返回指定列表支持的同步（线程安全的）列表。<br>    static <t> List<t>    synchronizedList(List<t> list) </t></t></t></p>
+<p>返回由指定映射支持的同步（线程安全的）映射。</p>
+<pre><code>static &lt;K,V&gt; Map&lt;K,V&gt;    synchronizedMap(Map&lt;K,V&gt; m) 
+</code></pre><p>返回指定 set 支持的同步（线程安全的）set。</p>
+<pre><code>static &lt;T&gt; Set&lt;T&gt;    synchronizedSet(Set&lt;T&gt; s) 
+</code></pre><h4 id="5、Arrays-toString方法"><a href="#5、Arrays-toString方法" class="headerlink" title="5、Arrays - toString方法"></a>5、Arrays - toString方法</h4><p>Arrays.toString方法</p>
+<pre><code>public class Demo1 {
+
+    public static void main(String[] args) {
+
+        int[] arr = {3,2,1,4,5,6};
+        System.out.println(Arrays.toString(arr));
+    }
+
+}
+
+经典实现
+
+public static String toString(int[] a) {
+    if (a == null)
+        return &quot;null&quot;;
+    int iMax = a.length - 1;
+    if (iMax == -1)
+        return &quot;[]&quot;;
+
+    StringBuilder b = new StringBuilder();
+    b.append(&apos;[&apos;);
+    for (int i = 0; ; i++) {
+        b.append(a[i]);
+        if (i == iMax)
+            return b.append(&apos;]&apos;).toString();
+        b.append(&quot;, &quot;);
+    }
+}
+</code></pre><h4 id="6、Arrays-asList方法"><a href="#6、Arrays-asList方法" class="headerlink" title="6、Arrays - asList方法"></a>6、Arrays - asList方法</h4><p>将数组转成集合</p>
+<pre><code>static &lt;T&gt; List&lt;T&gt; asList(T... a) 
+</code></pre><p>好处：可以使用集合中的方法来操作数组中的元素，除了改变长度的方法。</p>
+<p>a、注意：数组的长度是固定的，所以对于集合的增删方法是不可以使用的。否则会发生UnsupportedOperationException</p>
+<pre><code>public class Demo2 {
+    public static void main(String[] args) {
+
+        String[] arr = {&quot;aaa&quot;,&quot;bbb&quot;,&quot;ccc&quot;};
+
+        List&lt;String&gt; list = Arrays.asList(arr);
+
+        boolean b = list.contains(&quot;aaa&quot;);
+
+        System.out.println(b);
+
+    }
+}
+</code></pre><p>b、如果数组中的元素是对象，那么转成集合时，直接将数组中的对象元素，作为集合中的元素进行存储。</p>
+<p>如果数组中的元素是基本类型数值，那么会将该数组作为集合中的元素进行存储，因为集合中只能存储对象，而不能存储基本类型数据。</p>
+<pre><code>public class Demo3 {
+    public static void main(String[] args) {
+
+        int[] arr = {31,22,44,12};
+
+        List&lt;int[]&gt; list = Arrays.asList(arr);
+
+        System.out.println(list.size());
+
+    }
+}
+
+输出结果：
+1
+</code></pre><h4 id="7、Collection-toArray方法"><a href="#7、Collection-toArray方法" class="headerlink" title="7、Collection-toArray方法"></a>7、Collection-toArray方法</h4><p>集合转数组：可以对集合中的元素操作的方法进行限定，不允许对其增删。</p>
+<p>使用的是Collecion接口中的toArray方法</p>
+<p>toArray方法需要传入一个指定类型的数组。</p>
+<p>如果长度小于集合的size，那么该方法会创建一个同类型并和集合相同size的数组。</p>
+<p>如果长度大于集合的size，那么该方法就会使用指定的数组，存储集合中的元素，其它位置默认为null。</p>
+<p>建议，最好长度就指定为集合的size。</p>
+<pre><code>public class Demo4 {
+
+    public static void main(String[] args) {
+
+        List&lt;String&gt; list = new ArrayList&lt;String&gt;();
+        list.add(&quot;ab3&quot;);
+        list.add(&quot;sds&quot;);
+        list.add(&quot;asfa&quot;);
+
+        String[] arr = list.toArray(new String[5]);
+
+        System.out.println(Arrays.toString(arr));
+
+    }
+
+}
+
+输出结果：
+[ab3, sds, asfa, null, null]
+</code></pre><h4 id="8、集合框架-jdk5-0特性-ForEach循环"><a href="#8、集合框架-jdk5-0特性-ForEach循环" class="headerlink" title="8、集合框架 - jdk5.0特性 - ForEach循环"></a>8、集合框架 - jdk5.0特性 - ForEach循环</h4><pre><code>public class Demo5 {
+
+    public static void main(String[] args) {
+
+        /**
+         * foreach语句：
+         * 格式：
+         * for(类型 变量: Collection集合|数组){
+         * 
+         * }
+         * 
+         * 传统for循环和高级for循环的区别：
+         * 传统for循环可以对语句执行很多次，因为可以控制循环的增量和条件。
+         * 高级for循环是一种简化形式，必须有遍历的目标，可以是数组，也可以是Collecion单列集合。
+         * 
+         * 对数组的遍历，如果仅仅是为了获取数组中的元素，可以使用高级for循环。
+         * 如果要对数组的角标进行操作建议使用传统for循环。
+         */
+
+        List&lt;String&gt; list = new ArrayList&lt;String&gt;();
+
+        list.add(&quot;abc&quot;);
+        list.add(&quot;def&quot;);
+        list.add(&quot;ghi&quot;);
+        list.add(&quot;jkl&quot;);
+
+        //迭代器
+        Iterator&lt;String&gt; it = list.iterator();
+
+        while(it.hasNext()) {
+            System.out.println(it.next());
+        }
+
+        //高级for循环，通常只用于遍历，简化书写
+        for(String s : list) {
+            System.out.println(s);
+        }
+
+        //遍历数组
+        int[] arr = {3,8,2,1,7};
+        for(int i : arr) {
+            System.out.println(i);
+        }
+
+        //高级for循环遍历map集合，要先把map集合转为单列集合。
+        Map&lt;Integer,String&gt; map = new HashMap&lt;Integer,String&gt;();
+
+        map.put(3, &quot;zhangsan&quot;);
+        map.put(4, &quot;lisi&quot;);
+        map.put(5, &quot;wangwu&quot;);
+        map.put(7, &quot;zhaoliu&quot;);
+
+        for(Integer key : map.keySet()) {
+            String value = map.get(key);
+            System.out.println(key+&quot;:&quot;+value);
+        }
+
+        for(Map.Entry&lt;Integer, String&gt; merryEntry : map.entrySet()) {
+            Integer key = merryEntry.getKey();
+            String value = merryEntry.getValue();
+            System.out.println(key+&quot;::&quot;+value);
+        }
+
+    }
+
+}
+</code></pre><h4 id="9、集合框架-jdk5-0特性-函数可变参数"><a href="#9、集合框架-jdk5-0特性-函数可变参数" class="headerlink" title="9、集合框架 - jdk5.0特性 - 函数可变参数"></a>9、集合框架 - jdk5.0特性 - 函数可变参数</h4><pre><code>public class Demo6 {
+
+    public static void main(String[] args) {
+
+        int sum = newAdd(5,1,4,7,3);
+        System.out.println(&quot;sum=&quot;+sum);
+
+        int sum1 = newAdd(3,5,2,5,3,2,2);
+        System.out.println(&quot;sum1=&quot;+sum1);
+
+    }
+
+    /**
+     * 函数是可变参数。
+     * 其实就是一个数组，但是接收的是数组元素。
+     * 自动将这些元素封装为数组。简化了调用者的书写。
+     * 注意：可变参数类型，必须定义参数列表的结尾。
+     */
+
+    private static int newAdd(int a,int... arr) {
+        int sum = 0;
+        for (int i = 0; i &lt; arr.length; i++) {
+            sum+=arr[i];
+        }
+        return sum;
+    }
+
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/09/java/java-collections/java-collection-utilities/" data-id="cjcg0m9s2002entp3165jvcmu" class="article-share-link">Delen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/01/09/java/java-api/java-api-otherObjects/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Nieuwer</strong>
+      <div class="article-nav-title">
+        
+          其它对象API
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/01/09/java/java-collections/java-collection-map/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Ouder</strong>
+      <div class="article-nav-title">集合框架四 - Map集合</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categorieën</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Labels</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 18px;">angular</a> <a href="/tags/api/" style="font-size: 14px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 16px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/thread/" style="font-size: 12px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archieven</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recente berichten</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/01/15/java/java-io/IO-19-practice-cutstring/">IO流 - 十九：练习 - 按字节截取字符串</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/15/java/java-io/IO-1-instruction/">IO流 - 一、概述</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/10/java/java-io/IO-8-transform-coding/">IO流 - 八、转换流的编码解码</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/10/java/java-io/IO-9-file/">IO流 - 九、File对象</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/10/java/java-io/IO-7-stream-rule-demo/">IO流 - 七、流的操作规律 - 需求体现</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

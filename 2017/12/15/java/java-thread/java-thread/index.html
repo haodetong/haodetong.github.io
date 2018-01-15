@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>java多线程 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="java多线程">
+<meta name="keywords" content="java, thread">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java多线程">
+<meta property="og:url" content="http://yoursite.com/2017/12/15/java/java-thread/java-thread/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="java多线程">
+<meta property="og:updated_time" content="2017-12-18T08:29:24.287Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="java多线程">
+<meta name="twitter:description" content="java多线程">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Zoeken"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-java/java-thread/java-thread" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/12/15/java/java-thread/java-thread/" class="article-date">
+  <time datetime="2017-12-15T02:47:02.000Z" itemprop="datePublished">2017-12-15</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      java多线程
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="创建线程"><a href="#创建线程" class="headerlink" title="创建线程"></a>创建线程</h4><h5 id="创建线程方式一：继承thread类。"><a href="#创建线程方式一：继承thread类。" class="headerlink" title="创建线程方式一：继承thread类。"></a>创建线程方式一：继承thread类。</h5><p>步骤：</p>
+<p>1、定义一个子类继承Thread类。</p>
+<p>2、覆盖Thread类中的run方法。</p>
+<p>3、直接创建Thread的子类对象创建线程。</p>
+<p>4、调用start方法开启线程并调用线程的任务run方法执行。</p>
+<pre><code>class Demo extends Thread{
+    private String name;
+    Demo(String name){
+        this.name = name;
+    }
+    public void run(){
+        for(int x=0; x&lt;10; x++){
+            System.out.println(name+&quot;...x=&quot;+x);
+        }
+    }
+}
+
+class ThreadDemo2{
+    public static void main(String[] args){
+        Demo d1 = new Demo(&quot;张三&quot;);
+        Demo d2 = new Demo(&quot;李四&quot;);
+        d1.start();
+        d2.start();
+    }
+}
+</code></pre><h5 id="创建线程方式二：实现Runnable接口。"><a href="#创建线程方式二：实现Runnable接口。" class="headerlink" title="创建线程方式二：实现Runnable接口。"></a>创建线程方式二：实现Runnable接口。</h5><p>步骤：</p>
+<p>1、定义类实现Runnable接口。</p>
+<p>2、覆盖接口中的run方法，将线程的任务代码封闭到run方法中。</p>
+<p>3、通过Thread类创建线程对象，并将实现Runnable接口的子类对象，作为Thread类的构造函数的参数进行传递。</p>
+<pre><code>为什么？因为线程的任务都封装在Runnable接口子类对象的run方法中。
+所以要
+</code></pre><p>4、调用线程对象的start方法开启线程。</p>
+<pre><code>class Demo implements Runnable{
+    public void run(){
+        show();
+    }
+    public void show(){
+        for(int x=0; x&lt;20; x++){
+            system.out.println(Thread.currentThread().getname()+&quot;........&quot;+x);
+        }
+    }
+}
+
+class TreadDemo{
+    public static void main(sting[] args){
+        Demo d = new Demo();
+        Thread t1 = new Thread(d);
+        Thread t2 = new Thread(d);
+        t1.start;
+        t2.start;
+    }
+}
+</code></pre><h5 id="线程安全隐患排查原则"><a href="#线程安全隐患排查原则" class="headerlink" title="线程安全隐患排查原则"></a>线程安全隐患排查原则</h5><p>1、查找共享数据</p>
+<p>2、共享数据代码的操作不止一条</p>
+<p>事例：两个储户到银行存钱，每次存100，共存三次。银行总数从100到600递增。</p>
+<pre><code>class Bank{
+    private int sum;
+    public void add(int num){
+        sum = sum + num;
+        try{
+            Thread.sleep();
+        }catch(InterruptedException e){
+            //...
+        }
+        System.out.println(&quot;sum=&quot;+sum);
+    }
+}
+
+class Cus implements Runnable{
+    private b = new Bank();
+    public void run(){
+        for(int x=0; x&lt;3; x++){
+            b.add(100);
+        }
+    }
+}
+
+class BankDemo{
+    public static void main(String[] args){
+        Cus c = new Cus();
+        Thread t1 = new Thread(c);
+        Thread t2 = new Thread(c);
+        t1.start();
+        t2.start();
+    }
+}
+</code></pre><h5 id="分析多线程安全隐患："><a href="#分析多线程安全隐患：" class="headerlink" title="分析多线程安全隐患："></a>分析多线程安全隐患：</h5><p>共享数据有：private b</p>
+<p>执行代码有一句：b.add(100);</p>
+<p>b.add里有一个共享数据：private int sum;</p>
+<p>执行语句有两句：sum = sum + num; system.out.printls…;</p>
+<p>此处会产生安全隐患：比如第一次当线程0进来时，sum = 100，但没有执行system.out.println语句，第二次线程1进来，此时sum = 100+100,再执行线程0和线程1的输出语句时，就都成了200。</p>
+<h5 id="解决方式一："><a href="#解决方式一：" class="headerlink" title="解决方式一："></a>解决方式一：</h5><p>用同步代码块把产生线程安全隐患的代码封装，注意要保持多线程用的是同一个锁。</p>
+<pre><code>class Bank{
+    private int sum;
+    private Object obj = new Object();
+    public void add(int num){
+        synchronized(obj){//三个线程共用一个对象锁obj
+            sum = sum + num;
+            try{
+                Thread.sleep();
+            }catch(InterruptedException e){
+                //...
+            }
+            System.out.println(&quot;sum=&quot;+sum);
+        }
+    }
+}
+</code></pre><h5 id="解决方式二："><a href="#解决方式二：" class="headerlink" title="解决方式二："></a>解决方式二：</h5><p>同步函数</p>
+<pre><code>class Bank{
+    private int sum;
+    public synchronized void add(int num){//同步函数
+        sum = sum + num;
+        try{
+            Thread.sleep();
+        }catch(InterruptedException e){
+            //...
+        }
+        System.out.println(&quot;sum=&quot;+sum);
+    }
+}
+</code></pre><h5 id="同步的好处和弊端"><a href="#同步的好处和弊端" class="headerlink" title="同步的好处和弊端"></a>同步的好处和弊端</h5><p>好处：解决了线程的安全问题</p>
+<p>弊端：降低了效率，因为同步外的线程都会判断同步锁。</p>
+<h5 id="同步函数和同步代码块的区别："><a href="#同步函数和同步代码块的区别：" class="headerlink" title="同步函数和同步代码块的区别："></a>同步函数和同步代码块的区别：</h5><p>1、同步函数使用的锁是this，同步代码块的锁是任意的对象。</p>
+<p>2、建议使用同步代码块。</p>
+<h5 id="静态同步函数的锁"><a href="#静态同步函数的锁" class="headerlink" title="静态同步函数的锁"></a>静态同步函数的锁</h5><p>静态同步函数的锁是该函数所属的字节码文件对象</p>
+<p>该对象可以用this.getClass()方法获取，也可以用当前类名.class获取。</p>
+<pre><code>class Bank{
+    private int sum;
+    public static synchronized void add(int num){
+        sum = sum + num;
+        try{
+            Thread.sleep();
+        }catch(InterruptedException e){
+            //...
+        }
+        System.out.println(&quot;sum=&quot;+sum);
+    }
+}
+</code></pre><p>该静态同步函数add的同步锁即为该函数所属的字节码文件对象，即为Bank.class。</p>
+<h5 id="单例模式涉及的多线程问题"><a href="#单例模式涉及的多线程问题" class="headerlink" title="单例模式涉及的多线程问题"></a>单例模式涉及的多线程问题</h5><pre><code>//饿汉式
+class Single{
+    private static final Singles = new Single();
+    private Single(){};
+    public static Single getInstance(){
+        return s;
+    }
+}
+
+//懒汉式
+class Single{
+    private static final Singles = null;
+    private Single(){};
+    public static Single getInstance(){
+        if(s == null)
+            s = new Single();
+            return s;
+    }
+}
+
+class SingleDemo{
+    public static void main(String[] args){
+
+    }
+}
+</code></pre><p>饿汉式多线程安全隐患分析：</p>
+<p>如果把getInstance函数封装为多线程的任务，1、多线程存在共享数据s；2、只有一条语句return s；因此，不会存在安全隐患。</p>
+<p>懒汉式多线程安全隐患分析：</p>
+<p>如果把getInstance函数封装为多线程的任务，1、多线程存在共享数据s；2、有多条语句；因此，存在安全隐患。比如：线程0进来时，s == null，挂住了，线程1双进来了，s == null，挂住了。线程0取得执行权，生成对象并返回。线程1又取得执行权，又生成了对象并返回。就不能保证单例设计模式对象的唯一性了。</p>
+<p>因此，懒汉式需要同步函数。</p>
+<pre><code>public static synchronized Single getInstance(){
+    if(s == null)
+        s = new Single();
+        return s;
+}
+</code></pre><p>解决了安全问题，但是每一次线程进来时都会判断同步锁是否一样，降低了效率。</p>
+<p>同步代码块解决安全问题以及效率问题。</p>
+<pre><code>public static Single getInstance(){
+    if(s == null){ //a处的if
+        synchronized(Single.class){
+            if(s == null) //b处的if
+                s = new Single();
+                return s;
+        }
+    }
+    return s;
+}
+</code></pre><p>分析：线程0进入getInstance，判断a处的s == null,进入if，挂起。线程1进入判断a处的s == null，进入if挂起。线程0取得执行权，判断b处的s == null，生成对象并返回。线程1取得执行权，判断b处的s已经不为null了，跳出if。线程2进入getInstance，判断a处的s已经不为null了，直接return s。</p>
+<h5 id="多线程死锁事例"><a href="#多线程死锁事例" class="headerlink" title="多线程死锁事例"></a>多线程死锁事例</h5><pre><code>class Test implements Runnable{
+    private boolean flag = true;
+    public void run(){
+        if(flag){
+            while(true)
+                synchronized(MyLock.locka){
+                    System.out.prinln(Thread.currentThread().getName()+&quot;if...locka...&quot;);
+                synchronized(MyLock.lockb){
+                        System.out.prinln(Thread.currentThread().getName()+&quot;if...lockb...&quot;);                    
+                    }
+                }
+        }else{
+            while(true)
+                synchronized(MyLock.lockb){
+                    System.out.prinln(Thread.currentThread().getName()+&quot;else...lockb...&quot;);    
+                synchronized(MyLock.locka){
+                        System.out.prinln(Thread.currentThread().getName()+&quot;else...locka...&quot;);    
+                    }
+                }
+        }
+    }
+}
+
+class MyLock{
+    public static final Object locka = new Object();
+    public static final Object lockb = new Object();
+}
+
+class DeadLockTest{
+    public static void main(String[] args){
+        Test a = new Test();
+        Thread t1 = new Thread(a);
+        Thread t2 = new Thread(a);
+        t1.start();
+        try{
+            Thread.sleep(10);//冻结main主线程10毫秒
+        }catch(){
+            //...
+        }
+        a.flag = false;
+        t2.start();
+    }
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/12/15/java/java-thread/java-thread/" data-id="cjcg1dy8k0019q6p3urajx0e3" class="article-share-link">Delen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/thread/">thread</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/12/18/java/java-thread/thread-communication/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Nieuwer</strong>
+      <div class="article-nav-title">
+        
+          thread-communication
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/09/14/css/css-grid/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Ouder</strong>
+      <div class="article-nav-title">网格布局</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categorieën</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Labels</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 18px;">angular</a> <a href="/tags/api/" style="font-size: 14px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 16px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/thread/" style="font-size: 12px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archieven</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recente berichten</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/01/15/java/java-io/IO-19-practice-cutstring/">IO流 - 十九：练习 - 按字节截取字符串</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/15/java/java-io/IO-1-instruction/">IO流 - 一、概述</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/10/java/java-io/IO-8-transform-coding/">IO流 - 八、转换流的编码解码</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/10/java/java-io/IO-9-file/">IO流 - 九、File对象</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/10/java/java-io/IO-7-stream-rule-demo/">IO流 - 七、流的操作规律 - 需求体现</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

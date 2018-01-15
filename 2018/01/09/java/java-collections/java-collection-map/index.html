@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>集合框架四 - Map集合 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="java map集合">
+<meta name="keywords" content="java, api">
+<meta property="og:type" content="article">
+<meta property="og:title" content="集合框架四 - Map集合">
+<meta property="og:url" content="http://yoursite.com/2018/01/09/java/java-collections/java-collection-map/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="java map集合">
+<meta property="og:updated_time" content="2018-01-09T06:50:53.464Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="集合框架四 - Map集合">
+<meta name="twitter:description" content="java map集合">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Zoeken"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-java/java-collections/java-collection-map" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/09/java/java-collections/java-collection-map/" class="article-date">
+  <time datetime="2018-01-09T06:44:18.000Z" itemprop="datePublished">2018-01-09</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      集合框架四 - Map集合
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="四、集合框架-Map集合"><a href="#四、集合框架-Map集合" class="headerlink" title="四、集合框架 - Map集合"></a>四、集合框架 - Map集合</h3><h4 id="1、集合特点-amp-常用方法"><a href="#1、集合特点-amp-常用方法" class="headerlink" title="1、集合特点&amp;常用方法"></a>1、集合特点&amp;常用方法</h4><p>Collection：一次添加一个元素，集合称为单列集合。</p>
+<p>Map：一次添加一对元素，存储的是键值对，集合中必须保证键的唯一性。</p>
+<p>常用方法：</p>
+<p>添加：</p>
+<pre><code>value put(key,value):返回前一个和key关联的值，如果没有返回null
+</code></pre><p>删除：</p>
+<pre><code>void clear():清空map集合
+value remove(key):根据指定的key删除这个键值对，返回被删除键值对的value。
+</code></pre><p>判断：</p>
+<pre><code>boolean containskey(key)
+boolean containsValue(value)
+boolean isEmpty()
+</code></pre><p>获取：</p>
+<pre><code>value get(key):通过键获取值，如果没有该键返回null。因此，可以通过返回null，来判断是否包含指定键。
+int size():获取键值对的个数。
+</code></pre><p>方法演示：</p>
+<pre><code>public class MapDemo1 {
+
+    public static void main(String[] args) {
+
+        Map&lt;Integer,String&gt; map = new HashMap&lt;Integer,String&gt;();
+
+        method(map);
+
+    }
+
+    private static void method(Map&lt;Integer, String&gt; map) {
+
+        //添加
+        System.out.println(map.put(8, &quot;wangcai&quot;));
+        System.out.println(map.put(8, &quot;xiaoqiang&quot;));
+        map.put(2, &quot;zhangsan&quot;);
+        map.put(4, &quot;lisi&quot;);
+        System.out.println(map);
+
+        //删除
+        System.out.println(&quot;remove:&quot;+map.remove(2));
+
+        //判断
+        System.out.println(&quot;containskey:&quot;+map.containsKey(7));
+
+        //获取
+        System.out.println(&quot;get:&quot;+map.get(6));
+
+
+    }
+
+}
+</code></pre><h4 id="2、重点方法keySet"><a href="#2、重点方法keySet" class="headerlink" title="2、重点方法keySet"></a>2、重点方法keySet</h4><p>取出map中的所有元素。</p>
+<p>原理：通过keySet方法取出map中的所有键所在的Set集合，再通过Set的迭代器获取每一个键，再通过map集合的get方法获取每个键所对应的值。</p>
+<pre><code>public class MapDemo2 {
+
+    public static void main(String[] args) {
+
+        Map&lt;Integer,String&gt; map = new HashMap&lt;Integer,String&gt;();
+
+        method(map);
+
+    }
+
+    private static void method(Map&lt;Integer, String&gt; map) {
+
+        map.put(2, &quot;zhangsan&quot;);
+        map.put(8, &quot;lisi&quot;);
+        map.put(7, &quot;wangwu&quot;);
+        map.put(6, &quot;zhaoliu&quot;);
+
+        Set&lt;Integer&gt; keySet = map.keySet();
+        Iterator&lt;Integer&gt; it = keySet.iterator();
+
+        while(it.hasNext()) {
+            Integer key = it.next();
+            String value = map.get(key);
+            System.out.println(key+&quot;:&quot;+value);
+        }
+
+    }
+
+}
+
+输出结果：
+2:zhangsan
+6:zhaoliu
+7:wangwu
+8:lisi
+</code></pre><h4 id="3、重点方法entrySet"><a href="#3、重点方法entrySet" class="headerlink" title="3、重点方法entrySet"></a>3、重点方法entrySet</h4><p>该方法将键和值的映射关系作为对象存储到了Set集合中，而这个映射关系的类型就是Map.Entry类型（结婚证）。</p>
+<pre><code>public class MapDemo3 {
+
+    public static void main(String[] args) {
+
+        Map&lt;Integer,String&gt; map = new HashMap&lt;Integer,String&gt;();
+
+        method(map);
+
+    }
+
+    private static void method(Map&lt;Integer, String&gt; map) {
+
+        map.put(2, &quot;zhangsan&quot;);
+        map.put(8, &quot;lisi&quot;);
+        map.put(7, &quot;wangwu&quot;);
+        map.put(6, &quot;zhaoliu&quot;);
+
+        Set&lt;Map.Entry&lt;Integer,String&gt;&gt; entrySet = map.entrySet();
+
+        Iterator&lt;Map.Entry&lt;Integer,String&gt;&gt; it = entrySet.iterator();
+
+        while(it.hasNext()) {
+            Map.Entry&lt;Integer, String&gt; merryEntry = it.next();
+            Integer key = merryEntry.getKey();
+            String value = merryEntry.getValue();
+            System.out.println(key+&quot;:&quot;+value);
+        }
+
+    }
+
+}
+</code></pre><h4 id="4、values方法"><a href="#4、values方法" class="headerlink" title="4、values方法"></a>4、values方法</h4><p>Collection<v> values()</v></p>
+<p>返回此映射中包含的值的Collection视图。</p>
+<pre><code>public class MapDemo4 {
+
+    public static void main(String[] args) {
+
+        Map&lt;Integer,String&gt; map = new HashMap&lt;Integer,String&gt;();
+
+        method(map);
+
+    }
+
+    public static void method(Map&lt;Integer, String&gt; map) {
+        map.put(2, &quot;zhangsan&quot;);
+        map.put(8, &quot;lisi&quot;);
+        map.put(7, &quot;wangwu&quot;);
+        map.put(6, &quot;zhaoliu&quot;);
+
+        Collection&lt;String&gt; values = map.values();
+
+        Iterator&lt;String&gt; it = values.iterator();
+
+        while(it.hasNext()) {
+            System.out.println(it.next());
+        }
+
+    }
+
+}
+</code></pre><h4 id="5、Map集合-常见子类对象"><a href="#5、Map集合-常见子类对象" class="headerlink" title="5、Map集合-常见子类对象"></a>5、Map集合-常见子类对象</h4><p>Map常见子类：</p>
+<p>|– Hashtable：</p>
+<p>内部结构是哈希表，是同步的。不允许null作为键和值。</p>
+<p>|—— Properties：</p>
+<p>可以用来存储键值对型的配置文件的信息，可以和IO技术相结合。</p>
+<p>|– HashMap：</p>
+<p>内部结构是哈希表，不是同步的。允许null作为键和值。</p>
+<p>|– TreeMap：</p>
+<p>内部结构是二叉树，不是同步的。可以对Map集合中的键排序。</p>
+<h4 id="6、HashMap存储自定义对象"><a href="#6、HashMap存储自定义对象" class="headerlink" title="6、HashMap存储自定义对象"></a>6、HashMap存储自定义对象</h4><pre><code>public class MapDemo5 {
+
+    public static void main(String[] args) {
+
+        /**
+         * 将学生对象和学生的归属地通过键与值存储到map集合中。
+         */
+
+        HashMap&lt;Student,String&gt; hm = new HashMap&lt;Student,String&gt;();
+
+        hm.put(new Student(&quot;zhangsan&quot;,20),&quot;上海&quot;);
+        hm.put(new Student(&quot;lisi&quot;,21),&quot;北京&quot;);
+        hm.put(new Student(&quot;wangwu&quot;,30),&quot;临沂&quot;);
+        hm.put(new Student(&quot;wangwu&quot;,30),&quot;临沂&quot;);
+
+        Set&lt;Student&gt; keySet = hm.keySet();
+
+        Iterator&lt;Student&gt; it = keySet.iterator();
+
+        while(it.hasNext()) {
+            Student key = it.next();
+            String value = hm.get(key);
+            System.out.println(key.getName()+&quot;:&quot;+key.getAge()+&quot;:&quot;+value);
+        }
+
+
+    }
+
+}
+
+输出结果：
+zhangsan:20:上海
+wangwu:30:临沂
+wangwu:30:临沂
+lisi:21:北京
+
+Student类继承自Person2类，通过在Person2类中覆盖重写hashCode和equals方法，去重，保证唯一性。
+</code></pre><h4 id="7、TreeMap存储自定义对象"><a href="#7、TreeMap存储自定义对象" class="headerlink" title="7、TreeMap存储自定义对象"></a>7、TreeMap存储自定义对象</h4><pre><code>public class MapDemo6 {
+
+    public static void main(String[] args) {
+
+        /**
+         * 将学生对象和学生的归属地通过键与值存储到map集合中。
+         * 按姓名排序
+         */
+
+        TreeMap&lt;Student,String&gt; tm = new TreeMap&lt;Student,String&gt;(new ComparatorByName());
+
+        tm.put(new Student(&quot;zhangsan&quot;,20),&quot;上海&quot;);
+        tm.put(new Student(&quot;lisi&quot;,21),&quot;北京&quot;);
+        tm.put(new Student(&quot;wangwu&quot;,30),&quot;临沂&quot;);
+        tm.put(new Student(&quot;wangwu&quot;,30),&quot;临沂&quot;);
+
+        Set&lt;Map.Entry&lt;Student,String&gt;&gt; entrySet = tm.entrySet();
+
+        Iterator&lt;Map.Entry&lt;Student, String&gt;&gt; it = entrySet.iterator();
+
+        while(it.hasNext()) {
+            Map.Entry&lt;Student, String&gt; merryEntry = it.next();
+            Student key = merryEntry.getKey();
+            String value = merryEntry.getValue();
+            System.out.println(key.getName()+&quot;:&quot;+key.getAge()+&quot;:&quot;+value);
+        }
+    }
+
+}
+
+public class ComparatorByName implements Comparator&lt;Person2&gt; {
+
+    @Override
+    public int compare(Person2 o1, Person2 o2) {
+        Person2 p1 = (Person2)o1;
+        Person2 p2 = (Person2)o2;
+        int temp = p1.getName().compareTo(p2.getName());
+        return temp==0?p1.getAge()-p2.getAge():temp;
+    }    
+
+}
+</code></pre><h4 id="8、LinkedHashMap"><a href="#8、LinkedHashMap" class="headerlink" title="8、LinkedHashMap"></a>8、LinkedHashMap</h4><pre><code>public class MapDemo7 {
+
+    public static void main(String[] args) {
+
+        HashMap&lt;Integer,String&gt; hm = new LinkedHashMap&lt;Integer,String&gt;();
+
+        hm.put(7, &quot;aaaa&quot;);
+        hm.put(2, &quot;bbbb&quot;);
+        hm.put(1, &quot;dddd&quot;);
+        hm.put(10, &quot;ccc&quot;);
+
+        Iterator&lt;Map.Entry&lt;Integer,String&gt;&gt; it = hm.entrySet().iterator();
+
+        while(it.hasNext()) {
+            Map.Entry&lt;Integer, String&gt; merryEntry = it.next();
+            Integer key = merryEntry.getKey();
+            String value = merryEntry.getValue();
+
+            System.out.println(key+&quot;:&quot;+value);
+        }
+
+    }
+
+}
+
+输出结果：
+7:aaaa
+2:bbbb
+1:dddd
+10:ccc
+
+由HashMap变为LinkedHashMap之后，存和取的顺序保持了一致。
+</code></pre><h4 id="9、Map集合练习-按自然顺序，记录字母出现次数"><a href="#9、Map集合练习-按自然顺序，记录字母出现次数" class="headerlink" title="9、Map集合练习 - 按自然顺序，记录字母出现次数"></a>9、Map集合练习 - 按自然顺序，记录字母出现次数</h4><pre><code>public class MapDemp8 {
+
+
+    public static void main(String[] args) {
+
+        String str = &quot;jslsjflAAsCCjl  ++js--lajaslasjfsala&quot;;
+
+        String s = getCarCount(str);
+
+        System.out.println(s);
+
+    }
+
+    private static String getCarCount(String str) {
+
+        //字符串变字符数组
+        char[] charArr = str.toCharArray();
+
+        //TreeSet集合
+        TreeMap&lt;Character,Integer&gt; tm = new TreeMap&lt;Character,Integer&gt;();
+
+        for (int i = 0; i &lt; charArr.length; i++) {
+
+            if(!(charArr[i] &gt;= &apos;a&apos; &amp;&amp; charArr[i] &lt;= &apos;z&apos; || charArr[i] &gt;= &apos;A&apos; &amp;&amp; charArr[i] &lt;= &apos;Z&apos;)) {
+                continue;
+            }
+
+            Character chara = charArr[i];
+            Integer val = tm.get(chara);
+            if(val == null) {
+                tm.put(chara, 1);
+            }else {
+                Integer count = tm.get(chara) + 1;
+                tm.put(chara,count);
+            }
+
+
+        }
+
+        return mapToString(tm);
+    }
+
+    private static String mapToString(TreeMap&lt;Character, Integer&gt; tm) {
+        StringBuilder sb = new StringBuilder();
+
+        Set&lt;Character&gt; keySet = tm.keySet();
+
+        Iterator&lt;Character&gt; it = keySet.iterator();
+
+        while(it.hasNext()) {
+            Character key = it.next();
+            Integer value = tm.get(key);
+            sb.append(key+&quot;(&quot;+value+&quot;)&quot;);
+        }
+
+        return sb.toString();
+    }
+
+}
+
+输出结果：
+A(2)C(2)a(5)f(2)j(6)l(6)s(7)
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/09/java/java-collections/java-collection-map/" data-id="cjcg0m9ry002antp33r4k2nhr" class="article-share-link">Delen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/01/09/java/java-collections/java-collection-utilities/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Nieuwer</strong>
+      <div class="article-nav-title">
+        
+          集合框架五 - 工具类
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/01/09/java/java-collections/java-collection-notes/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Ouder</strong>
+      <div class="article-nav-title">集合框架三 - 查阅技巧</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categorieën</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Labels</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 18px;">angular</a> <a href="/tags/api/" style="font-size: 14px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 16px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/thread/" style="font-size: 12px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archieven</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recente berichten</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/01/15/java/java-io/IO-19-practice-cutstring/">IO流 - 十九：练习 - 按字节截取字符串</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/15/java/java-io/IO-1-instruction/">IO流 - 一、概述</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/10/java/java-io/IO-8-transform-coding/">IO流 - 八、转换流的编码解码</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/10/java/java-io/IO-9-file/">IO流 - 九、File对象</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/10/java/java-io/IO-7-stream-rule-demo/">IO流 - 七、流的操作规律 - 需求体现</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

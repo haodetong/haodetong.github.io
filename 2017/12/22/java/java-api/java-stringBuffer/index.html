@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>常用对象API-StringBuffer类 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="java api StringBuffer类">
+<meta name="keywords" content="java, api, stringBuffer">
+<meta property="og:type" content="article">
+<meta property="og:title" content="常用对象API-StringBuffer类">
+<meta property="og:url" content="http://yoursite.com/2017/12/22/java/java-api/java-stringBuffer/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="java api StringBuffer类">
+<meta property="og:updated_time" content="2017-12-23T01:58:41.899Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="常用对象API-StringBuffer类">
+<meta name="twitter:description" content="java api StringBuffer类">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Zoeken"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-java/java-api/java-stringBuffer" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/12/22/java/java-api/java-stringBuffer/" class="article-date">
+  <time datetime="2017-12-22T06:58:18.000Z" itemprop="datePublished">2017-12-22</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      常用对象API-StringBuffer类
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>StringBuffer就是字符串缓冲区，用于存储数据的容器，初始被容量16个字符。</p>
+<h4 id="1、特点"><a href="#1、特点" class="headerlink" title="1、特点"></a>1、特点</h4><p>(1)、长度是可变的</p>
+<p>(2)、可以存储不同类型的数据</p>
+<p>(3)、最终转成字符串进行使用</p>
+<p>(4)、可以对字符串进行插入修改</p>
+<h4 id="2、方法"><a href="#2、方法" class="headerlink" title="2、方法"></a>2、方法</h4><p>(1)、添加 返回StringBuffer类型的对象</p>
+<pre><code>StringBuffer append(data)
+
+StringBuffer sb = new StringBuffer();
+sb.append(4);
+sb.append(true);
+sb.insert(1, false);
+System.out.println(sb); //4falsetrue输出字符串
+</code></pre><p>(2)、指定位置插入</p>
+<pre><code>insert(index, data) 
+</code></pre><p>(3)、删除 返回StringBuffer类型的对象</p>
+<pre><code>StringBuffer delete(start, end)，包含头，不包含尾
+
+StringBuffer deleteCharAt(int index)，删除指定位置元素
+
+StringBuffer sb = new StringBuffer(&quot;abce&quot;);
+sb.delete(1, 3);
+System.out.println(sb);//ae
+</code></pre><p>(4)、查找</p>
+<pre><code>char charAt(index);
+int indexOf(stirng);
+int lastIndexOf(string);
+</code></pre><p>(5)、修改</p>
+<pre><code>StringBuffer replace(int start, int end, string str)
+
+void setCharAt(index, char);    
+
+sb.replace(1,3,&quot;nba&quot;);//anbae
+
+sb.setCharAt(2, &apos;1&apos;);//abqe    
+</code></pre><h4 id="3、StringBuilder类"><a href="#3、StringBuilder类" class="headerlink" title="3、StringBuilder类"></a>3、StringBuilder类</h4><p>jdk1.5以后出现了功能和StringBuffer一样的对象。就是StringBuilder。</p>
+<p>不同的是：</p>
+<p>StringBuffer是线程同步的，通常用于多线程。</p>
+<p>StringBuilder是线程不同步的，通常用于单线程，提高效率。</p>
+<pre><code>public class StringBuilderTest {
+
+    public static void main(String[] args) {
+        int[] arr = {3,1,5,1,2};
+        String s = arrayToString(arr);
+        System.out.println(s);
+    }
+
+    public static String arrayToString(int[] arr) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(&quot;[&quot;);
+        for(int i= 0; i&lt;arr.length; i++) {
+            if(i!=arr.length - 1)
+                sb.append(arr[i]+&quot;, &quot;);
+            else
+                sb.append(&quot;]&quot;);
+        }
+        return sb.toString();
+    }
+
+    public static String arrayToString2(int[] arr)         {
+        String str = &quot;[&quot;;
+        for(int i=0; i&lt;arr.length; i++) {
+            if(i!=arr.length - 1)
+                str+=arr[i]+&quot;, &quot;;
+            else
+                str+=arr[i]+&quot;]&quot;;
+        }
+        return str;
+    }
+}
+</code></pre><p>字符串拼接的方式会在字符串常量池中生成多个字符串。因此，推荐用缓冲区容器的方式。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/12/22/java/java-api/java-stringBuffer/" data-id="cjcg1dy8c0013q6p367ohn0l9" class="article-share-link">Delen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/api/">api</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/12/23/java/java-api/basic-data-class/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Nieuwer</strong>
+      <div class="article-nav-title">
+        
+          基本数据类型包装类
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/12/21/java/java-api/api-string/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Ouder</strong>
+      <div class="article-nav-title">api-string</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categorieën</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Labels</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 18px;">angular</a> <a href="/tags/api/" style="font-size: 14px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 16px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/thread/" style="font-size: 12px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archieven</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recente berichten</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/01/15/java/java-io/IO-19-practice-cutstring/">IO流 - 十九：练习 - 按字节截取字符串</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/15/java/java-io/IO-1-instruction/">IO流 - 一、概述</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/10/java/java-io/IO-8-transform-coding/">IO流 - 八、转换流的编码解码</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/10/java/java-io/IO-9-file/">IO流 - 九、File对象</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/10/java/java-io/IO-7-stream-rule-demo/">IO流 - 七、流的操作规律 - 需求体现</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
