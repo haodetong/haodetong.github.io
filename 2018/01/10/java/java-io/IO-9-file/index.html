@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>IO流 - 九、File对象 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="java-IO流">
+<meta name="keywords" content="java, IO">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IO流 - 九、File对象">
+<meta property="og:url" content="http://yoursite.com/2018/01/10/java/java-io/IO-9-file/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="java-IO流">
+<meta property="og:updated_time" content="2018-01-15T03:03:54.532Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="IO流 - 九、File对象">
+<meta name="twitter:description" content="java-IO流">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-java/java-io/IO-9-file" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/10/java/java-io/IO-9-file/" class="article-date">
+  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      IO流 - 九、File对象
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="1、File对象-构造函数-amp-字段"><a href="#1、File对象-构造函数-amp-字段" class="headerlink" title="1、File对象 - 构造函数&amp;字段"></a>1、File对象 - 构造函数&amp;字段</h4><pre><code>//可以将一个已存在的，或者不存在的文件或者目录，封装为File对象
+File f1 = new File(&quot;c:\\a.txt&quot;);
+File f2 = new File(&quot;c:\\&quot;,&quot;a.txt&quot;);
+File f3 = new File(&quot;c:\\&quot;);
+File f4 = new File(f,&quot;a.txt&quot;);
+File f5 = new File(&quot;c:&quot;+File.separator+&quot;abc\\a.txt&quot;);
+System.out.println(f5);//c:\abc\a.txt
+</code></pre><h4 id="2、File对象-常用方法"><a href="#2、File对象-常用方法" class="headerlink" title="2、File对象 - 常用方法"></a>2、File对象 - 常用方法</h4><p>（1）、获取</p>
+<pre><code>获取文件名称、文件路径、文件大小、文件修改时间。
+File file = new File(&quot;a.txt&quot;);
+String name = file.getName();
+String absPath = file.getAbsolutePath();
+String path = file.getPath();
+long length = file.length();
+long time = file.lastModified();    
+</code></pre><p>（2）、创建和删除</p>
+<pre><code>创建文件：如果文件不存在则创建，存在则不创建
+File file = new File(&quot;a.txt&quot;);
+boolean b = file.createNewFile();
+
+删除文件：
+boolean b = file.delete();    
+
+创建文件夹目录：
+File dir = new File(&quot;abc&quot;);
+boolean b = dir.mkdir();//make directory
+
+删除单个文件夹目录：
+boolean b = dir.delete();
+
+创建多级目录：
+File dir = new File(&quot;a\\b\\c\\d&quot;);
+dir.mkdirs();
+</code></pre><p>（3）、判断</p>
+<pre><code>判断文件是否存在
+File f = new File(&quot;a.txt&quot;);
+boolean b = f.exists();
+
+判断是否是文件，最好先判断是否存在，不存在则为false
+boolean b = f.isFile();
+
+判断是否是目录
+boolean b = f.isDerectory();
+</code></pre><p>（4）、重命名</p>
+<pre><code>//c盘的0.mp3重命名为了9.mp3并被剪切到了d盘
+File f1 = new File(&quot;c:\\0.mp3&quot;);
+File f2 = new File(&quot;d:\\9.mp3&quot;);
+boolean b = f1.renameTo(f2);
+</code></pre><p>（5）、系统根目录和容量获取</p>
+<pre><code>系统根目录
+File[] files = File.listRoots();
+for(File file:files) {
+    System.out.println(file);
+}
+输出结果：/
+
+File file  = new File(&quot;//&quot;);
+System.out.println(&quot;getFreeSpace:&quot;+file.getFreeSpace());
+System.out.println(&quot;getTotalSpace:&quot;+file.getTotalSpace());
+System.out.println(&quot;getUsableSpace:&quot;+file.getUsableSpace());
+</code></pre><p>（6）、获取目录内容</p>
+<pre><code>String[] list()
+获取当前目录下的文件以及文件夹的名称，包含隐藏文件。    调用list方法的File对象中封装的必须是目录。
+
+File file = new File(&quot;//Users//haojie//Projects//hexo&quot;);
+String[] contents = file.list();
+for(String con:contents) {
+    System.out.println(con);
+}
+输出结果：
+scaffolds
+.DS_Store
+db.json
+source
+node_modules
+public
+.gitignore
+package.json
+_config.yml
+.git
+.deploy_git
+themes             
+</code></pre><p>（7）、过滤器</p>
+<p>//通过文件名进行过滤<br>String[] list(FilenameFilter filter);</p>
+<pre><code>public class ListDemo {
+
+    public static void main(String[] args) {
+        File dir = new File(&quot;//Users//haojie//Projects//hexo//source//_posts&quot;);
+        String[] names = dir.list(new FileFilterBySuffix(&quot;.md&quot;));
+        for(String name:names) {
+            System.out.println(name);
+        }
+    }
+
+}
+
+public class FileFilterBySuffix implements FilenameFilter {
+
+    private String suffix;
+
+
+    public FileFilterBySuffix(String suffix) {
+        super();
+        this.suffix = suffix;
+    }
+
+    public boolean accept(File dir, String name) {
+        //通过文件后缀名进行过滤
+        return name.endsWith(suffix);
+    }
+
+}
+</code></pre><p>//通过文件对象进行过滤<br>File[] listFiles(FileFilter filter) </p>
+<pre><code>public class ListFilesDemo {
+
+    public static void main(String[] args) {
+        File dir = new File(&quot;//Users//haojie//Projects//hexo&quot;);
+        File[] files = dir.listFiles(new FileFilterByHidden());
+
+        for(File file:files) {
+            System.out.println(file);
+        }
+    }
+
+}    
+
+public class FileFilterByHidden implements FileFilter {
+
+    @Override
+    public boolean accept(File pathname) {
+        //过滤非隐藏文件
+        return !pathname.isHidden();
+    }
+
+}    
+</code></pre><h4 id="3、File对象-练习"><a href="#3、File对象-练习" class="headerlink" title="3、File对象 - 练习"></a>3、File对象 - 练习</h4><h4 id="（1）、深度遍历文件夹"><a href="#（1）、深度遍历文件夹" class="headerlink" title="（1）、深度遍历文件夹"></a>（1）、深度遍历文件夹</h4><pre><code>//列出指定文件夹下的所有目录和文件并按层级缩进
+public class Demo3 {
+
+    public static void main(String[] args) {
+        File dir = new File(&quot;//Users//haojie//Projects//hexo//source&quot;);
+        listAll(dir,0);
+    }
+
+    private static void listAll(File dir,int level) {
+
+        System.out.println(getSpace(level)+dir.getName());                
+        level++;
+
+        //获取指定目录下当前的所有文件夹或者文件对象
+        File[] files = dir.listFiles();
+
+        for (int i = 0; i &lt; files.length; i++) {
+            if(files[i].isDirectory()) {
+                listAll(files[i],level);
+            }else {
+                System.out.println(getSpace(level)+files[i].getName());                
+            }
+        }
+    }
+
+    private static String getSpace(int level) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i &lt; level; i++) {
+            sb.append(&quot;    &quot;);
+        }
+        return sb.toString();
+    }
+
+}
+</code></pre><h4 id="（2）、递归"><a href="#（2）、递归" class="headerlink" title="（2）、递归"></a>（2）、递归</h4><p>注意：递归一定要明确条件，否则会栈溢出</p>
+<pre><code>public class Demo4 {
+
+    public static void main(String[] args) {
+        toBinary(6);
+        System.out.println(getSum(5));
+    }
+
+    //num!
+    private static int getSum(int num) {
+        if(num == 1)
+            return 1;
+        return num + getSum(num-1);
+    }
+
+    //转二进制
+    private static void toBinary(int num) {
+
+        if(num &gt; 0) {
+            toBinary(num/2);
+            System.out.println(num%2);
+        }
+
+    }
+
+}
+</code></pre><h4 id="3-、删除目录"><a href="#3-、删除目录" class="headerlink" title="(3)、删除目录"></a>(3)、删除目录</h4><p>从里往外删，删除指定目录及目录下所有的目录和文件</p>
+<pre><code>public class Demo5 {
+
+    public static void main(String[] args) {
+
+        File dir = new File(&quot;//Users//haojie//a&quot;);
+        removeDir(dir);
+
+    }
+
+    private static void removeDir(File dir) {
+        File[] files = dir.listFiles();
+
+        for(File file:files) {
+            if(file.isDirectory()) {
+                removeDir(file);
+            } else {
+                System.out.println(file+&quot;:&quot;+file.delete());
+            }
+        }
+
+        System.out.println(dir+&quot;:&quot;+dir.delete());
+    }
+
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-9-file/" data-id="cjcfnyf02001grpp3mck8flig" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/01/15/java/java-io/IO-1-instruction/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          IO流 - 一、概述
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/01/10/java/java-io/IO-8-transform-coding/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">IO流 - 八、转换流的编码解码</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 18px;">angular</a> <a href="/tags/api/" style="font-size: 14px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 16px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/thread/" style="font-size: 12px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/01/15/java/java-io/IO-19-practice-cutstring/">IO流 - 十九：练习 - 按字节截取字符串</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/15/java/java-io/IO-1-instruction/">IO流 - 一、概述</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/10/java/java-io/IO-9-file/">IO流 - 九、File对象</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/10/java/java-io/IO-8-transform-coding/">IO流 - 八、转换流的编码解码</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/10/java/java-io/IO-7-stream-rule-demo/">IO流 - 七、流的操作规律 - 需求体现</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

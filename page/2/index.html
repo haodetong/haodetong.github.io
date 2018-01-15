@@ -48,9 +48,9 @@
       </nav>
       <nav id="sub-nav">
         
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="Flux RSS"></a>
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Rechercher"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
@@ -61,10 +61,10 @@
       <div class="outer">
         <section id="main">
   
-    <article id="post-java-thread" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-java/java-io/IO-15-randomAccessFile" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2017/12/15/java-thread/" class="article-date">
-  <time datetime="2017-12-15T02:47:02.000Z" itemprop="datePublished">2017-12-15</time>
+    <a href="/2018/01/10/java/java-io/IO-15-randomAccessFile/" class="article-date">
+  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
 </a>
     
   <div class="article-category">
@@ -79,7 +79,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/15/java-thread/">java多线程</a>
+      <a class="article-title" href="/2018/01/10/java/java-io/IO-15-randomAccessFile/">IO流 - 十五、RandomAccessFile</a>
     </h1>
   
 
@@ -87,244 +87,69 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h4 id="创建线程"><a href="#创建线程" class="headerlink" title="创建线程"></a>创建线程</h4><h5 id="创建线程方式一：继承thread类。"><a href="#创建线程方式一：继承thread类。" class="headerlink" title="创建线程方式一：继承thread类。"></a>创建线程方式一：继承thread类。</h5><p>步骤：</p>
-<p>1、定义一个子类继承Thread类。</p>
-<p>2、覆盖Thread类中的run方法。</p>
-<p>3、直接创建Thread的子类对象创建线程。</p>
-<p>4、调用start方法开启线程并调用线程的任务run方法执行。</p>
-<pre><code>class Demo extends Thread{
-    private String name;
-    Demo(String name){
-        this.name = name;
-    }
-    public void run(){
-        for(int x=0; x&lt;10; x++){
-            System.out.println(name+&quot;...x=&quot;+x);
-        }
-    }
-}
+        <p>随机访问文件，自身具备读写的方法。</p>
+<p>通过skipBytes(int x)，seek(int x)来达到随机访问。</p>
+<p>特点：</p>
+<p>1、不是IO体系中的子类。</p>
+<p>2、该对象既能读也能写。</p>
+<p>3、该对象内部维护了一个byte数组，并通过指针可以操作数组中的元素。</p>
+<p>4、可以通过getFilePointer方法获取指针的位置，和通过seek方法设置指针的位置。</p>
+<p>5、其实该对象就是将字节输入流和输出流进行了封装。</p>
+<p>6、该对象的源或目的只能是文件。通过构造函数就可以看出。可以是文本文件，也可是媒体文件。</p>
+<pre><code>public class RandomAccessDemo1 {
 
-class ThreadDemo2{
-    public static void main(String[] args){
-        Demo d1 = new Demo(&quot;张三&quot;);
-        Demo d2 = new Demo(&quot;李四&quot;);
-        d1.start();
-        d2.start();
-    }
-}
-</code></pre><h5 id="创建线程方式二：实现Runnable接口。"><a href="#创建线程方式二：实现Runnable接口。" class="headerlink" title="创建线程方式二：实现Runnable接口。"></a>创建线程方式二：实现Runnable接口。</h5><p>步骤：</p>
-<p>1、定义类实现Runnable接口。</p>
-<p>2、覆盖接口中的run方法，将线程的任务代码封闭到run方法中。</p>
-<p>3、通过Thread类创建线程对象，并将实现Runnable接口的子类对象，作为Thread类的构造函数的参数进行传递。</p>
-<pre><code>为什么？因为线程的任务都封装在Runnable接口子类对象的run方法中。
-所以要
-</code></pre><p>4、调用线程对象的start方法开启线程。</p>
-<pre><code>class Demo implements Runnable{
-    public void run(){
-        show();
-    }
-    public void show(){
-        for(int x=0; x&lt;20; x++){
-            system.out.println(Thread.currentThread().getname()+&quot;........&quot;+x);
-        }
-    }
-}
+    public static void main(String[] args) throws IOException {
 
-class TreadDemo{
-    public static void main(sting[] args){
-        Demo d = new Demo();
-        Thread t1 = new Thread(d);
-        Thread t2 = new Thread(d);
-        t1.start;
-        t2.start;
-    }
-}
-</code></pre><h5 id="线程安全隐患排查原则"><a href="#线程安全隐患排查原则" class="headerlink" title="线程安全隐患排查原则"></a>线程安全隐患排查原则</h5><p>1、查找共享数据</p>
-<p>2、共享数据代码的操作不止一条</p>
-<p>事例：两个储户到银行存钱，每次存100，共存三次。银行总数从100到600递增。</p>
-<pre><code>class Bank{
-    private int sum;
-    public void add(int num){
-        sum = sum + num;
-        try{
-            Thread.sleep();
-        }catch(InterruptedException e){
-            //...
-        }
-        System.out.println(&quot;sum=&quot;+sum);
-    }
-}
+        //randomWrite();
 
-class Cus implements Runnable{
-    private b = new Bank();
-    public void run(){
-        for(int x=0; x&lt;3; x++){
-            b.add(100);
-        }
-    }
-}
-
-class BankDemo{
-    public static void main(String[] args){
-        Cus c = new Cus();
-        Thread t1 = new Thread(c);
-        Thread t2 = new Thread(c);
-        t1.start();
-        t2.start();
-    }
-}
-</code></pre><h5 id="分析多线程安全隐患："><a href="#分析多线程安全隐患：" class="headerlink" title="分析多线程安全隐患："></a>分析多线程安全隐患：</h5><p>共享数据有：private b</p>
-<p>执行代码有一句：b.add(100);</p>
-<p>b.add里有一个共享数据：private int sum;</p>
-<p>执行语句有两句：sum = sum + num; system.out.printls…;</p>
-<p>此处会产生安全隐患：比如第一次当线程0进来时，sum = 100，但没有执行system.out.println语句，第二次线程1进来，此时sum = 100+100,再执行线程0和线程1的输出语句时，就都成了200。</p>
-<h5 id="解决方式一："><a href="#解决方式一：" class="headerlink" title="解决方式一："></a>解决方式一：</h5><p>用同步代码块把产生线程安全隐患的代码封装，注意要保持多线程用的是同一个锁。</p>
-<pre><code>class Bank{
-    private int sum;
-    private Object obj = new Object();
-    public void add(int num){
-        synchronized(obj){//三个线程共用一个对象锁obj
-            sum = sum + num;
-            try{
-                Thread.sleep();
-            }catch(InterruptedException e){
-                //...
-            }
-            System.out.println(&quot;sum=&quot;+sum);
-        }
-    }
-}
-</code></pre><h5 id="解决方式二："><a href="#解决方式二：" class="headerlink" title="解决方式二："></a>解决方式二：</h5><p>同步函数</p>
-<pre><code>class Bank{
-    private int sum;
-    public synchronized void add(int num){//同步函数
-        sum = sum + num;
-        try{
-            Thread.sleep();
-        }catch(InterruptedException e){
-            //...
-        }
-        System.out.println(&quot;sum=&quot;+sum);
-    }
-}
-</code></pre><h5 id="同步的好处和弊端"><a href="#同步的好处和弊端" class="headerlink" title="同步的好处和弊端"></a>同步的好处和弊端</h5><p>好处：解决了线程的安全问题</p>
-<p>弊端：降低了效率，因为同步外的线程都会判断同步锁。</p>
-<h5 id="同步函数和同步代码块的区别："><a href="#同步函数和同步代码块的区别：" class="headerlink" title="同步函数和同步代码块的区别："></a>同步函数和同步代码块的区别：</h5><p>1、同步函数使用的锁是this，同步代码块的锁是任意的对象。</p>
-<p>2、建议使用同步代码块。</p>
-<h5 id="静态同步函数的锁"><a href="#静态同步函数的锁" class="headerlink" title="静态同步函数的锁"></a>静态同步函数的锁</h5><p>静态同步函数的锁是该函数所属的字节码文件对象</p>
-<p>该对象可以用this.getClass()方法获取，也可以用当前类名.class获取。</p>
-<pre><code>class Bank{
-    private int sum;
-    public static synchronized void add(int num){
-        sum = sum + num;
-        try{
-            Thread.sleep();
-        }catch(InterruptedException e){
-            //...
-        }
-        System.out.println(&quot;sum=&quot;+sum);
-    }
-}
-</code></pre><p>该静态同步函数add的同步锁即为该函数所属的字节码文件对象，即为Bank.class。</p>
-<h5 id="单例模式涉及的多线程问题"><a href="#单例模式涉及的多线程问题" class="headerlink" title="单例模式涉及的多线程问题"></a>单例模式涉及的多线程问题</h5><pre><code>//饿汉式
-class Single{
-    private static final Singles = new Single();
-    private Single(){};
-    public static Single getInstance(){
-        return s;
-    }
-}
-
-//懒汉式
-class Single{
-    private static final Singles = null;
-    private Single(){};
-    public static Single getInstance(){
-        if(s == null)
-            s = new Single();
-            return s;
-    }
-}
-
-class SingleDemo{
-    public static void main(String[] args){
+        randomRead();
 
     }
-}
-</code></pre><p>饿汉式多线程安全隐患分析：</p>
-<p>如果把getInstance函数封装为多线程的任务，1、多线程存在共享数据s；2、只有一条语句return s；因此，不会存在安全隐患。</p>
-<p>懒汉式多线程安全隐患分析：</p>
-<p>如果把getInstance函数封装为多线程的任务，1、多线程存在共享数据s；2、有多条语句；因此，存在安全隐患。比如：线程0进来时，s == null，挂住了，线程1双进来了，s == null，挂住了。线程0取得执行权，生成对象并返回。线程1又取得执行权，又生成了对象并返回。就不能保证单例设计模式对象的唯一性了。</p>
-<p>因此，懒汉式需要同步函数。</p>
-<pre><code>public static synchronized Single getInstance(){
-    if(s == null)
-        s = new Single();
-        return s;
-}
-</code></pre><p>解决了安全问题，但是每一次线程进来时都会判断同步锁是否一样，降低了效率。</p>
-<p>同步代码块解决安全问题以及效率问题。</p>
-<pre><code>public static Single getInstance(){
-    if(s == null){ //a处的if
-        synchronized(Single.class){
-            if(s == null) //b处的if
-                s = new Single();
-                return s;
-        }
-    }
-    return s;
-}
-</code></pre><p>分析：线程0进入getInstance，判断a处的s == null,进入if，挂起。线程1进入判断a处的s == null，进入if挂起。线程0取得执行权，判断b处的s == null，生成对象并返回。线程1取得执行权，判断b处的s已经不为null了，跳出if。线程2进入getInstance，判断a处的s已经不为null了，直接return s。</p>
-<h5 id="多线程死锁事例"><a href="#多线程死锁事例" class="headerlink" title="多线程死锁事例"></a>多线程死锁事例</h5><pre><code>class Test implements Runnable{
-    private boolean flag = true;
-    public void run(){
-        if(flag){
-            while(true)
-                synchronized(MyLock.locka){
-                    System.out.prinln(Thread.currentThread().getName()+&quot;if...locka...&quot;);
-                synchronized(MyLock.lockb){
-                        System.out.prinln(Thread.currentThread().getName()+&quot;if...lockb...&quot;);                    
-                    }
-                }
-        }else{
-            while(true)
-                synchronized(MyLock.lockb){
-                    System.out.prinln(Thread.currentThread().getName()+&quot;else...lockb...&quot;);    
-                synchronized(MyLock.locka){
-                        System.out.prinln(Thread.currentThread().getName()+&quot;else...locka...&quot;);    
-                    }
-                }
-        }
-    }
-}
 
-class MyLock{
-    public static final Object locka = new Object();
-    public static final Object lockb = new Object();
-}
+    public static void randomRead() throws FileNotFoundException, IOException {
+        RandomAccessFile raf = new RandomAccessFile(&quot;ranacc.txt&quot;,&quot;r&quot;);
+        //读4个字节，获取张三
+        byte[] buf = new byte[4];
+        raf.read(buf);
+        String name = new String(buf);
+        System.out.println(&quot;name=&quot;+name);
 
-class DeadLockTest{
-    public static void main(String[] args){
-        Test a = new Test();
-        Thread t1 = new Thread(a);
-        Thread t2 = new Thread(a);
-        t1.start();
-        try{
-            Thread.sleep(10);//冻结main主线程10毫秒
-        }catch(){
-            //...
-        }
-        a.flag = false;
-        t2.start();
+        //再读4个字节，读取年龄
+        int age = raf.readInt();
+        System.out.println(&quot;age=&quot;+age);
+
+        //获取指针位置
+        System.out.println(&quot;pos:&quot;+raf.getFilePointer());//pos:8
+
+        //设置指针位置，raf.seek(8);//随机读取，只要指定指针的位置即可
+
+        raf.close();
     }
+
+    public static void randomWrite() throws FileNotFoundException, IOException {
+        RandomAccessFile raf = new RandomAccessFile(&quot;ranacc.txt&quot;,&quot;rw&quot;);
+
+        raf.write(&quot;张三&quot;.getBytes());
+        raf.writeInt(97);
+
+        raf.close();
+    }
+
 }
+</code></pre><p>随机写入&amp;细节</p>
+<p>//往指定位置写入数据</p>
+<pre><code>raf.seek(3*8);
+raf.write(&quot;哈哈&quot;.getBytes());
+raf.writeInt(108);
+raf.close;
 </code></pre>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/15/java-thread/" data-id="cjc8i1vqa001kn3p3k8568pj1" class="article-share-link">Partager</a>
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-15-randomAccessFile/" data-id="cjcfnyeys000frpp379zr6i0f" class="article-share-link">Share</a>
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/thread/">thread</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
 
     </footer>
   </div>
@@ -333,14 +158,14 @@ class DeadLockTest{
 
 
   
-    <article id="post-css-grid" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-java/java-io/IO-4-transform-stream" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2017/09/14/css-grid/" class="article-date">
-  <time datetime="2017-09-14T02:43:24.000Z" itemprop="datePublished">2017-09-14</time>
+    <a href="/2018/01/10/java/java-io/IO-4-transform-stream/" class="article-date">
+  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
 </a>
     
   <div class="article-category">
-    <a class="article-category-link" href="/categories/转载/">转载</a>
+    <a class="article-category-link" href="/categories/java/">java</a>
   </div>
 
   </div>
@@ -351,7 +176,7 @@ class DeadLockTest{
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2017/09/14/css-grid/">网格布局</a>
+      <a class="article-title" href="/2018/01/10/java/java-io/IO-4-transform-stream/">IO流 - 四、转换流</a>
     </h1>
   
 
@@ -359,2016 +184,359 @@ class DeadLockTest{
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>原文地址：<a href="http://www.w3cplus.com/css3/a-complete-guide-css-grid-layout.html" target="_blank" rel="external">CSS Grid布局指南</a></p>
-<p>英文出处：<a href="http://chris.house/blog/a-complete-guide-css-grid-layout/" target="_blank" rel="external">A Complete Guide to CSS Grid Layout</a></p>
-<h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><p>CSS Grid布局 （又名”网格”），是一个基于二维网格布局的系统，主要目的是改变我们基于网格设计的用户接口方式。如我们所知，CSS 总是用于网页的样式设置，但它并没有起到很好的作用。刚开始的时候我们使用表格(table)，然后使用浮动(float)、 定位(position)和内联块(inline-block)，但所有这些方法本质上来讲都是hacks，存留了很多需要实现的重要功能问题(例如，<a href="http://www.w3cplus.com/blog/tags/357.html" target="_blank" rel="external">垂直居中</a>)。虽然<a href="http://www.w3cplus.com/blog/tags/157.html" target="_blank" rel="external">Flexbox</a>可以起到一定的补救作用，但是它只可以实现简单的一维布局，并不适用于复杂的二维布局(实际上 Flexbox 和 Grid 可以一起结合使用起到最佳效果)。网格是 CSS 第一次专门创建的模块，用来解决我们之前在制作网站时使用hacks处理布局问题。</p>
-<p>这里有两件事情启发我创建本指南。第一个是 Rachel Andrew 的令人敬畏的书–<a href="http://abookapart.com/products/get-ready-for-css-grid-layout" target="_blank" rel="external">为 CSS Grid 布局做好准备</a>。这本书很详尽明确的的介绍了Grid，如果你想很好的掌握Grid的基础知识，我强烈建议你去购买。另外一个很大的灵感来自于 Chris Coyier 的– <a href="http://www.w3cplus.com/css3/a-guide-to-flexbox-new.html" target="_blank" rel="external">Flexbox完整指南</a>，这本书是我了解Flebox的一个很优秀的资源。这里，我还想补充一句，当你使用谷歌搜索”flexbox”时，会出现很多类似的资源，但是为什么不直接利用最好的资源呢？</p>
-<p>我书写此指南的目的是基于目前最新版本，规范其网格概念。所以我不会再次提及过时的 IE 语法，并且随着规范的成熟，我会尽力定期更新此指南。</p>
-<h4 id="基础知识与浏览器支持"><a href="#基础知识与浏览器支持" class="headerlink" title="基础知识与浏览器支持"></a>基础知识与浏览器支持</h4><p>Grid 的入门是很容易的。你只需要定义一个容器元素并设置display：grid，使用grid-template-columns 和 grid-template-rows属性设置网格的列与 行的大小，然后使用grid-column 和 grid-row属性将其子元素放入网格之中。与flexbox类似，网格项的源顺序无关紧要。为了更好地使你的网格与媒体查询相结合使用，你可以在 CSS 中任意放置。想象一下你定义的整个页面布局，然后如果想要完全重新布局以适应不同的屏幕宽度，这时仅仅使用几行 CSS 代码就可以实现。Grid是曾经介绍过的最强大 CSS 模块之一。</p>
-<p>关于 Grid 一件很重要的事情就是它现在还不适用于项目使用。目前还处于 <a href="https://www.w3.org/TR/css-grid-1/" target="_blank" rel="external">W3C 的工作草案</a>之中，并且默认情况下，还不被所有的浏览器所支持。Internet Explorer 10 和 11 已经可以实现支持，但也是利用一种过时的语法实现的。现在出于示例演示，我建议你使用启用了特殊标志的 Chrome, Opera 或者 Firefox 。在 Chrome，导航到chrome://flags 并启用” web 实验平台功能”。该方法同样适用于 Opera (opera://flags)。在Firefox中，启用 layout.css.grid.enabled 标志。</p>
-<iframe src="http://caniuse.com/css-grid/embed" frameborder="0" width="100%" height="413px"></iframe>
-
-<p>除了Microsoft，浏览器厂商似乎想要等到Grid规范成熟后再加以推广。这是一件好事，因为这意味着我们就不需要担心学习多个语法。</p>
-<p>等待 Grid 的使用，只是时间的问题。但是现在你需要开始学习它了。</p>
-<h4 id="重要术语"><a href="#重要术语" class="headerlink" title="重要术语"></a>重要术语</h4><p>在深入研究Grid之前，我们需要理解其相关术语概念。因为这里涉及到的术语在概念上都有点类似，如果你没有首先记住Grid规范中的相关定义，你就会很容易将其与另一个概念相混淆。但是不需要担心，这里的属性并不是很多。</p>
-<p>网格容器(Grid Container)</p>
-<p>当一个元素设置display: grid属性时，它就会成为所有网格项(Grid Items)的父元素。在下面的示例中，container就是网格容器。</p>
-<pre><code>&lt;div class=&quot;container&quot;&gt;
-    &lt;div class=&quot;item item-1&quot;&gt;&lt;/div&gt;
-    &lt;div class=&quot;item item-2&quot;&gt;&lt;/div&gt;
-    &lt;div class=&quot;item item-3&quot;&gt;&lt;/div&gt;
-&lt;/div&gt;
-</code></pre><h4 id="网格项-Grid-Item"><a href="#网格项-Grid-Item" class="headerlink" title="网格项(Grid Item)"></a>网格项(Grid Item)</h4><p>网格容器的孩子(e.g. 子元素)。这里item元素都是网格项，但是sub-item不包含其中。</p>
-<pre><code>&lt;div class=&quot;container&quot;&gt;
-    &lt;div class=&quot;item&quot;&gt;&lt;/div&gt; 
-    &lt;div class=&quot;item&quot;&gt;
-        &lt;p class=&quot;sub-item&quot;&gt;&lt;/p&gt;
-    &lt;/div&gt;
-    &lt;div class=&quot;item&quot;&gt;&lt;/div&gt;
-&lt;/div&gt;
-</code></pre><h4 id="网格线-Grid-Line"><a href="#网格线-Grid-Line" class="headerlink" title="网格线(Grid Line)"></a>网格线(Grid Line)</h4><p>分界线构成了网格的结构。他们可以是垂直的(“列网格线”)也可以是水平的(“行网格线”)，并且存在于一行或一列的任一侧。下面图片中的黄线就是列网格线的一个例子。</p>
-<p><img src="http://cdn.w3cplus.com/cdn/farfuture/gKpvc25w95A-Rw4rzvxuvooFq21vgQLTMvLHI9d9I9k/mtime:1460132248/sites/default/files/blogs/2016/1604/grid-line.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<h4 id="网格轨道-Grid-Track"><a href="#网格轨道-Grid-Track" class="headerlink" title="网格轨道(Grid Track)"></a>网格轨道(Grid Track)</h4><p>两个相邻网格线之间的空间。你可以把它们想像成网格的行或列。下图所示的是第二行和第三行网格线之间的网格轨道。</p>
-<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/gOiQ2Q-w5thxu5hsyw5c9UiGQq7RmnTs-qNKEfnSQxI/mtime:1460132250/sites/default/files/blogs/2016/1604/grid-track.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<h4 id="网格单元格-Grid-Cell"><a href="#网格单元格-Grid-Cell" class="headerlink" title="网格单元格(Grid Cell)"></a>网格单元格(Grid Cell)</h4><p>两个相邻的行和两个相邻的列之间的网格线空间。它是网格的一个”单位”。下面图片所示的是行网格线 1 和 2 与列网格线 2 和 3 之间的网格单元格。</p>
-<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/seD6LEaaFyvVwPATSrWehDkUrCdsHApObOg12OlXNm4/mtime:1460132245/sites/default/files/blogs/2016/1604/grid-cell.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<h4 id="网格区域-Grid-Area"><a href="#网格区域-Grid-Area" class="headerlink" title="网格区域(Grid Area)"></a>网格区域(Grid Area)</h4><p>四条网格线所包围的所有空间。网格区域可由任意数量的网格单元格组成。下面图片所示的是行网格线 1 和 3 和列网格线 1 和 3 之间的网格区域。</p>
-<p><img src="http://cdn.w3cplus.com/cdn/farfuture/t4WyvkNvPqgPU-Jly_aF7ZGgDaM6AxgAedTXkfx4L74/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-area.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<h4 id="网格容器属性-Grid-Container"><a href="#网格容器属性-Grid-Container" class="headerlink" title="网格容器属性(Grid Container)"></a>网格容器属性(Grid Container)</h4><h5 id="display"><a href="#display" class="headerlink" title="display"></a>display</h5><p>定义一个元素成为网格容器，并对其内容建立一个网格格式的上下文。</p>
-<h5 id="属性值"><a href="#属性值" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><p>grid: 产生一个块级的网格</p>
-</li>
-<li><p>inline-grid: 产生内联级网格</p>
-<pre><code>.container{
-    display: grid | inline-grid   
-}
-</code></pre></li>
-</ul>
-<p>注: column, float, clear, 和 vertical-align 元素对网格容器不起作用。</p>
-<h4 id="grid-template-rows"><a href="#grid-template-rows" class="headerlink" title="grid-template-rows"></a>grid-template-rows</h4><p>利用以空格分隔的值定义网格的列和行。值的大小代表轨道的大小，并且它们之间的空格表示网格线。</p>
-<h5 id="属性值-1"><a href="#属性值-1" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><p><track-size>: 可以是一个长度、百分比或者是网格中自由空间的一小部分(使用fr单位)</track-size></p>
-</li>
-<li><p><line-name>: 你选择的任意名称</line-name></p>
-</li>
-<li><p>subgrid - 如果你的网格容器本身就是一个网格项(即嵌套网格)，你可以使用此属性指定行和列的大小继承于父元素而不是自身指定。</p>
-<pre><code>.container{
-    grid-template-columns: &lt;track-size&gt; ... | &lt;line-name&gt; &lt;track-size&gt; ... | subgrid;
-    grid-template-rows: &lt;track-size&gt; ... | &lt;line-name&gt; &lt;track-size&gt; ... | subgrid;
-}
-</code></pre></li>
-</ul>
-<h4 id="示例"><a href="#示例" class="headerlink" title="示例:"></a>示例:</h4><p>当你在值之间留有空格时，网络线就会自动分配数值名称:</p>
-<pre><code>.container{
-    grid-template-columns: 40px 50px auto 50px 40px;
-    grid-template-rows: 25% 100px auto;
-}
-</code></pre><p><img src="http://cdn2.w3cplus.com/cdn/farfuture/X_DM7Y2QqrzK1H9w41DkpyGLmZeMkaq5pbyVZevlgBg/mtime:1460132249/sites/default/files/blogs/2016/1604/grid-numbers.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<p>但是你也可以显示命名，请参考下面括号语法中的名称命名方式:</p>
-<pre><code>.container{
-    grid-template-columns: [first] 40px [line2] 50px [line3] auto [col4-start] 50px [five] 40px [end];
-    grid-template-rows: [row1-start] 25% [row1-end] 100% [third-line] auto [last-line];
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/TeK_YrqYf9wK7TYBGo00d8vzqb0ErZkCLNVZrRWSRdM/mtime:1460132249/sites/default/files/blogs/2016/1604/grid-names.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<p>请注意，一条网格线可以具有有多个名称。例如，这里的第二行将有两个名字: row1-end 和 row2-start:</p>
-<pre><code>.container{
-    grid-template-rows: [row1-start] 25% [row1-end row2-start] 25% [row2-end];
-}
-</code></pre><p>如果你的定义中包含重复的部分，你可以使用 repeat() 表示法进行精简:</p>
-<pre><code>.container{
-    grid-template-columns: repeat(3, 20px [col-start]) 5%;
-}
-</code></pre><p>等效于:</p>
-<pre><code>.container{
-    grid-template-columns: 20px [col-start] 20px [col-start] 20px [col-start] 5%;
-}
-</code></pre><p>fr 单位允许你将一个轨道大小设置为网格容器内自由空间的一小部分。如下所示，每个网格项就会占据网格容器宽度的三分之一:</p>
-<pre><code>.container{
-    grid-template-columns: 1fr 1fr 1fr;
-}
-</code></pre><p>这里自由空间表示除去非弹性项以后剩余的空间。在此示例中的 fr 单位的可用空间表示减去50px以后的空间大小:</p>
-<pre><code>.container{
-    grid-template-columns: 1fr 50px 1fr 1fr;
-}
-</code></pre><h4 id="grid-template-areas"><a href="#grid-template-areas" class="headerlink" title="grid-template-areas"></a>grid-template-areas</h4><p>使用grid-area属性定义网格区域名称，从而定义网格模板。网格区域重复的名称就会导致内容跨越这些单元格。句点表示一个空单元格。语法本身提供了一种可视化的网格结构。</p>
-<h5 id="属性值-2"><a href="#属性值-2" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><p><grid-area-name>: 使用grid-area属性定义网格区域名称</grid-area-name></p>
-</li>
-<li><p>.: 句点表示一个空单元格</p>
-</li>
-<li><p>none: 无网格区域被定义</p>
-<pre><code>.container{
-    grid-template-areas: &quot;&lt;grid-area-name&gt; | . | none | ...&quot;
-                      &quot;...&quot;
-}
-</code></pre></li>
-</ul>
-<h5 id="示例-1"><a href="#示例-1" class="headerlink" title="示例:"></a>示例:</h5><pre><code>.item-a{
-    grid-area: header;
-}
-.item-b{
-    grid-area: main;
-}
-.item-c{
-    grid-area: sidebar;
-}
-.item-d{
-    grid-area: footer;
-}
-.container{
-    grid-template-columns: 50px 50px 50px 50px;
-    grid-template-rows: auto;
-    grid-template-areas: &quot;header header header header&quot;
-                         &quot;main main . sidebar&quot;
-                         &quot;footer footer footer footer&quot;
-}
-</code></pre><p>这将创建一个四列三行的网格。最上面的一行为header区域。中间一行由两个main区域，一个空单元格和一个sidebar区域。最后一行是footer区域。</p>
-<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/p5O591xAPbyGPVI0pepIgQIQyo25GEzXJc4FqPnkCgI/mtime:1460132550/sites/default/files/blogs/2016/1604/grid-template-areas.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<p>你所声明的每一行都需要具有相同数目的单元格。</p>
-<p>你可以使用任意数量的句点(.)声明单个空单元格。只要句点之间没有空格就表示一个空单元格。</p>
-<p>注意，你只是使用此语法进行网格区域命名，而不是网格线命名。当你使用此语法时，区域两边的线就会得到自动命名。如果网格区域名称为foo,则其行线和列线的名称就将为foo-start，最后一行线及其最后一列线的名字就会为foo-end。这意味着一些线就可能具有多个名称，如上面示例中所示，拥有三个名称: header-start, main-start, 以及footer-start。</p>
-<h4 id="grid-column-gap和grid-row-gap"><a href="#grid-column-gap和grid-row-gap" class="headerlink" title="grid-column-gap和grid-row-gap"></a>grid-column-gap和grid-row-gap</h4><p>指定网格线的大小。你可以把它想像成在行/列之间设置间距宽度。</p>
-<h5 id="属性值-3"><a href="#属性值-3" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><code>&lt;line-size&gt;</code>: 一个长度值</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    grid-column-gap: &lt;line-size&gt;;</div><div class="line">    grid-row-gap: &lt;line-size&gt;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h5 id="示例-2"><a href="#示例-2" class="headerlink" title="示例:"></a>示例:</h5><pre><code>.container{
-    grid-template-columns: 100px 50px 100px;
-    grid-template-rows: 80px auto 80px; 
-    grid-column-gap: 10px;
-    grid-row-gap: 15px;
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/NkH6E9Mt_yBnhLMcuOO2bvijzL-d1dr4PcHROe1jQTw/mtime:1460132245/sites/default/files/blogs/2016/1604/grid-column-row-gap.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<p>间距仅仅在列/行之间产生，而不会在边缘区。</p>
-<h4 id="grid-gap"><a href="#grid-gap" class="headerlink" title="grid-gap"></a>grid-gap</h4><p>grid-column-gap 和 grid-row-gap的简写值。</p>
-<h5 id="属性值-4"><a href="#属性值-4" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><grid-column-gap> <grid-row-gap>: 长度值</grid-row-gap></grid-column-gap></li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    grid-gap: &lt;grid-column-gap&gt; &lt;grid-row-gap&gt;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h5 id="示例-3"><a href="#示例-3" class="headerlink" title="示例:"></a>示例:</h5><pre><code>.container{
-    grid-template-columns: 100px 50px 100px;
-    grid-template-rows: 80px auto 80px; 
-    grid-gap: 10px 15px;
-}
-</code></pre><p>如果没有指定grid-row-gap属性的值，默认与grid-column-gap属性值相同</p>
-<h4 id="justify-items"><a href="#justify-items" class="headerlink" title="justify-items"></a>justify-items</h4><p>沿列轴对齐网格项中的内容(相反于align-item属性定义的沿行轴对齐)。此值适用于容器内所有的网格项。</p>
-<h5 id="属性值-5"><a href="#属性值-5" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><p>start: 内容与网格区域的左端对齐</p>
-</li>
-<li><p>end: 内容与网格区域的右端对齐</p>
-</li>
-<li><p>center: 内容处于网格区域的中间位置</p>
-</li>
-<li><p>stretch: 内容宽度占据整个网格区域空间(默认值)</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    justify-items: start | end | center | stretch;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h5 id="示例-4"><a href="#示例-4" class="headerlink" title="示例:"></a>示例:</h5><pre><code>.container{
-    justify-items: start;
-}
-</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/DeEsJc9aJ197-ygaKH5umTPYax9LHpKqb6UNjOz87AE/mtime:1460132247/sites/default/files/blogs/2016/1604/grid-justify-items-start.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    justify-items: end;
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/Z3ZWMZKBOshRlLnyD_ezkqsI_MswMPWela1e_HJzAH8/mtime:1460132247/sites/default/files/blogs/2016/1604/grid-justify-items-end.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    justify-items: center;
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/VxU0G7HhPCZ9mXhfkuCGrXXjGsvV-JKGdNQ-OzSe6b8/mtime:1460132247/sites/default/files/blogs/2016/1604/grid-justify-items-center.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    justify-items: stretch;
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/k4EK27vIfTqh5nmhucLhomEhun0LTJqUckrTctj41Ag/mtime:1460132248/sites/default/files/blogs/2016/1604/grid-justify-items-stretch.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<p>这也可以使用justify-self属性对各个网格项进行设置。</p>
-<h4 id="align-items"><a href="#align-items" class="headerlink" title="align-items"></a>align-items</h4><p>沿行轴对齐网格项中的内容(相反于justify-item属性定义的沿列轴对齐)。此值适用于容器内所有的网格项。</p>
-<h5 id="属性值-6"><a href="#属性值-6" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><p>start: 内容与网格区域的顶端对齐</p>
-</li>
-<li><p>end: 内容与网格区域的底部对齐</p>
-</li>
-<li><p>center: 内容处于网格区域的中间位置</p>
-</li>
-<li><p>stretch: 内容高度占据整个网格区域空间(默认值)</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    align-items: start | end | center | stretch;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h5 id="示例-5"><a href="#示例-5" class="headerlink" title="示例:"></a>示例:</h5><pre><code>.container{
-    align-items: start;
-}
-</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/SBt28c71z4UWwWCA6VMBJUPVUk5XLccB8-c2gB5RWlQ/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-align-items-start.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    align-items: end;
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/aVcTwfxWM3eKLHtrVECcY0PH-YrinUfDm4m3_eN5lXs/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-align-items-end.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    align-items: center;
-}
-</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/DYCXxtNsb_VN7Yz5qL8qDro-cRnENpRSl7irBEd3vTE/mtime:1460132243/sites/default/files/blogs/2016/1604/grid-align-items-center.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    align-items: stretch;
-}
-</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/fGHKY7-aeOfgpniLoTxQmsgCbLDRt1GiPaVXAl-4LOM/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-align-items-stretch.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<p>这也可以使用align-self属性对各个网格项进行设置。</p>
-<h4 id="justify-content"><a href="#justify-content" class="headerlink" title="justify-content"></a>justify-content</h4><p>当你使用px这种非响应式的单位对你的网格项进行大小设置时，就有可能出现一种情况–你的网格大小可能小于其网格容器的大小。在这种情况下，你就可以设置网格容器内网格的对齐方式。此属性会将网格沿列轴进行对齐(相反于align-content属性定义的沿行轴对齐)。</p>
-<h5 id="属性值-7"><a href="#属性值-7" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><p>start: 网格与网格容器的左端对齐</p>
-</li>
-<li><p>end: 网格与网格容器的右端对齐</p>
-</li>
-<li><p>center: 网格处于网格容器的中间</p>
-</li>
-<li><p>stretch: 调整网格项的大小，使其宽度填充整个网格容器</p>
-</li>
-<li><p>space-around: 在网格项之间设置偶数个空格间隙，其最边缘间隙大小为中间空格间隙大小的一半</p>
-</li>
-<li><p>space-between: 在网格项之间设置偶数个空格间隙，其最边缘不存在空格间隙</p>
-</li>
-<li><p>space-evenly: 在网格项之间设置偶数个空格间隙，同样适用于最边缘区域</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    justify-content: start | end | center | stretch | space-around | space-between | space-evenly;    </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>示例:</p>
-<pre><code>.container{
-    justify-content: start;
-}
-</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/V86BK0l5PPe8ypiC_ewHQnFOJGsHzAJFq81nEvaIzh0/mtime:1460132246/sites/default/files/blogs/2016/1604/grid-justify-content-start.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    justify-content: end; 
-}
-</code></pre><p><img src="http://cdn2.w3cplus.com/cdn/farfuture/OT3tWVLBz8oPeolOD2q01eBHPgyRPay198nZsNyplOw/mtime:1460132245/sites/default/files/blogs/2016/1604/grid-justify-content-end.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    justify-content: center;  
-}
-</code></pre><p><img src="http://cdn2.w3cplus.com/cdn/farfuture/x02TnVK7AWfQrBFo3BmtUW5-9ZdOLp2eBQKShftkYnM/mtime:1460132245/sites/default/files/blogs/2016/1604/grid-justify-content-center.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    justify-content: stretch; 
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/KhGlUpKr2znYjX26PmOrTvEXgf5SfBjuysXm0UwzxYk/mtime:1460132247/sites/default/files/blogs/2016/1604/grid-justify-content-stretch.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    justify-content: space-around;    
-}
-</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/0hwm5rYzTdMYuZV4dTK6ROAEgdxZsoKG0w9Z1utQoIQ/mtime:1460132246/sites/default/files/blogs/2016/1604/grid-justify-content-space-around.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    justify-content: space-between;   
-}
-</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/-Z5SERN8i6b_AFz-KvfhRxP-cHoaIeIYn9G4V5i31F0/mtime:1460132246/sites/default/files/blogs/2016/1604/grid-justify-content-space-between.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-  justify-content: space-evenly;    
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/akDy0eshtzxnti20ICE8V3JyJmotAXjkgLGyMa2HMic/mtime:1460132246/sites/default/files/blogs/2016/1604/grid-justify-content-space-evenly.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<h4 id="align-content"><a href="#align-content" class="headerlink" title="align-content"></a>align-content</h4><p>当你使用px这种非响应式的单位对你的网格项进行大小设置时，就有可能出现一种情况–你的网格大小可能小于其网格容器的大小。在这种情况下，你就可以设置网格容器内网格的对齐方式。此属性会将网格沿行轴进行对齐(相反于justify-content属性定义的沿列轴对齐)。</p>
-<h5 id="属性值-8"><a href="#属性值-8" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><p>start: 网格与网格容器的顶端对齐</p>
-</li>
-<li><p>end: 网格与网格容器的底部对齐</p>
-</li>
-<li><p>center: 网格处于网格容器的中间</p>
-</li>
-<li><p>stretch: 调整网格项的大小，使其高度填充整个网格容器</p>
-</li>
-<li><p>space-around: 在网格项之间设置偶数个空格间隙，其最边缘间隙大小为中间空格空隙大小的一半</p>
-</li>
-<li><p>space-between: 在网格项之间设置偶数个空格间隙，其最边缘不存在空格间隙</p>
-</li>
-<li><p>space-evenly: 在网格项之间设置偶数个空格间隙，同样适用于最边缘区域</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    align-content: start | end | center | stretch | space-around | space-between | space-evenly;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>#####示例:</p>
-<pre><code>.container{
-    align-content: start; 
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/hojdd_caTcpZcB5rA6bf9yu1nd-VzBCviKhKWdNlzmU/mtime:1460132243/sites/default/files/blogs/2016/1604/grid-align-content-start.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    align-content: end;   
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/Z4qpR9QCYog6YQuroNQV1MllyNGMaXdIJkwBmO9-FgE/mtime:1460132243/sites/default/files/blogs/2016/1604/grid-align-content-end.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    align-content: center;    
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/wgXMAOUrFkvw1g5JcA9hlb_d9gb3b_WWAAUxmnIUwMY/mtime:1460132242/sites/default/files/blogs/2016/1604/grid-align-content-center.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    align-content: stretch;   
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/vg-a2_oeUlNgPGVXTeKL-4N5UJlTH2x77cR3fmAgaqI/mtime:1460132243/sites/default/files/blogs/2016/1604/grid-align-content-stretch.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    align-content: space-around;  
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/O4UjhRmD81HKp0JycpbCreC1n59MuMZbLqq-U5ZGT10/mtime:1460132242/sites/default/files/blogs/2016/1604/grid-align-content-space-around.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    align-content: space-between; 
-}
-</code></pre><p><img src="http://cdn2.w3cplus.com/cdn/farfuture/ebLV62oCnLHL9gL8q0h3j44aXZGd-6jJnTGk3Zx9Fe0/mtime:1460132242/sites/default/files/blogs/2016/1604/grid-align-content-space-between.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    align-content: space-evenly;  
-}
-</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/14tRJmA8NGCIZ7UUAksJfSU2cot8Eyiwjw9Sgx7R0r4/mtime:1460132242/sites/default/files/blogs/2016/1604/grid-align-content-space-evenly.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<h4 id="grid-auto-columns和grid-auto-rows"><a href="#grid-auto-columns和grid-auto-rows" class="headerlink" title="grid-auto-columns和grid-auto-rows"></a>grid-auto-columns和grid-auto-rows</h4><p>指定任何自动生成的网格轨道(隐式网格跟踪)的大小。当你显式定位行或列(使用 grid-template-rows/grid-template-columns属性)时,就会产生超出定义范围内的隐式网格轨道。</p>
-<h5 id="属性值-9"><a href="#属性值-9" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><code>&lt;track-siz&gt;</code>: 可以是长度、 百分比或网格自由空间的一小部分(使用fr单位)</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    grid-auto-columns: &lt;track-size&gt; ...;</div><div class="line">    grid-auto-rows: &lt;track-size&gt; ...;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>为了说明隐式网格轨道是如何被创造出来的，请思考如下代码:</p>
-<pre><code>.container{
-    grid-template-columns: 60px 60px;
-    grid-template-rows: 90px 90px
-}
-</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/Dqn09IqXrYUqk3YP5ALD5KsauBp-8VFeVe0nO0U-Nqk/mtime:1460132245/sites/default/files/blogs/2016/1604/grid-auto.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<p>这里创建了一个2 x 2 的网格。</p>
-<p>但是现在你想象你使用grid-column 和 grid-row 来定位网格项，如下所示:</p>
-<pre><code>.item-a{
-    grid-column: 1 / 2;
-    grid-row: 2 / 3;
-}
-.item-b{
-    grid-column: 5 / 6;
-    grid-row: 2 / 3;
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/5cMq7ShQn3RVBpbPAIz_5V7m05azOp_8HNZAE3QmB_I/mtime:1460132250/sites/default/files/blogs/2016/1604/implicit-tracks.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<p>这里我们定义.item b开始于列线 5 并结束于在列线 6，但是我们从来没有定义列线 5 或 6。因为我们引用不存在的线，宽度为0的隐式轨道的就会被创建用来填补空白。我们可以使用grid-auto-columns 和 grid-auto-rows属性来设置这些隐式轨道的宽度:</p>
-<pre><code>.container{
-    grid-auto-columns: 60px;
-}
-</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/IS-UCPIfqtPIuj_V24vZqOXgiJbsSusPwIzbzg56yIM/mtime:1460132250/sites/default/files/blogs/2016/1604/implicit-tracks-with-widths.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<h4 id="grid-auto-flow"><a href="#grid-auto-flow" class="headerlink" title="grid-auto-flow"></a>grid-auto-flow</h4><p>如果你不显式的在网格中放置网格项，自动布局算法就会自动踢出此网格项。此属性用来控制自动布局算法的工作原理。</p>
-<h5 id="属性值-10"><a href="#属性值-10" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><p>row: 告诉自动布局算法填充每一行，必要时添加新行</p>
-</li>
-<li><p>column: 告诉自动布局算法填充每一列，必要时添加新列</p>
-</li>
-<li><p>dense: 告诉自动布局算法试图填补网格中之前较小的网格项留有的空白</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    grid-auto-flow: row | column | row dense | column dense</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>注意:dense值可能会导致更改网格项的顺序。</p>
-<h5 id="示例-6"><a href="#示例-6" class="headerlink" title="示例:"></a>示例:</h5><p>考虑如下HTMl代码:</p>
-<pre><code>&lt;section class=&quot;container&quot;&gt;
-    &lt;div class=&quot;item-a&quot;&gt;item-a&lt;/div&gt;
-    &lt;div class=&quot;item-b&quot;&gt;item-b&lt;/div&gt;
-    &lt;div class=&quot;item-c&quot;&gt;item-c&lt;/div&gt;
-    &lt;div class=&quot;item-d&quot;&gt;item-d&lt;/div&gt;
-    &lt;div class=&quot;item-e&quot;&gt;item-e&lt;/div&gt;
-&lt;/section&gt;
-</code></pre><p>这里定义了一个两列五行的网格，并将 grid-auto-flow属性设置为row(即默认值):</p>
-<pre><code>.container{
-    display: grid;
-    grid-template-columns: 60px 60px 60px 60px 60px;
-    grid-template-rows: 30px 30px;
-    grid-auto-flow: row;
-}
-</code></pre><p>将网格项放置在网格中时只需要其中的两个网格项:</p>
-<pre><code>.item-a{
-    grid-column: 1;
-    grid-row: 1 / 3;
-}
-.item-e{
-    grid-column: 5;
-    grid-row: 1 / 3;
-}
-</code></pre><p>因为我们将grid-auto-flow属性设置为了row，所以我们的网格看起来会像这个样子。注意我们我们没有对其进行设置的三个网格项(item-b, item-c and item-d),会沿行轴进行布局。</p>
-<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/DBQZgbw82BJwGw7Q61UdcDRlRANo-_2iJW2wQlUcDrw/mtime:1460132245/sites/default/files/blogs/2016/1604/grid-auto-flow-row.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<p>如果我们将grid-auto-flow属性设置为 column,item-b, item-c 和 item-d 就会沿列轴进行布局。</p>
-<pre><code>.container{
-    display: grid;
-    grid-template-columns: 60px 60px 60px 60px 60px;
-    grid-template-rows: 30px 30px;
-    grid-auto-flow: column;
-}
-</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/TPY1m3jC4Lir0oDl8aASuAUOwn5lJmAyiQdkzHJwg54/mtime:1460132245/sites/default/files/blogs/2016/1604/grid-auto-flow-column.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<h4 id="grid"><a href="#grid" class="headerlink" title="grid"></a>grid</h4><p>在一行声明中设置一下所有属性的简写形式:grid-template-rows, grid-template-columns, grid-template-areas, grid-auto-rows, grid-auto-columns, 以及 grid-auto-flow。它将 grid-column-gap 和 grid-row-gap属性设置为初始值，即使它们不能显示的设置此属性。</p>
-<h5 id="属性值-11"><a href="#属性值-11" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><p>none: 将所有的子属性设置为初始值</p>
-</li>
-<li><p>subgrid: 将grid-template-rows 和 grid-template-columns属性值设置为subgrid,其余子属性设置为初始值</p>
-</li>
-<li><p><code>&lt;grid-template-rows&gt;</code> / <code>&lt;grid-template-columns&gt;</code>: 将grid-template-rows 和 grid-template-columns属性值设置为指定值，其余子属性设置为初始值</p>
-</li>
-<li><p><code>&lt;grid-auto-flow&gt;</code>[<code>&lt;grid-auto-rows&gt;</code> [ / <code>&lt;grid-auto-columns&gt;</code>] ] : grid-auto-flow, grid-auto-rows 和 grid-auto-columns属性分别接受相同的值,如果省略了grid-auto-columns属性，它将设置为grid-auto-rows属性的值。如果两者均被忽略，那么都将被设置为初始值。</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    grid: none | subgrid | &lt;grid-template-rows&gt; / &lt;grid-template-columns&gt; | &lt;grid-auto-flow&gt; [&lt;grid-auto-rows&gt; [/ &lt;grid-auto-columns&gt;]];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h5 id="示例-7"><a href="#示例-7" class="headerlink" title="示例:"></a>示例:</h5><p>下面两个代码块是等效的:</p>
-<pre><code>.container{
-    grid: 200px auto / 1fr auto 1fr;
-}
-
-.container{
-    grid-template-rows: 200px auto;
-    grid-template-columns: 1fr auto 1fr;
-    grid-template-areas: none;
-}
-</code></pre><p>同样，下面的两个代码块也是等效的:</p>
-<pre><code>.container{
-    grid: column 1fr / auto;
-}
-
-.container{
-    grid-auto-flow: column;
-    grid-auto-rows: 1fr;
-    grid-auto-columns: auto;
-}
-</code></pre><p>它还接受一次性设置所有属性，更复杂但非常方便的语法。指定grid-template-areas, grid-auto-rows 和 grid-auto-columns属性，其他所有子属性都将设置为其初始值。你现在所做的是在其网格区域内，指定网格线名称和内联轨道大小。下面是最简单的描述:</p>
-<pre><code>.container{
-    grid: [row1-start] &quot;header header header&quot; 1fr [row1-end]
-          [row2-start] &quot;footer footer footer&quot; 25px [row2-end]
-          / auto 50px auto;
-}
-</code></pre><p>等效于:</p>
-<pre><code>.container{
-    grid-template-areas: &quot;header header header&quot;
-                         &quot;footer footer footer&quot;;
-    grid-template-rows: [row1-start] 1fr [row1-end row2-start] 25px [row2-end];
-    grid-template-columns: auto 50px auto;    
-}
-</code></pre><h4 id="网格项属性-Grid-Items"><a href="#网格项属性-Grid-Items" class="headerlink" title="网格项属性(Grid Items)"></a>网格项属性(Grid Items)</h4><h5 id="grid-column-start-grid-column-end-grid-row-start-grid-row-end"><a href="#grid-column-start-grid-column-end-grid-row-start-grid-row-end" class="headerlink" title="grid-column-start/grid-column-end/grid-row-start/grid-row-end"></a>grid-column-start/grid-column-end/grid-row-start/grid-row-end</h5><p>使用特定的网格线确定网格项在网格内的位置。grid-column-start/grid-row-start 属性表示网格项的网格线的起始位置，grid-column-end/grid-row-end属性表示网格项的网格线的终止位置。</p>
-<h5 id="属性值-12"><a href="#属性值-12" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><p><code>&lt;line&gt;</code>: 可以是一个数字来引用相应编号的网格线，或者使用名称引用相应命名的网格线</p>
-</li>
-<li><p>span <code>&lt;number&gt;</code>: 网格项包含指定数量的网格轨道</p>
-</li>
-<li><p>span <code>&lt;name&gt;</code>: 网格项包含指定名称网格项的网格线之前的网格轨道</p>
-</li>
-<li><p>auto: 表明自动定位，自动跨度或者默认跨度之一</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">.item&#123;</div><div class="line">    grid-column-start: &lt;number&gt; | &lt;name&gt; | span &lt;number&gt; | span &lt;name&gt; | auto</div><div class="line">    grid-column-end: &lt;number&gt; | &lt;name&gt; | span &lt;number&gt; | span &lt;name&gt; | auto</div><div class="line">    grid-row-start: &lt;number&gt; | &lt;name&gt; | span &lt;number&gt; | span &lt;name&gt; | auto</div><div class="line">    grid-row-end: &lt;number&gt; | &lt;name&gt; | span &lt;number&gt; | span &lt;name&gt; | auto</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>示例:</p>
-<pre><code>.item-a{
-    grid-column-start: 2;
-    grid-column-end: five;
-    grid-row-start: row1-start
-    grid-row-end: 3
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/_qe1h2tf7kOnbma7mv0npHmPxuqdtgBhz-ue5plGF7s/mtime:1460132249/sites/default/files/blogs/2016/1604/grid-start-end-a.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.item-b{
-    grid-column-start: 1;
-    grid-column-end: span col4-start;
-    grid-row-start: 2
-    grid-row-end: span 2
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/alQ0HIXYmT5gbNObM3SG329ddcjN0R53iwUYRx7mxu4/mtime:1460132249/sites/default/files/blogs/2016/1604/grid-start-end-b.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<p>如果没有声明grid-column-end/grid-row-end属性，默认情况下网格项的跨度为1。</p>
-<p>网格项可以互相重叠。可以使用z-index属性控制堆叠顺序。</p>
-<h4 id="grid-column-grid-row"><a href="#grid-column-grid-row" class="headerlink" title="grid-column/grid-row"></a>grid-column/grid-row</h4><h5 id="grid-column-start-grid-column-end-和-grid-row-start-grid-row-end属性分别的简写形式。"><a href="#grid-column-start-grid-column-end-和-grid-row-start-grid-row-end属性分别的简写形式。" class="headerlink" title="grid-column-start + grid-column-end, 和 grid-row-start + grid-row-end属性分别的简写形式。"></a>grid-column-start + grid-column-end, 和 grid-row-start + grid-row-end属性分别的简写形式。</h5><h5 id="属性值-13"><a href="#属性值-13" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><code>&lt;start-line&gt;</code> / <code>&lt;end-line&gt;</code>： 每一个属性均接收一个相同值，包括跨度。</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">.item&#123;</div><div class="line">    grid-column: &lt;start-line&gt; / &lt;end-line&gt; | &lt;start-line&gt; / span &lt;value&gt;;</div><div class="line">    grid-row: &lt;start-line&gt; / &lt;end-line&gt; | &lt;start-line&gt; / span &lt;value&gt;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h5 id="示例-8"><a href="#示例-8" class="headerlink" title="示例:"></a>示例:</h5><pre><code>.item-c{
-    grid-column: 3 / span 2;
-    grid-row: third-line / 4;
-}
-</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/9cHMaarlw9Q6EUB4uXNHygG6E2jez75tLEKURdJ6byc/mtime:1460132250/sites/default/files/blogs/2016/1604/grid-start-end-c.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<p>如果没有声明结束网格线值，默认网格轨道跨度为1.</p>
-<h4 id="grid-area"><a href="#grid-area" class="headerlink" title="grid-area"></a>grid-area</h4><p>给网格项进行命名以便于模板使用grid-template-areas属性创建时可以加以引用。另外也可以被grid-row-start + grid-column-start + grid-row-end + grid-column-end属性更为简洁的加以引用。</p>
-<h5 id="属性值-14"><a href="#属性值-14" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><p><code>&lt;name&gt;</code>: 你所定义的名称</p>
-</li>
-<li><p><code>&lt;row-start&gt;</code> / <code>&lt;column-start&gt;</code> / <code>&lt;row-end&gt;</code> / <code>&lt;column-end&gt;</code>: 可以为数字或者名称</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item&#123;</div><div class="line">    grid-area: &lt;name&gt; | &lt;row-start&gt; / &lt;column-start&gt; / &lt;row-end&gt; / &lt;column-end&gt;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h5 id="示例-9"><a href="#示例-9" class="headerlink" title="示例:"></a>示例:</h5><p>对网格项进行命名的一种方式:</p>
-<pre><code>.item-d{
-    grid-area: header
-}
-</code></pre><p>grid-row-start + grid-column-start + grid-row-end + grid-column-end属性的一种简写方式:</p>
-<pre><code>.item-d{
-    grid-area: 1 / col4-start / last-line / 6
-}
-</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/KPiJbq66MU7EYvSn5VTCzBseoZJIX5DKxJ1EiTYcEQM/mtime:1460132250/sites/default/files/blogs/2016/1604/grid-start-end-d.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<h4 id="justify-self"><a href="#justify-self" class="headerlink" title="justify-self"></a>justify-self</h4><p>沿列轴对齐网格项中的内容(相反于align-item属性定义的沿行轴对齐)。此值适用于单一网格项中的内容。</p>
-<h5 id="属性值-15"><a href="#属性值-15" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><p>start: 内容与网格区域的左端对齐</p>
-</li>
-<li><p>end: 内容与网格区域的右端对齐</p>
-</li>
-<li><p>center: 内容处于网格区域的中间位置</p>
-</li>
-<li><p>stretch: 内容宽度占据整个网格区域空间(默认值)</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item&#123;</div><div class="line">    justify-self: start | end | center | stretch;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h5 id="示例-10"><a href="#示例-10" class="headerlink" title="示例"></a>示例</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item-a&#123;</div><div class="line">    justify-self: start;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/FAa3UWcKAWEOIkPH8lXG5jfZE8OuistoRRDCRctpTbQ/mtime:1460132248/sites/default/files/blogs/2016/1604/grid-justify-self-start.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.item-a{
-    justify-self: end;
-}
-</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/wGYKmY8P1ZXvDQ-7hZD5PpaQNqx7DRcXJX8sJWoHqOQ/mtime:1460132248/sites/default/files/blogs/2016/1604/grid-justify-self-end.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.item-a{
-    justify-self: center;
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/ucq6X4Lajn6Nc9er0fx6XvcvZTFlD9fFfo_Otls8rP4/mtime:1460132248/sites/default/files/blogs/2016/1604/grid-justify-self-center.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.item-a{
-    justify-self: stretch;
-}
-</code></pre><p><img src="http://cdn2.w3cplus.com/cdn/farfuture/fIfcjkknWhPK0DrPTKv-0Klh8Lb1_JiiaY--htE70Vc/mtime:1460132249/sites/default/files/blogs/2016/1604/grid-justify-self-stretch.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<p>设置网格中所有网格项的对齐方式，可以使用网格容器上的justify-items属性。</p>
-<h4 id="align-self"><a href="#align-self" class="headerlink" title="align-self"></a>align-self</h4><p>沿行轴对齐网格项中的内容(相反于justify-item属性定义的沿列轴对齐)。此值适用于单一网格项中的内容。</p>
-<h5 id="属性值-16"><a href="#属性值-16" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><p>start: 内容与网格区域的顶端对齐</p>
-</li>
-<li><p>end: 内容与网格区域的底部对齐</p>
-</li>
-<li><p>center: 内容处于网格区域的中间位置</p>
-</li>
-<li><p>stretch: 内容高度占据整个网格区域空间(默认值)</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item&#123;</div><div class="line">    align-self: start | end | center | stretch;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>示例:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item-a&#123;</div><div class="line">    align-self: start;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><img src="http://cdn.w3cplus.com/cdn/farfuture/jQeKs_UnuosaBK6-eJDD9pMd9FBBr7PCs67KCOCz3iE/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-align-self-start.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item-a&#123;</div><div class="line">    align-self: end;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/abkBl5xW-qmCOAc1lSdD6GnsmO8Ngi2wjBcnbFp1_Nk/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-align-self-end.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item-a&#123;</div><div class="line">    align-self: center;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/A8Or3mJI9h3CLZ6JZ0iMk3SHp3vWsnlAHGSlVic3uO4/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-align-self-center.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item-a&#123;</div><div class="line">    align-self: stretch;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/pl7ZPQIMBPLDqNIjZQXxIfmBEqIjhPhh8GQcG9Ec0aA/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-align-self-stretch.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<p>使网格中所有的网格项对齐，可以使用网格容器上的align-items属性。</p>
-<p>特别声明：本文来自于<a href="http://chris.house/blog/a-complete-guide-css-grid-layout/" target="_blank" rel="external">Chris House写的指南</a>，此份指南由Chris himself所写，并且会不断的保持更新。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/css-grid/" data-id="cjc8i1vpb0011n3p37x56eeaz" class="article-share-link">Partager</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/css-grid/">css-grid</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-bootstrap-notes" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/09/14/bootstrap-notes/" class="article-date">
-  <time datetime="2017-09-14T02:21:19.000Z" itemprop="datePublished">2017-09-14</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/bootstrap/">bootstrap</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/09/14/bootstrap-notes/">bootstrap笔记</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><a href="http://v3.bootcss.com/" target="_blank" rel="external">Bootstrap</a>：最受欢迎的HTML、CSS和JS框架，用于开发响应式布局、移动设备优先的WEB项目。</p>
-<h4 id="启步"><a href="#启步" class="headerlink" title="启步"></a>启步</h4><p>1、响应式布局标签：</p>
-<pre><code>&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
-</code></pre><p>2、为了让最新浏览器运行在最新的渲染模式下，建议将此 <meta> 标签加入到页面中：</p>
-<pre><code>&lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
-</code></pre><p>3、让部分国产浏览器如360采用高速模式渲染页面：</p>
-<pre><code>&lt;meta name=&quot;renderer&quot; content=&quot;webkit&quot;&gt;
-</code></pre><h4 id="全局CSS样式"><a href="#全局CSS样式" class="headerlink" title="全局CSS样式"></a>全局CSS样式</h4><h5 id="一、概览"><a href="#一、概览" class="headerlink" title="一、概览"></a>一、概览</h5><p>1、移动设备优先</p>
-<p>在移动设备浏览器上，通过为视口（viewport）设置 meta 属性为 user-scalable=no 可以禁用其缩放（zooming）功能。</p>
-<pre><code>&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no&quot;&gt;
-</code></pre><p>2、布局容器</p>
-<p>.container 类用于固定宽度并支持响应式布局的容器。</p>
-<pre><code>&lt;div class=&quot;container&quot;&gt;
-  ...
-&lt;/div&gt;
-</code></pre><p>.container-fluid 类用于 100% 宽度，占据全部视口（viewport）的容器。</p>
-<pre><code>&lt;div class=&quot;container-fluid&quot;&gt;
-  ...
-&lt;/div&gt;
-</code></pre><h5 id="二、栅格系统"><a href="#二、栅格系统" class="headerlink" title="二、栅格系统"></a>二、栅格系统</h5><p>1、媒体查询</p>
-<p>Less文件中使用以下媒体查询（media query）来创建关键的分界点阈值。</p>
-<pre><code>/* 超小屏幕（手机，小于 768px） */
-/* 没有任何媒体查询相关的代码，因为这在 Bootstrap 中是默认的（还记得 Bootstrap 是移动设备优先的吗？） */
-
-/* 小屏幕（平板，大于等于 768px） */
-@media (min-width: @screen-sm-min) { ... }
-
-/* 中等屏幕（桌面显示器，大于等于 992px） */
-@media (min-width: @screen-md-min) { ... }
-
-/* 大屏幕（大桌面显示器，大于等于 1200px） */
-@media (min-width: @screen-lg-min) { ... }
-</code></pre><p>2、栅格参数</p>
-<pre><code>| 超小屏幕 手机（&lt;768px） 
-| 小屏幕 平板（&gt;=768px） 
-| 中等屏幕 显示器（&gt;=992px） 
-| 大屏幕 大显示器（&gt;=1200px）
-</code></pre><table>
-<thead>
-<tr>
-<th>.container 最大宽度</th>
-<th>自动</th>
-<th>750px</th>
-<th>970px</th>
-<th>1170px</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>类前缀</td>
-<td>.col-xs-</td>
-<td>.col-sm-</td>
-<td>.col-md-</td>
-<td>.col-lg-</td>
-</tr>
-<tr>
-<td>槽宽</td>
-<td>30px（每列左右各15px）</td>
-<td>30px</td>
-<td>30px</td>
-<td>30px</td>
-</tr>
-</tbody>
-</table>
-<p>实例：使用单一的一组 .col-md-* 栅格类，就可以创建一个基本的栅格系统，在手机和平板设备上一开始是堆叠在一起的（超小屏幕到小屏幕这一范围），在桌面（中等）屏幕设备上变为水平排列。所有“列（column）必须放在 ” .row 内。</p>
-<p><img src="../../public/css/images/column.png" alt=".col-md"></p>
-<center>grid demo</center>
-
-<pre><code>&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-md-8&quot;&gt;.col-md-8&lt;/div&gt;
-  &lt;div class=&quot;col-md-4&quot;&gt;.col-md-4&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-md-4&quot;&gt;.col-md-4&lt;/div&gt;
-  &lt;div class=&quot;col-md-4&quot;&gt;.col-md-4&lt;/div&gt;
-  &lt;div class=&quot;col-md-4&quot;&gt;.col-md-4&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-md-6&quot;&gt;.col-md-6&lt;/div&gt;
-  &lt;div class=&quot;col-md-6&quot;&gt;.col-md-6&lt;/div&gt;
-&lt;/div&gt;
-</code></pre><p>3、实例：移动设备和桌面屏幕</p>
-<p>是否不希望在小屏幕设备上所有列都堆叠在一起？那就使用针对超小屏幕和中等屏幕设备所定义的类吧，即 .col-xs- 和 .col-md-。请看下面的实例，研究一下这些是如何工作的。</p>
-<pre><code>&lt;!-- Stack the columns on mobile by making one full-width and the other half-width --&gt;
-&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-xs-12 col-md-8&quot;&gt;.col-xs-12 .col-md-8&lt;/div&gt;
-  &lt;div class=&quot;col-xs-6 col-md-4&quot;&gt;.col-xs-6 .col-md-4&lt;/div&gt;
-&lt;/div&gt;
-
-&lt;!-- Columns start at 50% wide on mobile and bump up to 33.3% wide on desktop --&gt;
-&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-xs-6 col-md-4&quot;&gt;.col-xs-6 .col-md-4&lt;/div&gt;
-  &lt;div class=&quot;col-xs-6 col-md-4&quot;&gt;.col-xs-6 .col-md-4&lt;/div&gt;
-  &lt;div class=&quot;col-xs-6 col-md-4&quot;&gt;.col-xs-6 .col-md-4&lt;/div&gt;
-&lt;/div&gt;
-
-&lt;!-- Columns are always 50% wide, on mobile and desktop --&gt;
-&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-xs-6&quot;&gt;.col-xs-6&lt;/div&gt;
-  &lt;div class=&quot;col-xs-6&quot;&gt;.col-xs-6&lt;/div&gt;
-&lt;/div&gt;
-</code></pre><p>4、列偏移</p>
-<p>使用 .col-md-offset- 类可以将列向右侧偏移。这些类实际是通过使用 选择器为当前元素增加了左侧的边距（margin）。例如，.col-md-offset-4 类将 .col-md-4 元素向右侧偏移了4个列（column）的宽度。</p>
-<pre><code>&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-md-4&quot;&gt;.col-md-4&lt;/div&gt;
-  &lt;div class=&quot;col-md-4 col-md-offset-4&quot;&gt;.col-md-4 .col-md-offset-4&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-md-3 col-md-offset-3&quot;&gt;.col-md-3 .col-md-offset-3&lt;/div&gt;
-  &lt;div class=&quot;col-md-3 col-md-offset-3&quot;&gt;.col-md-3 .col-md-offset-3&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-md-6 col-md-offset-3&quot;&gt;.col-md-6 .col-md-offset-3&lt;/div&gt;
-&lt;/div&gt;
-</code></pre><p>5、列排序</p>
-<p>通过使用 .col-md-push- 和 .col-md-pull- 类就可以很容易的改变列（column）的顺序。</p>
-<pre><code>&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-md-9 col-md-push-3&quot;&gt;.col-md-9 .col-md-push-3&lt;/div&gt;
-  &lt;div class=&quot;col-md-3 col-md-pull-9&quot;&gt;.col-md-3 .col-md-pull-9&lt;/div&gt;
-&lt;/div&gt;
-</code></pre><h5 id="三、排版"><a href="#三、排版" class="headerlink" title="三、排版"></a>三、排版</h5><p>1、标题</p>
-<p>h1到h6做为主标题 samll做为副标题</p>
-<pre><code>&lt;h1&gt;h1. Bootstrap heading &lt;small&gt;Secondary text&lt;/small&gt;&lt;/h1&gt;
-</code></pre><p>2、对齐</p>
-<pre><code>&lt;p class=&quot;text-left&quot;&gt;Left aligned text.&lt;/p&gt;
-&lt;p class=&quot;text-center&quot;&gt;Center aligned text.&lt;/p&gt;
-&lt;p class=&quot;text-right&quot;&gt;Right aligned text.&lt;/p&gt;
-&lt;p class=&quot;text-justify&quot;&gt;Justified text.&lt;/p&gt;
-&lt;p class=&quot;text-nowrap&quot;&gt;No wrap text.&lt;/p&gt;
-</code></pre><p>3、地址</p>
-<pre><code>&lt;address&gt;
-  &lt;strong&gt;Twitter, Inc.&lt;/strong&gt;&lt;br&gt;
-  795 Folsom Ave, Suite 600&lt;br&gt;
-  San Francisco, CA 94107&lt;br&gt;
-  &lt;abbr title=&quot;Phone&quot;&gt;P:&lt;/abbr&gt; (123) 456-7890
-&lt;/address&gt;
-
-&lt;address&gt;
-  &lt;strong&gt;Full Name&lt;/strong&gt;&lt;br&gt;
-  &lt;a href=&quot;mailto:#&quot;&gt;first.last@example.com&lt;/a&gt;
-&lt;/address&gt;
-</code></pre><p>4、内联列表</p>
-<pre><code>&lt;ul class=&quot;list-inline&quot;&gt;
-  &lt;li&gt;...&lt;/li&gt;
-&lt;/ul&gt;
-</code></pre><p>5、水平排列的描述</p>
-<pre><code>&lt;dl class=&quot;dl-horizontal&quot;&gt;
-  &lt;dt&gt;...&lt;/dt&gt;
-  &lt;dd&gt;...&lt;/dd&gt;
-&lt;/dl&gt;
-</code></pre><p>四、表格</p>
-<p>1、响应式表格</p>
-<p>将任何 .table 元素包裹在 .table-responsive 元素内，即可创建响应式表格，其会在小屏幕设备上（小于768px）水平滚动。当屏幕大于 768px 宽度时，水平滚动条消失。</p>
-<pre><code>&lt;div class=&quot;table-responsive&quot;&gt;
-  &lt;table class=&quot;table&quot;&gt;
-    ...
-  &lt;/table&gt;
-&lt;/div&gt;
-</code></pre><p>五、表单</p>
-<p>1、基本实例</p>
-<p>单独的表单控件会被自动赋予一些全局样式。所有设置了 .form-control 类的 <code>&lt;input&gt;</code>、<code>&lt;textarea&gt;</code> 和 <code>&lt;select&gt;</code> 元素都将被默认设置宽度属性为 width: 100%;。 将 label 元素和前面提到的控件包裹在 .form-group 中可以获得最好的排列。</p>
-<pre><code>&lt;form&gt;
-  &lt;div class=&quot;form-group&quot;&gt;
-    &lt;label for=&quot;exampleInputEmail1&quot;&gt;Email address&lt;/label&gt;
-    &lt;input type=&quot;email&quot; class=&quot;form-control&quot; id=&quot;exampleInputEmail1&quot; placeholder=&quot;Email&quot;&gt;
-  &lt;/div&gt;
-  &lt;div class=&quot;form-group&quot;&gt;
-    &lt;label for=&quot;exampleInputPassword1&quot;&gt;Password&lt;/label&gt;
-    &lt;input type=&quot;password&quot; class=&quot;form-control&quot; id=&quot;exampleInputPassword1&quot; placeholder=&quot;Password&quot;&gt;
-  &lt;/div&gt;
-  &lt;div class=&quot;form-group&quot;&gt;
-    &lt;label for=&quot;exampleInputFile&quot;&gt;File input&lt;/label&gt;
-    &lt;input type=&quot;file&quot; id=&quot;exampleInputFile&quot;&gt;
-    &lt;p class=&quot;help-block&quot;&gt;Example block-level help text here.&lt;/p&gt;
-  &lt;/div&gt;
-  &lt;div class=&quot;checkbox&quot;&gt;
-    &lt;label&gt;
-      &lt;input type=&quot;checkbox&quot;&gt; Check me out
-    &lt;/label&gt;
-  &lt;/div&gt;
-  &lt;button type=&quot;submit&quot; class=&quot;btn btn-default&quot;&gt;Submit&lt;/button&gt;
-&lt;/form&gt;
-</code></pre><p>2、…</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/bootstrap-notes/" data-id="cjc8i1vot000nn3p3rg5wd3mh" class="article-share-link">Partager</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/bootstrap/">bootstrap</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-angular-apply" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/09/14/angular-apply/" class="article-date">
-  <time datetime="2017-09-14T01:54:51.000Z" itemprop="datePublished">2017-09-14</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/angularjs/">angularjs</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/09/14/angular-apply/">理解数据绑定过程 - `$watch`, `$apply`和`$digest`</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>项目开发过程中，在自定义指令里，用jquery捕捉到事件后改变scope里的变量，模板里的变量没有发生变化。幸运的是，从中文社区找到一篇关于数据绑定过程的文章，不仅解决了这个问题，对angular的理解也更加深了一层。</p>
-<p>博文地址：<a href="http://www.angularjs.cn/A0a6" target="_blank" rel="external">理解$watch ，$apply 和 $digest — 理解数据绑定过程</a></p>
-<p>英文地址：<a href="http://angular-tips.com/blog/2013/08/watch-how-the-apply-runs-a-digest/" target="_blank" rel="external">$watch How the $apply Runs a $digest</a></p>
-<h4 id="一、浏览器循环事件和Angular-js扩展"><a href="#一、浏览器循环事件和Angular-js扩展" class="headerlink" title="一、浏览器循环事件和Angular.js扩展"></a>一、浏览器循环事件和Angular.js扩展</h4><p>我们的浏览器一直在等待事件，比如用户交互。假如你点击一个按钮或者在输入框里输入东西，事件的回调函数就会在javascript解释器里执行，然后你就可以做任何DOM操作，等回调函数执行完毕时，浏览器就会相应地对DOM做出变化。 Angular拓展了这个事件循环，生成一个<font color="#d44950">angular context</font>的执行环境（记住，这是个重要的概念），为了解释什么是<font color="#d44950">context</font>以及它如何工作，我们还需要解释更多的概念。</p>
-<h4 id="二、-watch队列（-watch-list）"><a href="#二、-watch队列（-watch-list）" class="headerlink" title="二、$watch队列（$watch list）"></a>二、$watch队列（$watch list）</h4><p>页面上绑定一个model就会向$watch队列里插入一条 $watch 。$watch 检测它监视的model是否发生了变化。</p>
-<h5 id="1、demo"><a href="#1、demo" class="headerlink" title="1、demo"></a>1、demo</h5><font color="#d44950">index.html</font>
-
-<pre><code>User: &lt;input type=&quot;text&quot; ng-model=&quot;user&quot; /&gt;
-Password: &lt;input type=&quot;password&quot; ng-model=&quot;pass&quot; /&gt;
-</code></pre><p>页面绑定了两个scope的变量，所以$watch list里面加入了两个$watch。</p>
-<h5 id="2、demo"><a href="#2、demo" class="headerlink" title="2、demo"></a>2、demo</h5><font color="#d44950">controllers.js</font>
-
-<pre><code>app.controller(&apos;MainCtrl&apos;, function($scope) {
-  $scope.foo = &quot;Foo&quot;;
-  $scope.world = &quot;World&quot;;
-});
-</code></pre><font color="#d44950">index.html</font>
-
-<pre><code>Hello, {{ World }}
-</code></pre><p>这里，即便我们在$scope上添加了两个东西，但是只有一个绑定在了UI上，因此在这里只生成了一个$watch.</p>
-<h5 id="3、demo"><a href="#3、demo" class="headerlink" title="3、demo"></a>3、demo</h5><font color="#d44950">controllers.js</font>
-
-<pre><code>app.controller(&apos;MainCtrl&apos;, function($scope) {
-  $scope.people = [...];
-});
-</code></pre><font color="#d44950">index.html</font>
-
-<pre><code>&lt;ul&gt;
-  &lt;li ng-repeat=&quot;person in people&quot;&gt;
-      {{person.name}} - {{person.age}}
-  &lt;/li&gt;
-&lt;/ul&gt;
-</code></pre><p>这里又生成了多少个$watch呢？每个person有两个（一个name，一个age），然后ng-repeat又有一个，因此10个person一共是(2 * 10) +1,也就是说有21个$watch。</p>
-<h5 id="4、总结"><a href="#4、总结" class="headerlink" title="4、总结"></a>4、总结</h5><p>因此，每一个绑定到了UI上的数据都会生成一个$watch。</p>
-<p>那这些$watch是什么时候生成的呢？</p>
-<p>当我们的模版加载完毕时，也就是在linking阶段（Angular分为compile阶段和linking阶段—译者注），Angular解释器会寻找每个directive，然后生成每个需要的$watch。</p>
-<h4 id="三、-digest循环"><a href="#三、-digest循环" class="headerlink" title="三、$digest循环"></a>三、$digest循环</h4><p>还记得我前面提到的扩展的事件循环吗？当浏览器接收到可以被angular context处理的事件时，$digest循环就会触发</p>
-<p>这个循环是由两个更小的循环组合起来的：</p>
-<p>一个处理evalAsync队列。</p>
-<p>另一个处理$watch队列，这个也是本篇博文的主题。 这个是处理什么的呢？$digest将会遍历我们的$watch</p>
-<ul>
-<li><p>嘿，$watch，你的值是什么？</p>
-<ul>
-<li>是9。</li>
-</ul>
-</li>
-<li><p>好的，它改变过吗？</p>
-<ul>
-<li>没有，先生。</li>
-</ul>
-</li>
-</ul>
-<p>*（这个变量没变过，那下一个）</p>
-<ul>
-<li><p>你呢，你的值是多少？</p>
-<ul>
-<li>报告，是Foo。</li>
-</ul>
-</li>
-<li><p>刚才改变过没？</p>
-<ul>
-<li>改变过，刚才是Bar。</li>
-</ul>
-</li>
-<li><p>（很好，我们有DOM需要更新了）</p>
-</li>
-<li><p>继续询问直到$watch队列都检查过。</p>
-</li>
-</ul>
-<p>这就是所谓的dirty-checking。</p>
-<p>既然所有的$watch都检查完了，那就要问了：有没有$watch更新过？如果有至少一个更新过，这个循环就会再次触发，直到所有的$watch都没有变化。这样就能够保证每个model都已经不会再变化。</p>
-<p>记住如果循环超过10次的话，它将会抛出一个异常，防止无限循环。</p>
-<p>当$digest循环结束时，DOM相应地变化。</p>
-<h5 id="1、demo-1"><a href="#1、demo-1" class="headerlink" title="1、demo"></a>1、demo</h5><font color="#d44950">controllers.js</font>
-
-<pre><code>app.controller(&apos;MainCtrl&apos;, function() {
-  $scope.name = &quot;Foo&quot;;
-
-  $scope.changeFoo = function() {
-      $scope.name = &quot;Bar&quot;;
-  }
-});
-</code></pre><font color="#d44950">index.html</font>
-
-<pre><code>{{ name }}
-&lt;button ng-click=&quot;changeFoo()&quot;&gt;Change the name&lt;/button&gt;
-</code></pre><p>这里我们只有一个$watch，因为ng-click不生成$watch（函数是不会变的）。</p>
-<ul>
-<li><p>按下按钮</p>
-</li>
-<li><p>浏览器接收到一个事件，进入angular context（后面会解释为什么）。</p>
-</li>
-<li><p>$digest循环开始执行，查询每个$watch是否变化。</p>
-</li>
-<li><p>由于监视$scope.name的$watch报告了变化，它会强制再执行一次$digest循环。</p>
-</li>
-<li><p>新的$digest循环没有检测到变化。</p>
-</li>
-<li><p>浏览器拿回控制权，更新与$scope.name新值相应部分的DOM。</p>
-</li>
-</ul>
-<h4 id="四、通过-apply进入angular-context"><a href="#四、通过-apply进入angular-context" class="headerlink" title="四、通过$apply进入angular context"></a>四、通过$apply进入angular context</h4><p>谁来决定什么事件可以进入angular context，而哪些又不能进入呢？$apply！</p>
-<ul>
-<li><p>如果当事件触发时，你调用$apply，它会进入angular context，如果没有调用就不会进入。</p>
-</li>
-<li><p>现在你可能会问：刚才的例子里我也没有调用$apply啊，为什么？Angular为了做了！</p>
-</li>
-<li><p>当你点击带有ng-click的元素时，事件就会被封装到一个$apply调用。</p>
-</li>
-<li><p>例如你有一个ng-model=”foo”的输入框，然后你敲一个f，事件就会这样调用$apply(“foo = ‘f’;”)。</p>
-</li>
-</ul>
-<h4 id="五、Angular什么时候不会自动为我们-apply呢？"><a href="#五、Angular什么时候不会自动为我们-apply呢？" class="headerlink" title="五、Angular什么时候不会自动为我们$apply呢？"></a>五、Angular什么时候不会自动为我们$apply呢？</h4><p>这是Angular新手共同的痛处。为什么我的jQuery不会更新我绑定的东西呢？因为jQuery没有调用$apply，事件没有进入angular context，$digest循环永远没有执行。</p>
-<h5 id="1、demo-2"><a href="#1、demo-2" class="headerlink" title="1、demo"></a>1、demo</h5><font color="#d44950">app.js</font>
-
-<pre><code>app.directive(‘clickable’, function() {
-
-return {
-  restrict: &quot;E&quot;,
-  scope: {
-    foo: &apos;=&apos;,//通过 &apos;=&apos; 双向绑定，隔离的scope得以与controller里的父scope通信
-    bar: &apos;=&apos;//双向绑定
-  },
-  template: &apos;&lt;ul style=&quot;background-color: lightblue&quot;&gt;&lt;li&gt;{{foo}}&lt;/li&gt;&lt;li&gt;{{bar}}&lt;/li&gt;&lt;/ul&gt;&apos;,
-  link: function(scope, element, attrs) {
-    element.bind(&apos;click&apos;, function() {
-      scope.foo++;
-      scope.bar++;
-    });
-  }
-}
-
-});
-
-app.controller(&apos;MainCtrl&apos;, function($scope) {
-  $scope.foo = 0;
-  $scope.bar = 0;
-});
-</code></pre><p>代码意图：将foo和bar从controller里绑定到一个list里面，每次点击这个元素的时候，foo和bar都会自增1。</p>
-<p>但是当我们点击元素ul时，发现元素没有变化还是0。</p>
-<p>这是因为点击事件是一个没有封装到$apply里的事件。虽然如此，但是scope里的变量（foo和bar）确实是自增了的，只是因为没能通过$apply进入angular context，所以模板里的dom没能得到更新。</p>
-<p>也就是说，如果我们自己执行一次$apply，那么这些$watch就会看到变化，然后根据需要更新dom。</p>
-<p>试试看看这个例子：<a href="http://jsbin.com/opimat/2/" target="_blank" rel="external">http://jsbin.com/opimat/2/</a></p>
-<ul>
-<li><p>当我们先点击ul时，像上面所讲的，虽然scope里的foo和bar都自增了，但由于element.bind(‘clilck’)事件没有封装到$apply里，所以dom没有得到更新，模板里看不到变化。</p>
-</li>
-<li><p>但当我们点击 change hello按钮时，由于ng-click事件被封装到了$apply里，所以进入了angular context里，$digest循环执行，询问每个$watch时，发现不仅$sopce.hello的值发生了变化，scope.foo和scope.bar也发生了变化。</p>
-</li>
-<li><p>浏览器更新dom时，就可以看到三处变化了。</p>
-</li>
-</ul>
-<h5 id="2、demo-1"><a href="#2、demo-1" class="headerlink" title="2、demo"></a>2、demo</h5><p>现在你在想那并不是你想要的，你想要的是点击蓝色区域的时候就更新点击数。</p>
-<p>a、很简单，执行一下$apply就可以了：</p>
-<pre><code>element.bind(&apos;click&apos;, function() {
-  scope.foo++;
-  scope.bar++;
-
-  scope.$apply();
-});
-</code></pre><p>$apply是我们的$scope（或者是direcvie里的link函数中的scope）的一个函数，调用它会强制一次$digest循环（除非当前正在执行循环，这种情况下会抛出一个异常，这是我们不需要在那里执行$apply的标志）。</p>
-<p>试试看：<a href="http://jsbin.com/opimat/3/edit" target="_blank" rel="external">http://jsbin.com/opimat/3/edit</a></p>
-<p>b、有用啦，但是有一种更好的使用$apply的方法：</p>
-<pre><code>element.bind(&apos;click&apos;, function() {
-  scope.$apply(function() {
-      scope.foo++;
-      scope.bar++;
-  });
-})
-</code></pre><p>有什么不一样的？差别就是在第一个版本中，我们是在angular context的外面更新的数据，如果有发生错误，Angular永远不知道。很明显在这个像个小玩具的例子里面不会出什么大错，但是想象一下我们如果有个alert框显示错误给用户，然后我们有个第三方的库进行一个网络调用然后失败了，如果我们不把它封装进$apply里面，Angular永远不会知道失败了，alert框就永远不会弹出来了。</p>
-<h4 id="六、使用-watch-来监视你自己的东西"><a href="#六、使用-watch-来监视你自己的东西" class="headerlink" title="六、使用 $watch 来监视你自己的东西"></a>六、使用 $watch 来监视你自己的东西</h4><p>你已经知道了我们设置的任何绑定都有一个它自己的$watch，当需要时更新DOM，但是我们如果要自定义自己的watches呢？简单</p>
-<h5 id="1、demo-3"><a href="#1、demo-3" class="headerlink" title="1、demo"></a>1、demo</h5><font color="#d44950">app.js</font>
-
-<pre><code>app.controller(&apos;MainCtrl&apos;, function($scope) {
-  $scope.name = &quot;Angular&quot;;
-
-  $scope.updated = -1;
-
-  $scope.$watch(&apos;name&apos;, function() {
-    $scope.updated++;
-  });
-});
-</code></pre><font color="#d44950">index.html</font>
-
-<pre><code>&lt;body ng-controller=&quot;MainCtrl&quot;&gt;
-  &lt;input ng-model=&quot;name&quot; /&gt;
-  Name updated: {{updated}} times.
-&lt;/body&gt;
-</code></pre><p>这就我们创造的一个新的$watch方法。</p>
-<ul>
-<li><p>第一个参数是一个字符串或函数，在这里只是一个字符串，就是我们要监视的变量的名字。</p>
-</li>
-<li><p>第二个参数是一个回调函数，当变量发生变化时被调用。</p>
-</li>
-<li><p>我们要知道的第一件事就是当controller执行到这个 $watch 时，它会立即执行一次，困此我们设置updated为 -1 。</p>
-</li>
-</ul>
-<p>试试看：<a href="http://jsbin.com/ucaxan/1/edit" target="_blank" rel="external">http://jsbin.com/ucaxan/1/edit</a></p>
-<h5 id="2、demo-2"><a href="#2、demo-2" class="headerlink" title="2、demo"></a>2、demo</h5><font color="#d44950">app.js</font>
-
-<pre><code>app.controller(&apos;MainCtrl&apos;, function($scope) {
-  $scope.name = &quot;Angular&quot;;
-
-  $scope.updated = 0;
-
-  $scope.$watch(&apos;name&apos;, function(newValue, oldValue) {
-    if (newValue === oldValue) { return; } // AKA first run
-    $scope.updated++;
-  });
-});
-</code></pre><font color="#d44950">index.html</font>
-
-<pre><code>&lt;body ng-controller=&quot;MainCtrl&quot;&gt;
-  &lt;input ng-model=&quot;name&quot; /&gt;
-  Name updated: {{updated}} times.
-&lt;/body&gt;
-</code></pre><ul>
-<li><p>watch的第二个参数接受两个参数，新值和旧值。</p>
-</li>
-<li><p>我们可以用他们来略过第一次的执行。</p>
-</li>
-<li><p>通常你不需要略过第一次执行，但在这个例子里面你是需要的。灵活点嘛少年。</p>
-</li>
-</ul>
-<h5 id="3、demo-1"><a href="#3、demo-1" class="headerlink" title="3、demo"></a>3、demo</h5><font color="#d44950">app.js</font>
-
-<pre><code>app.controller(&apos;MainCtrl&apos;, function($scope) {
-  $scope.user = { name: &quot;Fox&quot; };
-
-  $scope.updated = 0;
-
-  $scope.$watch(&apos;user&apos;, function(newValue, oldValue) {
-    if (newValue === oldValue) { return; }
-    $scope.updated++;
-  });
-});
-</code></pre><font color="#d44950">index.html</font>
-
-<pre><code>&lt;body ng-controller=&quot;MainCtrl&quot;&gt;
-  &lt;input ng-model=&quot;user.name&quot; /&gt;
-  Name updated: {{updated}} times.
-&lt;/body&gt;
-</code></pre><p>我们想要监视$scope.user对象里的任何变化，和以前一样这里只是用一个对象来代替前面的字符串。</p>
-<p>试试看：<a href="http://jsbin.com/ucaxan/3/edit" target="_blank" rel="external">http://jsbin.com/ucaxan/3/edit</a></p>
-<ul>
-<li><p>没用，为啥？</p>
-</li>
-<li><p>因为$watch默认是比较两个对象所引用的是否相同，在例子1和2里面，每次更改$scope.name都会创建一个新的基本变量，因此$watch会执行，因为对这个变量的引用已经改变了。</p>
-</li>
-<li><p>在上面的例子里，我们在监视$scope.user，当我们改变$scope.user.name时，对$scope.user的引用是不会改变的，我们只是每次创建了一个新的$scope.user.name，但是$scope.user永远是一样的。</p>
-</li>
-</ul>
-<h5 id="4、demo"><a href="#4、demo" class="headerlink" title="4、demo"></a>4、demo</h5><font color="#d44950">app.js</font>
-
-<pre><code>app.controller(&apos;MainCtrl&apos;, function($scope) {
-  $scope.user = { name: &quot;Fox&quot; };
-
-  $scope.updated = 0;
-
-  $scope.$watch(&apos;user&apos;, function(newValue, oldValue) {
-    if (newValue === oldValue) { return; }
-    $scope.updated++;
-  }, true);
-});
-</code></pre><font color="#d44950">index.html</font>
-
-<pre><code>&lt;body ng-controller=&quot;MainCtrl&quot;&gt;
-  &lt;input ng-model=&quot;user.name&quot; /&gt;
-  Name updated: {{updated}} times.
-&lt;/body&gt;
-</code></pre><p>试试看：<a href="http://jsbin.com/ucaxan/4/edit" target="_blank" rel="external">http://jsbin.com/ucaxan/4/edit</a></p>
-<ul>
-<li><p>现在有用了吧！因为我们对$watch加入了第三个参数，它是一个bool类型的参数，表示的是我们比较的是对象的值而不是引用。</p>
-</li>
-<li><p>由于当我们更新$scope.user.name时$scope.user也会改变，所以能够正确触发。</p>
-</li>
-</ul>
-<h4 id="七、总结"><a href="#七、总结" class="headerlink" title="七、总结"></a>七、总结</h4><p>1、好吧，我希望你们已经学会了在Angular中数据绑定是如何工作的。我猜想你的第一印象是dirty-checking很慢，好吧，其实是不对的。它像闪电般快。但是，是的，如果你在一个模版里有2000-3000个watch，它会开始变慢。但是我觉得如果你达到这个数量级，就可以找个用户体验专家咨询一下了</p>
-<p>2、无论如何，随着ECMAScript6的到来，在Angular未来的版本里我们将会有Object.observe那样会极大改善$digest循环的速度。同时未来的文章也会涉及一些tips&amp;tricks。</p>
-<p>3、另一方面，这个主题并不容易，如果你发现我落下了什么重要的东西或者有什么东西完全错了，请在github上提交问题或提交修正。</p>
-<h4 id="八、回到总题"><a href="#八、回到总题" class="headerlink" title="八、回到总题"></a>八、回到总题</h4><p>总结：数据绑定机制：</p>
-<p>1、angular发现一个model就会向$watch list里插入一个$watch，用来监测这个model是否发生了变化 。</p>
-<p>2、当事件触发后，比如ng-click，事件就会被封装到一个$apply。$apply决定了哪些事件触发后可以进入angular context，哪些事件触发后不会进入到angular context。</p>
-<p>3、$apply调用后，进入到angular context。</p>
-<p>4、$digest循环执行，询问每个$watch，看看它监测的model有没有发生变化。</p>
-<p>5、有变化再循环，直到没有发现变化为止。</p>
-<p>6、浏览器拿回控制权，更新相应的dom。</p>
-<p>这也就解释了为什么jquery改变scope的变量时，为什么dom没有更新。因为jQuery没有调用$apply，事件没有进入angular context，$digest循环永远没有执行。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/angular-apply/" data-id="cjc8i1vnh0001n3p3z06vxrk7" class="article-share-link">Partager</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-angular-directive" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/09/14/angular-directive/" class="article-date">
-  <time datetime="2017-09-14T01:30:09.000Z" itemprop="datePublished">2017-09-14</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/angularjs/">angularjs</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/09/14/angular-directive/">angularJS中的指令directive</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>原文：</p>
-<p><a href="http://blog.jobbole.com/62249/" target="_blank" rel="external">AngularJS 指令实践指南（一）</a></p>
-<p><a href="http://blog.jobbole.com/62999/" target="_blank" rel="external">AngularJS 指令实践指南（二）</a></p>
-<h4 id="一、创建自定义指令"><a href="#一、创建自定义指令" class="headerlink" title="一、创建自定义指令"></a>一、创建自定义指令</h4><pre><code>var app = angular.module(&apos;myapp&apos;, []);
-
-app.directive(&apos;rabbitHeader&apos;, function() {
-  return {
-      restrict: &apos;AE&apos;,
-      replace: &apos;true&apos;,
-      template: &apos;&lt;h3&gt;Hello World!!&lt;/h3&gt;&apos;
-  };
-});
-</code></pre><h5 id="1、表现形式"><a href="#1、表现形式" class="headerlink" title="1、表现形式"></a>1、表现形式</h5><ul>
-<li><p>html元素名</p>
-<pre><code>&lt;rabbit-header&gt;&lt;/rabbit-header&gt;
-</code></pre></li>
-<li><p>元素的属性</p>
-<pre><code>&lt;div rabbit-header&gt;&lt;/div&gt;
-</code></pre></li>
-<li><p>类名        </p>
-<pre><code>&lt;div class=&quot;rabbit-header&quot;&gt;&lt;/div&gt;    
-</code></pre></li>
-<li><p>注释</p>
-<pre><code>&lt;!-- directive: rabbit-header --&gt;
-</code></pre></li>
-</ul>
-<h5 id="2、属性"><a href="#2、属性" class="headerlink" title="2、属性"></a>2、属性</h5><p><em>restrict:</em></p>
-<ul>
-<li><p>A：只限属性使用</p>
-</li>
-<li><p>C：只限类名使用</p>
-</li>
-<li><p>E：只限元素名使用</p>
-</li>
-<li><p>M：只限注释使用</p>
-</li>
-</ul>
-<p><em>template | templateUrl</em></p>
-<ul>
-<li><p>template: 不一定要是简单的字符串，可以包含其它指令或表达式{} 等</p>
-</li>
-<li><p>templateUrl: 指向模板的一个地址</p>
-</li>
-</ul>
-<p><em>replace</em></p>
-<ul>
-<li><p>true: 生成的html内容会替换掉定义此指令的html</p>
-</li>
-<li><p>false: 生成的html内容会插入到定义此指令的元素中</p>
-</li>
-</ul>
-<h5 id="3、Link函数和Scope"><a href="#3、Link函数和Scope" class="headerlink" title="3、Link函数和Scope"></a>3、Link函数和Scope</h5><ul>
-<li><p>默认情况下指令不会创建新的子scope。</p>
-</li>
-<li><p>如果指令存在于一个controller下，它会使用这个contoller的scope。</p>
-</li>
-<li><p>指令的scope在link函数中使用。</p>
-</li>
-</ul>
-<p>index.html</p>
-<pre><code>&lt;body ng-controller=&quot;MainCtrl&quot;&gt;
-  &lt;input type=&quot;text&quot; ng-model=&quot;color&quot; placeholder=&quot;Enter a color&quot; /&gt;
-  &lt;hello-world&gt;&lt;/hello-world&gt;
-&lt;/body&gt;
-</code></pre><p>app.js</p>
-<pre><code>app.directive(&apos;helloWorld&apos;, function() {
-  return {
-    restrict: &apos;AE&apos;,
-    replace: true,
-    template: &apos;&lt;p style=&quot;background-color:{{color}}&quot;&gt;Hello World&apos;,
-    link: function(scope, elem, attrs) {
-      elem.bind(&apos;click&apos;, function() {
-        elem.css(&apos;background-color&apos;, &apos;white&apos;);
-        scope.$apply(function() {
-          scope.color = &quot;white&quot;;
-        });
-      });
-      elem.bind(&apos;mouseover&apos;, function() {
-        elem.css(&apos;cursor&apos;, &apos;pointer&apos;);
-      });
+        <p>字节流通向字符流的转换流:字符流Reader的子类InputStreamReader </p>
+<pre><code>public class Demo16 {
+    public static void main(String[] args) throws IOException {
+        //字节流
+        InputStream in = System.in;
+
+        //字节流转换成字符流，转换流
+        InputStreamReader isr = new InputStreamReader(in);
+
+        //高效字符流
+        BufferedReader bufr = new BufferedReader(isr);
+
+        String line = null;
+        while((line = bufr.readLine()) != null) {
+            if(line.equals(&quot;over&quot;))
+                break;
+            System.out.println(line.toUpperCase());
+        }
     }
-  };
-});
-</code></pre><p>link函数中的三个参数：</p>
-<ul>
-<li><p>scope - 在这个例子中，指令的scope就是controller的scope。</p>
-</li>
-<li><p>ele - 指令的jQLite(jQuery的子集)包装DOM元素。如果你在引入AngularJS之前引入了jQuery，那么这个元素就是jQuery元素，而不是jQLite元素。由于这个元素已经被jQuery/jQLite包装了，所以我们就在进行DOM操作的时候就不需要再使用 $()来进行包装。</p>
-</li>
-<li><p>attr - 一个包含了指令所在元素的属性的标准化的参数对象。举个例子，你给一个HTML元素添加了一些属性：，那么可以在 link 函数中通过 attrs.someAttribute 来使用它。</p>
-</li>
-</ul>
-<p>link函数主要用来为DOM元素添加事件监听、监视模型属性变化、以及更新DOM。</p>
-<p>在上面的指令代码片段中，我们添加了两个事件， click，和 mouseover。click 处理函数用来重置的背景色，而 mouseover 处理函数改变鼠标为 pointer。在模板中有一个表达式 {color}，当父scope中的 color 发生变化时，它用来改变 Hello World 文字的背景色。 这个plunker演示了这些概念</p>
-<h5 id="4、compile函数"><a href="#4、compile函数" class="headerlink" title="4、compile函数"></a>4、compile函数</h5><p>compile 函数在 link 函数被执行之前用来做一些DOM改造。它接收下面的参数：</p>
-<ul>
-<li>tElement – 指令所在的元素</li>
-<li>attrs – 元素上赋予的参数的标准化列表</li>
-</ul>
-<p>要注意的是 compile 函数不能访问 scope，并且必须返回一个 link 函数。但是如果没有设置 compile 函数，你可以正常地配置 link 函数，（有了compile，就不能用link，link函数由compile返回）。compile函数可以写成如下的形式：</p>
-<pre><code>app.directive(&apos;test&apos;, function() {
-  return {
-    compile: function(tElem,attrs) {
-      //do optional DOM transformation here
-      return function(scope,elem,attrs) {
-        //linking function here
-      };
-    }
-  };
-});
-</code></pre><p>大多数的情况下，你只需要使用 link 函数。这是因为大部分的指令只需要考虑注册事件监听、监视模型、以及更新DOM等，这些都可以在 link 函数中完成。 但是对于像 ng-repeat 之类的指令，需要克隆和重复 DOM 元素多次，在 link 函数执行之前由 compile 函数来完成。这就带来了一个问题，为什么我们需要两个分开的函数来完成生成过程，为什么不能只使用一个？要回答好这个问题，我们需要理解指令在Angular中是如何被编译的！</p>
-<h5 id="5、指令是如何被编译的"><a href="#5、指令是如何被编译的" class="headerlink" title="5、指令是如何被编译的"></a>5、指令是如何被编译的</h5><p>1、编译阶段 compile</p>
-<ul>
-<li><p>angular应用启动后，$compile服务遍历所有DOM元素。</p>
-</li>
-<li><p>所有指令都被识别后，angular执行他们的compile方法。</p>
-</li>
-<li><p>compile 方法返回一个 link 函数，被添加到稍后执行的 link 函数列表中。</p>
-</li>
-</ul>
-<p>2、链接阶段 linking</p>
-<ul>
-<li><p>所有收集到的link函数都将被一一执行。</p>
-</li>
-<li><p>指令创造出来的模板会在正确的scope下被解析和处理，然后返回具有事件响应的真实的DOM节点。</p>
-</li>
-</ul>
-<h5 id="6、改变指令的Scope"><a href="#6、改变指令的Scope" class="headerlink" title="6、改变指令的Scope"></a>6、改变指令的Scope</h5><p>默认情况下，指令获取它父节点的controller的scope。</p>
-<p>如果将父controller的scope暴露给指令，那么他们可以随意地修改 scope 的属性。</p>
-<p>在某些情况下，你的指令希望能够添加一些仅限内部使用的属性和方法。但是如果我们在父的scope中添加，会污染父scope。</p>
-<p>所以我们可以选择以下两种方式：</p>
-<ul>
-<li><p>一个子scope – 这个scope原型继承子父scope。</p>
-<pre><code>app.directive(&apos;helloWorld&apos;, function() {
-  return {
-    scope: true,  // use a child scope that inherits from parent
-    restrict: &apos;AE&apos;,
-    replace: &apos;true&apos;,
-    template: &apos;&lt;h3&gt;Hello World!!&lt;/h3&gt;&apos;
-  };
-});
-</code></pre></li>
-<li><p>一个隔离的scope – 一个孤立存在不继承自父scope的scope。</p>
-<pre><code>app.directive(&apos;helloWorld&apos;, function() {
-  return {
-    scope: {},  // use a new isolated scope
-    restrict: &apos;AE&apos;,
-    replace: &apos;true&apos;,
-    template: &apos;&lt;h3&gt;Hello World!!&lt;/h3&gt;&apos;
-  };
-});
-</code></pre></li>
-</ul>
-<p>这个指令使用了一个隔离的scope。</p>
-<p>隔离的scope在我们想要创建可重用的指令的时候是非常有好处的。</p>
-<p>通过使用隔离的scope，我们能够保证我们的指令是自包含的，可以被很容易的插入到HTML应用中。</p>
-<p>它内部不能访问父的scope，所保证了父scope不被污染。</p>
-<p>在我们的 helloWorld 指令例子中，如果我们将 scope 设置成 {}，那么上面的代码将不会工作。 它会创建一个新的隔离的scope，那么相应的表达式 { color } 会指向到这个新的scope中，它的值将是 undefined.</p>
-<p>使用隔离的scope并不意味着我们完全不能访问父scope的属性。其实有一些技术可以允许我们访问父scope的属性，甚至监视他们的变化。</p>
-<h4 id="二、隔离scope与父scope通信"><a href="#二、隔离scope与父scope通信" class="headerlink" title="二、隔离scope与父scope通信"></a>二、隔离scope与父scope通信</h4><h5 id="1、隔离scope与父scope之间的数据绑定"><a href="#1、隔离scope与父scope之间的数据绑定" class="headerlink" title="1、隔离scope与父scope之间的数据绑定"></a>1、隔离scope与父scope之间的数据绑定</h5><p>假设我们已经初始化完成app这个变量所指向的Angular模块。那么我们的 helloWorld 指令如下面代码所示：</p>
-<pre><code>app.directive(&apos;helloWorld&apos;, function() {
-  return {
-    scope: {},
-    restrict: &apos;AE&apos;,
-    replace: true,
-    template: &apos;&lt;p style=&quot;background-color:{{color}}&quot;&gt;Hello World&lt;/p&gt;&apos;,
-    link: function(scope, elem, attrs) {
-      elem.bind(&apos;click&apos;, function() {
-        elem.css(&apos;background-color&apos;,&apos;white&apos;);
-        scope.$apply(function() {
-          scope.color = &quot;white&quot;;
-        });
-      });
-      elem.bind(&apos;mouseover&apos;, function() {
-        elem.css(&apos;cursor&apos;, &apos;pointer&apos;);
-      });
-    }
-  };
-});
-</code></pre><p>使用这个指令的HTML标签如下：</p>
-<pre><code>&lt;body ng-controller=&quot;MainCtrl&quot;&gt;
-  &lt;input type=&quot;text&quot; ng-model=&quot;color&quot; placeholder=&quot;Enter a color&quot;/&gt;
-  &lt;hello-world/&gt;
-&lt;/body&gt;
-</code></pre><p>上面的代码现在是不能工作的。因为我们用了一个隔离的scope，指令内部的 {color} 表达式被隔离在指令内部的scope中(不是父scope)。</p>
-<p>但是外面的输入框元素中的 ng-model 指令是指向父scope中的 color 属性的。</p>
-<p>所以，我们需要一种方式来绑定隔离scope和父scope中的这两个参数。</p>
-<p>在Angular中，这种数据绑定可以通过为指令所在的HTML元素添加属性和在指令定义对象中配置相应的 scope 属性来实现。</p>
-<p>让我们来细究一下建立数据绑定的几种方式。</p>
-<h5 id="选择一：使用-实现单向文本绑定"><a href="#选择一：使用-实现单向文本绑定" class="headerlink" title="选择一：使用 @ 实现单向文本绑定"></a>选择一：使用 @ 实现单向文本绑定</h5><p>在下面的指令定义中，我们指定了隔离scope中的属性 color 绑定到指令所在HTML元素上的参数 colorAttr。</p>
-<p>在HTML标记中，你可以看到 {color}表达式被指定给了 color-attr 参数。当表达式的值发生改变时，color-attr 参数也跟着改变。隔离scope中的 color 属性的值也相应地被改变。</p>
-<pre><code>app.directive(&apos;helloWorld&apos;, function() {
-  return {
-    scope: {
-      color: &apos;@colorAttr&apos;
-    },
-    ....
-    // the rest of the configurations
-  };
-});
-</code></pre><p>更新后的HTML标记代码如下：</p>
-<pre><code>&lt;body ng-controller=&quot;MainCtrl&quot;&gt;
-  &lt;input type=&quot;text&quot; ng-model=&quot;color&quot; placeholder=&quot;Enter a color&quot;/&gt;
-  &lt;hello-world color-attr=&quot;{{color}}&quot;/&gt;
-&lt;/body&gt;
-</code></pre><p>我们称这种方式为单项绑定，是因为在这种方式下，你只能将字符串(使用表达式)传递给参数。</p>
-<p>当父scope的属性变化时，你的隔离scope模型中的属性值跟着变化。你甚至可以在指令内部监控这个scope属性的变化，并且触发一些任务。</p>
-<p>然而，反向的传递并不工作。你不能通过对隔离scope属性的操作来改变父scope的值。</p>
-<p>注意点：<br>当隔离scope属性和指令元素参数的名字一样时，你可以以更简单的方式设置scope绑定：</p>
-<pre><code>app.directive(&apos;helloWorld&apos;, function() {
-  return {
-    scope: {
-      color: &apos;@&apos;
-    },
-    ....
-    // the rest of the configurations
-  };
-});
-</code></pre><p>相应使用指令的HTML代码如下：</p>
-<hello-world color="">
-
-<h5 id="选择二：使用-实现双向绑定"><a href="#选择二：使用-实现双向绑定" class="headerlink" title="选择二：使用 = 实现双向绑定"></a>选择二：使用 = 实现双向绑定</h5><p>让我们将指令的定义改变成下面的样子：</p>
-<pre><code>app.directive(&apos;helloWorld&apos;, function() {
-  return {
-    scope: {
-      color: &apos;=&apos;
-    },
-    ....
-    // the rest of the configurations
-  };
-});
-</code></pre><p>相应的HTML修改如下：</p>
-<pre><code>&lt;body ng-controller=&quot;MainCtrl&quot;&gt;
-  &lt;input type=&quot;text&quot; ng-model=&quot;color&quot; placeholder=&quot;Enter a color&quot;/&gt;
-  &lt;hello-world color=&quot;color&quot;/&gt;
-&lt;/body&gt;
-</code></pre><p>与 @ 不同，这种方式让你能够给属性指定一个真实的scope数据模型，而不是简单的字符串。</p>
-<p>这样你就可以传递简单的字符串、数组、甚至复杂的对象给隔离scope。</p>
-<p>同时，还支持双向的绑定。每当父scope属性变化时，相对应的隔离scope中的属性也跟着改变，反之亦然。</p>
-<p>和之前的一样，你也可以监视这个scope属性的变化。</p>
-<h5 id="选择三：使用-amp-在父scope中执行函数"><a href="#选择三：使用-amp-在父scope中执行函数" class="headerlink" title="选择三：使用 &amp; 在父scope中执行函数"></a>选择三：使用 &amp; 在父scope中执行函数</h5><p>有时候从隔离scope中调用父scope中定义的函数是非常有必要的。为了能够访问外部scope中定义的函数，我们使用 &amp;。</p>
-<p>比如我们想要从指令内部调用 changColor() 方法。下面的代码告诉我们该怎么做：</p>
-<pre><code>app.directive(&apos;helloWorld&apos;,function(){
-  return{
-    scope:{
-      color:&apos;=&apos;,
-      changeColor:&apos;&amp;&apos;,
-    },
-    ...
-  }
-});
-</code></pre><p>相应的HTML代码如下：</p>
-<pre><code>&lt;body ng-controller=&quot;MainCtrl&quot;&gt;
-    &lt;input type=&quot;text&quot; ng-model=&quot;color&quot; placeholder=&quot;Enter a color&quot;/&gt;
-    &lt;hello-world color=&quot;color&quot; change-color=&apos;change()&apos;/&gt;
-&lt;/body&gt;
-</code></pre><p>这个 <a href="http://plnkr.co/edit/k4scWKwtGBJw7lfKGqVJ?p=preview" target="_blank" rel="external">Plunker</a> 例子对上面的概念做了很好的诠释。</p>
-<h5 id="2、父scope、子scope以及隔离scope的区别"><a href="#2、父scope、子scope以及隔离scope的区别" class="headerlink" title="2、父scope、子scope以及隔离scope的区别"></a>2、父scope、子scope以及隔离scope的区别</h5><p>下面的这个原则也许可以帮助你为你的指令选择正确的scope。</p>
-<ul>
-<li><p>父scope(scope: false) – 这是默认情况。如果你的指令不操作父scoe的属性，你就不需要一个新的scope。这种情况下是可以使用父scope的。</p>
-</li>
-<li><p>子scope(scope: true) – 这会为指令创建一个新的scope，并且原型继承自父scope。如果你的指令scope中的属性和方法与其他的指令以及父scope都没有关系的时候，你应该创建一个新scope。在这种方式下，你同样拥有父scope中所定义的属性和方法。</p>
-</li>
-<li><p>隔离scope(scope:{}) – 这就像一个沙箱！当你创建的指令是自包含的并且可重用的，你就需要使用这种scope。你在指令中会创建很多scope属性和方法，它们仅在指令内部使用，永远不会被外部的世界所知晓。如果是这样的话，隔离的scope是更好的选择。隔离的scope不会继承父scope。</p>
-</li>
-</ul>
-<h4 id="三、Transclusion（嵌入）"><a href="#三、Transclusion（嵌入）" class="headerlink" title="三、Transclusion（嵌入）"></a>三、Transclusion（嵌入）</h4><p>Transclusion可以让我们的指令包含任意内容的方法。</p>
-<p>如果你在指令定义中设置 transclude:true，一个新的嵌入的scope会被创建，它原型继承自父scope。</p>
-<p>如果你想要你的指令使用隔离的scope，但是它所包含的内容能够在父scope中执行，transclusion也可以帮忙。</p>
-<h5 id="1、demo"><a href="#1、demo" class="headerlink" title="1、demo"></a>1、demo</h5><p>假设我们注册一个如下的指令：</p>
-<pre><code>app.directive(&apos;outputText&apos;, function() {
-  return {
-    transclude: true,
-    scope: {},
-    template: &apos;&lt;div ng-transclude&gt;&lt;/div&gt;&apos;
-  };
-});
-</code></pre><p>它使用如下：</p>
-<pre><code>&lt;div output-text&gt;
-  &lt;p&gt;Hello {{name}}&lt;/p&gt;
-&lt;/div&gt;
-</code></pre><p>在这个例子中DOM内容 </p><p>Hello {name}</p> 被提取和放置到 <div ng-transclude=""></div> 内部。<p></p>
-<p>表达式{name}所对应的属性是在父scope中被定义的，而非子scope。</p>
-<p>你可以在这个 <a href="http://plnkr.co/edit/YQBPB9cvGgJiYMuIjzTw?p=preview" target="_blank" rel="external">Plunker</a> 例子中做一些实验。</p>
-<h5 id="2、transclude-’element’-和-transclude-true的区别"><a href="#2、transclude-’element’-和-transclude-true的区别" class="headerlink" title="2、transclude:’element’ 和 transclude:true的区别"></a>2、transclude:’element’ 和 transclude:true的区别</h5><p>有时候我我们要嵌入指令元素本身，而不仅仅是它的内容。在这种情况下，我们需要使用 transclude:’element’。</p>
-<p>它和 transclude:true 不同，它将标记了 ng-transclude 指令的元素一起包含到了指令模板中。</p>
-<p>使用transclusion，你的link函数会获得一个名叫 transclude 的链接函数，这个函数绑定了正确的指令scope，并且传入了另一个拥有被嵌入DOM元素拷贝的函数。</p>
-<p>你可以在这个 transclude 函数中执行比如修改元素拷贝或者将它添加到DOM上等操作。 类似 ng-repeat 这样的指令使用这种方式来重复DOM元素。</p>
-<p>仔细研究一下这个Plunker，它使用这种方式复制了DOM元素，并且改变了第二个实例的背景色。</p>
-<p>同样需要注意的是，在使用 transclude:’element’的时候，指令所在的元素会被转换成HTML注释。</p>
-<p>所以，如果你结合使用 transclude:’element’ 和 replace:false，那么指令模板本质上是被添加到了注释的innerHTML中——也就是说其实什么都没有发生！</p>
-<p>相反，如果你选择使用 replace:true，指令模板会替换HTML注释，那么一切就会如果所愿的工作。</p>
-<p>使用 replade:false 和 transclue:’element’有时候也是有用的，比如当你需要重复DOM元素但是并不想保留第一个元素实例（它会被转换成注释）的情况下。对这块还有疑惑的同学可以阅读stackoverflow上的这篇讨论，介绍的比较清晰。</p>
-<h4 id="四、controller-函数和-require"><a href="#四、controller-函数和-require" class="headerlink" title="四、controller 函数和 require"></a>四、controller 函数和 require</h4><p>如果想让指令与指令交互，就要用到controller函数。比如有些情况下，你需要通过组合两个指令来实现一个UI组件。那么你可以通过如下的方式来给指令添加一个 controller 函数。</p>
-<pre><code>app.directive(&apos;outerDirective&apos;, function() {
-  return {
-    scope: {},
-    restrict: &apos;AE&apos;,
-    controller: function($scope, $compile, $http) {
-      // $scope is the appropriate scope for the directive
-      this.addChild = function(nestedDirective) { // this refers to the controller
-        console.log(&apos;Got the message from nested directive:&apos; + nestedDirective.message);
-      };
-    }
-  };
-});
-</code></pre><p>这个代码为一个名叫 outerDirective的指令添加了controller。</p>
-<p>当另一个指令 innerDirective 想要与指令outerDirective交互时，innterDirective 需要声明对 outerDirective 的 controller 实例的引用(require)。</p>
-<p>可以通过如下的方式实现：</p>
-<pre><code>app.directive(&apos;innerDirective&apos;, function() {
-  return {
-    scope: {},
-    restrict: &apos;AE&apos;,
-    require: &apos;^outerDirective&apos;,
-    link: function(scope, elem, attrs, controllerInstance) {
-      //the fourth argument is the controller instance you require
-      scope.message = &quot;Hi, Parent directive&quot;;
-      controllerInstance.addChild(scope);
-    }
-  };
-});
-</code></pre><p>相应的HTML代码如下：</p>
-<pre><code>&lt;outer-directive&gt;
-  &lt;inner-directive&gt;&lt;/inner-directive&gt;
-&lt;/outer-directive&gt;
-</code></pre><p>require: ‘^outerDirective’ 告诉Angular在元素以及它的父元素outerDirective中搜索controller。</p>
-<p>这样被找到的 controller 实例会作为第四个参数controllerInstance被传入到 link 函数中。</p>
-<p>在我们的例子中，我们将嵌入的指令的scope发送给父亲指令。</p>
-<p>如果你想尝试这个代码的话，请在开启浏览器控制台的情况下打开这个<a href="http://plnkr.co/edit/NMWGE6l9p1tBZh3jCfKn?p=preview" target="_blank" rel="external">Plunker</a>。</p>
-<p>同时，<a href="https://docs.angularjs.org/guide/directive" target="_blank" rel="external">这篇Angular官方文档</a>上的最后部分给了一个非常好的关于指令交互的例子，是非常值得一读的。</p>
-<h4 id="五、一个记事本的应用"><a href="#五、一个记事本的应用" class="headerlink" title="五、一个记事本的应用"></a>五、一个记事本的应用</h4><p>这一部分，我们使用Angular指令创建一个简单的记事本应用。我们会使用HTML5的 localStorage 来存储笔记。</p>
-<p>我们会创建一个展现记事本的指令。</p>
-<p>用户可以查看他/她创建过的笔记记录。当他点击 add new 按钮的时候，记事本会进入可编辑状态，并且允许创建新的笔记。当点击 back 按钮的时候，新的笔记会被自动保存。笔记的保存使用了一个名叫 noteFactory 的工厂类，它使用了 localStorage。</p>
-<p>你可以从<a href="https://github.com/jsprodotcom/source/blob/master/AngularJS_Note_Taker-source_code.zip" target="_blank" rel="external">GitHub</a>上下到这个Demo的源代码。</p>
-<h4 id="六、总结"><a href="#六、总结" class="headerlink" title="六、总结"></a>六、总结</h4><p>一个很重要的点需要注意的是，任何使用jQuery能做的事情，我们都能用Angular指令来做到，并且使用更少的代码。</p>
-<p>所以，在使用jQuery之前，请考虑一下我们能否在不进行DOM操作的情况下以更好的方式来完成任务。试着使用Angular来最小化jQuery的使用吧。</p>
-</hello-world>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/angular-directive/" data-id="cjc8i1vnr0004n3p3yflhmldu" class="article-share-link">Partager</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-angular-errors" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/09/14/angular-errors/" class="article-date">
-  <time datetime="2017-09-14T01:23:54.000Z" itemprop="datePublished">2017-09-14</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/angularjs/">angularjs</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/09/14/angular-errors/">angular应用中常见问题记录</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h5 id="1、问题：Template-for-directive-‘rabbitFooter’-must-have-exactly-one-root-element"><a href="#1、问题：Template-for-directive-‘rabbitFooter’-must-have-exactly-one-root-element" class="headerlink" title="1、问题：Template for directive ‘rabbitFooter’ must have exactly one root element"></a>1、问题：Template for directive ‘rabbitFooter’ must have exactly one root element</h5><p>控制台报错：angular.js?bust=1463908350577:13550 Error: [$compile:tplrt] Template for directive ‘rabbitFooter’ must have exactly one root element. ../../../template/tplIndex/rabbitFooter.html</p>
-<p>指令rabbitFooter对应的模板：</p>
-<pre><code>&lt;!--s footer--&gt;
-&lt;div class=&quot;footerbox&quot;&gt;
-    &lt;div class=&quot;footercon&quot;&gt;
-        ...
-    &lt;/div&gt;
-    &lt;div class=&quot;copybox&quot;&gt;
-        ...
-    &lt;/div&gt;
-    &lt;!--
-    &lt;div class=&quot;authpics&quot;&gt;
-        ...
-    &lt;/div&gt;--&gt;
-&lt;/div&gt;
-&lt;!--e footer--&gt;
-</code></pre><p>解决方案：保证模板的所有代码要有一个最外层的DIV，最外层注释也不要有。</p>
-<pre><code>&lt;div class=&quot;footerbox&quot;&gt;
-    &lt;div class=&quot;footercon&quot;&gt;
-        ...
-    &lt;/div&gt;
-    &lt;div class=&quot;copybox&quot;&gt;
-        ...
-    &lt;/div&gt;
-    &lt;!--
-    &lt;div class=&quot;authpics&quot;&gt;
-        ...
-    &lt;/div&gt;
-    --&gt;
-&lt;/div&gt;
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/angular-errors/" data-id="cjc8i1vnv0005n3p3ibizvqs2" class="article-share-link">Partager</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-react-native-es5-es6" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/08/17/react-native-es5-es6/" class="article-date">
-  <time datetime="2017-08-17T06:54:33.000Z" itemprop="datePublished">2017-08-17</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/react/">react</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/08/17/react-native-es5-es6/">React/React Native的ES5 ES6写法对照表</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>摘抄：<a href="http://bbs.reactnative.cn/topic/15/react-react-native-%E7%9A%84es5-es6%E5%86%99%E6%B3%95%E5%AF%B9%E7%85%A7%E8%A1%A8" target="_blank" rel="external">React/React Native 的ES5 ES6写法对照表</a></p>
-<p>###一、模块</p>
-<p>#####1、引用</p>
-<p>在ES5里，如果使用CommonJS标准，引入React包基本通过require进行，代码类似这样：</p>
-<pre><code>//ES5
-var React = require(&quot;react-native&quot;);
-var {
-    Image,
-    Text,
-    PropTypes
-} = React;  //引用不同的React Native组件
-</code></pre><p>在ES6里，import写法更为标准</p>
-<pre><code>//ES6
-import React, {
-    Image, 
-    Text,
-    PropTypes
-} from &apos;react-native&apos;;
-</code></pre><p>#####2、导出单个类</p>
-<p>在ES5里，要导出一个类给别的模块用，一般通过module.exports来导出</p>
-<pre><code>//ES5
-var MyComponent = React.createClass({
-    ...
-});
-module.exports = MyComponent;
-</code></pre><p>在ES6里，通常用export default来实现相同的功能：</p>
-<pre><code>//ES6
-export default class MyComponent extends React.Component{
-    ...
 }
-</code></pre><p>引用的时候也类似：</p>
-<pre><code>//ES5
-var MyComponent = require(&apos;./MyComponent.js&apos;);
+</code></pre><p>字符通向字节流的转换流:字符流Writer的子类outputStreamWriter</p>
+<p>public class Demo17 {</p>
+<pre><code>public static void main(String[] args) throws IOException {
 
-//ES6
-import MyComponent from &apos;./MyComponent.js&apos;;
-</code></pre><p>###二、组件</p>
-<p>#####1、定义组件</p>
-<p>在ES5里，通常通过React.createClass来定义一个组件类，像这样：</p>
-<pre><code>//ES5
-var Photo = React.createClass({
-    render: function() {
-        return (
-            &lt;Image source={this.props.source} /&gt;
-        );
-    },
-});
-</code></pre><p>在ES6里，我们通过定义一个继承自React.Component的class来定义一个组件类，像这样：</p>
-<pre><code>//ES6
-class Photo extends React.Component {
-    render() {
-        return (
-            &lt;Image source={this.props.source} /&gt;
-        );
+    BufferedReader bufr = new BufferedReader(new InputStreamReader(System.in));
+
+    BufferedWriter bufw = new BufferedWriter(new OutputStreamWriter(System.out));
+
+    String line = null;
+    while((line=bufr.readLine()) != null) {
+        if(&quot;over&quot;.equals(line))
+            break;
+        bufw.write(line.toUpperCase());
+        bufw.newLine();
+        bufw.flush();
     }
-}    
-</code></pre><p>#####2、给组件定义方法</p>
-<p>从上面的例子里可以看到，给组件定义方法不再用 名字: function()的写法，而是直接用名字()，在方法的最后也不能有逗号了。</p>
-<p>//ES5</p>
-<pre><code>var Photo = React.createClass({
-    componentWillMount: function(){
-
-    },
-    render: function() {
-        return (
-            &lt;Image source={this.props.source} /&gt;
-        );
-    },
-});
-</code></pre><p>//ES6</p>
-<p>class Photo extends React.Component {<br>    componentWillMount() {</p>
-<pre><code>}
-render() {
-    return (
-        &lt;Image source={this.props.source} /&gt;
-    );
 }
 </code></pre><p>}</p>
-<p>#####3、定义组件的属性类型和默认属性</p>
-<p>在ES5里，属性类型和默认属性分别通过propTypes成员和getDefaultProps方法来实现</p>
-<pre><code>//ES5 
-var Video = React.createClass({
-    getDefaultProps: function() {
-        return {
-            autoPlay: false,
-            maxLoops: 10,
-        };
-    },
-    propTypes: {
-        autoPlay: React.PropTypes.bool.isRequired,
-        maxLoops: React.PropTypes.number.isRequired,
-        posterFrameSrc: React.PropTypes.string.isRequired,
-        videoSrc: React.PropTypes.string.isRequired,
-    },
-    render: function() {
-        return (
-            &lt;View /&gt;
-        );
-    },
-});
-</code></pre><p>在ES6里，可以统一使用static成员来实现</p>
-<pre><code>//ES6
-class Video extends React.Component {
-    static defaultProps = {
-        autoPlay: false,
-        maxLoops: 10,
-    };  // 注意这里有分号
-    static propTypes = {
-        autoPlay: React.PropTypes.bool.isRequired,
-        maxLoops: React.PropTypes.number.isRequired,
-        posterFrameSrc: React.PropTypes.string.isRequired,
-        videoSrc: React.PropTypes.string.isRequired,
-    };  // 注意这里有分号
-    render() {
-        return (
-            &lt;View /&gt;
-        );
-    } // 注意这里既没有分号也没有逗号
-}
-</code></pre><p>也有人这么写，虽然不推荐，但读到代码的时候你应当能明白它的意思：</p>
-<pre><code>//ES6
-class Video extends React.Component {
-    render() {
-        return (
-            &lt;View /&gt;
-        );
-    }
-}
-Video.defaultProps = {
-    autoPlay: false,
-    maxLoops: 10,
-};
-Video.propTypes = {
-    autoPlay: React.PropTypes.bool.isRequired,
-    maxLoops: React.PropTypes.number.isRequired,
-    posterFrameSrc: React.PropTypes.string.isRequired,
-    videoSrc: React.PropTypes.string.isRequired,
-};
-</code></pre><p>注意: 对React开发者而言，static成员在IE10及之前版本不能被继承，而在IE11和其它浏览器上可以，这有时候会带来一些问题。React Native开发者可以不用担心这个问题。</p>
-<p>#####4、初始化state</p>
-<p>ES5下情况类似，</p>
-<pre><code>//ES5 
-var Video = React.createClass({
-    getInitialState: function() {
-        return {
-            loopsRemaining: this.props.maxLoops,
-        };
-    },
-})
-</code></pre><p>ES6下，有两种写法：</p>
-<pre><code>//ES6
-class Video extends React.Component {
-    state = {
-        loopsRemaining: this.props.maxLoops,
-    }
-}
-</code></pre><p>不过我们推荐更易理解的在构造函数中初始化（这样你还可以根据需要做一些计算）：</p>
-<pre><code>//ES6
-class Video extends React.Component {
-    constructor(props){
-        super(props);
-        this.state = {
-            loopsRemaining: this.props.maxLoops,
-        };
-    }
-}
-</code></pre><p>###三、把方法作为回调提供</p>
-<p>#####1、写法</p>
-<p>在ES5下，React.createClass会把所有的方法都bind一遍，这样可以提交到任意的地方作为回调函数，而this不会变化。但官方现在逐步认为这反而是不标准、不易理解的。</p>
-<pre><code>//ES5
-var PostInfo = React.createClass({
-    handleOptionsButtonClick: function(e) {
-        // Here, &apos;this&apos; refers to the component instance.
-        this.setState({showOptionsModal: true});
-    },
-    render: function(){
-        return (
-            &lt;TouchableHighlight onPress={this.handleOptionsButtonClick}&gt;
-                &lt;Text&gt;{this.props.label}&lt;/Text&gt;
-            &lt;/TouchableHighlight&gt;
-        )
-    },
-});
-</code></pre><p>在ES6下，你需要通过bind来绑定this引用，或者使用箭头函数（它会绑定当前scope的this引用）来调用。</p>
-<pre><code>//ES6
-class PostInfo extends React.Component
-{
-    handleOptionsButtonClick(e){
-        this.setState({showOptionsModal: true});
-    }
-    render(){
-        return (
-            &lt;TouchableHighlight 
-                onPress={this.handleOptionsButtonClick.bind(this)}
-                onPress={e=&gt;this.handleOptionsButtonClick(e)}
-                &gt;
-                &lt;Text&gt;{this.props.label}&lt;/Text&gt;
-            &lt;/TouchableHighlight&gt;
-        )
-    },
-}
-</code></pre><p>#####2、箭头函数</p>
-<p>箭头函数实际上是在这里定义了一个临时的函数，箭头函数的箭头=&gt;之前是一个空括号、单个的参数名、或用括号括起的多个参数名，而箭头之后可以是一个表达式（作为函数的返回值），或者是用花括号括起的函数体（需要自行通过return来返回值，否则返回的是undefined）。</p>
-<pre><code>// 箭头函数的例子
-()=&gt;1
-v=&gt;v+1
-(a,b)=&gt;a+b
-()=&gt;{
-    alert(&quot;foo&quot;);
-}
-e=&gt;{
-    if (e == 0){
-        return 0;
-    }
-    return 1000/e;
-}
-</code></pre><p>需要注意的是，不论是bind还是箭头函数，每次被执行都返回的是一个新的函数引用，因此如果你还需要函数的引用去做一些别的事情（譬如卸载监听器），那么你必须自己保存这个引用。</p>
-<p>//错误的做法</p>
-<pre><code>class PauseMenu extends React.Component{
-    componentWillMount(){
-        AppStateIOS.addEventListener(&apos;change&apos;, this.onAppPaused.bind(this));
-    }
-    componentDidUnmount(){
-        AppStateIOS.removeEventListener(&apos;change&apos;, this.onAppPaused.bind(this));
-    }
-    onAppPaused(event){
-    }
-}
-</code></pre><p>//正确的做法</p>
-<pre><code>class PauseMenu extends React.Component{
-    constructor(props){
-        super(props);
-        this._onAppPaused = this.onAppPaused.bind(this);
-    }
-    componentWillMount(){
-        AppStateIOS.addEventListener(&apos;change&apos;, this._onAppPaused);
-    }
-    componentDidUnmount(){
-        AppStateIOS.removeEventListener(&apos;change&apos;, this._onAppPaused);
-    }
-    onAppPaused(event){
-    }
-}
-</code></pre><p>从这个帖子中我们还学习到一种新的做法：</p>
-<p>// 正确的做法</p>
-<pre><code>class PauseMenu extends React.Component{
-    componentWillMount(){
-        AppStateIOS.addEventListener(&apos;change&apos;, this.onAppPaused);
-    }
-    componentDidUnmount(){
-        AppStateIOS.removeEventListener(&apos;change&apos;, this.onAppPaused);
-    }
-    onAppPaused = (event) =&gt; {
-        //把方法直接作为一个arrow function的属性来定义，初始化的时候就绑定好了this指针
-    }
-}
-</code></pre><p>###四、在es6中Mixins不再推荐使用</p>
-<p>在ES5下，我们经常使用mixin来为我们的类添加一些新的方法，譬如PureRenderMixin</p>
-<pre><code>var PureRenderMixin = require(&apos;react-addons-pure-render-mixin&apos;);
-React.createClass({
-  mixins: [PureRenderMixin],
 
-  render: function() {
-    return &lt;div className={this.props.className}&gt;foo&lt;/div&gt;;
-  }
-});
-</code></pre><p>然而现在官方已经不再打算在ES6里继续推行Mixin。</p>
-<p>对于库编写者而言，应当尽快放弃Mixin的编写方式，推荐一种新的编码方式。</p>
-<pre><code>//Enhance.js
-import { Component } from &quot;React&quot;;
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-4-transform-stream/" data-id="cjcfnyezk0010rpp3n6aoajuz" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
 
-export var Enhance = ComposedComponent =&gt; class extends Component {
-    constructor() {
-        this.state = { data: null };
-    }
-    componentDidMount() {
-        this.setState({ data: &apos;Hello&apos; });
-    }
-    render() {
-        return &lt;ComposedComponent {...this.props} data={this.state.data} /&gt;;
-    }
-};
+    </footer>
+  </div>
+  
+</article>
 
-//HigherOrderComponent.js
-import { Enhance } from &quot;./Enhance&quot;;
 
-class MyComponent {
-    render() {
-        if (!this.data) return &lt;div&gt;Waiting...&lt;/div&gt;;
-        return &lt;div&gt;{this.data}&lt;/div&gt;;
-    }
+  
+    <article id="post-java/java-io/IO-14-serializable" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/10/java/java-io/IO-14-serializable/" class="article-date">
+  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/10/java/java-io/IO-14-serializable/">IO流 - 十四、IO流 - 对象的序列化、反序列化</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>ObjectInputStream与ObjectOutputStream</p>
+<p>被操作的对象需要实现Serializable标记接口</p>
+<h4 id="1、ObjectOutputStream-对象序列化"><a href="#1、ObjectOutputStream-对象序列化" class="headerlink" title="1、ObjectOutputStream-对象序列化"></a>1、ObjectOutputStream-对象序列化</h4><p>将对象写到硬盘上。</p>
+<pre><code>FileOutputStream fos = new FileOutputStream(&quot;t.tmp&quot;);
+ObjectOutputStream oos = new ObjectOutputStream(fos);
+
+oos.writeInt(12345);
+oos.writeObject(&quot;Today&quot;);
+oos.writeObject(new Date());
+
+oos.close;
+</code></pre><p>存储自定义对象时，要实现对象序列化，对象要实现Serializable接口</p>
+<pre><code>class Person implements Serializable{
+    ...
 }
 
-export default Enhance(MyComponent); // Enhanced component
-</code></pre><p>用一个“增强函数”，来为某个类增加一些方法，并且返回一个新类，这无疑能实现mixin所实现的大部分需求。</p>
-<p>###五、es6+带来的其它好处</p>
-<p>解构&amp;属性延展</p>
-<p>结合使用ES6+的解构和属性延展，我们给孩子传递一批属性更为方便。</p>
-<p>这个例子把className以外的所有属性传递给了div标签：</p>
-<pre><code>class AutoloadingPostsGrid extends React.Component {
-    render() {
-        var {
-            className,
-            ...others,  // contains all properties of this.props except for className
-        } = this.props;
-        return (
-            &lt;div className={className}&gt;
-                &lt;PostsGrid {...others} /&gt;
-                &lt;button onClick={this.handleLoadMoreClick}&gt;Load more&lt;/button&gt;
-            &lt;/div&gt;
-        );
+ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(&quot;obj.object&quot;));
+oos.writeObject(new Person(&quot;小强&quot;,30));
+oos.close;
+</code></pre><h4 id="2、ObjectInputStream-对象反序列化"><a href="#2、ObjectInputStream-对象反序列化" class="headerlink" title="2、ObjectInputStream-对象反序列化"></a>2、ObjectInputStream-对象反序列化</h4><p>读取存储在硬盘上的对象。</p>
+<p>ObjectInputStream ois = new ObjectInputStream(new FileInputStream(“obj.object”));</p>
+<p>Person p = ois.readObject();<br>System.out.println(p.getName()+p.getAge());</p>
+<p>ois.close();</p>
+<h4 id="3、序列化接口-Seriallizable"><a href="#3、序列化接口-Seriallizable" class="headerlink" title="3、序列化接口 - Seriallizable"></a>3、序列化接口 - Seriallizable</h4><p>显示化序列号</p>
+<pre><code>class Person {
+    private static final long serialVersionUID = 97274;
+}
+</code></pre><p>将对象存储到硬盘后，即使改动了Person类，依然能识别该类和取出的对象是同一个版本。</p>
+<h4 id="4、关键字-transient"><a href="#4、关键字-transient" class="headerlink" title="4、关键字 - transient"></a>4、关键字 - transient</h4><p>静态属性不会加入序列化写入到硬盘中。</p>
+<p>非静态属性，如果不想写入到硬盘中，需要关键字transient（短暂的）修饰。</p>
+<p>private static int age;</p>
+<p>private transient String name;</p>
+<p>都不会被序列化写入硬盘中。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-14-serializable/" data-id="cjcfnyeyq000crpp3j7g4zvbb" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/java-io/IO-13-file-coperate" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/10/java/java-io/IO-13-file-coperate/" class="article-date">
+  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/10/java/java-io/IO-13-file-coperate/">IO流 - 十三、IO流 - 文件切割合并</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="1、文件切割"><a href="#1、文件切割" class="headerlink" title="1、文件切割"></a>1、文件切割</h4><pre><code>public class SplitFile {
+
+    private static final int SIZE = 1024*1024;
+
+    public static void main(String[] args) throws IOException {
+        //指定切割文件
+        File file = new File(&quot;IMG_0215.JPG&quot;);
+
+        //读取流
+        FileInputStream fis = new FileInputStream(file);
+
+        //写入流
+        FileOutputStream fos = null;
+
+        //缓冲区
+        byte[] buf = new byte[SIZE];
+
+        //存储目录
+        File dir = new File(&quot;//Users//haojie//eclipse-workspace//hello world//partfiles&quot;);
+        if(!dir.exists())
+            dir.mkdir();
+
+        //切割
+        int length = 0;
+        int count = 1;
+        while((length = fis.read(buf)) != -1) {
+            fos = new FileOutputStream(new File(dir,(count++)+&quot;.part&quot;));
+            fos.write(buf, 0, length);;
+        }
+
+        //关闭流
+        fos.close();
+        fis.close();
+    }
+
+}
+</code></pre><h4 id="2、文件合并"><a href="#2、文件合并" class="headerlink" title="2、文件合并"></a>2、文件合并</h4><pre><code>public class Merge {
+
+    public static void main(String[] args) throws IOException {
+
+        File dir = new File(&quot;//Users//haojie//eclipse-workspace//hello world//partfiles&quot;);
+        mergeFile(dir);
+    }
+
+    public static void mergeFile(File dir) throws IOException {
+        //读取流
+        ArrayList&lt;FileInputStream&gt; al = new ArrayList&lt;FileInputStream&gt;();
+        for(int x=1; x&lt;3; x++) {
+            al.add(new FileInputStream(new File(dir,x+&quot;.part&quot;)));
+        }
+        //合并流
+        Enumeration&lt;FileInputStream&gt; en = Collections.enumeration(al);
+        SequenceInputStream sis = new SequenceInputStream(en);
+        //输出流
+        FileOutputStream fos = new FileOutputStream(new File(dir,&quot;1.JPG&quot;));
+        //缓冲区
+        byte[] buf = new byte[1024];
+        int length = 0;
+        while((length = sis.read(buf)) != -1) {
+            fos.write(buf, 0, length);
+        }
+        //关闭流
+        fos.close();
+        sis.close();
+    }
+
+}
+</code></pre><h4 id="3、文件切割合并-配置文件"><a href="#3、文件切割合并-配置文件" class="headerlink" title="3、文件切割合并+配置文件"></a>3、文件切割合并+配置文件</h4><pre><code>public class FileSplitMergeUtil {
+
+    private static final int SIZE = 1024*1024;
+
+    public static void main(String[] args) throws IOException {
+
+        //切割
+        File file = new File(&quot;IMG_0215.JPG&quot;);
+        splitFile(file);
+
+        //合并
+        File dir = new File(&quot;//Users//haojie//eclipse-workspace//hello world//partfiles&quot;);
+        mergeFile(dir);
+    }
+
+    //切割传入的文件
+    public static void splitFile(File file) throws IOException {
+
+        //读取流
+        FileInputStream fis = new FileInputStream(file);
+
+        //写入流
+        FileOutputStream fos = null;
+
+        //缓冲区
+        byte[] buf = new byte[SIZE];
+
+        //存储目录
+        File dir = new File(&quot;//Users//haojie//eclipse-workspace//hello world//partfiles&quot;);
+        if(!dir.exists())
+            dir.mkdir();
+
+        //切割
+        int length = 0;
+        int count = 1;
+        while((length = fis.read(buf)) != -1) {
+            fos = new FileOutputStream(new File(dir,(count++)+&quot;.part&quot;));
+            fos.write(buf, 0, length);
+            fos.close();
+        }
+
+        /**
+         * 配置文件
+         * partcount 碎片数量
+         * filename 被切割文件名称
+         */
+        Properties prop = new Properties();
+
+        //配置文件设置
+        prop.setProperty(&quot;partcount&quot;, count+&quot;&quot;);
+        prop.setProperty(&quot;filename&quot;, file.getName());
+
+        //配置文件输出流
+        fos = new FileOutputStream(new File(dir,count+&quot;.properties&quot;));
+
+        //写入配置信息
+        prop.store(fos, &quot;fileinfo&quot;);
+
+        //关闭流
+        fos.close();
+        fis.close();
+    }
+
+    public static void mergeFile(File dir) throws IOException {
+        //过滤配置文件
+        File[] files = dir.listFiles(new SuffixFilter(&quot;.properties&quot;));
+        if(files.length != 1)
+            throw new RuntimeException(dir+&quot;获取配置文件失败&quot;);
+        File confile = files[0];
+
+        //读取配置文件
+        Properties prop = new Properties();
+        FileInputStream fis = new FileInputStream(confile);
+        prop.load(fis);
+        String filename = prop.getProperty(&quot;filename&quot;);
+        int count = Integer.parseInt(prop.getProperty(&quot;partcount&quot;));
+
+        //检查碎片文件个数
+        File[] partFiles = dir.listFiles(new SuffixFilter(&quot;.part&quot;));
+        if(partFiles.length != (count-1)) {
+            throw new RuntimeException(&quot;碎片文件与配置信息中的数量不符&quot;);            
+        }
+
+        //读取流
+        ArrayList&lt;FileInputStream&gt; al = new ArrayList&lt;FileInputStream&gt;();
+        for(int x=0; x&lt;partFiles.length; x++) {
+            al.add(new FileInputStream(partFiles[x]));
+        }
+
+        //合并流
+        Enumeration&lt;FileInputStream&gt; en = Collections.enumeration(al);
+        SequenceInputStream sis = new SequenceInputStream(en);
+
+        //输出流
+        FileOutputStream fos = new FileOutputStream(new File(dir,filename));
+
+        //缓冲区
+        byte[] buf = new byte[1024];
+        int length = 0;
+        while((length = sis.read(buf)) != -1) {
+            fos.write(buf, 0, length);
+        }
+
+        //关闭流
+        fos.close();
+        sis.close();
     }
 }
-</code></pre><p>下面这种写法，则是传递所有属性的同时，用override来覆盖属性中的className值：</p>
-<pre><code>&lt;div {...this.props} className=&quot;override&quot;&gt;
-    …
-&lt;/div&gt;
-</code></pre><p>这个例子则相反，如果属性中没有包含className，则提供默认的值，而如果属性中已经包含了，则使用属性中的值</p>
-<pre><code>&lt;div className=&quot;base&quot; {...this.props}&gt;
-    …
-&lt;/div&gt;    
+
+public class SuffixFilter implements FilenameFilter {
+
+    private String suffix;
+
+    public SuffixFilter(String suffix) {
+        super();
+        this.suffix = suffix;
+    }
+
+    public boolean accept(File dir, String name) {
+        return name.endsWith(suffix);
+    }
+
+}
 </code></pre>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/08/17/react-native-es5-es6/" data-id="cjc8i1vqx001vn3p3ltl6bjy8" class="article-share-link">Partager</a>
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-13-file-coperate/" data-id="cjcfnyeyj0009rpp3z7knvv1j" class="article-share-link">Share</a>
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/react/">react</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
 
     </footer>
   </div>
@@ -2377,14 +545,14 @@ export default Enhance(MyComponent); // Enhanced component
 
 
   
-    <article id="post-github-hexo-blog" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-java/java-io/IO-12-sequenceInputStream" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2017/08/14/github-hexo-blog/" class="article-date">
-  <time datetime="2017-08-14T02:34:20.000Z" itemprop="datePublished">2017-08-14</time>
+    <a href="/2018/01/10/java/java-io/IO-12-sequenceInputStream/" class="article-date">
+  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
 </a>
     
   <div class="article-category">
-    <a class="article-category-link" href="/categories/github/">github</a>
+    <a class="article-category-link" href="/categories/java/">java</a>
   </div>
 
   </div>
@@ -2395,7 +563,7 @@ export default Enhance(MyComponent); // Enhanced component
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2017/08/14/github-hexo-blog/">github+hexo博客并备份</a>
+      <a class="article-title" href="/2018/01/10/java/java-io/IO-12-sequenceInputStream/">IO流 - 十二、序列流 - SequenceInputStream</a>
     </h1>
   
 
@@ -2403,268 +571,59 @@ export default Enhance(MyComponent); // Enhanced component
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h3 id="一、hexo"><a href="#一、hexo" class="headerlink" title="一、hexo"></a>一、hexo</h3><p>1、官方网址：<a href="https://hexo.io/" target="_blank" rel="external">https://hexo.io/</a></p>
-<p>2、常用命令</p>
-<pre><code>npm install hexo -g #安装  
-npm update hexo -g #升级  
-hexo init #初始化
-</code></pre><p>3、简写</p>
-<pre><code>hexo n &quot;我的博客&quot; == hexo new &quot;我的博客&quot; #新建文章
-hexo p == hexo publish #草稿
-hexo g == hexo generate #生成
-hexo s == hexo server #启动服务预览
-hexo d == hexo deploy #部署
-</code></pre><p>4、布署</p>
-<p>修改_config.yml</p>
-<pre><code># Deployment
-## Docs: http://hexo.io/docs/deployment.html
-deploy:
-      type: git
-      repository: git@***.github.com:***/***.github.io.git
-      branch: master
-</code></pre><h3 id="二、Github"><a href="#二、Github" class="headerlink" title="二、Github"></a>二、Github</h3><p>1、摘抄</p>
-<p><a href="http://www.ruanyifeng.com/blog/2015/12/git-cheat-sheet.html" target="_blank" rel="external">常用 Git 命令清单</a></p>
-<p><a href="http://www.ruanyifeng.com/blog/2014/06/git_remote.html" target="_blank" rel="external">Git远程操作详解</a></p>
-<p><img src="http://image.beekka.com/blog/2014/bg2014061202.jpg" alt="MacDown Screenshot"></p>
-<ul>
-<li>Workspace：工作区</li>
-<li>Index / Stage：暂存区</li>
-<li>Repository：仓库区（或本地仓库）</li>
-<li>Remote：远程仓库</li>
-</ul>
-<p>2、常用命令</p>
-<p>a、新建本地仓库</p>
-<pre><code># 在当前目录新建一个Git代码库
-$ git init
+        <p>对多个流进行合并</p>
+<h4 id="1、构造方法"><a href="#1、构造方法" class="headerlink" title="1、构造方法"></a>1、构造方法</h4><p>SequenceInputStream(Enumeration&lt;? extends InputStream&gt; e)</p>
+<pre><code>public class demo1 {
 
-# 新建一个目录，将其初始化为Git代码库
-$ git init [project-name]
+    public static void main(String[] args) throws IOException {
+        /**
+         * 将1.txt，2.txt，3.txt文件中的数据合并到一个文件4.txt中
+         */
+        Vector&lt;FileInputStream&gt; v = new Vector&lt;FileInputStream&gt;();
+        v.add(new FileInputStream(&quot;1.txt&quot;));
+        v.add(new FileInputStream(&quot;2.txt&quot;));
+        v.add(new FileInputStream(&quot;3.txt&quot;));
 
-# 下载一个项目和它的整个代码历史
-$ git clone [url]    
-</code></pre><p>b、增加/删除文件</p>
-<pre><code># 添加指定文件到暂存区
-$ git add [file1] [file2] ...
+        Enumeration&lt;FileInputStream&gt; en = v.elements();
 
-# 添加指定目录到暂存区，包括子目录
-$ git add [dir]
+        SequenceInputStream sis = new SequenceInputStream(en);
 
-# 添加当前目录的所有文件到暂存区
-$ git add .
+        FileOutputStream fos = new FileOutputStream(&quot;4.txt&quot;);
 
-# 删除工作区文件，并且将这次删除放入暂存区
-$ git rm [file1] [file2] ...
+        byte[] buf = new byte[1024];
 
-# 改名文件，并且将这个改名放入暂存区
-$ git mv [file-original] [file-renamed]
-</code></pre><p>c、代码提交</p>
-<pre><code># 提交暂存区到仓库区
-$ git commit -m [message]
+        int length = 0;
 
-# 提交暂存区的指定文件到仓库区
-$ git commit [file1] [file2] ... -m [message]
+        while((length = sis.read(buf)) != -1 ) {
+            fos.write(buf,0,length);
+        }
 
-# 提交时显示所有diff信息
-$ git commit -v
-</code></pre><p>d、分支</p>
-<pre><code># 列出所有本地分支
-$ git branch
+        fos.close();
+        sis.close();
+    }
 
-# 列出所有远程分支
-$ git branch -r
+}
+</code></pre><h4 id="2、枚举和迭代"><a href="#2、枚举和迭代" class="headerlink" title="2、枚举和迭代"></a>2、枚举和迭代</h4><pre><code>//Vctor集合效率低。
 
-# 列出所有本地分支和远程分支
-$ git branch -a
+Vector&lt;FileInputStream&gt; v = new Vector&lt;FileInputStream&gt;();
+v.add(new FileInputStream(&quot;1.txt&quot;));
+v.add(new FileInputStream(&quot;2.txt&quot;));
+v.add(new FileInputStream(&quot;3.txt&quot;));
 
-# 新建一个分支，但依然停留在当前分支
-$ git branch [branch-name]
+Enumeration&lt;FileInputStream&gt; en = v.elements();
 
-# 新建一个分支，并切换到该分支
-$ git checkout -b [branch]
-
-# 新建一个分支，与指定的远程分支建立追踪关系
-$ git branch --track [branch] [remote-branch]
-
-# 切换到指定分支，并更新工作区
-$ git checkout [branch-name]
-
-# 切换到上一个分支
-$ git checkout -
-
-# 建立追踪关系，在现有分支与指定的远程分支之间
-$ git branch --set-upstream [branch] [remote-branch]
-
-# 合并指定分支到当前分支
-$ git merge [branch]
-
-# 删除分支
-$ git branch -d [branch-name]
-
-# 删除远程分支
-$ git push origin --delete [branch-name]
-$ git branch -dr [remote/branch]    
-</code></pre><p>e、查看信息</p>
-<pre><code># 显示有变更的文件
-$ git status
-
-# 显示当前分支的版本历史
-$ git log
-
-# 显示暂存区和工作区的差异
-$ git diff
-</code></pre><p>f、远程同步</p>
-<pre><code># 下载远程仓库的所有变动
-$ git fetch [remote]
-
-# 显示所有远程仓库
-$ git remote -v
-
-# 显示某个远程仓库的信息
-$ git remote show [remote]
-
-# 上传本地指定分支到远程仓库
-$ git push [remote] [branch]
-
-# 强行推送当前分支到远程仓库，即使有冲突
-$ git push [remote] --force
-
-# 推送所有分支到远程仓库
-$ git push [remote] --all
-</code></pre><p>g、撤销</p>
-<pre><code># 恢复暂存区的指定文件到工作区
-$ git checkout [file]
-
-# 恢复某个commit的指定文件到暂存区和工作区
-$ git checkout [commit] [file]
-
-# 恢复暂存区的所有文件到工作区
-$ git checkout .
-
-# 重置暂存区的指定文件，与上一次commit保持一致，但工作区不变
-$ git reset [file]
-
-# 重置暂存区与工作区，与上一次commit保持一致
-$ git reset --hard
-</code></pre><p>3、Git远程操作详解</p>
-<p>a、git clone</p>
-<pre><code>#从远程主机克隆一个版本库
-$ git clone &lt;版本库的网址&gt;    
-</code></pre><p>b、git remote</p>
-<pre><code>#列出所有的主机
-$ git remote
-origin
-
-#查看远程主机的网址
-$ git remote -v
-origin  git@github.com:jquery/jquery.git (fetch)
-origin  git@github.com:jquery/jquery.git (push)
-
-#克隆版本库的时候，所使用的远程主机自动被Git命名为origin
-$ git remote show &lt;主机名&gt;
-
-#git remote add命令用于添加远程主机。
-$ git remote add &lt;主机名&gt; &lt;网址&gt;
-
-#git remote rm命令用于删除远程主机
-$ git remote rm &lt;主机名&gt;
-
-#git remote rename命令用于远程主机的改名。
-$ git remote rename &lt;原主机名&gt; &lt;新主机名&gt;
-</code></pre><p>c、git fetch</p>
-<p>git fetch 取回到本地的是远程主机版本库的更新</p>
-<p>git fetch命令通常用来查看其他人的进程，因为它取回的代码对你本地的开发代码没有影响。</p>
-<p>默认情况下，git fetch取回所有分支（branch）的更新。如果只想取回特定分支的更新，可以指定分支名。</p>
-<pre><code>$ git fetch &lt;远程主机名&gt; &lt;分支名&gt;
-</code></pre><p>比如，取回origin主机的master分支。</p>
-<pre><code>$ git fetch origin master
-</code></pre><p>d、git pull</p>
-<p>git pull命令的作用是，取回远程主机某个分支的更新，再与本地的指定分支合并。它的完整格式稍稍有点复杂。</p>
-<pre><code>$ git pull &lt;远程主机名&gt; &lt;远程分支名&gt;:&lt;本地分支名&gt;
-</code></pre><p>比如，取回origin主机的next分支，与本地的master分支合并，需要写成下面这样</p>
-<pre><code>$ git pull origin next:master
-</code></pre><p>如果远程分支是与当前分支合并，则冒号后面的部分可以省略。</p>
-<pre><code>$ git pull origin next
-</code></pre><p>上面命令表示，取回origin/next分支，再与当前分支合并。实质上，这等同于先做git fetch，再做git merge。</p>
-<p>$ git fetch origin<br>$ git merge origin/next</p>
-<p>在某些场合，Git会自动在本地分支与远程分支之间，建立一种追踪关系（tracking）。比如，在git clone的时候，所有本地分支默认与远程主机的同名分支，建立追踪关系，也就是说，本地的master分支自动”追踪”origin/master分支。</p>
-<p>Git也允许手动建立追踪关系。</p>
-<pre><code>git branch --set-upstream master origin/next
-</code></pre><p>上面命令指定master分支追踪origin/next分支。</p>
-<p>e、git push</p>
-<p>git push命令用于将本地分支的更新，推送到远程主机。它的格式与git pull命令相仿。</p>
-<pre><code>$ git push &lt;远程主机名&gt; &lt;本地分支名&gt;:&lt;远程分支名&gt;
-</code></pre><p>如果省略远程分支名，则表示将本地分支推送与之存在”追踪关系”的远程分支（通常两者同名），如果该远程分支不存在，则会被新建。</p>
-<pre><code>$ git push origin master
-</code></pre><p>上面命令表示，将本地的master分支推送到origin主机的master分支。如果后者不存在，则会被新建。</p>
-<p>如果省略本地分支名，则表示删除指定的远程分支，因为这等同于推送一个空的本地分支到远程分支。</p>
-<pre><code>$ git push origin :master
-# 等同于
-$ git push origin --delete master
-</code></pre><p>上面命令表示删除origin主机的master分支。</p>
-<p>三、hexo多个终端同步</p>
-<p>1、在其中一个终端操作，push本地文件夹Hexo中的必要文件到yourname.github.io的hexo分支上</p>
-<pre><code>//初始化本地仓库
-git init  
-
-//将本地与Github项目对接
-git remote add origin git@github.com:yourname/yourname.github.io.git
-
-//将必要的文件依次添加，有些文件夹如npm install产生的node_modules由于路径过长不好处理，所以这里没有用`git add .`命令了，而是依次添加必要文件，如下图所示
-git add source scaffolds themes .npmignore _config.yml package.json
-git commit -m &quot;Blog Source Hexo&quot;
-
-//新建hexo分支
-git branch hexo 
-
-//切换到hexo分支上
-git checkout hexo   
-
-//push到Github项目的hexo分支上
-git push origin hexo   
-</code></pre><p>2、在另一终端完成clone和push更新</p>
-<pre><code>//将Github中hexo分支clone到本地
-git clone -b hexo git@github.com:yourname/yourname.github.io.git  
-
-//切换到刚刚clone的文件夹内
-cd  yourname.github.io
-
-//注意，这里一定要切换到刚刚clone的文件夹内执行，安装必要的所需组件，不用再init  
-npm install    
-
-//新建一个.md文件，并编辑完成自己的博客内容
-hexo new post &quot;new blog name&quot;   
-
-//经测试每次只要更新source中的文件到Github中即可，因为只是新建了一篇新博客
-git add source 
-
-git commit -m &quot;XX&quot;
-
-//更新分支
-git push origin hexo  
-
-//push更新完分支之后将自己写的博客对接到自己搭的博客网站上，同时同步了Github中的master
-hexo d -g
-</code></pre><p>3、不同终端更新博客</p>
-<pre><code>//先pull完成本地与远端的融合
-git pull origin hexo  
-
-hexo new post &quot; new blog name&quot;
-
-git add source
-
-git commit -m &quot;XX&quot;
-
-git push origin hexo
-
-hexo d -g
+//ArrayList集合代替
+ArrayList&lt;FileInputStream&gt; al = new ArrayList&lt;FileInputStream&gt;();
+//用集合工具类中的方法，返回Enumeration类对象
+Enumeration&lt;FileInputStream&gt; en = Collections.enumeration(al);
 </code></pre>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/08/14/github-hexo-blog/" data-id="cjc8i1vp8000xn3p3k7x4hif2" class="article-share-link">Partager</a>
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-12-sequenceInputStream/" data-id="cjcfnyeyf0006rpp3k7g7yh7g" class="article-share-link">Share</a>
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/github/">github</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
 
     </footer>
   </div>
@@ -2673,59 +632,14 @@ hexo d -g
 
 
   
-    <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-java/java-io/IO-11-printSream" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2017/08/14/hello-world/" class="article-date">
-  <time datetime="2017-08-14T02:32:17.000Z" itemprop="datePublished">2017-08-14</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/08/14/hello-world/">Hello World</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/08/14/hello-world/" data-id="cjc8i1voy000pn3p3caakr5wz" class="article-share-link">Partager</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-angular-requirejs" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/05/17/angular-requirejs/" class="article-date">
-  <time datetime="2017-05-17T07:52:11.000Z" itemprop="datePublished">2017-05-17</time>
+    <a href="/2018/01/10/java/java-io/IO-11-printSream/" class="article-date">
+  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
 </a>
     
   <div class="article-category">
-    <a class="article-category-link" href="/categories/angularjs/">angularjs</a>
+    <a class="article-category-link" href="/categories/java/">java</a>
   </div>
 
   </div>
@@ -2736,7 +650,7 @@ hexo d -g
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2017/05/17/angular-requirejs/">angularjs + requirjs前端架构</a>
+      <a class="article-title" href="/2018/01/10/java/java-io/IO-11-printSream/">IO流 - 十一、打印流</a>
     </h1>
   
 
@@ -2744,145 +658,948 @@ hexo d -g
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>在决定使用angularJS开发项目时，考虑到多人协作，模块化，扩展等等因素，决定引入requirJS实现js文件的异步加载，解决模块之间的依赖关系。</p>
-<p>参考了一些关于angularJS项目的前端架构，都觉得不甚理想，幸运的是最终看到一篇关于angularJS如何集成requireJS的文章：</p>
-<p>原文地址：<a href="http://www.cnblogs.com/cunjieliu/p/4021121.html" target="_blank" rel="external">如何将angularJS项目与requireJS集成</a></p>
-<p>一、项目组织目录：</p>
-<ul>
-<li><p>css 文件夹</p>
-</li>
-<li><p>img 文件夹</p>
-</li>
-<li><p>js 文件夹</p>
-</li>
-</ul>
-<p> – appIndex 文件夹</p>
-<p>  — api文件夹</p>
-<p>  — controller 文件夹</p>
-<p>     —- ctlModule.js</p>
-<p>     —- mainController.js</p>
-<p>     —- homeController.js</p>
-<p>  — directives 文件夹</p>
-<p>  — services 文件夹</p>
-<p>  — app.js</p>
-<p>  — index_main.js</p>
-<p>  — router.js</p>
-<p> – appLogin 文件夹</p>
-<p>  — …</p>
-<p>  — 与appIndex类似</p>
-<p>  — …</p>
-<ul>
-<li>lib 文件夹</li>
-</ul>
-<p> – angular 文件夹</p>
-<p>  — angular.js</p>
-<p>  — angular-ui-router.js</p>
-<p>  — …</p>
-<p> – bootstrap 文件夹</p>
-<p> – jquery 文件夹</p>
-<p> – require 文件夹</p>
-<p> – php 文件夹</p>
-<p> – template 文件夹</p>
-<p>  — common 文件夹</p>
-<p>  — tplIndex 文件夹</p>
-<p>  — tplLogin文件夹</p>
-<ul>
-<li><p>404.html</p>
-</li>
-<li><p>favicon.ico</p>
-</li>
-<li><p>humans.txt</p>
-</li>
-<li><p>index.html</p>
-</li>
-<li><p>LICENSE.txt</p>
-</li>
-<li><p>login.html</p>
-</li>
-<li><p>server.js</p>
-</li>
-</ul>
-<p>二、组织目录说明</p>
-<p>两个大的模块，一个appIndex，代表前台展示模块；一个appLogin，代表登录模块。appLogin与appIndex类似，以appIndex为例：</p>
-<p>appIndex下的文件夹：</p>
-<p>api: 与后端交互</p>
-<p>controllers： 控制器</p>
-<p>directives: 指令</p>
-<p>services: 服务</p>
-<p>appIndex下的文件：</p>
-<p>app.js 定义整个项目的module</p>
-<p>index_main.js 配置脚本文件，启动angular</p>
-<p>router.js 定义路由</p>
-<p>api下的文件：</p>
-<p>apiModule.js 定义api的module</p>
-<p>mainApi.js 加载所有的api文件</p>
-<p>homeApi.js 一个普通的api文件</p>
-<p>controllers下的文件：</p>
-<p>ctlModule.js 定义控制器的module</p>
-<p>mainController.js 加载所有的控制器文件</p>
-<p>homeController.js 一个普通的控制器文件</p>
-<p>directives下的文件：</p>
-<p>dirModule.js 定义指令的module</p>
-<p>mainDirective.js 加载所有的指令文件</p>
-<p>headerDirective.js 一个普通的指令文件</p>
-<p>services下的文件：</p>
-<p>serModule.js 定义服务的module</p>
-<p>mainService.js 加载所有的服务文件</p>
-<p>homeService.js 一个普通的服务文件</p>
-<p>三、命名约定</p>
-<p>$stateProvider.state(‘home’,{<br>    url: ‘/home’,<br>   templateUrl:’../../template/tplIndex/home.html’,<br>   controller:’homeCtl’<br>})<br>以homeController为例：</p>
-<p>对应的模板为home.html</p>
-<p>控制器名字：homeCtl</p>
-<p>return ctl.controller(‘homeCtl’,function($scope,person,serGetTitle,testData){</p>
-<p> …<br>});<br>})</p>
-<p>homeCtl里使用的服务，看到ser开头的，如serGetTitle，对应到homeService.js里查找，看到Data结尾的，如testData，对应到homeApi.js里查找<br>四、代码分析</p>
-<p>1、index.html 主要代码如下：</p>
-<p>&lt;!doctype html&gt;</p>
-<p><html class="no-js" lang=""><br>    <head><br>        <script data-main="js/appIndex/index_main" src="lib/require/require.js"></script><br>    </head><br>    <body><br>        <rabbit-header></rabbit-header></body></html></p>
-<pre><code>    &lt;div&gt;
-        &lt;ul&gt;
-            &lt;li&gt;&lt;a href=&quot;#/home&quot;&gt;home&lt;/a&gt;&lt;/li&gt;
-        &lt;/ul&gt;
-    &lt;/div&gt;
+        <p>打印流字符流与字节流</p>
+<p>PrintWriter与PrintStream</p>
+<p>可以直接操作输出流和文件</p>
+<h4 id="1、PrintStream-字节打印流"><a href="#1、PrintStream-字节打印流" class="headerlink" title="1、PrintStream 字节打印流"></a>1、PrintStream 字节打印流</h4><pre><code>/**
+    PrintStream:
+    1、提供了打印方法可以对多种数据类型值进行打印，并保持数据的表现形式。
+    2、它不抛IOException
+    构造函数，接收三种类型的值：
+    1、字符串路径
+    2、File对象
+    3、字节输出流
+*/
+610: 0000-0000 0000-0000 0000-0010 0110-0001
+PrintStream out = new PrintStream(&quot;print.txt&quot;);
+out.write(610);//b ,只写最低8位
+out.print(97);//97，将97先变成字符，保持原样形式打印到目的地。
+out.close;
+</code></pre><h4 id="2、PrintWriter-字符打印流"><a href="#2、PrintWriter-字符打印流" class="headerlink" title="2、PrintWriter 字符打印流"></a>2、PrintWriter 字符打印流</h4><pre><code>/**
+    构造函数参数：
+    1、字符串路径
+    2、File对象
+    3、字节输出流
+    4、字符输出流
+*/
 
-    &lt;div ui-view&gt;&lt;/div&gt;
 
-    &lt;rabbit-footer&gt;&lt;/rabbit-footer&gt;
+public class PrintWriterDemo1 {
 
-&lt;/body&gt;
-</code></pre><p><br>在首页index.html只需要引入requireJs库文件，并且指明入口函数main.js，采用手动启动angularjs应用，所以这里不用为首页添加ng-app=’rabbit’。</p>
-<p>2、index_main.js 主要代码如下：</p>
-<p>require.config({<br>    baseUrl:’js’,<br>    paths:{<br>        jquery:’../lib/jquery/jquery-1.9.1’,<br>        angular:’../lib/angular/angular’,<br>        angularUiRouter:’../lib/angular/angular-ui-router’,<br>        Restangular:’../lib/angular/restangular-1.5.2’,<br>        lodash:’../lib/angular/lodash-1.8.3’,<br>        app:’appIndex/app’,<br>        router:’appIndex/router’,<br>        mainController:’appIndex/controllers/mainController’,<br>        ctlModule:’appIndex/controllers/ctlModule’,<br>        homeController:’appIndex/controllers/homeController’,<br>        …<br>    },<br>    shim:{<br>        ‘angular’:{<br>            exports:’angular’<br>        },<br>        ‘angularUiRouter’:{<br>            deps: [‘angular’],<br>            exports:’angularUiRouter’<br>        },<br>        …<br>    },<br>    urlArgs:”bust=” + (new Date()).getTime()  //防止读取缓存，调试用<br>});</p>
-<p>require([<br>    ‘jquery’,<br>    ‘angular’,<br>    ‘angularUiRouter’,<br>    ‘app’,<br>    ‘router’<br>], function ($,angular,angularUiRouter,app,router) {<br>   $(document).ready(function(){<br>        //采用手动启动angularjs应用，所以这里不用为首页添加ng-app=’rabbit’<br>        angular.bootstrap(document, [‘rabbit’]);<br>    });<br>});<br>3、两个重要的文件app.js和router.js</p>
-<p>app.js 主要代码如下：</p>
-<p>define([“angular”,’mainController’,’mainDirective’,’mainService’,’mainApi’],function(angular){<br>        return angular.module(“rabbit”,[‘ui.router’,’app.ctlModule’,’app.dirModule’,’app.serModule’,’app.apiModule’]);<br>    })<br>定义匿名模块:依赖的mainController和mainDirective主要是用来加载angular的控制器和指令</p>
-<p>ui.router:一个基于ngRoute开发的第三方路由，作为框架额外的附加功能，它们都将以模块依赖的形式被引入</p>
-<p>rabbit为自定义的模块名，依赖第三方路由模块ui.router,以及自定义的控制器模块，自定义的指令模块</p>
-<p>这样做的目的是：在程序启动(bootstrap)的时候，加载依赖模块(如：ui.router)，将所有挂载在该模块的服务(provider)，指令(directive)，过滤器(filter)等都进行注册，那么在后面的程序中便可以调用了。</p>
-<p>router.js 主要代码如下：</p>
-<p>define([‘app’],function(app){<br>        return app.run([‘$rootScope’, ‘$log’, function($rootScope, $log){<br>                        $rootScope.$on(‘$stateChangeSuccess’, function(event, toState, toParams, fromState, fromParams){<br>                            $log.debug(‘successfully changed states’) ;<br>                        });<br>                    }])<br>                  .config(function($stateProvider, $urlRouterProvider, $locationProvider, $uiViewScrollProvider){<br>                        // 默认进入重定向<br>                        //$urlRouterProvider.otherwise(‘/index’);<br>                        $stateProvider.state(‘home’,{<br>                            url: ‘/home’,<br>                            templateUrl:’../../template/tplIndex/home.html’,<br>                            controller:’homeCtl’<br>                        })<br>                })<br>});<br>配置了一个指定 /home 的路由。</p>
-<p>4、控制器</p>
-<p>mainController.js 主要代码如下：</p>
-<p>define([‘homeController’,’indexController’], function() {});<br>主要用来加载各个控制器（所有的控制器都将在这个文件中被加载），我们可以有很多个控制器文件，按照具体需要进行添加。</p>
-<p>homeController.js 主要代码如下：</p>
-<p>define([‘ctlModule’,’jquery’],function(ctl,$){<br>    return ctl.controller(‘homeCtl’,function($scope,serGetTitle,testData){<br>        $scope.title = serGetTitle.title;<br>        $scope.projects = testData.getMessages();<br>    })<br>})<br>控制器homeCtl依赖于ctlModule模块，其实可以理解为app.ctlModule模块下的一个“方法”。</p>
-<p>ctlModule.js 主要代码如下：</p>
-<p>define([‘angular’], function (angular) {<br>    ‘use strict’;<br>    return angular.module(‘app.ctlModule’, []);<br> });<br>声明一个叫作app.ctlModule的模块，app.js里的模块rabbit，依赖于这个模块，并调用这个模块下的所有“方法”</p>
-<p>5、指令，服务，接口</p>
-<p>同控制器的定义方法完全类似。</p>
-<p>五、说明</p>
-<p>php文件夹放了一些php文件，可以用apache建一个站点，模拟与服务器端的数据交互。</p>
-<p>server.js是一个静态文件服务器，mac下进入目录，执行node server，即可创建一个简单的nodejs服务器。</p>
-<p>个人感觉这样设计一个前端架构，虽然会让开发变得繁琐，但功能划分比较明确，提供了一个开发标准，适合于多人协同作业，总体上来说利大于弊。</p>
-<p>源码下载地址：angularJS集成requireJS</p>
+    public static void main(String[] args) throws IOException {
+        //键盘输入流
+        BufferedReader bufr = new BufferedReader(new InputStreamReader(System.in));
 
+        //打印流,自动刷新缓冲区
+        PrintWriter out = new PrintWriter(new FileWriter(&quot;out.txt&quot;),true);
+
+        String line = null;
+        while((line = bufr.readLine()) != null) {
+            if(&quot;over&quot;.equals(line))
+                break;
+            out.println(line.toUpperCase());
+        }
+        out.close();
+        bufr.close();
+    }
+
+}
+</code></pre>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/17/angular-requirejs/" data-id="cjc8i1vop000jn3p3c8h2abtp" class="article-share-link">Partager</a>
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-11-printSream/" data-id="cjcfnyeyd0003rpp3nzrqrbd6" class="article-share-link">Share</a>
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/java-io/IO-10-properties" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/10/java/java-io/IO-10-properties/" class="article-date">
+  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/10/java/java-io/IO-10-properties/">IO流 - 十、IO流 - Properties集合</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="1、基本功能"><a href="#1、基本功能" class="headerlink" title="1、基本功能"></a>1、基本功能</h4><p>Map</p>
+<p>|—–Hashtable</p>
+<p>|————-Properties         </p>
+<p>Properties集合特点：</p>
+<p>1、该集合中的键和值都是字符串类型。</p>
+<p>2、集合中的数据可以保存流中，或者从流中获取。</p>
+<p>通常该集合用于操作以键值对形式存在的配置文件。</p>
+<pre><code>public class Demo1 {
+
+    public static void main(String[] args) {
+
+        Properties prop = new Properties();
+        //存储
+        prop.setProperty(&quot;zhangsan&quot;, &quot;32&quot;);
+        prop.setProperty(&quot;lisi&quot;, &quot;32&quot;);
+        prop.setProperty(&quot;wangwu&quot;, &quot;32&quot;);
+        prop.setProperty(&quot;zhaoliu&quot;, &quot;32&quot;);
+        //取出
+        Set&lt;String&gt; names = prop.stringPropertyNames();
+
+        for(String name:names) {
+            String value = prop.getProperty(name);
+            System.out.println(name+&quot;:&quot;+value);
+        }
+
+    }
+
+}
+</code></pre><h4 id="2、list方法"><a href="#2、list方法" class="headerlink" title="2、list方法"></a>2、list方法</h4><p>public void list(PrintStream out)    </p>
+<p>将属性列表输出到指定的输出流。此方法用于调试。</p>
+<pre><code>Properties prop = new Properties();
+//存储
+prop.setProperty(&quot;zhangsan&quot;, &quot;32&quot;);
+prop.setProperty(&quot;lisi&quot;, &quot;32&quot;);
+prop.setProperty(&quot;wangwu&quot;, &quot;32&quot;);
+prop.setProperty(&quot;zhaoliu&quot;, &quot;32&quot;);
+/*
+//取出
+Set&lt;String&gt; names = prop.stringPropertyNames();
+
+for(String name:names) {
+    String value = prop.getProperty(name);
+    System.out.println(name+&quot;:&quot;+value);
+}
+*/
+//prop.list(System.out);
+
+Properties props = System.getProperties();
+props.list(System.out);    
+</code></pre><h4 id="3、store方法"><a href="#3、store方法" class="headerlink" title="3、store方法"></a>3、store方法</h4><p>store(OutputStream out,String comments)</p>
+<p>Store(Writer writer,String comments)</p>
+<p>将集合中的字符串，键值信息持久化存储到硬盘的文件中。</p>
+<pre><code>public class Dmo2 {
+
+    public static void main(String[] args) throws IOException {
+
+        Properties prop = new Properties();
+        //存储
+        prop.setProperty(&quot;zhangsan&quot;, &quot;32&quot;);
+        prop.setProperty(&quot;lisi&quot;, &quot;32&quot;);
+        prop.setProperty(&quot;wangwu&quot;, &quot;32&quot;);
+        prop.setProperty(&quot;zhaoliu&quot;, &quot;32&quot;);
+
+        //将这些集合中的键值对信息持久化存储到文件中，需要关联输出流。
+        FileOutputStream fos = new FileOutputStream(&quot;info.txt&quot;);
+        prop.store(fos, &quot;name+age&quot;);
+
+        fos.close();
+
+    }
+
+}
+
+info.txt
+
+#name+age
+#Sat Jan 13 10:32:19 CST 2018
+zhangsan=32
+lisi=32
+zhaoliu=32
+wangwu=32
+</code></pre><h4 id="4、修改配置信息"><a href="#4、修改配置信息" class="headerlink" title="4、修改配置信息"></a>4、修改配置信息</h4><p>load(InputStream inStream)</p>
+<p>load(Reader reader)</p>
+<p>读取配置信息</p>
+<pre><code>public class Demo3 {
+
+    public static void main(String[] args) throws IOException {
+
+        Properties prop = new Properties();
+
+        FileInputStream fis = new FileInputStream(&quot;info.txt&quot;);
+
+        prop.load(fis);
+        prop.list(System.out);
+
+    }
+}
+
+输出结果：
+-- listing properties --
+zhangsan=32
+lisi=32
+zhaoliu=32
+wangwu=32
+</code></pre><p>模拟load方法</p>
+<pre><code>public static void myLoad() throws IOException {
+    Properties prop = new Properties();
+
+    BufferedReader bufr = new BufferedReader(new FileReader(&quot;info.txt&quot;));
+
+    String line = null;
+    while((line = bufr.readLine()) != null) {
+        if(line.startsWith(&quot;#&quot;)) 
+            continue;
+        String[] arr = line.split(&quot;=&quot;);
+        System.out.println(arr[0]+&quot;::&quot;+arr[1]);
+    }
+
+}
+</code></pre><p>修改硬盘的文件中已有的配置信息</p>
+<pre><code>public class Demo4 {
+
+    /**
+     * 读取文件
+     * 键值对信息存储到集合中
+     * 通过集合方法修改数据
+     * 通过流将修改后的数据存储到文件
+     * @param args
+     * @throws IOException 
+     */
+
+    public static void main(String[] args) throws IOException {
+        //读取文件流，流可以直接操作File对象
+        File file = new File(&quot;info.txt&quot;);
+        if(!file.exists()) {
+            file.createNewFile();
+        }
+        FileReader fr = new FileReader(file);
+
+        //创建空集合
+        Properties prop = new Properties();
+
+        //集合加载流数据
+        prop.load(fr);
+        //prop.list(System.out);
+
+        //修改集合数据
+        prop.setProperty(&quot;zhangsan&quot;, &quot;20&quot;);
+
+        //写入文件流
+        FileWriter fw = new FileWriter(file);
+
+        //集合持久化存储文件流
+        prop.store(fw,&quot;&quot;);
+
+        //关闭流
+        fr.close();
+        fw.close();
+    }
+
+}
+</code></pre><h4 id="5、Properties集合-练习"><a href="#5、Properties集合-练习" class="headerlink" title="5、Properties集合 - 练习"></a>5、Properties集合 - 练习</h4><p>定义功能，获取应用程序的运行次数，超过5次，给出到期提示并退出程序。</p>
+<p>思路：使用计数器，并以文件形式保存在硬盘中。</p>
+<pre><code>public class Demo5 {
+    public static void main(String[] args) throws IOException {
+        //封装配置文件对象
+        File confile = new File(&quot;count.properties&quot;);
+        if(!confile.exists()) {
+            confile.createNewFile();
+        }
+
+        //输入流
+        FileInputStream fis = new FileInputStream(confile);
+
+        //创建空集合
+        Properties prop = new Properties();
+
+        //加载数据流
+        prop.load(fis);
+
+        //获取数据
+        String value = prop.getProperty(&quot;time&quot;);
+
+        //计数器
+        int count = 0;
+        if(value != null) {
+            count = Integer.parseInt(value);
+            if(count &gt;= 5) {
+                throw new RuntimeException(&quot;使用次数到期&quot;);
+            }
+        }
+        count++;
+
+        //计数
+        prop.setProperty(&quot;time&quot;, count+&quot;&quot;);
+
+        //输出流
+        FileOutputStream fos = new FileOutputStream(confile);
+
+        //存储
+        prop.store(fos, &quot;&quot;);
+
+        fis.close();
+        fos.close();
+
+    }
+}
+</code></pre><h4 id="6、Properties集合-练习-文件清单列表"><a href="#6、Properties集合-练习-文件清单列表" class="headerlink" title="6、Properties集合 - 练习 - 文件清单列表"></a>6、Properties集合 - 练习 - 文件清单列表</h4><p>获取指定目录下，指定扩展名的所有文件，把这些文件的绝对路径写入到一个文本中。</p>
+<pre><code>public class Demo6 {
+
+    public static void main(String[] args) {
+        //指定文件夹
+        File dir = new File(&quot;test&quot;);
+
+        //定义集合
+        List&lt;File&gt; list = new ArrayList&lt;File&gt;();
+
+        //定义过滤器
+        FilenameFilter filter = new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.endsWith(&quot;.md&quot;);
+            }
+        };
+
+        //深度遍历文件夹
+        getFiles(dir,filter,list);
+
+        //遍历list写入文件
+        File destfile = new File(&quot;markdownlist.txt&quot;);
+        writeToFile(list,destfile);
+
+
+    }
+    /**
+     * 深度遍历，找到所有的文件并过滤，把符合条件的文件存储到容器中
+     * @param dir
+     * @param filter
+     * @param list
+     */
+    public static void getFiles(File dir, FilenameFilter filter, List&lt;File&gt; list) {
+        File[] files = dir.listFiles();
+        for(File file:files) {
+            if(file.isDirectory()) {
+                //递归
+                getFiles(dir, filter, list);
+            } else {
+                //过滤并添加集合
+                if(filter.accept(dir, file.getName())) {
+                    list.add(file);
+                }
+            }
+        }
+    }
+
+    //写入到文件中
+    public static void writeToFile(List&lt;File&gt; list, File destFile) {
+        BufferedWriter bufw = null;
+        try {
+            bufw = new BufferedWriter(new FileWriter(destFile));
+            for(File file:list) {
+                bufw.write(file.getAbsolutePath());
+                bufw.flush();
+                bufw.newLine();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(&quot;写入失败&quot;);
+        } finally {
+            if(bufw != null)
+                try {
+                    bufw.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(&quot;关闭失败&quot;);
+                }
+        }
+
+    }
+
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-10-properties/" data-id="cjcfnyeyb0001rpp3tm501zxv" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/java-io/IO-3-byte-stream" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/10/java/java-io/IO-3-byte-stream/" class="article-date">
+  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/10/java/java-io/IO-3-byte-stream/">IO流 - 三、字节流</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="1、操作文件基本演示"><a href="#1、操作文件基本演示" class="headerlink" title="1、操作文件基本演示"></a>1、操作文件基本演示</h4><p>写</p>
+<pre><code>public class Demo8 {
+
+    public static void main(String[] args) throws IOException {
+
+        //创建字节输出流对象
+        FileOutputStream fos = new FileOutputStream(&quot;demo.txt&quot;);
+
+        //数据直接写入目标文件，没有缓冲区
+        fos.write(&quot;aaaaaddfsdss&quot;.getBytes());
+
+        fos.close();
+
+    }
+
+}
+</code></pre><p>逐个字节读取</p>
+<p>public class Demo9 {</p>
+<pre><code>public static void main(String[] args) throws IOException {
+
+    FileInputStream fis = new FileInputStream(&quot;demo.txt&quot;);
+
+    int ch = 0;
+    while((ch = fis.read()) != -1) {
+        System.out.println((char)ch);
+    }
+
+    fis.close();
+}
+</code></pre><p>}</p>
+<p>逐个数组读取</p>
+<pre><code>public class Demo10 {
+
+    public static void main(String[] args) throws IOException {
+
+        FileInputStream fis = new FileInputStream(&quot;demo.txt&quot;);
+
+        byte[] buf = new byte[1024];
+        int length = 0;
+
+        while((length = fis.read(buf, 0, length)) != -1) {
+            System.out.println(new String(buf,0,length));
+        }
+
+        fis.close();
+
+    }
+
+}
+</code></pre><h4 id="2、练习-复制mp3"><a href="#2、练习-复制mp3" class="headerlink" title="2、练习 - 复制mp3"></a>2、练习 - 复制mp3</h4><p>直接复制</p>
+<pre><code>public class Demo11 {
+
+    public static void main(String[] args) throws IOException {
+
+        FileInputStream fis = new FileInputStream(&quot;0.mp3&quot;);
+        FileOutputStream fos = new FileOutputStream(&quot;1.mp3&quot;);
+
+        byte[] buf = new byte[1024];
+        int length = 0;
+
+        while((length = fis.read()) != -1) {
+            fos.write(buf,0,length);
+        }
+
+        fos.close();
+        fis.close();
+    }
+
+}
+</code></pre><p>高效复制</p>
+<pre><code>public class Demo11 {
+
+    public static void main(String[] args) throws IOException {
+
+        FileInputStream fis = new FileInputStream(&quot;0.mp3&quot;);
+        BufferedInputStream bufis = new BufferedInputStream(fis);
+
+        FileOutputStream fos = new FileOutputStream(&quot;1.mp3&quot;);
+        BufferedOutputStream bufos = new BufferedOutputStream(fos);
+
+        byte[] buf = new byte[1024];
+
+        int length = 0;
+        while((length = bufis.read(buf)) != -1) {
+            bufos.write(buf, 0, length);
+        }
+
+        bufis.close();
+        bufos.close();
+
+    }
+}
+</code></pre><h4 id="3、演示键盘录入"><a href="#3、演示键盘录入" class="headerlink" title="3、演示键盘录入"></a>3、演示键盘录入</h4><p>读取键盘录入的一个数据，并打印在控制台上。</p>
+<p>键盘本身就是一个标准的输入设备。</p>
+<p>对于java而言，对于这种输入设备都有相应的对象。</p>
+<p>java.lang包里的 System类</p>
+<p>public static finael InputStream in</p>
+<p>“标准”输入流，不用关闭。</p>
+<p>键盘录入：</p>
+<pre><code>public class Demo12 {
+    public static void main(String[] args) throws IOException {
+        InputStream in = System.in;
+        int ch = in.read();
+        System.out.println(ch);
+    }
+}
+</code></pre><p>读取键盘录入：</p>
+<pre><code>public class Demo15 {
+
+    public static void main(String[] args) throws IOException {
+
+        InputStream in = System.in;
+        int ch = 0;
+        StringBuilder sb = new StringBuilder();
+        while((ch=in.read())!=-1) {
+            if(ch==&apos;\r&apos;) 
+                continue;
+            if(ch==&apos;\n&apos;) {
+                String temp = sb.toString();
+                if(&quot;over&quot;.equals(temp))
+                    break;
+                System.out.println(temp.toUpperCase());
+                sb.delete(0, sb.length());
+            } else {
+                sb.append((char)ch);
+            }
+        }
+
+    }
+
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-3-byte-stream/" data-id="cjcfnyez7000urpp31oh7e3ys" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/java-io/IO-2-buffered" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/10/java/java-io/IO-2-buffered/" class="article-date">
+  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/10/java/java-io/IO-2-buffered/">IO流 - 二、缓冲区</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="二、缓冲区"><a href="#二、缓冲区" class="headerlink" title="二、缓冲区"></a>二、缓冲区</h3><p>提高了对数据的读写效率。</p>
+<p>对应类：</p>
+<p>BufferedWriter</p>
+<p>BufferedReader</p>
+<h4 id="1、缓冲区单个字符读写"><a href="#1、缓冲区单个字符读写" class="headerlink" title="1、缓冲区单个字符读写"></a>1、缓冲区单个字符读写</h4><pre><code>public class Demo6 {
+
+    public static void main(String[] args) throws IOException {
+        FileReader fr = new FileReader(&quot;demo.txt&quot;);
+        BufferedReader bufr = new BufferedReader(fr);
+
+        FileWriter fw = new FileWriter(&quot;buf_copy.txt&quot;);
+        BufferedWriter bufw = new BufferedWriter(fw);
+
+        int ch = 0;
+        while((ch = bufr.read())!=-1) {
+            bufw.write(ch);
+        }
+        bufw.close();
+        bufr.close();
+
+    }
+
+}
+</code></pre><h4 id="2、缓冲区逐行读写"><a href="#2、缓冲区逐行读写" class="headerlink" title="2、缓冲区逐行读写"></a>2、缓冲区逐行读写</h4><pre><code>public class Demo6 {
+
+    public static void main(String[] args) throws IOException {
+        FileReader fr = new FileReader(&quot;demo.txt&quot;);
+        BufferedReader bufr = new BufferedReader(fr);
+
+        FileWriter fw = new FileWriter(&quot;buf_copy.txt&quot;);
+        BufferedWriter bufw = new BufferedWriter(fw);
+
+        String line = null;
+
+        while((line = bufr.readLine())!=null) {
+            bufw.write(line);
+            bufw.newLine();
+            bufw.flush();
+        }
+
+        bufw.close();
+        bufr.close();
+
+    }
+
+}
+</code></pre><h4 id="3、缓冲区-装饰设计模式"><a href="#3、缓冲区-装饰设计模式" class="headerlink" title="3、缓冲区 - 装饰设计模式"></a>3、缓冲区 - 装饰设计模式</h4><p>装饰设计模式：</p>
+<p>对一组对象的功能进行增强时，就可以使用该模式解决问题。</p>
+<pre><code>public class Person {
+    public void eat() {
+        System.out.println(&quot;....eating...&quot;);
+    }
+}
+
+//通过继承进行功能扩展
+class NewPerson extends Person{
+    public void eat() {
+        System.out.println(&quot;befor...eating...&quot;);
+        super.eat();
+        System.out.println(&quot;after...eating&quot;);
+    }
+}
+
+//通过装饰类进行功能扩展
+class NewPerson2 {
+    private Person p;
+    NewPerson2(Person p){
+        this.p = p;
+    }
+    void eat() {        
+        System.out.println(&quot;befor...eating...&quot;);
+        p.eat();
+        System.out.println(&quot;after...eating&quot;);
+    }
+}
+</code></pre><p>装饰和继承的区别：</p>
+<p>Writer</p>
+<p>|– TextWriter:用于操作文本</p>
+<p>—– BufferedTextWriter:加入缓冲技术</p>
+<p>|– MediaWriter:用于操作媒体</p>
+<p>—– BufferedMediaWriter:加入缓冲技术</p>
+<p>继承导致原有类的体系越来越臃肿，不够灵活。</p>
+<p>class Buffered {<br>    Buffered(Writer w){<br>        …<br>    }<br>}</p>
+<p>装饰比继承更灵活。</p>
+<h4 id="4、缓冲区-装饰类-LineNumberReader"><a href="#4、缓冲区-装饰类-LineNumberReader" class="headerlink" title="4、缓冲区 - 装饰类 - LineNumberReader"></a>4、缓冲区 - 装饰类 - LineNumberReader</h4><pre><code>public class Demo7 {
+
+    public static void main(String[] args) throws IOException {
+
+        FileReader fr = new FileReader(&quot;demo.txt&quot;);
+        LineNumberReader lnr = new LineNumberReader(fr);
+
+        String line = null;
+        lnr.setLineNumber(100);
+        while((line = lnr.readLine()) != null) {
+            System.out.println(lnr.getLineNumber()+&quot;:&quot;+line);
+        }
+    }
+
+}
+
+输出结果：
+101:abc
+102:cde
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-2-buffered/" data-id="cjcfnyezb000xrpp37me6gjbz" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java-api-otherObjects" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/09/java-api-otherObjects/" class="article-date">
+  <time datetime="2018-01-09T07:16:19.000Z" itemprop="datePublished">2018-01-09</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/09/java-api-otherObjects/">其它对象API</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="一、System类"><a href="#一、System类" class="headerlink" title="一、System类"></a>一、System类</h3><p>System类中的方法和属性都是静态的。</p>
+<p>常见方法：</p>
+<p>long currentTimeMillis():获取当前时间的毫秒值</p>
+<p>Properties getProperties():获取当前系统的属性信息    </p>
+<pre><code>public class SystemApi {
+    public static void main(String[] args) {
+
+        long millisTime = System.currentTimeMillis();
+        System.out.println(millisTime);
+
+        Properties prop = System.getProperties();
+
+        Set&lt;String&gt; nameSet = prop.stringPropertyNames();
+
+        for(String name:nameSet) {
+            String value = prop.getProperty(name);
+            System.out.println(name+&quot;::&quot;+value);
+        }
+
+
+    }
+}
+</code></pre><h3 id="二、Runtime类"><a href="#二、Runtime类" class="headerlink" title="二、Runtime类"></a>二、Runtime类</h3><p>Runtime:</p>
+<p>没有构造方法摘要，说明该类不可以创建对象。</p>
+<p>又发现该类有非静态方法，说明该类应该有提供的静态的返回该类对象的方法。</p>
+<p>而且只有一个这种方法，说明Runtime类使用了单例设计模式。</p>
+<pre><code>public class RuntimeApi {
+
+    public static void main(String[] args) throws IOException, InterruptedException {
+
+        Runtime r = Runtime.getRuntime();
+
+        Process p = r.exec(&quot;open -a Safari.app http://www.baidu.com&quot;);
+        Thread.sleep(2000);
+        p.destroy();
+    }
+
+}
+</code></pre><h3 id="三、Math类"><a href="#三、Math类" class="headerlink" title="三、Math类"></a>三、Math类</h3><p>常用方法：</p>
+<p>double ceil():返回大于参数的最小整数。</p>
+<p>double floor():返回小于参数的最大整数。</p>
+<p>double round():返回四舍五入的整数。</p>
+<p>max(a,b):返回最大值</p>
+<p>pow(a,b):a的b次方</p>
+<p>double random():返回大于等于0.0小于1.0的随机double值，与java.util中的Random类相似。</p>
+<h3 id="四、Date类"><a href="#四、Date类" class="headerlink" title="四、Date类"></a>四、Date类</h3><h4 id="（一）、日期对象和毫秒值之间的转换"><a href="#（一）、日期对象和毫秒值之间的转换" class="headerlink" title="（一）、日期对象和毫秒值之间的转换"></a>（一）、日期对象和毫秒值之间的转换</h4><h5 id="毫秒值–-gt-日期对象"><a href="#毫秒值–-gt-日期对象" class="headerlink" title="毫秒值–&gt;日期对象"></a>毫秒值–&gt;日期对象</h5><p>1、通过Date对象的构造方法 new Date(timeMills);</p>
+<p>2、通过setTime方法。</p>
+<p>目的是通过Date对象的方法，对该日期中的年月日等字段进行操作。</p>
+<h5 id="日期对象–-gt-毫秒值"><a href="#日期对象–-gt-毫秒值" class="headerlink" title="日期对象–&gt;毫秒值"></a>日期对象–&gt;毫秒值</h5><p>1、通过getTime方法。</p>
+<p>目的是通过具体的数值进行运算。</p>
+<pre><code>public static void thord1() {
+        //long time = System.currentTimeMillis();//1515489394135
+
+        Date date1 = new Date();//将当前日期和时间封装成Date对象
+        System.out.println(date1);//Tue Jan 09 17:16:34 CST 2018
+
+        Date date2 = new Date(1515489367117l);//将指定毫秒封装成Date对象
+        System.out.println(date2);//Tue Jan 09 17:16:07 CST 2018
+}
+</code></pre><h4 id="（二）、日期对象转成字符串"><a href="#（二）、日期对象转成字符串" class="headerlink" title="（二）、日期对象转成字符串"></a>（二）、日期对象转成字符串</h4><pre><code>public class DateDemo {
+
+    public static void main(String[] args) {
+
+        Date date = new Date();
+
+        //获取日期格式对象。具备着默认的风格
+        DateFormat dateFormat = DateFormat.getDateInstance();
+        String str_date = dateFormat.format(date);
+        System.out.println(str_date); //Jan 9, 2018
+
+        DateFormat dateFormat2 = DateFormat.getDateTimeInstance();
+        String str_date2 = dateFormat2.format(date);
+        System.out.println(str_date2);//Jan 9, 2018 5:48:43 PM
+
+        //其它风格 FULL LONG SHORT MEDIUM
+        //DateFormat dateFormat3 = DateFormat.getDateInstance(DateFormat.FULL);//Tuesday, January 9, 2018
+
+        //DateFormat dateFormat3 = DateFormat.getDateInstance(DateFormat.LONG);//January 9, 2018
+
+        //DateFormat dateFormat3 = DateFormat.getDateInstance(DateFormat.SHORT);//1/9/18
+
+        DateFormat dateFormat3 = DateFormat.getDateInstance(DateFormat.MEDIUM);//Jan 9, 2018
+
+        String str_date3 = dateFormat3.format(date);
+        System.out.println(str_date3);
+
+        //日期和时间
+        DateFormat dateFormat4 = DateFormat.getDateTimeInstance(DateFormat.LONG,DateFormat.LONG);//Jan 9, 2018
+
+        String str_date4 = dateFormat4.format(date);
+        System.out.println(str_date4);
+
+        //自定义风格
+        DateFormat dateFormats = DateFormat.getDateInstance();
+        dateFormats = new SimpleDateFormat(&quot;yyyy-MM-dd&quot;);
+        String str_date5 = dateFormats.format(date);
+        System.out.println(str_date5);//2018-01-09
+
+
+    }
+}
+</code></pre><h4 id="（三）、字符串转成日期对象"><a href="#（三）、字符串转成日期对象" class="headerlink" title="（三）、字符串转成日期对象"></a>（三）、字符串转成日期对象</h4><p>使用的是DateFormat类中的parse方法。</p>
+<pre><code>public class DateFormatDemo {
+
+    public static void main(String[] args) throws ParseException {
+
+        //默认的日期字符串格式转成日期对象
+        String str_date = &quot;Jan 9, 2018 5:48:43 PM&quot;;
+        DateFormat dateFormat = DateFormat.getDateInstance();
+        Date date = dateFormat.parse(str_date);
+        System.out.println(date);
+
+        //将自定义的日期字符串格式转成日期对象
+        String str_date2 = &quot;2018--1--10&quot;;
+        DateFormat dateFormat2 = DateFormat.getDateInstance(DateFormat.LONG);
+        dateFormat2 = new SimpleDateFormat(&quot;yyyy--MM--dd&quot;);
+        Date date2 = dateFormat2.parse(str_date2);
+        System.out.println(date2);
+
+    }
+
+}
+</code></pre><h4 id="（四）、Date类-练习"><a href="#（四）、Date类-练习" class="headerlink" title="（四）、Date类 - 练习"></a>（四）、Date类 - 练习</h4><pre><code>public class Demo1 {
+
+    public static void main(String[] args) throws ParseException {
+
+        /**
+         * 练习：
+         * &quot;2017.12.20&quot;到&quot;2018.1.10&quot;中间相隔多少天
+         * 
+         * 思路：
+         * 1、日期字符串转日期对象
+         * 2、日期对象方法获取毫秒数
+         * 3、毫秒数相减，再计算天数
+         */
+
+        String str_date1 = &quot;2017.12.20&quot;;
+        String str_date2 = &quot;2018.1.10&quot;;
+
+        //DateFormat dateFormat = DateFormat.getDateInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat(&quot;yyyy.MM.dd&quot;);
+        Date date1 = dateFormat.parse(str_date1);
+        Date date2 = dateFormat.parse(str_date2);
+
+        long date1Millis = date1.getTime();
+        long date2millis = date2.getTime();
+
+        int day = (int) Math.abs(date1Millis - date2millis)/1000/60/60/24;
+
+
+        System.out.println(day);
+    }
+
+}
+</code></pre><h3 id="四、Calendar类"><a href="#四、Calendar类" class="headerlink" title="四、Calendar类"></a>四、Calendar类</h3><p>常见方法：</p>
+<p>set()</p>
+<p>get()</p>
+<p>add():偏移</p>
+<h5 id="一、基本演示"><a href="#一、基本演示" class="headerlink" title="一、基本演示"></a>一、基本演示</h5><pre><code>public class CalendarDemo {
+
+    public static void main(String[] args) {
+
+        Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH)+1;
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        int week = c.get(Calendar.DAY_OF_WEEK);
+
+        System.out.println(year+&quot;年&quot;+month+&quot;月&quot;+day+&quot;日&quot;+getWeek(week));
+
+    }
+
+    private static String getWeek(int i) {
+        String[] weeks = {&quot;&quot;,&quot;星期日&quot;,&quot;星期一&quot;,&quot;星期二&quot;,&quot;星期三&quot;,&quot;星期四&quot;,&quot;星期五&quot;,&quot;星期六&quot;};
+        return weeks[i];
+    }
+}
+</code></pre><h5 id="二、练习"><a href="#二、练习" class="headerlink" title="二、练习"></a>二、练习</h5><pre><code>public class CalendarDemo {
+
+    public static void main(String[] args) {
+
+        Calendar c = Calendar.getInstance();
+        //指定日期
+        c.set(2018, 0, 20);
+        showDate(c);
+
+        //日期偏移
+        c.add(Calendar.YEAR, 2);
+        showDate(c);
+
+    }
+
+    public static void showDate(Calendar c) {
+        //Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH)+1;
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        int week = c.get(Calendar.DAY_OF_WEEK);
+
+        System.out.println(year+&quot;年&quot;+month+&quot;月&quot;+day+&quot;日&quot;+getWeek(week));
+    }
+
+    private static String getWeek(int i) {
+        String[] weeks = {&quot;&quot;,&quot;星期日&quot;,&quot;星期一&quot;,&quot;星期二&quot;,&quot;星期三&quot;,&quot;星期四&quot;,&quot;星期五&quot;,&quot;星期六&quot;};
+        return weeks[i];
+    }
+
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/09/java-api-otherObjects/" data-id="cjcfm8gli002tn2p3h369tna1" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/api/">api</a></li></ul>
 
     </footer>
   </div>
@@ -2894,7 +1611,7 @@ hexo d -g
 
 
   <nav id="page-nav">
-    <a class="extend prev" rel="prev" href="/">&laquo; __('prev')</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/3/">__('next') &raquo;</a>
+    <a class="extend prev" rel="prev" href="/">&laquo; __('prev')</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/3/">__('next') &raquo;</a>
   </nav>
 </section>
         
@@ -2902,7 +1619,7 @@ hexo d -g
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Catégories</h3>
+    <h3 class="widget-title">Categories</h3>
     <div class="widget">
       <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
     </div>
@@ -2912,9 +1629,9 @@ hexo d -g
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Mot-clés</h3>
+    <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
     </div>
   </div>
 
@@ -2922,9 +1639,9 @@ hexo d -g
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Nuage de mot-clés</h3>
+    <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/angular/" style="font-size: 20px;">angular</a> <a href="/tags/api/" style="font-size: 15px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 17.5px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/thread/" style="font-size: 12.5px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 18px;">angular</a> <a href="/tags/api/" style="font-size: 14px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 16px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/thread/" style="font-size: 12px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
     </div>
   </div>
 
@@ -2941,28 +1658,28 @@ hexo d -g
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Articles récents</h3>
+    <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
         
           <li>
-            <a href="/2018/01/09/java-api-otherObjects/">其它对象API</a>
+            <a href="/2018/01/15/java/java-io/IO-19-practice-cutstring/">IO流 - 十九：练习 - 按字节截取字符串</a>
           </li>
         
           <li>
-            <a href="/2018/01/09/java-collection-utilities/">集合框架五 - 工具类</a>
+            <a href="/2018/01/15/java/java-io/IO-1-instruction/">IO流 - 一、概述</a>
           </li>
         
           <li>
-            <a href="/2018/01/09/java-collection-map/">集合框架四 - Map集合</a>
+            <a href="/2018/01/10/java/java-io/IO-9-file/">IO流 - 九、File对象</a>
           </li>
         
           <li>
-            <a href="/2018/01/09/java-collection-notes/">集合框架三 - 查阅技巧</a>
+            <a href="/2018/01/10/java/java-io/IO-8-transform-coding/">IO流 - 八、转换流的编码解码</a>
           </li>
         
           <li>
-            <a href="/2018/01/09/java-collection-generic/">集合框架二 - 泛型</a>
+            <a href="/2018/01/10/java/java-io/IO-7-stream-rule-demo/">IO流 - 七、流的操作规律 - 需求体现</a>
           </li>
         
       </ul>
@@ -2978,7 +1695,7 @@ hexo d -g
   <div class="outer">
     <div id="footer-info" class="inner">
       &copy; 2018 John Doe<br>
-      Propulsé by <a href="http://hexo.io/" target="_blank">Hexo</a>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
 </footer>

@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>IO流 - 十、IO流 - Properties集合 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="java-IO流">
+<meta name="keywords" content="java, IO">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IO流 - 十、IO流 - Properties集合">
+<meta property="og:url" content="http://yoursite.com/2018/01/10/java/java-io/IO-10-properties/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="java-IO流">
+<meta property="og:updated_time" content="2018-01-15T03:03:54.534Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="IO流 - 十、IO流 - Properties集合">
+<meta name="twitter:description" content="java-IO流">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-java/java-io/IO-10-properties" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/10/java/java-io/IO-10-properties/" class="article-date">
+  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      IO流 - 十、IO流 - Properties集合
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="1、基本功能"><a href="#1、基本功能" class="headerlink" title="1、基本功能"></a>1、基本功能</h4><p>Map</p>
+<p>|—–Hashtable</p>
+<p>|————-Properties         </p>
+<p>Properties集合特点：</p>
+<p>1、该集合中的键和值都是字符串类型。</p>
+<p>2、集合中的数据可以保存流中，或者从流中获取。</p>
+<p>通常该集合用于操作以键值对形式存在的配置文件。</p>
+<pre><code>public class Demo1 {
+
+    public static void main(String[] args) {
+
+        Properties prop = new Properties();
+        //存储
+        prop.setProperty(&quot;zhangsan&quot;, &quot;32&quot;);
+        prop.setProperty(&quot;lisi&quot;, &quot;32&quot;);
+        prop.setProperty(&quot;wangwu&quot;, &quot;32&quot;);
+        prop.setProperty(&quot;zhaoliu&quot;, &quot;32&quot;);
+        //取出
+        Set&lt;String&gt; names = prop.stringPropertyNames();
+
+        for(String name:names) {
+            String value = prop.getProperty(name);
+            System.out.println(name+&quot;:&quot;+value);
+        }
+
+    }
+
+}
+</code></pre><h4 id="2、list方法"><a href="#2、list方法" class="headerlink" title="2、list方法"></a>2、list方法</h4><p>public void list(PrintStream out)    </p>
+<p>将属性列表输出到指定的输出流。此方法用于调试。</p>
+<pre><code>Properties prop = new Properties();
+//存储
+prop.setProperty(&quot;zhangsan&quot;, &quot;32&quot;);
+prop.setProperty(&quot;lisi&quot;, &quot;32&quot;);
+prop.setProperty(&quot;wangwu&quot;, &quot;32&quot;);
+prop.setProperty(&quot;zhaoliu&quot;, &quot;32&quot;);
+/*
+//取出
+Set&lt;String&gt; names = prop.stringPropertyNames();
+
+for(String name:names) {
+    String value = prop.getProperty(name);
+    System.out.println(name+&quot;:&quot;+value);
+}
+*/
+//prop.list(System.out);
+
+Properties props = System.getProperties();
+props.list(System.out);    
+</code></pre><h4 id="3、store方法"><a href="#3、store方法" class="headerlink" title="3、store方法"></a>3、store方法</h4><p>store(OutputStream out,String comments)</p>
+<p>Store(Writer writer,String comments)</p>
+<p>将集合中的字符串，键值信息持久化存储到硬盘的文件中。</p>
+<pre><code>public class Dmo2 {
+
+    public static void main(String[] args) throws IOException {
+
+        Properties prop = new Properties();
+        //存储
+        prop.setProperty(&quot;zhangsan&quot;, &quot;32&quot;);
+        prop.setProperty(&quot;lisi&quot;, &quot;32&quot;);
+        prop.setProperty(&quot;wangwu&quot;, &quot;32&quot;);
+        prop.setProperty(&quot;zhaoliu&quot;, &quot;32&quot;);
+
+        //将这些集合中的键值对信息持久化存储到文件中，需要关联输出流。
+        FileOutputStream fos = new FileOutputStream(&quot;info.txt&quot;);
+        prop.store(fos, &quot;name+age&quot;);
+
+        fos.close();
+
+    }
+
+}
+
+info.txt
+
+#name+age
+#Sat Jan 13 10:32:19 CST 2018
+zhangsan=32
+lisi=32
+zhaoliu=32
+wangwu=32
+</code></pre><h4 id="4、修改配置信息"><a href="#4、修改配置信息" class="headerlink" title="4、修改配置信息"></a>4、修改配置信息</h4><p>load(InputStream inStream)</p>
+<p>load(Reader reader)</p>
+<p>读取配置信息</p>
+<pre><code>public class Demo3 {
+
+    public static void main(String[] args) throws IOException {
+
+        Properties prop = new Properties();
+
+        FileInputStream fis = new FileInputStream(&quot;info.txt&quot;);
+
+        prop.load(fis);
+        prop.list(System.out);
+
+    }
+}
+
+输出结果：
+-- listing properties --
+zhangsan=32
+lisi=32
+zhaoliu=32
+wangwu=32
+</code></pre><p>模拟load方法</p>
+<pre><code>public static void myLoad() throws IOException {
+    Properties prop = new Properties();
+
+    BufferedReader bufr = new BufferedReader(new FileReader(&quot;info.txt&quot;));
+
+    String line = null;
+    while((line = bufr.readLine()) != null) {
+        if(line.startsWith(&quot;#&quot;)) 
+            continue;
+        String[] arr = line.split(&quot;=&quot;);
+        System.out.println(arr[0]+&quot;::&quot;+arr[1]);
+    }
+
+}
+</code></pre><p>修改硬盘的文件中已有的配置信息</p>
+<pre><code>public class Demo4 {
+
+    /**
+     * 读取文件
+     * 键值对信息存储到集合中
+     * 通过集合方法修改数据
+     * 通过流将修改后的数据存储到文件
+     * @param args
+     * @throws IOException 
+     */
+
+    public static void main(String[] args) throws IOException {
+        //读取文件流，流可以直接操作File对象
+        File file = new File(&quot;info.txt&quot;);
+        if(!file.exists()) {
+            file.createNewFile();
+        }
+        FileReader fr = new FileReader(file);
+
+        //创建空集合
+        Properties prop = new Properties();
+
+        //集合加载流数据
+        prop.load(fr);
+        //prop.list(System.out);
+
+        //修改集合数据
+        prop.setProperty(&quot;zhangsan&quot;, &quot;20&quot;);
+
+        //写入文件流
+        FileWriter fw = new FileWriter(file);
+
+        //集合持久化存储文件流
+        prop.store(fw,&quot;&quot;);
+
+        //关闭流
+        fr.close();
+        fw.close();
+    }
+
+}
+</code></pre><h4 id="5、Properties集合-练习"><a href="#5、Properties集合-练习" class="headerlink" title="5、Properties集合 - 练习"></a>5、Properties集合 - 练习</h4><p>定义功能，获取应用程序的运行次数，超过5次，给出到期提示并退出程序。</p>
+<p>思路：使用计数器，并以文件形式保存在硬盘中。</p>
+<pre><code>public class Demo5 {
+    public static void main(String[] args) throws IOException {
+        //封装配置文件对象
+        File confile = new File(&quot;count.properties&quot;);
+        if(!confile.exists()) {
+            confile.createNewFile();
+        }
+
+        //输入流
+        FileInputStream fis = new FileInputStream(confile);
+
+        //创建空集合
+        Properties prop = new Properties();
+
+        //加载数据流
+        prop.load(fis);
+
+        //获取数据
+        String value = prop.getProperty(&quot;time&quot;);
+
+        //计数器
+        int count = 0;
+        if(value != null) {
+            count = Integer.parseInt(value);
+            if(count &gt;= 5) {
+                throw new RuntimeException(&quot;使用次数到期&quot;);
+            }
+        }
+        count++;
+
+        //计数
+        prop.setProperty(&quot;time&quot;, count+&quot;&quot;);
+
+        //输出流
+        FileOutputStream fos = new FileOutputStream(confile);
+
+        //存储
+        prop.store(fos, &quot;&quot;);
+
+        fis.close();
+        fos.close();
+
+    }
+}
+</code></pre><h4 id="6、Properties集合-练习-文件清单列表"><a href="#6、Properties集合-练习-文件清单列表" class="headerlink" title="6、Properties集合 - 练习 - 文件清单列表"></a>6、Properties集合 - 练习 - 文件清单列表</h4><p>获取指定目录下，指定扩展名的所有文件，把这些文件的绝对路径写入到一个文本中。</p>
+<pre><code>public class Demo6 {
+
+    public static void main(String[] args) {
+        //指定文件夹
+        File dir = new File(&quot;test&quot;);
+
+        //定义集合
+        List&lt;File&gt; list = new ArrayList&lt;File&gt;();
+
+        //定义过滤器
+        FilenameFilter filter = new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.endsWith(&quot;.md&quot;);
+            }
+        };
+
+        //深度遍历文件夹
+        getFiles(dir,filter,list);
+
+        //遍历list写入文件
+        File destfile = new File(&quot;markdownlist.txt&quot;);
+        writeToFile(list,destfile);
+
+
+    }
+    /**
+     * 深度遍历，找到所有的文件并过滤，把符合条件的文件存储到容器中
+     * @param dir
+     * @param filter
+     * @param list
+     */
+    public static void getFiles(File dir, FilenameFilter filter, List&lt;File&gt; list) {
+        File[] files = dir.listFiles();
+        for(File file:files) {
+            if(file.isDirectory()) {
+                //递归
+                getFiles(dir, filter, list);
+            } else {
+                //过滤并添加集合
+                if(filter.accept(dir, file.getName())) {
+                    list.add(file);
+                }
+            }
+        }
+    }
+
+    //写入到文件中
+    public static void writeToFile(List&lt;File&gt; list, File destFile) {
+        BufferedWriter bufw = null;
+        try {
+            bufw = new BufferedWriter(new FileWriter(destFile));
+            for(File file:list) {
+                bufw.write(file.getAbsolutePath());
+                bufw.flush();
+                bufw.newLine();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(&quot;写入失败&quot;);
+        } finally {
+            if(bufw != null)
+                try {
+                    bufw.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(&quot;关闭失败&quot;);
+                }
+        }
+
+    }
+
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-10-properties/" data-id="cjcfnyeyb0001rpp3tm501zxv" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/01/10/java/java-io/IO-11-printSream/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          IO流 - 十一、打印流
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/01/10/java/java-io/IO-3-byte-stream/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">IO流 - 三、字节流</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 18px;">angular</a> <a href="/tags/api/" style="font-size: 14px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 16px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/thread/" style="font-size: 12px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/01/15/java/java-io/IO-19-practice-cutstring/">IO流 - 十九：练习 - 按字节截取字符串</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/15/java/java-io/IO-1-instruction/">IO流 - 一、概述</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/10/java/java-io/IO-9-file/">IO流 - 九、File对象</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/10/java/java-io/IO-8-transform-coding/">IO流 - 八、转换流的编码解码</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/10/java/java-io/IO-7-stream-rule-demo/">IO流 - 七、流的操作规律 - 需求体现</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
