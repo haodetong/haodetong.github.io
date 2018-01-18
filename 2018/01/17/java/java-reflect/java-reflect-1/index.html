@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>java反射机制 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="java reflect">
+<meta name="keywords" content="java, reflect">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java反射机制">
+<meta property="og:url" content="http://yoursite.com/2018/01/17/java/java-reflect/java-reflect-1/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="java reflect">
+<meta property="og:updated_time" content="2018-01-17T12:39:37.160Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="java反射机制">
+<meta name="twitter:description" content="java reflect">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-java/java-reflect/java-reflect-1" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/17/java/java-reflect/java-reflect-1/" class="article-date">
+  <time datetime="2018-01-17T11:06:09.000Z" itemprop="datePublished">2018-01-17</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      java反射机制
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="1、概述"><a href="#1、概述" class="headerlink" title="1、概述"></a>1、概述</h4><p>java反射机制是在运行状态中，对于任意一个类，都能够知道这个类的所有属性和方法，对于任意一个类，都能够调用它的任意方法和属性，这种动态的获取信息以及动态调用对象的方法的功能就称为java语言的反射机制。</p>
+<p>可以理解为对类的解剖。</p>
+<h4 id="2、获取Class类的对象的三种方式"><a href="#2、获取Class类的对象的三种方式" class="headerlink" title="2、获取Class类的对象的三种方式"></a>2、获取Class类的对象的三种方式</h4><p>（1）、Object类中的getClass()方法</p>
+<pre><code>Person p = new Person();
+Class pc = p.getClass();
+</code></pre><p>（2）、通过静态属性class</p>
+<pre><code>Class pc = Person.class;
+</code></pre><p>（3）、通过Class类中的forName方法</p>
+<pre><code>String className = &quot;src/reflect/Person&quot;;//带包的路径
+Class pc = Class.forName(className);
+</code></pre><h4 id="3、获取Class中的构造函数"><a href="#3、获取Class中的构造函数" class="headerlink" title="3、获取Class中的构造函数"></a>3、获取Class中的构造函数</h4><pre><code>class Person {
+    public String name;
+    private int age;
+    Person() {
+
+    }
+    Person(int age, String name) {
+        this.name = name;
+        this.age = age;
+    }
+}
+
+//字节码文件对象，class对象的类
+Class pc = Class.forName(className);
+
+//生成该字节码文件对象，class对象，调用的是空参的构造函数
+Object obj = pc.newInstance();
+
+//实参的构造函数，生成对象，先获取构造函数
+Constructor ct = pc.getConstructor(int.class,String.class);
+
+//通过构造器对象的newInstance方法生成对象
+Object obj = ct.newInstance(38,&quot;小明&quot;);
+</code></pre><h4 id="4、获取Class中的字段"><a href="#4、获取Class中的字段" class="headerlink" title="4、获取Class中的字段"></a>4、获取Class中的字段</h4><pre><code>//字节码文件对象，class对象的类
+Class pc = Class.forName(className);
+
+//只能获取public字段
+Field nameField = pc.getField(&quot;name&quot;);
+
+//能获取public和private字段
+Field ageField = pc.getDeclaredField(&quot;age&quot;);
+
+//对私有字段的访问取消权限检查，暴力访问
+ageField.setAccessible(true);
+
+//生成对象
+Object obj = pc.newInstance();
+
+//age赋值
+ageField.set(obj,22);
+
+//age取值
+Object ageValue = field.get(obj);
+
+syso(ageValue);//22
+</code></pre><h4 id="5、获取Class中的方法"><a href="#5、获取Class中的方法" class="headerlink" title="5、获取Class中的方法"></a>5、获取Class中的方法</h4><pre><code>//字节码文件对象，class对象的类
+Class pc = Class.forName(className);
+
+//获取所有的public方法，包含父类中的
+Method[] methods = pc.getMethods();
+
+//获取本类中所有的public和private方法，不包含父类中的
+methods = pc.getDeclaredMethods();
+
+//获取指定的空参方法show，null代表空参
+Method showMethod = pc.getMethod(&quot;show&quot;,null);
+
+//生成对象
+Object obj = pc.newInstance();
+
+//调用show方法，null代表实参
+showMethod.invoke(obj,null);
+
+//获取指定的带参数的方法paramMethod
+Method paramMethod = pc.getMethod(&quot;paramMethod&quot;, String.class, int.class);
+
+//调用paramMethod方法
+paramMethod.invoke(obj,&quot;小强&quot;,22);
+</code></pre><h4 id="6、反射练习"><a href="#6、反射练习" class="headerlink" title="6、反射练习"></a>6、反射练习</h4><pre><code>public class ReflectPractice {
+    public static void main(String[] args) throws IOException, ReflectiveOperationException {
+        //主板开启
+        Mainboard mb = new Mainboard();
+        mb.run();
+
+        //加载声卡，网卡等设备
+        //读取配置文件，获取设备类名称
+        File configFile = new File(&quot;pci.properties&quot;);
+        if(!configFile.exists())
+            configFile.createNewFile();
+        Properties prop = new Properties();
+        FileInputStream fis = new FileInputStream(configFile);
+        prop.load(fis);
+        for(int x=0; x&lt;prop.size(); x++) {
+            String pciName = prop.getProperty(&quot;pci&quot;+(x+1));
+            //根据设备名，获取该设备字节码文件对象
+            Class clazz = Class.forName(pciName);
+            //实例化设备对象
+            PCI p = (PCI)clazz.newInstance();
+            //运行设备
+            mb.usePCI(p);
+        }
+        fis.close();
+    }
+}
+
+public interface PCI {
+    public void open();
+    public void close();
+}    
+
+public class Mainboard {
+
+    public void run() {
+        System.out.println(&quot;mainboard run&quot;);
+    }
+
+    public void usePCI(PCI p) {
+        if(p != null) {            
+            p.open();
+            p.close();
+        }
+    }
+
+}
+
+public class NetCard implements PCI {
+
+    @Override
+    public void open() {
+        System.out.println(&quot;netcard open&quot;);
+    }
+
+    @Override
+    public void close() {
+        System.out.println(&quot;netcard close&quot;);
+    }
+
+}
+
+public class SoundCard implements PCI{
+
+    @Override
+    public void open() {
+        System.out.println(&quot;sound open&quot;);
+    }
+
+    @Override
+    public void close() {
+        System.out.println(&quot;sound close&quot;);
+    }
+
+}
+
+file pci.properties
+
+pci1=reflect.SoundCard
+pci2=reflect.NetCard
+
+只需要向配置文件中添加设备名称即可，不用再修改mainborad文件，增加了程序的扩展性。
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/17/java/java-reflect/java-reflect-1/" data-id="cjck83ht6003ozvp372izf5d5" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/reflect/">reflect</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/01/17/java/java-regex/java-regex-1/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          java-正则表达式
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/01/15/java/java-io/IO-19-practice-cutstring/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">IO流 - 十九：练习 - 按字节截取字符串</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 18px;">angular</a> <a href="/tags/api/" style="font-size: 14px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 16px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/thread/" style="font-size: 12px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/01/17/java/java-regex/java-regex-1/">java-正则表达式</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/17/java/java-reflect/java-reflect-1/">java反射机制</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/15/java/java-io/IO-19-practice-cutstring/">IO流 - 十九：练习 - 按字节截取字符串</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/15/java/java-io/IO-1-instruction/">IO流 - 一、概述</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/10/java/java-io/IO-10-properties/">IO流 - 十、IO流 - Properties集合</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

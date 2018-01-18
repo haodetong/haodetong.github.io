@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>java-正则表达式 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="java regex">
+<meta name="keywords" content="java, regex">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java-正则表达式">
+<meta property="og:url" content="http://yoursite.com/2018/01/17/java/java-regex/java-regex-1/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="java regex">
+<meta property="og:updated_time" content="2018-01-18T02:46:08.624Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="java-正则表达式">
+<meta name="twitter:description" content="java regex">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-java/java-regex/java-regex-1" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/17/java/java-regex/java-regex-1/" class="article-date">
+  <time datetime="2018-01-17T12:50:07.000Z" itemprop="datePublished">2018-01-17</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      java-正则表达式
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>正则表达式用于操作字符串数据。</p>
+<h4 id="1、匹配："><a href="#1、匹配：" class="headerlink" title="1、匹配："></a>1、匹配：</h4><pre><code>匹配手机号码
+String tel = &quot;15022443344&quot;;
+String regex = &quot;1[3578][0-9]{9}&quot;;
+String regex2 = &quot;1[3578]\\d{9}&quot;;
+
+boolean r = tel.matches(regex);
+sosy(tel+&quot;:&quot;+r);
+
+1[3578][0-9]{9}
+1[3578]\\d{9}
+
+1:第一位固定是1 
+[3578]:第二位是3578中的一个
+[0-9]:第三位是0-9中的一个
+{9}：第三位共出现9次
+\:对\进行转义
+\d:代表[0-9]
+</code></pre><h4 id="2、切割："><a href="#2、切割：" class="headerlink" title="2、切割："></a>2、切割：</h4><p>其实使用的就是String类中的split(String regex)方法</p>
+<pre><code>*:任意次数，0次，1次或多次
+?:0次或1次
++:1次或多次
+
+String str = &quot;adf djs    sfjjs&quot;;
+String names = str.split(&quot; +&quot;);//空格出现一次或多次
+
+===========================
+
+.:代表任意字符
+String str = &quot;adf.djss.fjjs&quot;;
+String names = str.split(&quot;\\.&quot;);
+
+():代表组
+//根据重复的t和重复的m切割三个字段
+String str = &quot;zhangsantttttttxiaoqiangmmmmmmmmzhaoliu&quot;;
+String names = str.split(&quot;(.)\\1+&quot;);
+
+(.)\\1+
+.:代表第一个字符是任意字符，可以是t,也可以是m
+(.):默认代表的是第1组
+\\1:代表第二个字符是第1组的重复
++:代表重复的组出现1次或多次
+
+组：((A)(B(C)))
+最外边的()代表第1组
+(A)是第2组
+(B(C))是第3组
+(C)是第4组
+</code></pre><h4 id="3、替换："><a href="#3、替换：" class="headerlink" title="3、替换："></a>3、替换：</h4><pre><code>replaceAll(regex,replacement)
+
+//用#代替所有的连续的重复字符
+ String str = &quot;zhangsantttttttxiaoqiangmmmmmmmmzhaoliu&quot;;
+ str = str.replaceAll(&quot;(.)\\1+&quot;, &quot;#&quot;);
+ syso(str);
+ 输出结果：
+ zhangsan#xiaoqiang#zhaoliu
+
+========================
+
+//将所有连续的重复字符变成单个,重复的t变成1个t，重复的m变成一个m
+String str = &quot;zhangsantttttttxiaoqiangmmmmmmmmzhaoliu&quot;;
+ str = str.replaceAll(&quot;(.)\\1+&quot;, &quot;$1&quot;);
+syso(str);
+ 输出结果：
+ zhangsantxiaoqiangmzhaoliu
+
+$1:代表获取前一个参数中的组1
+
+============================
+
+String tel = &quot;15022229999&quot;;
+tel = tel.replaceAll(&quot;(\\d{3})\\d{4}(\\d{4})&quot;,&quot;$1****$2&quot;);
+syso(tel);
+输出结果：
+150****9999
+</code></pre><h4 id="4、获取"><a href="#4、获取" class="headerlink" title="4、获取"></a>4、获取</h4><pre><code>//取三个字符组成的字符串
+public class RegexGetDemo {
+
+    public static void main(String[] args) {
+
+        String str = &quot;hao jlalal jie lskqjx wxm jajlw&quot;;
+        String regex = &quot;\\b[a-z]{3}\\b&quot;;
+        //将正则封装成对象
+        Pattern p = Pattern.compile(regex);
+        //获取匹配器对象
+        Matcher m = p.matcher(str);
+        //查找
+        while(m.find()) {
+            System.out.println(m.group());
+        }    
+    }
+}    
+输出结果：
+hao
+jie
+wxm
+
+\b:表示边界
+</code></pre><h4 id="5、练习"><a href="#5、练习" class="headerlink" title="5、练习"></a>5、练习</h4><pre><code>String str = &quot;我我...我我我....我我我要...要要要.....学学学....编编....程程程&quot;;
+//去掉.
+str = str.replaceAll(&quot;\\.+&quot;, &quot;&quot;);
+//去掉叠词
+str = str.replaceAll(&quot;(.)\\1+&quot;,&quot;$1&quot;);
+System.out.println(str);    
+
+输出结果：
+我要学编程
+</code></pre><hr>
+<pre><code>//ip地址排序
+String ip_str = &quot;192.168.9.30 127.0.0.1 4.4.4.5 101.80.8.44&quot;;
+
+System.out.println(&quot;str:&quot;+ip_str);
+
+//补0，ip地址四段数字，不足3位的补足3位
+ip_str = ip_str.replaceAll(&quot;(\\d+)&quot;, &quot;00$1&quot;);
+
+//四段数字全都保留32位
+ip_str = ip_str.replaceAll(&quot;0*(\\d{3})&quot;, &quot;$1&quot;);
+
+//分割
+String[] ips = ip_str.split(&quot; +&quot;);
+
+//treeSet排序
+TreeSet&lt;String&gt; ts = new TreeSet&lt;String&gt;();
+for(String ip:ips) {
+    ts.add(ip);
+}
+
+//去掉补足3位的0
+System.out.println(&quot;排序&quot;);
+for(String ip:ts) {
+    System.out.println(ip.replaceAll(&quot;0*(\\d+)&quot;,&quot;$1&quot;));            
+}
+</code></pre><hr>
+<pre><code>//校验邮箱地址
+String mail = &quot;test@126.com&quot;;//.cn .com.cn
+String regex = &quot;[a-zA-Z0-9_]+@[a-zA-Z0-9]+(\\.[a-zA-Z]{1,3})+&quot;;
+boolean b = mail.matches(regex);
+System.out.println(b);
+</code></pre><hr>
+<p>网页爬虫，获取指定网页里所有的邮箱</p>
+<pre><code>public static List&lt;String&gt; getMails() throws IOException {
+    //源
+    URL url = new URL(&quot;http://www.baidu.com/web/aaa.html&quot;);
+    //读取源
+    BufferedReader bufIn = new BufferedReader(new InputStreamReader(url.openStream()));
+    //对源中的数据进行规则匹配
+    String mail_regex = &quot;\\w+@\\w+(\\.\\w)+&quot;;
+    List&lt;String&gt; list = new ArrayList&lt;String&gt;();
+    Pattern p = Pattern.compile(mail_regex);
+    String line = null;
+    while((line = bufIn.readLine()) != null) {
+        Matcher m = p.matcher(line);
+        while(m.find()) {
+            //数据写入集合
+            list.add(m.group());
+        }        
+    }
+    bufIn.close();
+    return list;
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/17/java/java-regex/java-regex-1/" data-id="cjck83ht8003szvp3yvf5vkee" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/regex/">regex</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2018/01/17/java/java-reflect/java-reflect-1/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">java反射机制</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 18px;">angular</a> <a href="/tags/api/" style="font-size: 14px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 16px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/thread/" style="font-size: 12px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/01/17/java/java-regex/java-regex-1/">java-正则表达式</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/17/java/java-reflect/java-reflect-1/">java反射机制</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/15/java/java-io/IO-19-practice-cutstring/">IO流 - 十九：练习 - 按字节截取字符串</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/15/java/java-io/IO-1-instruction/">IO流 - 一、概述</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/10/java/java-io/IO-10-properties/">IO流 - 十、IO流 - Properties集合</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

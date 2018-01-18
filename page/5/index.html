@@ -50,7 +50,7 @@
         
           <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Zoeken"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
@@ -60,6 +60,228 @@
 </header>
       <div class="outer">
         <section id="main">
+  
+    <article id="post-angularjs/angular-requirejs" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/05/17/angularjs/angular-requirejs/" class="article-date">
+  <time datetime="2017-05-17T07:52:11.000Z" itemprop="datePublished">2017-05-17</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/angularjs/">angularjs</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/05/17/angularjs/angular-requirejs/">angularjs + requirjs前端架构</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在决定使用angularJS开发项目时，考虑到多人协作，模块化，扩展等等因素，决定引入requirJS实现js文件的异步加载，解决模块之间的依赖关系。</p>
+<p>参考了一些关于angularJS项目的前端架构，都觉得不甚理想，幸运的是最终看到一篇关于angularJS如何集成requireJS的文章：</p>
+<p>原文地址：<a href="http://www.cnblogs.com/cunjieliu/p/4021121.html" target="_blank" rel="external">如何将angularJS项目与requireJS集成</a></p>
+<p>一、项目组织目录：</p>
+<ul>
+<li><p>css 文件夹</p>
+</li>
+<li><p>img 文件夹</p>
+</li>
+<li><p>js 文件夹</p>
+</li>
+</ul>
+<p> – appIndex 文件夹</p>
+<p>  — api文件夹</p>
+<p>  — controller 文件夹</p>
+<p>     —- ctlModule.js</p>
+<p>     —- mainController.js</p>
+<p>     —- homeController.js</p>
+<p>  — directives 文件夹</p>
+<p>  — services 文件夹</p>
+<p>  — app.js</p>
+<p>  — index_main.js</p>
+<p>  — router.js</p>
+<p> – appLogin 文件夹</p>
+<p>  — …</p>
+<p>  — 与appIndex类似</p>
+<p>  — …</p>
+<ul>
+<li>lib 文件夹</li>
+</ul>
+<p> – angular 文件夹</p>
+<p>  — angular.js</p>
+<p>  — angular-ui-router.js</p>
+<p>  — …</p>
+<p> – bootstrap 文件夹</p>
+<p> – jquery 文件夹</p>
+<p> – require 文件夹</p>
+<p> – php 文件夹</p>
+<p> – template 文件夹</p>
+<p>  — common 文件夹</p>
+<p>  — tplIndex 文件夹</p>
+<p>  — tplLogin文件夹</p>
+<ul>
+<li><p>404.html</p>
+</li>
+<li><p>favicon.ico</p>
+</li>
+<li><p>humans.txt</p>
+</li>
+<li><p>index.html</p>
+</li>
+<li><p>LICENSE.txt</p>
+</li>
+<li><p>login.html</p>
+</li>
+<li><p>server.js</p>
+</li>
+</ul>
+<p>二、组织目录说明</p>
+<p>两个大的模块，一个appIndex，代表前台展示模块；一个appLogin，代表登录模块。appLogin与appIndex类似，以appIndex为例：</p>
+<p>appIndex下的文件夹：</p>
+<p>api: 与后端交互</p>
+<p>controllers： 控制器</p>
+<p>directives: 指令</p>
+<p>services: 服务</p>
+<p>appIndex下的文件：</p>
+<p>app.js 定义整个项目的module</p>
+<p>index_main.js 配置脚本文件，启动angular</p>
+<p>router.js 定义路由</p>
+<p>api下的文件：</p>
+<p>apiModule.js 定义api的module</p>
+<p>mainApi.js 加载所有的api文件</p>
+<p>homeApi.js 一个普通的api文件</p>
+<p>controllers下的文件：</p>
+<p>ctlModule.js 定义控制器的module</p>
+<p>mainController.js 加载所有的控制器文件</p>
+<p>homeController.js 一个普通的控制器文件</p>
+<p>directives下的文件：</p>
+<p>dirModule.js 定义指令的module</p>
+<p>mainDirective.js 加载所有的指令文件</p>
+<p>headerDirective.js 一个普通的指令文件</p>
+<p>services下的文件：</p>
+<p>serModule.js 定义服务的module</p>
+<p>mainService.js 加载所有的服务文件</p>
+<p>homeService.js 一个普通的服务文件</p>
+<p>三、命名约定</p>
+<p>$stateProvider.state(‘home’,{<br>    url: ‘/home’,<br>   templateUrl:’../../template/tplIndex/home.html’,<br>   controller:’homeCtl’<br>})<br>以homeController为例：</p>
+<p>对应的模板为home.html</p>
+<p>控制器名字：homeCtl</p>
+<p>return ctl.controller(‘homeCtl’,function($scope,person,serGetTitle,testData){</p>
+<p> …<br>});<br>})</p>
+<p>homeCtl里使用的服务，看到ser开头的，如serGetTitle，对应到homeService.js里查找，看到Data结尾的，如testData，对应到homeApi.js里查找<br>四、代码分析</p>
+<p>1、index.html 主要代码如下：</p>
+<p>&lt;!doctype html&gt;</p>
+<p><html class="no-js" lang=""><br>    <head><br>        <script data-main="js/appIndex/index_main" src="lib/require/require.js"></script><br>    </head><br>    <body><br>        <rabbit-header></rabbit-header></body></html></p>
+<pre><code>    &lt;div&gt;
+        &lt;ul&gt;
+            &lt;li&gt;&lt;a href=&quot;#/home&quot;&gt;home&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/div&gt;
+
+    &lt;div ui-view&gt;&lt;/div&gt;
+
+    &lt;rabbit-footer&gt;&lt;/rabbit-footer&gt;
+
+&lt;/body&gt;
+</code></pre><p><br>在首页index.html只需要引入requireJs库文件，并且指明入口函数main.js，采用手动启动angularjs应用，所以这里不用为首页添加ng-app=’rabbit’。</p>
+<p>2、index_main.js 主要代码如下：</p>
+<p>require.config({<br>    baseUrl:’js’,<br>    paths:{<br>        jquery:’../lib/jquery/jquery-1.9.1’,<br>        angular:’../lib/angular/angular’,<br>        angularUiRouter:’../lib/angular/angular-ui-router’,<br>        Restangular:’../lib/angular/restangular-1.5.2’,<br>        lodash:’../lib/angular/lodash-1.8.3’,<br>        app:’appIndex/app’,<br>        router:’appIndex/router’,<br>        mainController:’appIndex/controllers/mainController’,<br>        ctlModule:’appIndex/controllers/ctlModule’,<br>        homeController:’appIndex/controllers/homeController’,<br>        …<br>    },<br>    shim:{<br>        ‘angular’:{<br>            exports:’angular’<br>        },<br>        ‘angularUiRouter’:{<br>            deps: [‘angular’],<br>            exports:’angularUiRouter’<br>        },<br>        …<br>    },<br>    urlArgs:”bust=” + (new Date()).getTime()  //防止读取缓存，调试用<br>});</p>
+<p>require([<br>    ‘jquery’,<br>    ‘angular’,<br>    ‘angularUiRouter’,<br>    ‘app’,<br>    ‘router’<br>], function ($,angular,angularUiRouter,app,router) {<br>   $(document).ready(function(){<br>        //采用手动启动angularjs应用，所以这里不用为首页添加ng-app=’rabbit’<br>        angular.bootstrap(document, [‘rabbit’]);<br>    });<br>});<br>3、两个重要的文件app.js和router.js</p>
+<p>app.js 主要代码如下：</p>
+<p>define([“angular”,’mainController’,’mainDirective’,’mainService’,’mainApi’],function(angular){<br>        return angular.module(“rabbit”,[‘ui.router’,’app.ctlModule’,’app.dirModule’,’app.serModule’,’app.apiModule’]);<br>    })<br>定义匿名模块:依赖的mainController和mainDirective主要是用来加载angular的控制器和指令</p>
+<p>ui.router:一个基于ngRoute开发的第三方路由，作为框架额外的附加功能，它们都将以模块依赖的形式被引入</p>
+<p>rabbit为自定义的模块名，依赖第三方路由模块ui.router,以及自定义的控制器模块，自定义的指令模块</p>
+<p>这样做的目的是：在程序启动(bootstrap)的时候，加载依赖模块(如：ui.router)，将所有挂载在该模块的服务(provider)，指令(directive)，过滤器(filter)等都进行注册，那么在后面的程序中便可以调用了。</p>
+<p>router.js 主要代码如下：</p>
+<p>define([‘app’],function(app){<br>        return app.run([‘$rootScope’, ‘$log’, function($rootScope, $log){<br>                        $rootScope.$on(‘$stateChangeSuccess’, function(event, toState, toParams, fromState, fromParams){<br>                            $log.debug(‘successfully changed states’) ;<br>                        });<br>                    }])<br>                  .config(function($stateProvider, $urlRouterProvider, $locationProvider, $uiViewScrollProvider){<br>                        // 默认进入重定向<br>                        //$urlRouterProvider.otherwise(‘/index’);<br>                        $stateProvider.state(‘home’,{<br>                            url: ‘/home’,<br>                            templateUrl:’../../template/tplIndex/home.html’,<br>                            controller:’homeCtl’<br>                        })<br>                })<br>});<br>配置了一个指定 /home 的路由。</p>
+<p>4、控制器</p>
+<p>mainController.js 主要代码如下：</p>
+<p>define([‘homeController’,’indexController’], function() {});<br>主要用来加载各个控制器（所有的控制器都将在这个文件中被加载），我们可以有很多个控制器文件，按照具体需要进行添加。</p>
+<p>homeController.js 主要代码如下：</p>
+<p>define([‘ctlModule’,’jquery’],function(ctl,$){<br>    return ctl.controller(‘homeCtl’,function($scope,serGetTitle,testData){<br>        $scope.title = serGetTitle.title;<br>        $scope.projects = testData.getMessages();<br>    })<br>})<br>控制器homeCtl依赖于ctlModule模块，其实可以理解为app.ctlModule模块下的一个“方法”。</p>
+<p>ctlModule.js 主要代码如下：</p>
+<p>define([‘angular’], function (angular) {<br>    ‘use strict’;<br>    return angular.module(‘app.ctlModule’, []);<br> });<br>声明一个叫作app.ctlModule的模块，app.js里的模块rabbit，依赖于这个模块，并调用这个模块下的所有“方法”</p>
+<p>5、指令，服务，接口</p>
+<p>同控制器的定义方法完全类似。</p>
+<p>五、说明</p>
+<p>php文件夹放了一些php文件，可以用apache建一个站点，模拟与服务器端的数据交互。</p>
+<p>server.js是一个静态文件服务器，mac下进入目录，执行node server，即可创建一个简单的nodejs服务器。</p>
+<p>个人感觉这样设计一个前端架构，虽然会让开发变得繁琐，但功能划分比较明确，提供了一个开发标准，适合于多人协同作业，总体上来说利大于弊。</p>
+<p>源码下载地址：angularJS集成requireJS</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/05/17/angularjs/angular-requirejs/" data-id="cjck83hp2000bzvp3e1wq0pea" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-personal-notes/Soccer-Superstars" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/05/18/personal-notes/Soccer-Superstars/" class="article-date">
+  <time datetime="2016-05-18T03:17:56.000Z" itemprop="datePublished">2016-05-18</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/随笔/">随笔</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/05/18/personal-notes/Soccer-Superstars/">时光飞逝 传奇谢幕</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>&emsp;&emsp;上赛季，老将纷纷谢幕。皮尔洛远走大联盟，不知道当尤文赛季初打不开局面时，斑马球迷是否会怀念皮波后场远程制导般的长传…杰拉德泪洒安菲尔德，习惯了看到杰拉德带队进场的又岂止红军球迷….看到斯坦福桥的神灯穿上天蓝色球衣，蓝军球迷会否五味杂陈难以言说…</p>
+<p>&emsp;&emsp;本赛季结束，相似的一幕再次上演。罗西基和阿尔特塔与枪手告别，队长的泪水让枪迷动容。克洛泽告别蓝鹰，球迷久久不愿离场。美国老门将霍华德告别英超，阿比亚蒂告别米兰，迪纳塔莱告别乌迪内斯，托尼告别意甲，甚至连效忠了一世的狼王托蒂和蓝军特里都前途未卜…</p>
+<p>&emsp;&emsp;记忆里，还有曾经以为会永远飘扬在伯纳乌上空的皇马旗帜-指环王劳尔，还有大步流星阳光帅气的米兰卡卡，还有威震英伦霸气绝伦的魔兽德罗巴…</p>
+<p>&emsp;&emsp;记忆里，还有那支橙色的鲁能泰山，尤其是看到这赛季鲁能的举步维艰，更是让人想起当年那些驰骋沙场战功赫赫无敌猛将。中锋韩鹏头球无敌，小胖王永珀脚法细腻，摩托车吕征跑起来后面带土，还有李徽，队长刘金东，铁血后腰崔鹏，时不时来脚远射的周海滨，开球时习惯一看二退三磕脚的李雷雷，穿针引线的日科夫….</p>
+<p>&emsp;&emsp;不可否认，职业足球里，或许球员与俱乐部的合同是冰冷的，球员新陈代谢也是自然规律，但球员与球迷的感情却也是深厚的，球员对俱乐部的感情也是真挚的。伟大的俱乐部不正是靠这些伟大的球星传承积淀的精神与文化吗。总觉得还是那个红黑剑条衫22号的卡卡最快乐，还是那个白衣7号的劳尔最为潇洒…希望足坛多一些吉格斯和萨内蒂的轶事，少出现一些卡西泪别伯纳乌，神灯反戈蓝军的残酷。</p>
+<p>&emsp;&emsp;老将谢幕，新秀扬名。内马尔赛场如穿花蝴蝶过人如麻，阿扎尔左闪右晃似凌波微步，贝尔威风凛凛似追风逐电，J罗凌空抽射犹如石破天惊…看到后梅罗时代，身价动辄亿元的博格巴们精彩纷呈的表演固然赏心悦目，但感觉里总少了一份难以言表的激动，是因为少了当年宿舍里一起欢呼的伙伴？少了年少时的激情与冲动？蓦然回首，才知道了杰拉德们告别的不光是他们的职业生涯，还有留给我们的无数个美好瞬间，还有时光飞逝永远回不去的青春。</p>
+<p>&emsp;&emsp;老兵不死，传奇不朽。你们带给我们球迷的不只是美好瞬间，还有你们的精神，兢兢业业的精神，永不放弃的精神，追求荣誉的精神，忠心感恩的精神。我们会以你们为榜样，也会将这种精神传递给我们的下一代。祝老将们未来一切都好。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2016/05/18/personal-notes/Soccer-Superstars/" data-id="cjck83hpm000uzvp3e90633cf" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/足球/">足球</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
   
     <article id="post-angularjs/angular-jsonp" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
@@ -125,7 +347,7 @@ $http.jsonp(myUrl).success(
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/05/16/angularjs/angular-jsonp/" data-id="cjcg1dy6h0001q6p3ovpo0l5l" class="article-share-link">Delen</a>
+      <a data-url="http://yoursite.com/2016/05/16/angularjs/angular-jsonp/" data-id="cjck83hot0007zvp3lcpoevz2" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
@@ -458,7 +680,7 @@ app.config(function($httpProvider) {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/05/15/angularjs/angular-http/" data-id="cjcg1dy6r0009q6p3u7j2le06" class="article-share-link">Delen</a>
+      <a data-url="http://yoursite.com/2016/05/15/angularjs/angular-http/" data-id="cjck83hof0002zvp3tgbh7yu1" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
@@ -648,7 +870,7 @@ var books = author.getList(&apos;books&apos;);
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/05/13/angularjs/restangular/" data-id="cjcg1dy6u000cq6p3oghyycya" class="article-share-link">Delen</a>
+      <a data-url="http://yoursite.com/2016/05/13/angularjs/restangular/" data-id="cjck83hp5000ezvp3ml43dlk5" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
@@ -671,7 +893,7 @@ var books = author.getList(&apos;books&apos;);
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Categorieën</h3>
+    <h3 class="widget-title">Categories</h3>
     <div class="widget">
       <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
     </div>
@@ -681,9 +903,9 @@ var books = author.getList(&apos;books&apos;);
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Labels</h3>
+    <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
     </div>
   </div>
 
@@ -693,14 +915,14 @@ var books = author.getList(&apos;books&apos;);
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 18px;">angular</a> <a href="/tags/api/" style="font-size: 14px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 16px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/thread/" style="font-size: 12px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 18px;">angular</a> <a href="/tags/api/" style="font-size: 14px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 16px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/thread/" style="font-size: 12px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
     </div>
   </div>
 
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Archieven</h3>
+    <h3 class="widget-title">Archives</h3>
     <div class="widget">
       <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
     </div>
@@ -710,9 +932,17 @@ var books = author.getList(&apos;books&apos;);
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Recente berichten</h3>
+    <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2018/01/17/java/java-regex/java-regex-1/">java-正则表达式</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/17/java/java-reflect/java-reflect-1/">java反射机制</a>
+          </li>
         
           <li>
             <a href="/2018/01/15/java/java-io/IO-19-practice-cutstring/">IO流 - 十九：练习 - 按字节截取字符串</a>
@@ -723,15 +953,7 @@ var books = author.getList(&apos;books&apos;);
           </li>
         
           <li>
-            <a href="/2018/01/10/java/java-io/IO-8-transform-coding/">IO流 - 八、转换流的编码解码</a>
-          </li>
-        
-          <li>
-            <a href="/2018/01/10/java/java-io/IO-9-file/">IO流 - 九、File对象</a>
-          </li>
-        
-          <li>
-            <a href="/2018/01/10/java/java-io/IO-7-stream-rule-demo/">IO流 - 七、流的操作规律 - 需求体现</a>
+            <a href="/2018/01/10/java/java-io/IO-10-properties/">IO流 - 十、IO流 - Properties集合</a>
           </li>
         
       </ul>

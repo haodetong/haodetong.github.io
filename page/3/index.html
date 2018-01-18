@@ -50,7 +50,7 @@
         
           <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Zoeken"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
@@ -60,6 +60,334 @@
 </header>
       <div class="outer">
         <section id="main">
+  
+    <article id="post-java/java-io/IO-8-transform-coding" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/10/java/java-io/IO-8-transform-coding/" class="article-date">
+  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/10/java/java-io/IO-8-transform-coding/">IO流 - 八、转换流的编码解码</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="1、OutputStreamWriter转换流。字符转换成字节：编码。"><a href="#1、OutputStreamWriter转换流。字符转换成字节：编码。" class="headerlink" title="1、OutputStreamWriter转换流。字符转换成字节：编码。"></a>1、OutputStreamWriter转换流。字符转换成字节：编码。</h4><p>需求：将一个中文字符串按照指定的编码表，写入到一个文本文件中。其实就是需要将内存中的“你好”字符转成字节存到硬盘中。</p>
+<p>分析：</p>
+<p>明确使用指定编码表，就不可以使用FileWriter，因为FileWriter内部是使用默认的本地编码表。只能使用其父类OutputStreamWriter类。</p>
+<p>OutputStreamWriter接收一个字节流对象，既然是操作文本，那么就应该是FileOutputStream。</p>
+<p>OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(“a.txt”),charsetName);</p>
+<p>需要高效</p>
+<p>BufferedWriter bufw = new BufferedWriter(osw);</p>
+<pre><code>默认编码表：
+FileWriter fw = new FileWriter(&quot;a.txt&quot;);
+fw.write(&quot;你好&quot;);
+fw.close;
+
+指定编码表：
+OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(&quot;a.txt&quot;),&quot;UTF-8&quot;);
+osw.write(&quot;你好&quot;);
+osw.close;
+</code></pre><p>FileWriter fw = new FileWriter(“a.txt”);</p>
+<p>OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(“a.txt”),”GBK”);</p>
+<p>这两句代码的功能是等同的。</p>
+<p>FileWriter：其实就是转换流并指定了本机默认编码表，而且是这个转换流的子类，用于方便的操作文本文件。</p>
+<p>如果操作文件需要明确具体的编码。FileWriter就不可行了，必须用转换流。</p>
+<h4 id="2、InputStreamReader转换流。字节转换成字符：解码。"><a href="#2、InputStreamReader转换流。字节转换成字符：解码。" class="headerlink" title="2、InputStreamReader转换流。字节转换成字符：解码。"></a>2、InputStreamReader转换流。字节转换成字符：解码。</h4><p>需求：读取硬盘中的文件内容，到控制台输出。</p>
+<p>其实就是通过转换流，读取硬盘中的字节转换为字符到内存，再从内存通过System.out转换流，将字符转换为字节输出到控制台。</p>
+<pre><code>默认编码表：
+FileReader fr = new FileReader(&quot;a.txt&quot;);
+char[] buf = new char[10];
+int length = fr.read(buf);
+String str = new String(buf,0,length);
+System.out.println(str);
+
+指定编码表：
+InputStreamReader isr = new InputStreamReader(new FileInputStream(&quot;a.txt&quot;),&quot;&quot;utf-8&quot;&quot;);
+char[] buf = new char[10];
+int length = isr.read(buf);
+String str = new String(buf,0,length);
+System.out.println(str);
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-8-transform-coding/" data-id="cjck83htb003vzvp3ic7di5pc" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/java-api/java-api-otherObjects" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/09/java/java-api/java-api-otherObjects/" class="article-date">
+  <time datetime="2018-01-09T07:16:19.000Z" itemprop="datePublished">2018-01-09</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/09/java/java-api/java-api-otherObjects/">其它对象API</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="一、System类"><a href="#一、System类" class="headerlink" title="一、System类"></a>一、System类</h3><p>System类中的方法和属性都是静态的。</p>
+<p>常见方法：</p>
+<p>long currentTimeMillis():获取当前时间的毫秒值</p>
+<p>Properties getProperties():获取当前系统的属性信息    </p>
+<pre><code>public class SystemApi {
+    public static void main(String[] args) {
+
+        long millisTime = System.currentTimeMillis();
+        System.out.println(millisTime);
+
+        Properties prop = System.getProperties();
+
+        Set&lt;String&gt; nameSet = prop.stringPropertyNames();
+
+        for(String name:nameSet) {
+            String value = prop.getProperty(name);
+            System.out.println(name+&quot;::&quot;+value);
+        }
+
+
+    }
+}
+</code></pre><h3 id="二、Runtime类"><a href="#二、Runtime类" class="headerlink" title="二、Runtime类"></a>二、Runtime类</h3><p>Runtime:</p>
+<p>没有构造方法摘要，说明该类不可以创建对象。</p>
+<p>又发现该类有非静态方法，说明该类应该有提供的静态的返回该类对象的方法。</p>
+<p>而且只有一个这种方法，说明Runtime类使用了单例设计模式。</p>
+<pre><code>public class RuntimeApi {
+
+    public static void main(String[] args) throws IOException, InterruptedException {
+
+        Runtime r = Runtime.getRuntime();
+
+        Process p = r.exec(&quot;open -a Safari.app http://www.baidu.com&quot;);
+        Thread.sleep(2000);
+        p.destroy();
+    }
+
+}
+</code></pre><h3 id="三、Math类"><a href="#三、Math类" class="headerlink" title="三、Math类"></a>三、Math类</h3><p>常用方法：</p>
+<p>double ceil():返回大于参数的最小整数。</p>
+<p>double floor():返回小于参数的最大整数。</p>
+<p>double round():返回四舍五入的整数。</p>
+<p>max(a,b):返回最大值</p>
+<p>pow(a,b):a的b次方</p>
+<p>double random():返回大于等于0.0小于1.0的随机double值，与java.util中的Random类相似。</p>
+<h3 id="四、Date类"><a href="#四、Date类" class="headerlink" title="四、Date类"></a>四、Date类</h3><h4 id="（一）、日期对象和毫秒值之间的转换"><a href="#（一）、日期对象和毫秒值之间的转换" class="headerlink" title="（一）、日期对象和毫秒值之间的转换"></a>（一）、日期对象和毫秒值之间的转换</h4><h5 id="毫秒值–-gt-日期对象"><a href="#毫秒值–-gt-日期对象" class="headerlink" title="毫秒值–&gt;日期对象"></a>毫秒值–&gt;日期对象</h5><p>1、通过Date对象的构造方法 new Date(timeMills);</p>
+<p>2、通过setTime方法。</p>
+<p>目的是通过Date对象的方法，对该日期中的年月日等字段进行操作。</p>
+<h5 id="日期对象–-gt-毫秒值"><a href="#日期对象–-gt-毫秒值" class="headerlink" title="日期对象–&gt;毫秒值"></a>日期对象–&gt;毫秒值</h5><p>1、通过getTime方法。</p>
+<p>目的是通过具体的数值进行运算。</p>
+<pre><code>public static void thord1() {
+        //long time = System.currentTimeMillis();//1515489394135
+
+        Date date1 = new Date();//将当前日期和时间封装成Date对象
+        System.out.println(date1);//Tue Jan 09 17:16:34 CST 2018
+
+        Date date2 = new Date(1515489367117l);//将指定毫秒封装成Date对象
+        System.out.println(date2);//Tue Jan 09 17:16:07 CST 2018
+}
+</code></pre><h4 id="（二）、日期对象转成字符串"><a href="#（二）、日期对象转成字符串" class="headerlink" title="（二）、日期对象转成字符串"></a>（二）、日期对象转成字符串</h4><pre><code>public class DateDemo {
+
+    public static void main(String[] args) {
+
+        Date date = new Date();
+
+        //获取日期格式对象。具备着默认的风格
+        DateFormat dateFormat = DateFormat.getDateInstance();
+        String str_date = dateFormat.format(date);
+        System.out.println(str_date); //Jan 9, 2018
+
+        DateFormat dateFormat2 = DateFormat.getDateTimeInstance();
+        String str_date2 = dateFormat2.format(date);
+        System.out.println(str_date2);//Jan 9, 2018 5:48:43 PM
+
+        //其它风格 FULL LONG SHORT MEDIUM
+        //DateFormat dateFormat3 = DateFormat.getDateInstance(DateFormat.FULL);//Tuesday, January 9, 2018
+
+        //DateFormat dateFormat3 = DateFormat.getDateInstance(DateFormat.LONG);//January 9, 2018
+
+        //DateFormat dateFormat3 = DateFormat.getDateInstance(DateFormat.SHORT);//1/9/18
+
+        DateFormat dateFormat3 = DateFormat.getDateInstance(DateFormat.MEDIUM);//Jan 9, 2018
+
+        String str_date3 = dateFormat3.format(date);
+        System.out.println(str_date3);
+
+        //日期和时间
+        DateFormat dateFormat4 = DateFormat.getDateTimeInstance(DateFormat.LONG,DateFormat.LONG);//Jan 9, 2018
+
+        String str_date4 = dateFormat4.format(date);
+        System.out.println(str_date4);
+
+        //自定义风格
+        DateFormat dateFormats = DateFormat.getDateInstance();
+        dateFormats = new SimpleDateFormat(&quot;yyyy-MM-dd&quot;);
+        String str_date5 = dateFormats.format(date);
+        System.out.println(str_date5);//2018-01-09
+
+
+    }
+}
+</code></pre><h4 id="（三）、字符串转成日期对象"><a href="#（三）、字符串转成日期对象" class="headerlink" title="（三）、字符串转成日期对象"></a>（三）、字符串转成日期对象</h4><p>使用的是DateFormat类中的parse方法。</p>
+<pre><code>public class DateFormatDemo {
+
+    public static void main(String[] args) throws ParseException {
+
+        //默认的日期字符串格式转成日期对象
+        String str_date = &quot;Jan 9, 2018 5:48:43 PM&quot;;
+        DateFormat dateFormat = DateFormat.getDateInstance();
+        Date date = dateFormat.parse(str_date);
+        System.out.println(date);
+
+        //将自定义的日期字符串格式转成日期对象
+        String str_date2 = &quot;2018--1--10&quot;;
+        DateFormat dateFormat2 = DateFormat.getDateInstance(DateFormat.LONG);
+        dateFormat2 = new SimpleDateFormat(&quot;yyyy--MM--dd&quot;);
+        Date date2 = dateFormat2.parse(str_date2);
+        System.out.println(date2);
+
+    }
+
+}
+</code></pre><h4 id="（四）、Date类-练习"><a href="#（四）、Date类-练习" class="headerlink" title="（四）、Date类 - 练习"></a>（四）、Date类 - 练习</h4><pre><code>public class Demo1 {
+
+    public static void main(String[] args) throws ParseException {
+
+        /**
+         * 练习：
+         * &quot;2017.12.20&quot;到&quot;2018.1.10&quot;中间相隔多少天
+         * 
+         * 思路：
+         * 1、日期字符串转日期对象
+         * 2、日期对象方法获取毫秒数
+         * 3、毫秒数相减，再计算天数
+         */
+
+        String str_date1 = &quot;2017.12.20&quot;;
+        String str_date2 = &quot;2018.1.10&quot;;
+
+        //DateFormat dateFormat = DateFormat.getDateInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat(&quot;yyyy.MM.dd&quot;);
+        Date date1 = dateFormat.parse(str_date1);
+        Date date2 = dateFormat.parse(str_date2);
+
+        long date1Millis = date1.getTime();
+        long date2millis = date2.getTime();
+
+        int day = (int) Math.abs(date1Millis - date2millis)/1000/60/60/24;
+
+
+        System.out.println(day);
+    }
+
+}
+</code></pre><h3 id="四、Calendar类"><a href="#四、Calendar类" class="headerlink" title="四、Calendar类"></a>四、Calendar类</h3><p>常见方法：</p>
+<p>set()</p>
+<p>get()</p>
+<p>add():偏移</p>
+<h5 id="一、基本演示"><a href="#一、基本演示" class="headerlink" title="一、基本演示"></a>一、基本演示</h5><pre><code>public class CalendarDemo {
+
+    public static void main(String[] args) {
+
+        Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH)+1;
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        int week = c.get(Calendar.DAY_OF_WEEK);
+
+        System.out.println(year+&quot;年&quot;+month+&quot;月&quot;+day+&quot;日&quot;+getWeek(week));
+
+    }
+
+    private static String getWeek(int i) {
+        String[] weeks = {&quot;&quot;,&quot;星期日&quot;,&quot;星期一&quot;,&quot;星期二&quot;,&quot;星期三&quot;,&quot;星期四&quot;,&quot;星期五&quot;,&quot;星期六&quot;};
+        return weeks[i];
+    }
+}
+</code></pre><h5 id="二、练习"><a href="#二、练习" class="headerlink" title="二、练习"></a>二、练习</h5><pre><code>public class CalendarDemo {
+
+    public static void main(String[] args) {
+
+        Calendar c = Calendar.getInstance();
+        //指定日期
+        c.set(2018, 0, 20);
+        showDate(c);
+
+        //日期偏移
+        c.add(Calendar.YEAR, 2);
+        showDate(c);
+
+    }
+
+    public static void showDate(Calendar c) {
+        //Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH)+1;
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        int week = c.get(Calendar.DAY_OF_WEEK);
+
+        System.out.println(year+&quot;年&quot;+month+&quot;月&quot;+day+&quot;日&quot;+getWeek(week));
+    }
+
+    private static String getWeek(int i) {
+        String[] weeks = {&quot;&quot;,&quot;星期日&quot;,&quot;星期一&quot;,&quot;星期二&quot;,&quot;星期三&quot;,&quot;星期四&quot;,&quot;星期五&quot;,&quot;星期六&quot;};
+        return weeks[i];
+    }
+
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/09/java/java-api/java-api-otherObjects/" data-id="cjck83hqo001izvp384l33hwy" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/api/">api</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
   
     <article id="post-java/java-collections/java-collection-utilities" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
@@ -470,7 +798,7 @@ public static String toString(int[] a) {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/09/java/java-collections/java-collection-utilities/" data-id="cjcg0m9s2002entp3165jvcmu" class="article-share-link">Delen</a>
+      <a data-url="http://yoursite.com/2018/01/09/java/java-collections/java-collection-utilities/" data-id="cjck83hrg0027zvp3pxnevlmb" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li></ul>
@@ -839,7 +1167,7 @@ A(2)C(2)a(5)f(2)j(6)l(6)s(7)
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/09/java/java-collections/java-collection-map/" data-id="cjcg0m9ry002antp33r4k2nhr" class="article-share-link">Delen</a>
+      <a data-url="http://yoursite.com/2018/01/09/java/java-collections/java-collection-map/" data-id="cjck83hr5001uzvp32cexqyzj" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li></ul>
@@ -905,7 +1233,7 @@ A(2)C(2)a(5)f(2)j(6)l(6)s(7)
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/09/java/java-collections/java-collection-notes/" data-id="cjcg0m9s0002cntp3mdmecqe8" class="article-share-link">Delen</a>
+      <a data-url="http://yoursite.com/2018/01/09/java/java-collections/java-collection-notes/" data-id="cjck83hr9001zzvp39pve1zys" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li></ul>
@@ -1345,7 +1673,7 @@ class CompareByName2 implements Comparator&lt;Person2&gt;{
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/09/java/java-collections/java-collection-generic/" data-id="cjcg0m9rr0028ntp3bnutgsxd" class="article-share-link">Delen</a>
+      <a data-url="http://yoursite.com/2018/01/09/java/java-collections/java-collection-generic/" data-id="cjck83hqz001rzvp3vh0a4ql0" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li></ul>
@@ -2055,7 +2383,7 @@ public class TreeSetPractice {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/27/java/java-collections/java-collection-framework/" data-id="cjcg0m9ro0027ntp3j29mu29u" class="article-share-link">Delen</a>
+      <a data-url="http://yoursite.com/2017/12/27/java/java-collections/java-collection-framework/" data-id="cjck83hqu001nzvp34vt18xck" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li></ul>
@@ -2240,7 +2568,7 @@ public class WrapperTest {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/23/java/java-api/basic-data-class/" data-id="cjcg1dy8a0011q6p38p0kz5lq" class="article-share-link">Delen</a>
+      <a data-url="http://yoursite.com/2017/12/23/java/java-api/basic-data-class/" data-id="cjck83hqq001lzvp3cifuigil" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/api/">api</a></li></ul>
@@ -2353,7 +2681,7 @@ sb.setCharAt(2, &apos;1&apos;);//abqe
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/22/java/java-api/java-stringBuffer/" data-id="cjcg1dy8c0013q6p367ohn0l9" class="article-share-link">Delen</a>
+      <a data-url="http://yoursite.com/2017/12/22/java/java-api/java-stringBuffer/" data-id="cjck83hqs001mzvp3cs49ruw1" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/api/">api</a></li></ul>
@@ -2542,889 +2870,10 @@ public static String getMaxSubstring(String s1, String s2){
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/21/java/java-api/api-string/" data-id="cjcg1dy880010q6p30qcqbozs" class="article-share-link">Delen</a>
+      <a data-url="http://yoursite.com/2017/12/21/java/java-api/api-string/" data-id="cjck83hql001hzvp3e51oteeo" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/api/">api</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/java-thread/thread-communication" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/18/java/java-thread/thread-communication/" class="article-date">
-  <time datetime="2017-12-18T08:42:27.000Z" itemprop="datePublished">2017-12-18</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/java/">java</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/18/java/java-thread/thread-communication/">thread-communication</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h4 id="一、多线程通信"><a href="#一、多线程通信" class="headerlink" title="一、多线程通信"></a>一、多线程通信</h4><p>多个线程在处理同一资源，但是任务不同。</p>
-<h4 id="1、示例"><a href="#1、示例" class="headerlink" title="1、示例"></a>1、示例</h4><p>input类：输入</p>
-<p>resource类： name、sex</p>
-<p>output类：输出</p>
-<p>input和output作为两个线程，处理同一个资源resource。</p>
-<pre><code>class Resource{
-    String name;
-    String sex;
-}
-
-class Input implements Runnable{
-    Resource r;
-    Input(Resource r){
-        this.r = r;
-    }
-    public void run(){
-        int x = 0;
-        while(true){
-            synchronized(r){//同步锁r与output保持一致
-                if(x == 0){
-                    r.name = &quot;张三&quot;;
-                    r.sex = &quot;男&quot;;
-                }else{
-                    r.name = &quot;李四&quot;;
-                    r.sex = &quot;女&quot;;
-                }
-            }
-            x = (x+1)%2;
-        }
-    }
-}
-
-class Output implements Runnable{
-    Resource r;
-    Input(Resource r){
-        this.r = r;
-    }
-    public void run(){
-        while(true){                    
-            synchronized(r){
-                System.out.println(r.name+&quot;....&quot;+r.sex);
-            }
-        }
-    }
-}
-
-class ResourceDemo{
-    public static void main(String[] args){
-        Resource r = new Resource();
-        Input in = new Input(r);
-        Output out = new Output(r);
-        Thread t1 = new Thread(in);
-        Thread t2 = new Thread(out);
-        t1.start();
-        t2.start();
-    }
-}
-</code></pre><p>线程分析：</p>
-<p>input拿到执行权后，输入张三男，output拿到执行权，输出张三、男，input再拿到执行输入李四女，还是input拿到执行权，输入张三男，覆盖了李四女，output拿到执行权还是输出张三男。因此，无法实现input输入一次，output就输出一次的需求。</p>
-<h4 id="2、多线程通信-等待唤醒机制"><a href="#2、多线程通信-等待唤醒机制" class="headerlink" title="2、多线程通信-等待唤醒机制"></a>2、多线程通信-等待唤醒机制</h4><p>实现input输入一次，output就紧接着输出一次。</p>
-<p>等待唤醒机制涉及的方法：</p>
-<p>1、wait()：让线程处于冻结状态，被wait的线程会被存储到线程池中。</p>
-<p>2、notify()：唤醒线程池中一个线程（任意）。</p>
-<p>3、notifyAll()：唤醒线程池中的所有线程。</p>
-<p>4、以上方法都必须定义在同步中。因为这些方法都是用于操作线程状态的方法。必须要明确到底操作的是哪个锁上的线程。</p>
-<p>5、r锁即为线程input和output的监视器。</p>
-<p>6、为什么操作线程的方法wait、notify、notifyAll定义在了Object类中，而没有定义在Thread类中。因为这些方法是监视器的方法。监视器就是锁。锁可以是任意对象，任意对象都继承自Object类。</p>
-<pre><code>class Resource{
-    String name;
-    String sex;
-    boolean flag = false;
-}
-
-class Input implements Runnable{
-    Resource r;
-    Input(Resource r){
-        this.r = r;
-    }
-    public void run(){
-        int x = 0;
-        while(true){
-            synchronized(r){//同步锁r与output保持一致
-                if(r.flag)
-                    try{
-                        r.wait()
-                    }catch(InterruptedException e){
-                        //...
-                    }
-                if(x == 0){
-                    r.name = &quot;张三&quot;;
-                    r.sex = &quot;男&quot;;
-                }else{
-                    r.name = &quot;李四&quot;;
-                    r.sex = &quot;女&quot;;
-                }
-                r.flag = true;
-                r.notify();
-            }
-            x = (x+1)%2;
-        }
-    }
-}
-
-class Output implements Runnable{
-    Resource r;
-    Input(Resource r){
-        this.r = r;
-    }
-    public void run(){
-        while(true){                    
-            synchronized(r){
-                if(!r.flag)
-                    try{
-                        r.wait()
-                    }catch(InterruptedException e){
-                        //...
-                    }
-                    System.out.println(r.name+&quot;....&quot;+r.sex);
-                    r.flag = false;
-                    r.notify();
-            }
-        }
-    }
-}
-
-class ResourceDemo{
-    public static void main(String[] args){
-        Resource r = new Resource();
-        Input in = new Input(r);
-        Output out = new Output(r);
-        Thread t1 = new Thread(in);
-        Thread t2 = new Thread(out);
-        t1.start();
-        t2.start();
-    }
-}
-</code></pre><p>线程分析：input和output分别取得执行权，并相互唤醒对方。</p>
-<p>代码优化：不要直接访问Resource中的变量，提高安全性。</p>
-<pre><code>class Resource{
-    private String name;
-    private String sex;
-    private boolean flag = false;
-    public synchronized void set(String name, String sex){
-        if(flag){
-            try{
-                    this.wait()
-                }catch(InterruptedException e){
-                    //...
-                }
-            this.name = name;
-            this.sex = sex;
-            flag = true;
-            this.notify();//同步函数的锁是this
-        }
-    }
-    public synchronized void out(){
-        if(!flag){
-            try{
-                    this.wait()
-                }catch(InterruptedException e){
-                    //...
-                }
-        }
-        System.out.println(name+&quot;....&quot;+sex);
-        flag = false;
-        this.notify();
-    }
-}
-
-class Input implements Runnable{
-    Resource r;
-    Input(Resource r){
-        this.r = r;
-    }
-    public void run(){
-        int x = 0;
-        while(true){
-            if(x == 0){
-                r.set(&quot;张三&quot;,&quot;男&quot;);
-            }else{
-                r.set(&quot;张三&quot;,&quot;女&quot;);
-            }
-            x = (x+1)%2;
-        }
-    }
-}
-
-class Output implements Runnable{
-    Resource r;
-    Input(Resource r){
-        this.r = r;
-    }
-    public void run(){
-        while(true){                    
-            r.out();
-        }
-    }
-}
-
-class ResourceDemo{
-    public static void main(String[] args){
-        Resource r = new Resource();
-        Input in = new Input(r);
-        Output out = new Output(r);
-        Thread t1 = new Thread(in);
-        Thread t2 = new Thread(out);
-        t1.start();
-        t2.start();
-    }
-}
-</code></pre><h4 id="3、多线程通信-多生产者多消费者问题"><a href="#3、多线程通信-多生产者多消费者问题" class="headerlink" title="3、多线程通信-多生产者多消费者问题"></a>3、多线程通信-多生产者多消费者问题</h4><pre><code>class Resource{
-    private String name;
-    private int count = 1;
-    private boolean flag = false;
-    public synchronized void set(String name){
-        if(flag)
-            try{
-                this.wait()
-            }catch(InterruptedException e){
-                //...
-            }
-        this.name = name + count;
-        count++;
-        System.out.println(Thread.currentThread().getName()+&quot;...生产者...&quot;+this.name);
-        flag = true;
-        this.notify();//同步函数的锁是this
-    }
-    public synchronized void out(){
-        if(!flag)
-            try{
-                this.wait()
-            }catch(InterruptedException e){
-                //...
-            }
-        System.out.println(Thread.currentThread().getName()+&quot;...消费者...&quot;+this.name);
-        flag = false;
-        this.notify();
-    }
-}
-
-class Producer implements Runnable{
-    private Resource r;
-    Producer(Resource r){
-        this.r = r;
-    }
-    public void run(){
-        while(true){
-            r.set(&quot;烤鸭&quot;);
-        }
-    }
-}
-
-class Consumer implements Runnable{
-    private Resource r;
-    Producer(Resource r){
-        this.r = r;
-    }
-    public void run(){
-        while(true){
-            r.out();
-        }
-    }
-}
-
-//只有一个生产者和一个消费者，安全
-class ProducerConsumerDemo{
-    public static void main(String[] args){
-        Resource r = new Resource();
-        Producer pro = new Producer();
-        Consumer con = new Consumer();
-        Thread t1 = new Thread(pro);
-        Thread t2 = new Thread(con);
-        t1.start();
-        t2.start();
-    }
-}
-
-//存在多个生产者和多个消费者，存在安全隐患
-class ProducerConsumerDemo{
-    public static void main(String[] args){
-        Resource r = new Resource();
-        Producer pro = new Producer();
-        Consumer con = new Consumer();
-        Thread t1 = new Thread(pro);
-        Thread t2 = new Thread(pro);
-        Thread t3 = new Thread(con);
-        Thread t4 = new Thread(con);
-        t1.start();
-        t2.start();
-        t3.start();
-        t4.start();
-    }
-}
-</code></pre><p>线程分析：只有一个生产者，一个消费者时，没有问题。但是当有多个生产者和多个消费者是会存在安全隐患，甚至死锁。</p>
-<h5 id="隐患分析："><a href="#隐患分析：" class="headerlink" title="隐患分析："></a>隐患分析：</h5><p>t0,t1,t2,t3都有执行资格。</p>
-<p>线程t0拿到执行权，生产烤鸭1，flag为true。</p>
-<p>t0再次拿到执行权被冻结。</p>
-<p>t1拿到执行权也被冻结。此时，t0和t1都进入线程池。</p>
-<p>t2拿到执行权，消费了烤鸭1，flag为false。唤醒线程池中被冻结的线程t0或t1。假设唤醒了t0。此时，t0,t2,t3有执行资格。</p>
-<p>t2继续拿到执行权被冻结，进入线程池（t1,t2）。</p>
-<p>t3拿到执行权也被冻结，进入线程池（t1,t2,t3）。</p>
-<p>被唤醒的t0拿到执行权，没有判断if(flag)，直接往下执行，生产烤鸭2，flag为true。唤醒线程池中的一个线程。</p>
-<p>如果t1被唤醒，此时t0和t1有执行资格，线程池中还有t2和t3。</p>
-<p>t0拿到执行权，被冻结进入线程池。</p>
-<p>被唤醒的t1拿到执行权，还是没有判断if(flag)，从被冻结的位置，直接往下执行，又生产了烤鸭3。</p>
-<p>问题出现，烤鸭2没有被消费的情况下，生产了烤鸭3。</p>
-<h5 id="隐患解决方法：t1拿到执行权后，要判断flag为true，不要再生产烤鸭3。"><a href="#隐患解决方法：t1拿到执行权后，要判断flag为true，不要再生产烤鸭3。" class="headerlink" title="隐患解决方法：t1拿到执行权后，要判断flag为true，不要再生产烤鸭3。"></a>隐患解决方法：t1拿到执行权后，要判断flag为true，不要再生产烤鸭3。</h5><p>因此要将if改为while</p>
-<pre><code>public synchronized void set(String name){
-    while(flag)
-        try{
-            this.wait()
-        }catch(InterruptedException e){
-            //...
-        }
-    ...
-}
-
-public synchronized void out(){
-    while(!flag)
-        try{
-            this.wait()
-        }catch(InterruptedException e){
-            //...
-        }
-    ...
-}
-</code></pre><h5 id="死锁分析："><a href="#死锁分析：" class="headerlink" title="死锁分析："></a>死锁分析：</h5><p>t0和t1被冻结进入线程池。</p>
-<p>t2拿到执行权，消费烤鸭1，flag为false，唤醒t0。</p>
-<p>t2和t3先后拿到执行权被冻结进入线程池。</p>
-<p>t0拿到执行权，生产烤鸭，flag变为true，唤醒线程池中的任意一个线程。此时，线程池中有t1,t2,t3。</p>
-<p>如果唤醒的是t1，此时有执行资格的为t0和t1。先后拿到执行权，由于flag为true，都被冻结进入线程池。此时，t0,t1,t2,t3都被冻结在线程池中。</p>
-<p>没有线程被唤醒，没有线程有执行资格，没有线程能拿到执行权，死锁。</p>
-<h5 id="死锁解决："><a href="#死锁解决：" class="headerlink" title="死锁解决："></a>死锁解决：</h5><p>t0拿到执行权，生产烤鸭，flag变为true，唤醒线程池中的线程时，全部唤醒。</p>
-<pre><code>public synchronized void set(String name){
-    ...
-    this.notifyAll();
-}
-
-public synchronized void out(String name){
-    ...
-    this.notifyAll();
-}
-</code></pre><h4 id="4、多线程通信-多生产者多消费者问题-JDK1-5新特性-Lock"><a href="#4、多线程通信-多生产者多消费者问题-JDK1-5新特性-Lock" class="headerlink" title="4、多线程通信-多生产者多消费者问题-JDK1.5新特性-Lock"></a>4、多线程通信-多生产者多消费者问题-JDK1.5新特性-Lock</h4><p>Lock接口是1.5版本对synchronized的替代。</p>
-<p>同步代码块和同步函数对于锁的操作是隐式的。</p>
-<p>jdk1.5以后将同步和锁封装成了对象，并将操作锁的隐式方式定义到了该对象中，将隐式动作变成了显式动作。</p>
-<pre><code>Object obj = new Object();
-void show(){
-    synchronized(obj){
-        //...
-    }
-}
-
-Lock lock = new ReentrantLock();
-void show(){
-    try{
-        lock.lock();//获取锁
-        //...
-    }catch(){
-        //...
-    }finally{
-        lock.unlock();
-    }
-}
-</code></pre><h4 id="5、多线程通信-多生产者多消费者问题-JDK1-5新特性-Condition"><a href="#5、多线程通信-多生产者多消费者问题-JDK1-5新特性-Condition" class="headerlink" title="5、多线程通信-多生产者多消费者问题-JDK1.5新特性-Condition"></a>5、多线程通信-多生产者多消费者问题-JDK1.5新特性-Condition</h4><pre><code>Object obj = new Object();
-void show(){
-    synchronized(obj){
-        //...
-    }
-}
-
-同步代码块中的锁对象，只有一组操作线程的方法，就是继承自object的wait(),notify(),notifyAll()。
-
-Lock lock = new ReentrantLock();
-void show(){
-    try{
-        lock.lock();//获取锁
-        //...
-    }catch(){
-        //...
-    }finally{
-        lock.unlock();
-    }
-}
-
-jdk1.5以后将操作线程的方法封装为了对象即为condition接口。
-
-Lock替代的是synchronized的方法和语句的使用，Condition替代了Object监视器（即锁）的方法（wait,notify,notifyAll）的使用。
-
-通过Lock接口的newCondition方法，就可以使一个实现了Lock接口的锁对象生成多组监视器方法。
-
-interface Condition{
-    await();
-    signal();
-    signalAll();
-}
-
-Lock lock = new ReentrantLock();
-Condition c1 = lock.newCondition();
-Condition c2 = lock.newCondition();
-</code></pre><h5 id="优化烤鸭示例代码"><a href="#优化烤鸭示例代码" class="headerlink" title="优化烤鸭示例代码"></a>优化烤鸭示例代码</h5><pre><code>import java.util.concurrent.locks.*
-
-class Resource{
-    private ...
-    ...
-    //创建一个锁对象
-    Lock lock = new ReentrantLock();
-    //通过已有的锁获取该锁上的监视器对象
-    Condition con = lock.newCondition();
-    public void set(String name){
-        lock.lock();
-        try{
-            while(flag)
-                //try{this.wait();}catch(...){}
-                try{con.await();}catch(...){}
-                ...
-                //notifyAll();
-                con.signalAll();
-        }finally{
-            lock.unlock();
-        }
-    }
-    public void out(){
-        lock.lock();
-        try{
-            while(!flag)
-                //try{this.wait();}catch(...){}
-                try{con.await();}catch(...){}
-                ...
-                //notifyAll();
-                con.signalAll();
-        }finally{
-            lock.unlock();
-        }
-    }
-}
-</code></pre><h5 id="notifyAll解决方法缺点"><a href="#notifyAll解决方法缺点" class="headerlink" title="notifyAll解决方法缺点"></a>notifyAll解决方法缺点</h5><p>唤醒了所有的线程，t1还有可能优于t2和t2拿到执行权，降低了效率。</p>
-<p>应该想办法做到：set的线程t0和t1只唤醒out的t2和t3，而out的线程t2和t3只唤醒t0和t1。</p>
-<p>lock和condition满足条件，四个线程共用一把锁lock，但是一把锁有两个监视器，一个监视器用来监视set，另一个监视器用来监视out。</p>
-<h5 id="优化烤鸭示例代码-1"><a href="#优化烤鸭示例代码-1" class="headerlink" title="优化烤鸭示例代码"></a>优化烤鸭示例代码</h5><pre><code>Lock lock = new ReentrantLock();
-Condition producer_con = lock.newCondition();
-Condition consumer_con = lock.newCondition();
-public void set(String name){
-    lock.lock();
-    try{
-        while(flag)
-            //try{this.wait();}catch(...){}
-            //try{con.await();}catch(...){}
-            try{producer_con();}catch(...){}
-            ...
-            //notifyAll();
-            //con.signalAll();
-            //唤醒消费者的线程的一个线程即可
-            consumer_con.signal();
-    }finally{
-        lock.unlock();
-    }
-}
-public void out(){
-    lock.lock();
-    try{
-        while(!flag)
-            //try{this.wait();}catch(...){}
-            //try{con.await();}catch(...){}
-            try{consumer_con.await();}catch(...){}
-            ...
-            //notifyAll();
-            //con.signalAll();
-            producer_con.signal();
-    }finally{
-        lock.unlock();
-    }
-}
-</code></pre><h5 id="lock-amp-condition"><a href="#lock-amp-condition" class="headerlink" title="lock &amp; condition"></a>lock &amp; condition</h5><p>Lock接口：替代了同步代码块或者同步函数。将同步的隐式锁操作变成显式操作。同时更为灵活。可以给一个锁加上多组监视器。</p>
-<pre><code>lock():获取锁
-
-unlock():释放锁
-</code></pre><p>Condition接口：替代了Object中的wait，notify，notifyAll方法。将这些监视器的方法进行了封装，变成Condition监视器对象。可以任意锁进行组合。</p>
-<pre><code>await():相当于wait()方法
-signal():相当于notify()方法
-signalAll():相当于notifyAll()方法
-</code></pre><h4 id="6、wait和sleep的区别"><a href="#6、wait和sleep的区别" class="headerlink" title="6、wait和sleep的区别"></a>6、wait和sleep的区别</h4><p>1、wait可以指定时间，也可以不指定时间。sleep必须指定时间。</p>
-<p>2、在同步中，对cpu的执行权和锁的处理不同。<br>    wait：释放执行权，也释放锁。<br>    sleep：释放执行权，不释放锁。</p>
-<h4 id="7、停止线程方式-定义标记"><a href="#7、停止线程方式-定义标记" class="headerlink" title="7、停止线程方式 - 定义标记"></a>7、停止线程方式 - 定义标记</h4><p>1、stop方法。已过时。</p>
-<p>2、run方法结束</p>
-<p>任务中都有循环结构，只要控制住循环就可以结束任务。</p>
-<p>控制循环通常就用定义标记来完成。</p>
-<pre><code>class StopThread implements Runnable{
-    private boolean flag = true;
-    public void run(){
-        while(flag){
-            System.out.println(Thread.currentThread().getName()+&quot;...&quot;);
-        }
-    }
-    public void setFlag(){
-        flag = false;
-    }
-}
-
-class StopThreadDemo{
-    public static void main(String[] args){
-        StopThread st = new StopThread();
-        Thread t1 = new Thread(st);
-        Thread t2 = new Thread(st);
-        t1.start();
-        t2.start();
-
-        int num = 1;
-        for(;;){
-            if(++num == 50){
-                st.setFlag(0;
-                break;
-            }
-            System.out.println(&quot;main...&quot;+num);
-        }
-        System.out.println(&quot;over&quot;);
-    }
-}
-</code></pre><p>如果线程处于冻结状态，无法读取标记，可以用Thread类中的interrupt方法将线程从冻结状态强制恢复到运行状态中来，让线程具备cpu的执行资格。</p>
-<p>强制动作会发生中断异常，需要处理。</p>
-<pre><code>class StopThread implements Runnable{
-    private boolean flag = true;
-    public void run(){
-        while(flag){
-            try{
-                wait();
-            }catch(InterruptedException e){
-                System.out.printlin(Thread.currentThread().getName()+&quot;...&quot;+e);
-            }
-            System.out.printlin(Thread.currentThread().getName()+&quot;...+++&quot;);
-        }
-    }
-    public void setFlag(){
-        flag = false;
-    }
-}
-
-class StopThreadDemo{
-    public static void main(String[] args){
-        StopThread st = new StopThread();
-        Thread t1 = new Thread(st);
-        Thread t2 = new Thread(st);
-        t1.start();
-        t2.start();
-
-        int num = 1;
-        for(;;){
-            if(++num == 50){
-                //st.setFlag(0;
-                t1.interrupt();
-                t2.interrupt();
-                break;
-            }
-            System.out.println(&quot;main...&quot;+num);
-        }
-        System.out.println(&quot;over&quot;);
-    }
-}
-</code></pre><h4 id="8、多线程-守护线程"><a href="#8、多线程-守护线程" class="headerlink" title="8、多线程 - 守护线程"></a>8、多线程 - 守护线程</h4><p>setDaemon：后台线程，守护线程，用户线程。</p>
-<p>运行时，跟前台线程一样，争夺cpu资源。</p>
-<p>前台线程需要手动结束，后台线程当前台线程全部结束后自动结束。</p>
-<p>setDaemon在线程开启之前调用。</p>
-<pre><code>t1.setDaemon(true);
-t1.start();
-t2.setDaemon(true);
-t2.start();
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/18/java/java-thread/thread-communication/" data-id="cjcg1dy8n001cq6p35pz525xk" class="article-share-link">Delen</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/thread/">thread</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/java-thread/java-thread" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/15/java/java-thread/java-thread/" class="article-date">
-  <time datetime="2017-12-15T02:47:02.000Z" itemprop="datePublished">2017-12-15</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/java/">java</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/15/java/java-thread/java-thread/">java多线程</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h4 id="创建线程"><a href="#创建线程" class="headerlink" title="创建线程"></a>创建线程</h4><h5 id="创建线程方式一：继承thread类。"><a href="#创建线程方式一：继承thread类。" class="headerlink" title="创建线程方式一：继承thread类。"></a>创建线程方式一：继承thread类。</h5><p>步骤：</p>
-<p>1、定义一个子类继承Thread类。</p>
-<p>2、覆盖Thread类中的run方法。</p>
-<p>3、直接创建Thread的子类对象创建线程。</p>
-<p>4、调用start方法开启线程并调用线程的任务run方法执行。</p>
-<pre><code>class Demo extends Thread{
-    private String name;
-    Demo(String name){
-        this.name = name;
-    }
-    public void run(){
-        for(int x=0; x&lt;10; x++){
-            System.out.println(name+&quot;...x=&quot;+x);
-        }
-    }
-}
-
-class ThreadDemo2{
-    public static void main(String[] args){
-        Demo d1 = new Demo(&quot;张三&quot;);
-        Demo d2 = new Demo(&quot;李四&quot;);
-        d1.start();
-        d2.start();
-    }
-}
-</code></pre><h5 id="创建线程方式二：实现Runnable接口。"><a href="#创建线程方式二：实现Runnable接口。" class="headerlink" title="创建线程方式二：实现Runnable接口。"></a>创建线程方式二：实现Runnable接口。</h5><p>步骤：</p>
-<p>1、定义类实现Runnable接口。</p>
-<p>2、覆盖接口中的run方法，将线程的任务代码封闭到run方法中。</p>
-<p>3、通过Thread类创建线程对象，并将实现Runnable接口的子类对象，作为Thread类的构造函数的参数进行传递。</p>
-<pre><code>为什么？因为线程的任务都封装在Runnable接口子类对象的run方法中。
-所以要
-</code></pre><p>4、调用线程对象的start方法开启线程。</p>
-<pre><code>class Demo implements Runnable{
-    public void run(){
-        show();
-    }
-    public void show(){
-        for(int x=0; x&lt;20; x++){
-            system.out.println(Thread.currentThread().getname()+&quot;........&quot;+x);
-        }
-    }
-}
-
-class TreadDemo{
-    public static void main(sting[] args){
-        Demo d = new Demo();
-        Thread t1 = new Thread(d);
-        Thread t2 = new Thread(d);
-        t1.start;
-        t2.start;
-    }
-}
-</code></pre><h5 id="线程安全隐患排查原则"><a href="#线程安全隐患排查原则" class="headerlink" title="线程安全隐患排查原则"></a>线程安全隐患排查原则</h5><p>1、查找共享数据</p>
-<p>2、共享数据代码的操作不止一条</p>
-<p>事例：两个储户到银行存钱，每次存100，共存三次。银行总数从100到600递增。</p>
-<pre><code>class Bank{
-    private int sum;
-    public void add(int num){
-        sum = sum + num;
-        try{
-            Thread.sleep();
-        }catch(InterruptedException e){
-            //...
-        }
-        System.out.println(&quot;sum=&quot;+sum);
-    }
-}
-
-class Cus implements Runnable{
-    private b = new Bank();
-    public void run(){
-        for(int x=0; x&lt;3; x++){
-            b.add(100);
-        }
-    }
-}
-
-class BankDemo{
-    public static void main(String[] args){
-        Cus c = new Cus();
-        Thread t1 = new Thread(c);
-        Thread t2 = new Thread(c);
-        t1.start();
-        t2.start();
-    }
-}
-</code></pre><h5 id="分析多线程安全隐患："><a href="#分析多线程安全隐患：" class="headerlink" title="分析多线程安全隐患："></a>分析多线程安全隐患：</h5><p>共享数据有：private b</p>
-<p>执行代码有一句：b.add(100);</p>
-<p>b.add里有一个共享数据：private int sum;</p>
-<p>执行语句有两句：sum = sum + num; system.out.printls…;</p>
-<p>此处会产生安全隐患：比如第一次当线程0进来时，sum = 100，但没有执行system.out.println语句，第二次线程1进来，此时sum = 100+100,再执行线程0和线程1的输出语句时，就都成了200。</p>
-<h5 id="解决方式一："><a href="#解决方式一：" class="headerlink" title="解决方式一："></a>解决方式一：</h5><p>用同步代码块把产生线程安全隐患的代码封装，注意要保持多线程用的是同一个锁。</p>
-<pre><code>class Bank{
-    private int sum;
-    private Object obj = new Object();
-    public void add(int num){
-        synchronized(obj){//三个线程共用一个对象锁obj
-            sum = sum + num;
-            try{
-                Thread.sleep();
-            }catch(InterruptedException e){
-                //...
-            }
-            System.out.println(&quot;sum=&quot;+sum);
-        }
-    }
-}
-</code></pre><h5 id="解决方式二："><a href="#解决方式二：" class="headerlink" title="解决方式二："></a>解决方式二：</h5><p>同步函数</p>
-<pre><code>class Bank{
-    private int sum;
-    public synchronized void add(int num){//同步函数
-        sum = sum + num;
-        try{
-            Thread.sleep();
-        }catch(InterruptedException e){
-            //...
-        }
-        System.out.println(&quot;sum=&quot;+sum);
-    }
-}
-</code></pre><h5 id="同步的好处和弊端"><a href="#同步的好处和弊端" class="headerlink" title="同步的好处和弊端"></a>同步的好处和弊端</h5><p>好处：解决了线程的安全问题</p>
-<p>弊端：降低了效率，因为同步外的线程都会判断同步锁。</p>
-<h5 id="同步函数和同步代码块的区别："><a href="#同步函数和同步代码块的区别：" class="headerlink" title="同步函数和同步代码块的区别："></a>同步函数和同步代码块的区别：</h5><p>1、同步函数使用的锁是this，同步代码块的锁是任意的对象。</p>
-<p>2、建议使用同步代码块。</p>
-<h5 id="静态同步函数的锁"><a href="#静态同步函数的锁" class="headerlink" title="静态同步函数的锁"></a>静态同步函数的锁</h5><p>静态同步函数的锁是该函数所属的字节码文件对象</p>
-<p>该对象可以用this.getClass()方法获取，也可以用当前类名.class获取。</p>
-<pre><code>class Bank{
-    private int sum;
-    public static synchronized void add(int num){
-        sum = sum + num;
-        try{
-            Thread.sleep();
-        }catch(InterruptedException e){
-            //...
-        }
-        System.out.println(&quot;sum=&quot;+sum);
-    }
-}
-</code></pre><p>该静态同步函数add的同步锁即为该函数所属的字节码文件对象，即为Bank.class。</p>
-<h5 id="单例模式涉及的多线程问题"><a href="#单例模式涉及的多线程问题" class="headerlink" title="单例模式涉及的多线程问题"></a>单例模式涉及的多线程问题</h5><pre><code>//饿汉式
-class Single{
-    private static final Singles = new Single();
-    private Single(){};
-    public static Single getInstance(){
-        return s;
-    }
-}
-
-//懒汉式
-class Single{
-    private static final Singles = null;
-    private Single(){};
-    public static Single getInstance(){
-        if(s == null)
-            s = new Single();
-            return s;
-    }
-}
-
-class SingleDemo{
-    public static void main(String[] args){
-
-    }
-}
-</code></pre><p>饿汉式多线程安全隐患分析：</p>
-<p>如果把getInstance函数封装为多线程的任务，1、多线程存在共享数据s；2、只有一条语句return s；因此，不会存在安全隐患。</p>
-<p>懒汉式多线程安全隐患分析：</p>
-<p>如果把getInstance函数封装为多线程的任务，1、多线程存在共享数据s；2、有多条语句；因此，存在安全隐患。比如：线程0进来时，s == null，挂住了，线程1双进来了，s == null，挂住了。线程0取得执行权，生成对象并返回。线程1又取得执行权，又生成了对象并返回。就不能保证单例设计模式对象的唯一性了。</p>
-<p>因此，懒汉式需要同步函数。</p>
-<pre><code>public static synchronized Single getInstance(){
-    if(s == null)
-        s = new Single();
-        return s;
-}
-</code></pre><p>解决了安全问题，但是每一次线程进来时都会判断同步锁是否一样，降低了效率。</p>
-<p>同步代码块解决安全问题以及效率问题。</p>
-<pre><code>public static Single getInstance(){
-    if(s == null){ //a处的if
-        synchronized(Single.class){
-            if(s == null) //b处的if
-                s = new Single();
-                return s;
-        }
-    }
-    return s;
-}
-</code></pre><p>分析：线程0进入getInstance，判断a处的s == null,进入if，挂起。线程1进入判断a处的s == null，进入if挂起。线程0取得执行权，判断b处的s == null，生成对象并返回。线程1取得执行权，判断b处的s已经不为null了，跳出if。线程2进入getInstance，判断a处的s已经不为null了，直接return s。</p>
-<h5 id="多线程死锁事例"><a href="#多线程死锁事例" class="headerlink" title="多线程死锁事例"></a>多线程死锁事例</h5><pre><code>class Test implements Runnable{
-    private boolean flag = true;
-    public void run(){
-        if(flag){
-            while(true)
-                synchronized(MyLock.locka){
-                    System.out.prinln(Thread.currentThread().getName()+&quot;if...locka...&quot;);
-                synchronized(MyLock.lockb){
-                        System.out.prinln(Thread.currentThread().getName()+&quot;if...lockb...&quot;);                    
-                    }
-                }
-        }else{
-            while(true)
-                synchronized(MyLock.lockb){
-                    System.out.prinln(Thread.currentThread().getName()+&quot;else...lockb...&quot;);    
-                synchronized(MyLock.locka){
-                        System.out.prinln(Thread.currentThread().getName()+&quot;else...locka...&quot;);    
-                    }
-                }
-        }
-    }
-}
-
-class MyLock{
-    public static final Object locka = new Object();
-    public static final Object lockb = new Object();
-}
-
-class DeadLockTest{
-    public static void main(String[] args){
-        Test a = new Test();
-        Thread t1 = new Thread(a);
-        Thread t2 = new Thread(a);
-        t1.start();
-        try{
-            Thread.sleep(10);//冻结main主线程10毫秒
-        }catch(){
-            //...
-        }
-        a.flag = false;
-        t2.start();
-    }
-}
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/15/java/java-thread/java-thread/" data-id="cjcg1dy8k0019q6p3urajx0e3" class="article-share-link">Delen</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/thread/">thread</a></li></ul>
 
     </footer>
   </div>
@@ -3444,7 +2893,7 @@ class DeadLockTest{
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Categorieën</h3>
+    <h3 class="widget-title">Categories</h3>
     <div class="widget">
       <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
     </div>
@@ -3454,9 +2903,9 @@ class DeadLockTest{
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Labels</h3>
+    <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
     </div>
   </div>
 
@@ -3466,14 +2915,14 @@ class DeadLockTest{
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 18px;">angular</a> <a href="/tags/api/" style="font-size: 14px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 16px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/thread/" style="font-size: 12px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 18px;">angular</a> <a href="/tags/api/" style="font-size: 14px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 16px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/thread/" style="font-size: 12px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
     </div>
   </div>
 
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Archieven</h3>
+    <h3 class="widget-title">Archives</h3>
     <div class="widget">
       <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
     </div>
@@ -3483,9 +2932,17 @@ class DeadLockTest{
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Recente berichten</h3>
+    <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2018/01/17/java/java-regex/java-regex-1/">java-正则表达式</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/17/java/java-reflect/java-reflect-1/">java反射机制</a>
+          </li>
         
           <li>
             <a href="/2018/01/15/java/java-io/IO-19-practice-cutstring/">IO流 - 十九：练习 - 按字节截取字符串</a>
@@ -3496,15 +2953,7 @@ class DeadLockTest{
           </li>
         
           <li>
-            <a href="/2018/01/10/java/java-io/IO-8-transform-coding/">IO流 - 八、转换流的编码解码</a>
-          </li>
-        
-          <li>
-            <a href="/2018/01/10/java/java-io/IO-9-file/">IO流 - 九、File对象</a>
-          </li>
-        
-          <li>
-            <a href="/2018/01/10/java/java-io/IO-7-stream-rule-demo/">IO流 - 七、流的操作规律 - 需求体现</a>
+            <a href="/2018/01/10/java/java-io/IO-10-properties/">IO流 - 十、IO流 - Properties集合</a>
           </li>
         
       </ul>
