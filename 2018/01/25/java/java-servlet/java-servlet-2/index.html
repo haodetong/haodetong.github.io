@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>java Servlet 二、核心 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="java servlet">
+<meta name="keywords" content="java, servlet">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java Servlet 二、核心">
+<meta property="og:url" content="http://yoursite.com/2018/01/25/java/java-servlet/java-servlet-2/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="java servlet">
+<meta property="og:updated_time" content="2018-03-07T03:34:29.980Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="java Servlet 二、核心">
+<meta name="twitter:description" content="java servlet">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-java/java-servlet/java-servlet-2" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/25/java/java-servlet/java-servlet-2/" class="article-date">
+  <time datetime="2018-01-25T12:30:10.000Z" itemprop="datePublished">2018-01-25</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      java Servlet 二、核心
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="二、Servlet核心"><a href="#二、Servlet核心" class="headerlink" title="二、Servlet核心"></a>二、Servlet核心</h3><h4 id="2-1-GenericServlet"><a href="#2-1-GenericServlet" class="headerlink" title="2.1 GenericServlet"></a>2.1 GenericServlet</h4><h4 id="2-1-1-GenericServlet-源码"><a href="#2-1-1-GenericServlet-源码" class="headerlink" title="2.1.1 GenericServlet 源码"></a>2.1.1 GenericServlet 源码</h4><pre><code>//缺省适配器设计模式
+public abstract class GenericServlet implements Servlet, ServletConfig,
+        java.io.Serializable {
+
+    private transient ServletConfig config;
+
+    @Override
+    public void destroy() {
+        // NOOP by default
+    }
+
+    @Override
+    public String getInitParameter(String name) {
+        return getServletConfig().getInitParameter(name);
+    }
+
+    @Override
+    public Enumeration&lt;String&gt; getInitParameterNames() {
+        return getServletConfig().getInitParameterNames();
+    }
+
+    @Override
+    public ServletConfig getServletConfig() {
+        return config;
+    }
+
+
+    @Override
+    public ServletContext getServletContext() {
+        return getServletConfig().getServletContext();
+    }
+
+
+    @Override
+    public String getServletInfo() {
+        return &quot;&quot;;
+    }
+
+    //模板设计模式
+    public void init(ServletConfig config) throws ServletException {
+        this.config = config;
+        //调用无参的init()方法
+        this.init();
+    }
+
+       //该无参的init()方法，就是要让子类来重写的
+    public void init() throws ServletException {
+        // NOOP by default
+    }
+
+    //抽象化service方法，让子类去实现
+    public abstract void service(ServletRequest req, ServletResponse res)
+            throws ServletException, IOException;
+
+
+    @Override
+    public String getServletName() {
+        return config.getServletName();
+    }
+}
+</code></pre><p>实现了servlet接口，并抽象化了service方法，让子类去实现。</p>
+<p>实现了servletconfig接口，子类可以直接调用servletconfig的方法。</p>
+<h4 id="2-1-2-获取请求的提交方式"><a href="#2-1-2-获取请求的提交方式" class="headerlink" title="2.1.2 获取请求的提交方式"></a>2.1.2 获取请求的提交方式</h4><pre><code>public class genericSevletDemo extends GenericServlet {
+    private static final long serialVersionUID = 1L;
+
+    public void service(ServletRequest request, ServletResponse response) throws ServletException, IOException {
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse res = (HttpServletResponse) response;
+        String method = req.getMethod();
+
+        if(&quot;POSt&quot;.equals(method)){
+            doPost(req,res);
+        }else if(&quot;GET&quot;.equals(method)){
+            doGet(req,res);
+        }
+    }
+
+}
+</code></pre><p>继续封装doPost和doGet为HttpServlet类</p>
+<h4 id="2-2-HttpServlet"><a href="#2-2-HttpServlet" class="headerlink" title="2.2 HttpServlet"></a>2.2 HttpServlet</h4><p>HttpServlet源码</p>
+<pre><code>public abstract class HttpServlet extends GenericServlet {
+
+    @Override
+public void service(ServletRequest req, ServletResponse res){
+     HttpServletRequest  request;
+    HttpServletResponse response;
+
+    try {
+        request = (HttpServletRequest) req;
+        response = (HttpServletResponse) res;
+    } catch (ClassCastException e) {
+        throw new ServletException(&quot;non-HTTP request or response&quot;);
+    }
+    service(request, response);
+}
+
+     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+        throws ServletException, IOException {
+            ...
+        }
+
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+        throws ServletException, IOException {
+        ...
+        }
+} 
+</code></pre><p>//servlet继承httpservlet类</p>
+<pre><code>public class HttpservDemo extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.getWriter().append(&quot;Served at: &quot;).append(request.getContextPath());
+    }
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doGet(request, response);
+    }
+
+}
+</code></pre><h4 id="2-3-HttpServletRequest"><a href="#2-3-HttpServletRequest" class="headerlink" title="2.3 HttpServletRequest"></a>2.3 HttpServletRequest</h4><h5 id="2-3-1-请求的生命周期"><a href="#2-3-1-请求的生命周期" class="headerlink" title="2.3.1 请求的生命周期"></a>2.3.1 请求的生命周期</h5><p>当客户端浏览器将请求发送到服务器后，服务器会根据HTTP请求协议的格式对请求进行解析。同时，服务器会创建HttpServletRequest的实现类RequestFacade的对象，即请求对象。然后再调用相应的set方法，将解析出的数据封装到请示对象中。此时HttpServletRequest实例就创建并初始化完成了。也就是说，请求对象是由服务器创建的的。</p>
+<p>当服务器向客户端发送响应结束后，HttpServletRequest实例对象就被服务器销毁。</p>
+<p>一次请求对应一个请求对象，别外一次请求对应另一个请求对象，与之前的请求对象没有任何关系。HttpServletRequest实例的生命周期很短暂。</p>
+<h5 id="2-3-2-请求参数"><a href="#2-3-2-请求参数" class="headerlink" title="2.3.2 请求参数"></a>2.3.2 请求参数</h5><p>HttpServletRequest对于请求中所携带的参数是以Map的形式接收的，并且该Map的key为String，value为String数组（一个请求参数可能会有多个值的情况出现）。</p>
+<pre><code>public class HttpservDemo extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //getParameter()方法，获取指定key对应的value，等同于getParameterValues()[0]
+        String name = request.getParameter(&quot;name&quot;);
+        String ageStr = request.getParameter(&quot;age&quot;);
+        Integer age = Integer.valueOf(ageStr);
+        System.out.println(&quot;name = &quot;+name);
+        System.out.println(&quot;age = &quot;+age);
+
+        //getParameterName()方法,获取所有keys
+        Enumeration&lt;String&gt; names = request.getParameterNames();
+        while(names.hasMoreElements()) {
+            String eleName = names.nextElement();
+            String eleValue = request.getParameter(eleName);
+            System.out.println(eleName + &quot;-----&quot; + eleValue);
+        }
+
+        //getParameterValues()方法,获取指定key对应的所有values，
+        //如&lt;checkbox name = &quot;hobby&quot;&gt;running&lt;/checkbox&gt;
+        //如&lt;checkbox name = &quot;hobby&quot;&gt;reading&lt;/checkbox&gt;
+        String[] hobby = request.getParameterValues(&quot;hobby&quot;);
+        for(String h : hobby) {
+            System.out.println(h);
+        }
+
+        //getParameterMap()方法,获取存放请求参数的Map
+        Map&lt;String, String[]&gt; map = request.getParameterMap();
+        for(String key : map.keySet()) {
+            System.out.println(key+&quot;-----&quot;+request.getParameter(key));
+        }
+    }
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doGet(request, response);
+    }
+
+}
+</code></pre><h5 id="2-3-3-域属性"><a href="#2-3-3-域属性" class="headerlink" title="2.3.3 域属性"></a>2.3.3 域属性</h5><p>Request中也存在域属性空间，用于存放有名称的数据。该数据只在当前Request请求中可以访问。</p>
+<p>对于Request中的域属性操作的常用方法：</p>
+<p>设置</p>
+<pre><code>void setAttribute(String name, Object object);
+</code></pre><p>获取</p>
+<pre><code>Object getAttribute(String name);
+</code></pre><p>在FirstServlet中设置，跳转到otherServlet中获取</p>
+<pre><code>public class FirstServlet extends HttpServlet {   
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setAttribute(&quot;address&quot;, &quot;zhuhaijinwan&quot;);
+        request.setAttribute(&quot;phone&quot;, &quot;15011112222&quot;);
+
+        request.getRequestDispatcher(&quot;/other&quot;).forward(request, response);
+    }
+}
+
+public class OtherServlet extends HttpServlet {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String address = (String) request.getAttribute(&quot;address&quot;);
+        String phone = (String) request.getAttribute(&quot;phone&quot;);
+
+        Enumeration&lt;String&gt; names = request.getAttributeNames();
+        while(names.hasMoreElements()) {
+            String name = names.nextElement();
+            String value = (String) request.getAttribute(name);
+        }
+    }
+}
+</code></pre><h5 id="2-3-4-服务器相关信息"><a href="#2-3-4-服务器相关信息" class="headerlink" title="2.3.4 服务器相关信息"></a>2.3.4 服务器相关信息</h5><p>1、获取请求的URL，如：“<a href="http://localhost:8080/httpServlet/some”" target="_blank" rel="external">http://localhost:8080/httpServlet/some”</a></p>
+<pre><code>StringBuffer getRequestURL();
+</code></pre><p>2、获取请求的URI，如：”/httpServlet/some”</p>
+<pre><code>String getRequestURI();
+</code></pre><p>3、获取当前应用在Web容器中的名称，如：”httpServlet”</p>
+<pre><code>String getContext();    
+</code></pre><p>4、获取路径中与web.xml中注册servlet时的<code>&lt;url-pattern/&gt;</code>相匹配的路径信息</p>
+<pre><code>//servletPath指的是与&lt;url-pattern&gt;精确部分相匹配的路径
+String getServletPath()
+
+//pathInfo指的是与非精确部分相匹配的路径
+String getPathInfo()
+</code></pre><p>a、例如:<code>&lt;url-pattern/&gt;</code>的值为/xxx/ooo/*，用户提交的请求为：<a href="http://localhost:8080/httpServlet/xxx/ooo/abc/def。" target="_blank" rel="external">http://localhost:8080/httpServlet/xxx/ooo/abc/def。</a></p>
+<p>servletPath就是：/xxx/ooo</p>
+<p>pathInfo就是：/abc/def</p>
+<p>b、若用户提交的请求为后辍方式，如:<a href="http://localhost:8080/httpServlet/aaa/bbb/ccc.do。" target="_blank" rel="external">http://localhost:8080/httpServlet/aaa/bbb/ccc.do。</a></p>
+<p>servletpath就是：/aaa/bbb/ccc.do</p>
+<p>pathInfo: null</p>
+<p>c、URI = ServletContext + ServletPath + PathInfo</p>
+<p>5、获取请求的方式是post还是get等</p>
+<pre><code>String getMethod()
+</code></pre><p>6、获取客户端浏览器的IP</p>
+<pre><code>//对于服务器端来说，客户端就是远程端
+String getRemoteAddr()
+</code></pre><h4 id="2-4-中文乱码问题"><a href="#2-4-中文乱码问题" class="headerlink" title="2.4 中文乱码问题"></a>2.4 中文乱码问题</h4><p>当页面中提交一个包含中文的请求时，在服务器端有可能会出现中文乱码问题。</p>
+<h5 id="2-4-1-乱码产生的原因"><a href="#2-4-1-乱码产生的原因" class="headerlink" title="2.4.1 乱码产生的原因"></a>2.4.1 乱码产生的原因</h5><p>Http协议中规定，数据传输采用字节码编码方式，即无论浏览器提交的数据包含的中文是什么字符编码格式，一旦由浏览器经过Http传输协议传输，则这些数据均将以字节码的形式上传给服务器。</p>
+<p>因为Http协议的底层使用的TCP（Transmission Contrl Protocol）传输协议。传输控制协议是一种面向连接的、可靠的、基于字节流的、端对端的通信协议。在请求中，这些字节均以%开头，并以十六进制形式出现。如%5A%3D等。</p>
+<p>那么乱码是如何产生的呢？</p>
+<p>当用户通过浏览器提交一个包含 UTF-8编码格式的两个字的中文请求时，浏览器会将这两个中文字符变为六个字节，即形成六个类似%8E的字节表示形式，并将这六个字节上传到tomcat服务器。</p>
+<p>tomcat服务器接收到这六个字节后，并不知道它们原来采用的是什么字符编码。而tomcat默认的编码格式为ISO-8859-1。所以会将这个六个字符按照这种格式进行编码，编码后在控制台显示，所以在控制台会显示乱码。</p>
+<h5 id="2-4-3-乱码的解决方法"><a href="#2-4-3-乱码的解决方法" class="headerlink" title="2.4.3 乱码的解决方法"></a>2.4.3 乱码的解决方法</h5><p>1、tomcat9已经解决了GET提交时的中文乱码问题。</p>
+<p>2、request.setCharacterEncoding(“UTF-8”);解决了POST提交中文时的乱码问题。无法解决GET提交时的中文乱码问题。</p>
+<p>3、Get提交时中文乱码解决方案有两种：</p>
+<p>（1）、修改tomcat/conf/server.xml，添加URIEncoding</p>
+<pre><code>&lt;Connector port=&quot;8080&quot; protocol=&quot;HTTP/1.1&quot;
+    connectionTimeOut=&quot;20000&quot; redirectPort=&quot;8443&quot; URIEncoding=&quot;UTF-8&quot;
+/&gt;
+</code></pre><p>(2)、无论Post还是get都可以</p>
+<pre><code>String name = request.getParaeter(&quot;name&quot;);
+byte[] bytes = name.getBytes(&quot;ISO8859-1&quot;);
+name = new String(bytes,&quot;UTF-8&quot;);
+</code></pre><h4 id="2-5-HttpServletResponse"><a href="#2-5-HttpServletResponse" class="headerlink" title="2.5 HttpServletResponse"></a>2.5 HttpServletResponse</h4><p>web服务器收到一个Http请求后，会针对每个请求创建一个HttpServletRequest对象和HttpServletResponse对象。若需要获取客户端提交请求的相关信息，刚需要HttpServletRequest对象来完成。若需要向客户端发送数据，则需要通过HttpServletResponse对象来完成。</p>
+<h5 id="2-5-1-向客户端发送数据"><a href="#2-5-1-向客户端发送数据" class="headerlink" title="2.5.1 向客户端发送数据"></a>2.5.1 向客户端发送数据</h5><p>ServletResonse接口有一个方法getWriter()，用于获取到一个输出流对象PrintWriter，该输出流对象是专门用于向客户端浏览器中输出字符数据的，称为标准输出流。</p>
+<pre><code>response.getWriter().append(&quot;Served at: &quot;).append(request.getContextPath());
+
+PrintWriter out = response.getWriter();
+out.append(&quot;dddd&quot;);
+out.print(&quot;aaa&quot;);
+out.pirntln(&quot;bbbb&quot;);
+out.Write(&quot;ccc&quot;);
+</code></pre><h5 id="2-5-2-响应乱码的产生"><a href="#2-5-2-响应乱码的产生" class="headerlink" title="2.5.2 响应乱码的产生"></a>2.5.2 响应乱码的产生</h5><p>两种方法：</p>
+<p>1、设置MIME类型，设置字符编码格式</p>
+<pre><code>response.setContentType(&quot;text/html&quot;);
+response.setCharacterEncoding(&quot;UTF-8&quot;);
+</code></pre><p>2、同时设置MIME类型和字符编码格式</p>
+<pre><code>response.setContentType(&quot;text/html;charset=UTF-8&quot;);
+</code></pre><h4 id="2-6-请求转发与重定向"><a href="#2-6-请求转发与重定向" class="headerlink" title="2.6 请求转发与重定向"></a>2.6 请求转发与重定向</h4><p>通过HttpServletRequest获取到的RequestDispatcher对象的forward()方法，可以完成请求转发功能。</p>
+<p>而通过HttpServletResponse的sendRedirect()方法，可以完成重定向功能。</p>
+<h5 id="2-6-1什么是请求转发与重定向"><a href="#2-6-1什么是请求转发与重定向" class="headerlink" title="2.6.1什么是请求转发与重定向"></a>2.6.1什么是请求转发与重定向</h5><p>请求转发：一次请求，一次响应。</p>
+<p>重定向：多次请求，多次响应。</p>
+<h5 id="2-6-2-请求转发程序举例"><a href="#2-6-2-请求转发程序举例" class="headerlink" title="2.6.2 请求转发程序举例"></a>2.6.2 请求转发程序举例</h5><pre><code>public class SomServlet extends HttpServlet {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String name = req.getParameter(&quot;name&quot;);
+        String age = req.getParameter(&quot;age&quot;);
+        req.setAttribute(&quot;ageStr&quot;, age);
+        //请求转发
+        req.getRequestDispatcher(&quot;other&quot;).forward(req, resp);
+    }
+}
+
+public class OtherServlet extends HttpServlet {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //可以继续使用request,response,也可以获取someServlet中设置的域属性
+        String name = request.getParameter(&quot;name&quot;);
+        request.getAttribute(&quot;ageStr&quot;);
+
+        PrintWriter out = response.getWriter();
+        out.print(&quot;this is otherServlet&quot;);
+    }
+}
+</code></pre><h5 id="2-6-3-重定向举例"><a href="#2-6-3-重定向举例" class="headerlink" title="2.6.3 重定向举例"></a>2.6.3 重定向举例</h5><pre><code>public class SomServlet extends HttpServlet {
+
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String name = req.getParameter(&quot;name&quot;);
+        String age = req.getParameter(&quot;age&quot;);
+        req.setAttribute(&quot;ageStr&quot;, age);
+        req.getRequestDispatcher(&quot;other&quot;).forward(req, resp);
+
+        //重定向
+        resp.sendRedirect(&quot;other&quot;);
+    }
+}
+
+public class OtherServlet extends HttpServlet {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //不能再继续使用request,response,也不能获取someServlet中设置的域属性
+        PrintWriter out = response.getWriter();
+        out.print(&quot;this is otherServlet&quot;);
+    }
+
+}
+</code></pre><h5 id="2-6-4-重定向时的数据传递"><a href="#2-6-4-重定向时的数据传递" class="headerlink" title="2.6.4 重定向时的数据传递"></a>2.6.4 重定向时的数据传递</h5><p>//重定向数据传递，及乱码解决方案</p>
+<pre><code>public class SomServlet extends HttpServlet {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String name = req.getParameter(&quot;name&quot;);
+        //解决中文乱码
+        name = new String(name.getBytes(&quot;ISO8859-1&quot;),&quot;UTF-8&quot;);
+
+        String age = req.getParameter(&quot;age&quot;);
+        req.setAttribute(&quot;ageStr&quot;, age);
+        req.getRequestDispatcher(&quot;other&quot;).forward(req, resp);
+
+        //编码，解决重定向传递时乱码问题
+        name =  URLEncoder.encode(name,&quot;UTF-8&quot;);
+
+        //重定向
+        resp.sendRedirect(&quot;other?pname=&quot;+name+&quot;&amp;page=&quot;+age);
+    }
+
+}    
+
+public class OtherServlet extends HttpServlet {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        String pname = request.getParameter(&quot;pname&quot;);
+        //解码
+        pname = URLDecoder.decode(pname,&quot;UTF-8&quot;);
+
+        //打散组装
+        pname = new String(pname.getBytes(&quot;ISO8859-1&quot;),&quot;UTF-8&quot;);
+
+        String page = request.getParameter(&quot;page&quot;);
+
+        System.out.println(&quot;pname====&quot; +pname);
+        System.out.println(&quot;page====&quot; +page);
+
+        PrintWriter out = response.getWriter();
+        out.print(&quot;this is otherServlet&quot;);
+    }
+
+}
+</code></pre><h5 id="2-6-5-重定向到其它应用"><a href="#2-6-5-重定向到其它应用" class="headerlink" title="2.6.5 重定向到其它应用"></a>2.6.5 重定向到其它应用</h5><p>重定向与请求转发还有一点很重要的不同点是，重定向可以跳转到其它应用中，而请求转发只能在当前应用中跳转。也正因为如此，所以sendRedirect()的参数中，必须要添加request.getContext(),即当前应用的根目录，指定要跳转到哪个应用的哪个资源。</p>
+<pre><code>//重定向到另一个应用的名称为other的servlet
+response.sendRedirect(&quot;/redirect-two/other&quot;);
+</code></pre><h5 id="2-6-6-请求转发与重定向对比"><a href="#2-6-6-请求转发与重定向对比" class="headerlink" title="2.6.6 请求转发与重定向对比"></a>2.6.6 请求转发与重定向对比</h5><p>(1)、请求转发</p>
+<p>A、浏览器只发出一次请求，收到一次响应</p>
+<p>B、请求所转发到的资源中可以直接获取到请求中所携带的数据</p>
+<p>C、浏览器地址栏显示的是用户所提交的路径</p>
+<p>D、只能跳转到当前应用中的资源</p>
+<p>(2)、</p>
+<p>A、浏览器发出两次请求，接收到两次响应</p>
+<p>B、重定向到的资源不能直接获取到用户提交请求中所携带的数据</p>
+<p>C、浏览器地址栏显示的是重定向的请求路径，而非用户提交请求的路径。也正因为如此，重定向有一个很重要的作用：防止表单重复提交</p>
+<p>D、重定向不仅可以跳转到当前应用的其它资源，也可以跳转到其它应用中的资源</p>
+<h5 id="2-6-7-请求转发与重定向的选择"><a href="#2-6-7-请求转发与重定向的选择" class="headerlink" title="2.6.7 请求转发与重定向的选择"></a>2.6.7 请求转发与重定向的选择</h5><p>（1）、若需跳转到其它应用，只能选择重定向</p>
+<p>（2）、若是处理表单数据的servlet，要跳转到其它servlet，则需要选择重定向。为了防止表单重复提交。</p>
+<p>（3）、若对某一请求进行处理的servlet的执行需要消耗大量的服务器资源（cpu,内存），此时这个servlet执行完毕后，也需要重定向。</p>
+<p>（4）、其它情况，一般使用请求转发。</p>
+<h4 id="2-7-RequestDispatcher"><a href="#2-7-RequestDispatcher" class="headerlink" title="2.7 RequestDispatcher"></a>2.7 RequestDispatcher</h4><p>RequestDispatcher是javax.servlet包下的一个接口，通过HttpServletRequest可以获取到其接口对象，该对象就是用于完成转发功能的。</p>
+<h4 id="2-7-1-forward-与include"><a href="#2-7-1-forward-与include" class="headerlink" title="2.7.1 forward()与include()"></a>2.7.1 forward()与include()</h4><p>SomeServlet</p>
+<pre><code>public class SomServlet extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        System.out.println(&quot;some request = &quot; + req);
+        System.out.println(&quot;some resp = &quot; + resp);
+        req.getRequestDispatcher(&quot;other&quot;).forward(req, resp);
+    }
+
+}
+</code></pre><p>OtherServlet</p>
+<pre><code>public class OtherServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        System.out.println(&quot;other response = &quot; + response);
+        System.out.println(&quot;other request = &quot; + request);
+    }
+
+}
+</code></pre><p>输出结果中的request：</p>
+<pre><code>some request = org.apache.catalina.connector.RequestFacade@289113c7
+other request = org.apache.catalina.core.ApplicationHttpRequest@4d0d88e6
+</code></pre><p>1、other中的HttpServletRequest request是对some中的HttpServletRequest req的增强，实际上是将用户请求和转发请求这两次请求进行了合并。</p>
+<p>2、将req.getRequestDispatcher(“other”).forward(req, resp);改为req.getRequestDispatcher(“other”).include(req, resp);后，输出结果和上面的相同。说明对于request，forward与include没有区别。</p>
+<p>输出结果中的response:</p>
+<pre><code>//forward()方法跳转时    
+some resp = org.apache.catalina.connector.ResponseFacade@6451e20e
+other response = org.apache.catalina.connector.ResponseFacade@6451e20e
+
+//include()方法跳转时
+some resp = org.apache.catalina.connector.ResponseFacade@48202e11
+other response = org.apache.catalina.core.ApplicationHttpResponse@5f53ab27
+</code></pre><p>1、forward()方法跳转时，some中的resp与other中的response一样，都是ResponseFacade。</p>
+<p>2、include()方法跳转时，some中的resp为ResponseFacade，other中的response为ApplicationHttpResponse。</p>
+<p>3、说明requestDispatcher的forward()与include()的区别，主要集中在响应对象上。</p>
+<h4 id="2-7-2-代码测试"><a href="#2-7-2-代码测试" class="headerlink" title="2.7.2 代码测试"></a>2.7.2 代码测试</h4><p>SomeServlet</p>
+<pre><code>public class SomServlet extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        PrintWriter out = resp.getWriter();
+        out.print(&quot;someServlet:forward() before &quot;);
+
+        req.getRequestDispatcher(&quot;other&quot;).forward(req, resp);
+
+        out.print(&quot;someServlet:forward() after &quot;);
+    }
+
+}
+</code></pre><p>OtherServlet</p>
+<pre><code>public class OtherServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        PrintWriter out = response.getWriter();
+        out.print(&quot;other servlet data&quot;);
+    }
+
+}
+</code></pre><p>客户端浏览器输出结果：</p>
+<p>forward()方法跳转的输出结果：</p>
+<pre><code>other servlet data
+</code></pre><p>incluce()方法跳转的输出结果：</p>
+<pre><code>someServlet:forward() before 
+other servlet data
+someServlet:forward() after 
+</code></pre><p>1、forward()与include()的区别，主要表现在标准输出流的开启时间不同。</p>
+<p>2、说明在SomeServlet中，用forward()方法向前跳转时，请求此时还并没有结束，所以reqp还没有开启，因此两个输出语句没有执行。</p>
+<p>3、include()方法跳转时，some和other中的输出语句全部执行。说明，include不仅将other的数据写入到了标准输出流中，也将some中的数据包含到了自己的输出流中，</p>
+<p>4、forward的转发示意：</p>
+<p>浏览器—&gt;发送请求—&gt;服务器中的SomeServlet—-&gt;发送请求—-&gt;服务器中的OtherServlet—&gt;OtherServlet对浏览器做出响应。</p>
+<p>向浏览器给出响应的是OtherServlet，输出流是在OtherServlet中开启的。</p>
+<p>5、include的转发示意：</p>
+<p>浏览器—&gt;发送请求—&gt;服务器中的SomeServlet—-&gt;发送请求—&gt;服务器中的OtherServlet—-&gt;OtherServlet将SomeServlet进行了包含，并向SomeServlet做出响应 —&gt; SomeServle对浏览器做出响应。</p>
+<p>向浏览器给出响应的是SomeServlet，输出流在SomeServlet中就开启了。</p>
+<p>包含的过程就是由ApplicationHttpResponse这个增强的response来完成的。</p>
+<h3 id="2-9-Servlet的线程安全问题"><a href="#2-9-Servlet的线程安全问题" class="headerlink" title="2.9 Servlet的线程安全问题"></a>2.9 Servlet的线程安全问题</h3><p>Servlet是单例多线程环境下运行的，其运行可能会产生线程安全问题。</p>
+<h4 id="2-9-1-线程安全问题"><a href="#2-9-1-线程安全问题" class="headerlink" title="2.9.1 线程安全问题"></a>2.9.1 线程安全问题</h4><p>1、同时满足以下两个条件，则会出现线程安全问题。</p>
+<p>（1）、存在多线程并发访问</p>
+<p>（2）、存在可修改的共享数据</p>
+<p>2、JVM中可能存在线程安全问题的数据分析</p>
+<p>（1）、栈内存数据分析</p>
+<p>栈内存是是多例的，即JVM会为每个线程创建一个栈，所以其中的数据是不共享的。另外，栈里面放的是方法栈帧，一个方法在栈里面，以一个栈帧的形式出现，方法的栈帧中放的是方法的签名（头部信息）、局部变量、返回的信息等，方法中的局部变量存放在Stack的栈帧中，方法执行完毕，栈帧弹栈，局部变量消失。局部变量是局部的，不是共享的。所以栈内存中的数据不存在线程安全问题。</p>
+<p>（2）、堆内存数据分析</p>
+<p> 一个JVM中只存放一个堆内存，堆内存是共享的。被创建出的对象存放在堆内存中，而存放在堆内存中的对象，实际就是对象成员变量的集合。即成员变量是存放在堆内存的。堆内存中的数据是多线程共享的，也就是说，堆内存中的数据是存在线程安全隐患的。</p>
+<p>（3）、方法区数据分析</p>
+<p>一个JVM中只存在一个方法区。方法的代码片段，静态变量与常量都存放在方法区，方法区是多线程共享的。常量是不能修改的，所以常量不存在安全问题。静态变量是多线程共享的，所以静态变量存在安全隐患。 </p>
+<p>3、线程安全问题的解决方案</p>
+<p>（1）、对于一般性的类，不要定义为单例的。除非项目有特殊需求，或该类对象属于重量级对象。所谓重量级对象是指，创建该类对象是会占用较大的系统资源。</p>
+<p>（2）、无论类是否为单例类，尽量不要使用静态变量。</p>
+<p>（3）、若需要定义为单例类，则单例类尽量不使用成员变量（例如Servlet类）。</p>
+<p>（4）、若单例类中必须要使用成员变量，则对成员变量的操作添加串行化锁synchronized，实现线程同步。不过，最好不要使用线程同步机制，因为一旦操作进入串行化的排队状态，将大大降低程序的执行效率。</p>
+<h4 id="2-9-2-Servlet的线程安全问题"><a href="#2-9-2-Servlet的线程安全问题" class="headerlink" title="2.9.2 Servlet的线程安全问题"></a>2.9.2 Servlet的线程安全问题</h4><p>Servlet是单例多线程并发访问的，所以存在线程安全问题。</p>
+<p>为了避免问题产生，对用Servlet类的使用，一般是不声明成员变量的。</p>
+<p>若项目中必须要求声明成员变量，则只能通过同步机制synchronize避免。</p>
+<h4 id="2-9-3-对线程安全问题的合理利用"><a href="#2-9-3-对线程安全问题的合理利用" class="headerlink" title="2.9.3 对线程安全问题的合理利用"></a>2.9.3 对线程安全问题的合理利用</h4><p>Servlet中的成员变量是每一个线程均可修改和访问的，所以可以利用这一点，实现计数器功能，用于统计当前Servlet的被访问的次数。</p>
+<pre><code>public class SomeServlet extends HttpServle{
+    //定义成员变量 - 计数器
+    private int count;
+    public void doGet(...){
+        count++;
+        response.setContentType(&quot;text/html;charset=UTF-8&quot;);
+        PrinterWriter out = resp.getWriter();
+        out.print(&quot;当前网页的访问次数：&quot; + count);
+
+    }
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/25/java/java-servlet/java-servlet-2/" data-id="cjegiwofi004ervp33wd9l8sf" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/servlet/">servlet</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/01/25/java/java-servlet/java-servlet-1/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          java Servlet 一、基础
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/01/17/java/java-regex/java-regex-1/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">java-正则表达式</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 18.33px;">angular</a> <a href="/tags/api/" style="font-size: 15px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 16.67px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 13.33px;">jsp</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.67px;">servlet</a> <a href="/tags/thread/" style="font-size: 11.67px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/03/07/java/java-jsp/java-jsp-3/">第3章 jsp系统开发模型</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/31/java/java-jsp/java-jsp-2/">第2章 JSP核心</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/31/java/java-jsp/java-jsp-1/">第1章 JSP基础</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/25/java/java-servlet/java-servlet-1/">java Servlet 一、基础</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/25/java/java-servlet/java-servlet-2/">java Servlet 二、核心</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

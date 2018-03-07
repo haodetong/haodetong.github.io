@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>第2章 JSP核心 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="java jsp">
+<meta name="keywords" content="java, jsp">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第2章 JSP核心">
+<meta property="og:url" content="http://yoursite.com/2018/01/31/java/java-jsp/java-jsp-2/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="java jsp">
+<meta property="og:updated_time" content="2018-03-07T03:25:57.451Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="第2章 JSP核心">
+<meta name="twitter:description" content="java jsp">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-java/java-jsp/java-jsp-2" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/31/java/java-jsp/java-jsp-2/" class="article-date">
+  <time datetime="2018-01-31T11:54:50.000Z" itemprop="datePublished">2018-01-31</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      第2章 JSP核心
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="第2章-JSP核心"><a href="#第2章-JSP核心" class="headerlink" title="第2章 JSP核心"></a>第2章 JSP核心</h3><h3 id="2-1-内置对象"><a href="#2-1-内置对象" class="headerlink" title="2.1 内置对象"></a>2.1 内置对象</h3><h4 id="2-1-1-pageContext"><a href="#2-1-1-pageContext" class="headerlink" title="2.1.1 pageContext"></a>2.1.1 pageContext</h4><p>javax.servlet.jsp.PageContext</p>
+<p>页面上下文，具有一个只在当前页面范围的域属性空间，即其具有setAttribute()方法和getAttribute()方法。</p>
+<p>EL表达式，访问变量时，只能访问域属性空间内的变量。因此，可以将变量先存放到该域属性空间，或其它三个域属性空间（request、session、application）。</p>
+<p>pageContext具有一些get方法，可以获取Request、Response、Session、ServletContext、ServletConfig、page(即当前Servlet)、exception、out等其它八个内置对象</p>
+<h4 id="2-1-2-application"><a href="#2-1-2-application" class="headerlink" title="2.1.2 application"></a>2.1.2 application</h4><p>即ServletContext</p>
+<p>ServletContext所具有的方法，application都有。</p>
+<p>常用的方法，例如：</p>
+<p>void setAttribute(String name, Object object);</p>
+<p>Object getAttribute(String name);</p>
+<p>Object removeAttribute(String name);</p>
+<h4 id="2-1-3-out"><a href="#2-1-3-out" class="headerlink" title="2.1.3 out"></a>2.1.3 out</h4><p>所属类型：javax.servlet.jsp.JspWriter</p>
+<p>JspWriter类继承自IO流的Writer类。</p>
+<p>即out就是一个输出流。</p>
+<h4 id="2-1-4-page"><a href="#2-1-4-page" class="headerlink" title="2.1.4 page"></a>2.1.4 page</h4><p>查看jsp翻译的servlet，page对象即Servlet对象本身。</p>
+<p>final java.lang.Object page = this.</p>
+<h4 id="2-1-5-exception"><a href="#2-1-5-exception" class="headerlink" title="2.1.5 exception"></a>2.1.5 exception</h4><p>普通的jsp页面中，不能使用exception内置对象。因为打开jsp翻译的servlet，发现其中并没有exception对象。</p>
+<p>若要在页面中直接使用exception对象，则需要配合着page指令使用。</p>
+<h4 id="2-1-6-其它对象"><a href="#2-1-6-其它对象" class="headerlink" title="2.1.6 其它对象"></a>2.1.6 其它对象</h4><p>request,response,session,config，用法与servlet时的用法相同。</p>
+<h3 id="2-2-JSP指令-directive"><a href="#2-2-JSP指令-directive" class="headerlink" title="2.2 JSP指令(directive)"></a>2.2 JSP指令(directive)</h3><p>jsp中包含三类指令：</p>
+<h5 id="page指令"><a href="#page指令" class="headerlink" title="page指令"></a>page指令</h5><h5 id="include指令"><a href="#include指令" class="headerlink" title="include指令"></a>include指令</h5><h5 id="taglib标签库指令"><a href="#taglib标签库指令" class="headerlink" title="taglib标签库指令"></a>taglib标签库指令</h5><p>&lt;%@ 指令名称 属性名 = 属性值 属性名 = 属性值 %&gt;</p>
+<h4 id="2-1-1-page指令"><a href="#2-1-1-page指令" class="headerlink" title="2.1.1 page指令"></a>2.1.1 page指令</h4><p>（1）、pageEncodeing属性</p>
+<p>&lt;%@ page pageEncoding = “utf-8”%&gt;</p>
+<p>默认的MIME类型为text/html</p>
+<p>//servlet<br>response.setContentType(“text/html;charset=UTF-8”);</p>
+<p>(2)、contentType属性</p>
+<p>&lt;%@ page contentType = “text/html; charset=UTF-8” %&gt;</p>
+<p>//servlet<br>response.setContentType(“text/html;charset=UTF-8”);</p>
+<p>可以对pageEncoding默认的MIMe类型进行修改</p>
+<p>（3）、import属性</p>
+<p>&lt;%@ page import = “java.util.Date”%&gt;</p>
+<p>(4)、errorPage\isErrorPage属性</p>
+<pre><code>&lt;%@ page errorPage = &quot;/error.jsp&quot; %&gt;
+</code></pre><p>//error.jsp</p>
+<pre><code>&lt;%@ page isErrorPage = &quot;true&quot;%&gt;
+&lt;html&gt;
+    &lt;body&gt;
+        error page&lt;br /&gt;
+        ex = &lt;%=exception.getMessage() %&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre><p>//serlvet</p>
+<pre><code>public void _jspService(...){
+    ...
+    java.lang.Throwable exception = ...;
+    ...
+}
+</code></pre><p>(5)、Session属性</p>
+<p>//hello1.jsp</p>
+<pre><code>&lt;body&gt;
+    &lt;%
+        session.setAttribute(&quot;user&quot;,&quot;zhangsan&quot;);
+    %&gt;
+&lt;/body&gt;
+</code></pre><p>//servlet</p>
+<pre><code>session = pageContext.getSession();
+
+查看源码发现，返回的还是request.getSession()
+</code></pre><p>1、    设置</p>
+<p>HttpSession session = request.getSession(true);<br>session.setAttribute(…);</p>
+<p>设为true，意味着没有session对象时才创建，有则不创建。</p>
+<p>2、读取</p>
+<p>HttpSession session = request.getSession(false);<br>if(session != null){<br>    session.getAttribute(“…”);<br>}</p>
+<p>设为false，意味着获取现有的session对象，如果没有，也不创建。</p>
+<p>//hello2.jsp</p>
+<pre><code>&lt;%@ page contentType = &quot;text/html; charset = UTF-8&quot;%&gt;
+&lt;%-- 清除内置的Session对象 --%&gt;
+&lt;%@ page session = &quot;fasle&quot;%&gt;
+
+&lt;body&gt;
+    HttpSession session =     request.getSession(false);
+    if(session != null){
+        String user = (String) session.getAttribute(&quot;user&quot;);
+        out.print(&quot;user = &quot; + user);
+    }        
+&lt;body/&gt;
+</code></pre><h4 id="2-2-2-include指令"><a href="#2-2-2-include指令" class="headerlink" title="2.2.2 include指令"></a>2.2.2 include指令</h4><p>(1)、用法</p>
+<p>可以包含动态文件也可以包含静态页面文件。</p>
+<p>index.jsp</p>
+<pre><code>&lt;html&gt;
+&lt;body&gt;
+    index page before&lt;br /&gt;
+
+    &lt;%@ include file = &quot;/next.jsp&quot;%&gt;
+
+    index page after&lt;br /&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre><p>next.jsp</p>
+<pre><code>&lt;html&gt;
+&lt;body&gt;
+    next page
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre><p>（2）、静态联编</p>
+<p>只生成了一个index_jsp.java的servlet源文件，没有生成next_jsp.java文件。</p>
+<p>jsp翻译引擎，将include指令包含的next.jsp文件直接翻译到了index.jsp对应的servlet中，形成了一个.java文件。</p>
+<p>该包含操作是在编译之前，由jsp翻译引擎完成的，而不是在程序运行期间完成的。</p>
+<p>这种包含是一种静态包含，称为静态联编。</p>
+<p>整个过程只一个_jspService()方法。也就是说，index.jsp和next.jsp之间是可以相互访问局部变量的。</p>
+<h3 id="2-3-JSP动作（Action）"><a href="#2-3-JSP动作（Action）" class="headerlink" title="2.3 JSP动作（Action）"></a>2.3 JSP动作（Action）</h3><p>页面中，应该使用EL表达式、JSTL标签及JSP动作，来代替java代码块、表达式。</p>
+<p>JSP动作的语法格式</p>
+<p><code>&lt;jsp:动作名称 属性名 = 属性值 属性名 = 属性值 ...&gt;&lt;/jsp:动作名称&gt;</code></p>
+<p>或</p>
+<p><code>&lt;jsp:动作名称 属性名 = 属性值 属性名 = 属性值 ... /&gt;</code></p>
+<p>实际开发中，常用的就两个forward和include。</p>
+<p>底层使用的是<code>request.getRequestDispatcher(&quot;&quot;).forward(...)和.include()</code>。</p>
+<h4 id="2-3-1-forward动作"><a href="#2-3-1-forward动作" class="headerlink" title="2.3.1 forward动作"></a>2.3.1 forward动作</h4><p>index.jsp</p>
+<pre><code>&lt;body&gt;
+    index page befor &lt;br /&gt;
+
+    &lt;jsp:forward page=&quot;/next.jsp&quot;&gt;&lt;/jsp:forward&gt;
+
+    index page after &lt;br /&gt;
+
+&lt;body/&gt;
+</code></pre><p>next.jsp</p>
+<pre><code>&lt;body&gt;
+    next page
+&lt;/body&gt;
+</code></pre><p>forward跳转时，只显示</p>
+<pre><code>next page
+</code></pre><h4 id="2-3-2-include动作"><a href="#2-3-2-include动作" class="headerlink" title="2.3.2 include动作"></a>2.3.2 include动作</h4><p>index.jsp</p>
+<pre><code>&lt;body&gt;
+    index page befor &lt;br /&gt;
+
+    &lt;jsp:include page=&quot;/next.jsp&quot;&gt;&lt;/jsp:include&gt;
+
+    index page after &lt;br /&gt;
+
+&lt;body/&gt;
+</code></pre><p>next.jsp</p>
+<pre><code>&lt;body&gt;
+    next page
+&lt;/body&gt;
+</code></pre><p>include跳转时，全显示</p>
+<pre><code>index page befor
+next page
+index page after 
+</code></pre><p>(注)：</p>
+<p>生成了两个.java文件：index_jsp.java与left_jsp.java。</p>
+<p>这个包含动作是在程序运行过程中，由index_jsp文件中的_jspService()方法通过JspRuntimeLibrary类的include()方法调用了left_jsp文件中的_jspService()方法完成的。</p>
+<p>这种在运行期执行的包含，称为动态联编。    </p>
+<h3 id="2-4-EL表达式"><a href="#2-4-EL表达式" class="headerlink" title="2.4 EL表达式"></a>2.4 EL表达式</h3><p>Expression Language，表达式语言。</p>
+<p>${expression}获取到指定表达式的值。</p>
+<h4 id="2-4-1-获取数据"><a href="#2-4-1-获取数据" class="headerlink" title="2.4.1 获取数据"></a>2.4.1 获取数据</h4><p>(1)、EL只能从四大域中获取数据</p>
+<p>其查找数据的顺序是，依次按照由小到大的范围，从四大域中查找指定名称的属性值，找到后就不再继续往下查找。</p>
+<pre><code>&lt;body&gt;
+    &lt;%
+        String username = &quot;abc&quot;;
+        pageContext.setAttribute(&quot;username&quot;, username);
+        request.setAttribute(&quot;username&quot;, username);
+        session.setAttribute(&quot;username&quot;, username);
+        application.setAttribute(&quot;username&quot;, username);
+    %&gt;
+    //从四大域属性空间中依次查找
+    username = ${username}
+
+&lt;/body&gt;
+</code></pre><p>（2）、从指定域中获取数据</p>
+<pre><code>//通过EL的内置对象，从指定的域属性空间中查找
+username = ${requestScope.username}
+</code></pre><p>（3）、访问Bean的属性</p>
+<pre><code>&lt;body&gt;
+    &lt;%
+        School school = new School(&quot;qinghua&quot;,&quot;beijing&quot;);        
+        Student studentb = new Student(&quot;zhangsan&quot;,23);
+        pageContext.setAttribute(&quot;student&quot;, student);
+    %&gt;
+
+    student = ${student}
+
+    name = ${student.name}
+
+    schoolName = ${student.school.sname}
+
+&lt;/body&gt;
+</code></pre><p>（4）、获取数组中的元素</p>
+<pre><code>&lt;body&gt;
+
+    &lt;%
+        String[] names = {&quot;zhangsan&quot;, &quot;lisi&quot;, &quot;wangwu&quot;};
+        pageContext.setAttribute(&quot;names&quot;, names);
+    %&gt;
+
+    names[1] = ${names[1]}
+
+    &lt;%
+        School[] schools = new School[3];
+        schools[0] = new School(&quot;qinghua&quot;, &quot;beijing&quot;);
+        schools[1] = new School(&quot;haiyang&quot;, &quot;qingdao&quot;);
+        schools[2] = new School(&quot;shanda&quot;, &quot;shandong&quot;);
+        pageContext.setAttribute(&quot;chools&quot;, schools);
+    %&gt;
+
+    chools[2].sname = ${schools[2].sname}
+
+&lt;/body&gt;
+</code></pre><p>（5）、获取List中的元素</p>
+<pre><code>EL可以通过索引访问List，但无法访问Set。因为Set中没有索引的概念。
+
+&lt;body&gt;
+    &lt;%
+        List&lt;String&gt; names = new ArrayList&lt;String&gt;();
+        names.add(&quot;zhangsan&quot;);
+        names.add(&quot;lisi&quot;);
+        names.add(&quot;wangwu&quot;);
+        pageContext.setAttribute(&quot;names&quot;,names);
+    %&gt;
+
+    names[2] = ${names[2]};
+
+&lt;body/&gt;
+</code></pre><p>（6）、获取Map中的元素</p>
+<pre><code>&lt;body&gt;
+    &lt;%
+        Map&lt;String, Object&gt; map = new Map&lt;&gt;();
+        map.put(&quot;school&quot;, new School(&quot;qinghua&quot;, &quot;beijing&quot;));
+        map.put(&quot;mobile&quot;, &quot;1111111&quot;);
+        map.put(&quot;age&quot;, 21);
+        pageContext.setAttribute(&quot;map&quot;, map);
+    %&gt;
+
+    school.name = ${map.school.sname}
+
+    mobile = ${map.mobile};
+
+    age = ${map.age}；
+
+&lt;/body&gt;
+</code></pre><h4 id="2-4-2-运算符"><a href="#2-4-2-运算符" class="headerlink" title="2.4.2 运算符"></a>2.4.2 运算符</h4><p>算术运算符，关系运算符，逻辑运算符，条件运算符，取值运算符</p>
+<p>除了这些，还有一个empty</p>
+<p>${empty 变量}</p>
+<ul>
+<li>变量未定义，返回true</li>
+<li>变量为String类型，空串返回true</li>
+<li>变量为引用类型，其值为null返回true</li>
+<li>变量为集合类型，不包含任何元素，返回true</li>
+</ul>
+<h4 id="2-4-3-EL内置对象"><a href="#2-4-3-EL内置对象" class="headerlink" title="2.4.3 EL内置对象"></a>2.4.3 EL内置对象</h4><p>EL中表示四个域属性空间的内置对象：pageScope requestScope sessionScope applicationScope</p>
+<p>其它的常用内置对象还有：</p>
+<p>（1）、pageContext</p>
+<p>EL中的pageContext与JSP中内置对象中的pageContext是同一个对象。</p>
+<p>通过该对象，可以获取request、response、session、servletContext、servletConfig等对象。</p>
+<ul>
+<li><p><code>${pageContext.request.contextPath}</code>，获取项目根目录，一般用在JSP页面的路径前。</p>
+<form action="${pageContext.request.contextPath/register.do}" method="post"><br>   …<br></form>
+</li>
+<li><p>pageContext.request 其底层实际调用的是pageContext.getRequest()方法</p>
+</li>
+<li><p>在EL的11个内置对象中，除了pageContext外，其它10个内置对象，其类型均为java.util.Map类型。    </p>
+</li>
+</ul>
+<p>（2）、param</p>
+<p>获取请求中指定参数的值</p>
+<p>GET: http:localhost:8080/textproject/index.jsp?name=abc</p>
+<p>//index.jsp</p>
+<p>param.name = ${param.name}</p>
+<p>POST:</p>
+<pre><code>&lt;form action = &quot;${pageContext.request.contextPath/show.jsp}&quot;&gt;
+    姓名：&lt;input type = &quot;text&quot; name = &quot;name&quot; /&gt;
+    年龄：&lt;input type = &quot;text&quot; name = &quot;age&quot; /&gt;
+    爱好：
+    &lt;input type = &quot;checkbox&quot; name = &quot;hobby&quot; value = &quot;swimming&quot; /&gt;
+    &lt;input type = &quot;checkbox&quot; name = &quot;hobby&quot; value = &quot;climbing&quot; /&gt;
+    &lt;input type = &quot;checkbox&quot; name = &quot;hobby&quot; value = &quot;reading&quot; /&gt;
+&lt;/form&gt;
+</code></pre><p>//show.jsp</p>
+<pre><code>name = ${param.name}
+age = ${param.age}
+</code></pre><p>（3）、paramValues</p>
+<pre><code>hobby[0] = ${paramValues.hobby[0]}
+hobby[1] = ${paramValues.hobby[0]}
+hobby[2] = ${paramValues.hobby[0]}
+</code></pre><p>（4）、initParam</p>
+<p>获取web.xml中初始化参数</p>
+<p>web.xml</p>
+<pre><code>&lt;context-param&gt;
+    &lt;param-name&gt;company&lt;param-name/&gt;
+    &lt;param-value&gt;powernode&lt;param-value/&gt;
+&lt;/context-param&gt;
+</code></pre><p>jsp页面</p>
+<pre><code>company = ${initParam.company}
+</code></pre><h4 id="2-4-4-自定义EL函数"><a href="#2-4-4-自定义EL函数" class="headerlink" title="2.4.4 自定义EL函数"></a>2.4.4 自定义EL函数</h4><p>自定义EL函数，实际字符串连接的功能</p>
+<p>1、定义类</p>
+<pre><code>public class ELFunctions{
+    public static String lowerToUpper(String source){
+        return source.toUpperCase();
+    }
+
+    public static String upperToLower(String source){
+        return source.toLowerCase();
+    }
+}
+</code></pre><p>2、标签库定义 注册</p>
+<p>自定义的类及其函数，需要在扩展名为.tld的XML文件中进行注册</p>
+<p>XML文件是需要约束的，即需要配置文件头部。这个头部约束可以从以下文件中复制。</p>
+<p>comcat-9/webapps/examples/web-inf/jsp2/jsp2-example-taglib.tld</p>
+<p>//WEB-INF/myElFuns.tld</p>
+<pre><code>&lt;tablib ...&gt;
+
+    //定义标签库信息
+    &lt;tlib-version&gt;1.0&lt;/tlib-version&gt;
+    &lt;show-name&gt;myElFuncs&lt;/short-name&gt;
+    &lt;uri&gt;http://www.test.com/myproject/jsp/el/customElFuncs&lt;/uri&gt;
+
+    //注册函数
+    &lt;function&gt;
+        &lt;name&gt;myLowerToUpper&lt;/name&gt;
+        &lt;function-class&gt;myproject.testpackage. ELFunctions&lt;/function-class&gt;
+        &lt;function-signature&gt;java.lang.String. lowerToUpper(java.lang.String)&lt;/function-signature&gt;
+    &lt;function/&gt;
+
+    &lt;function&gt;
+        &lt;name&gt;myUpperToLower&lt;/name&gt;
+        &lt;function-class&gt;myproject.testpackage. ELFunctions&lt;/function-class&gt;
+        &lt;function-signature&gt;java.lang.String. upperToLower(java.lang.String)&lt;/function-signature&gt;
+    &lt;function/&gt;
+
+&lt;/tablib&gt;
+</code></pre><p>//index.jsp</p>
+<pre><code>&lt;%@ taglib uri = &quot;http://www.test.com/myproject/jsp/el/customElFuncs&quot; prefix = &quot;myElFuncs&quot;%&gt;
+&lt;body&gt;
+    ${myElFuncs:myLowerToUpper(&quot;abc&quot;)}
+&lt;/body&gt;
+</code></pre><h4 id="2-4-5-JSTL中的EL函数"><a href="#2-4-5-JSTL中的EL函数" class="headerlink" title="2.4.5 JSTL中的EL函数"></a>2.4.5 JSTL中的EL函数</h4><p>JSTL，JSP Standard Tag Library，即JSP标准标签库。</p>
+<p>该标签库中，定义好了一套处理字符串的函数标签库。</p>
+<p>将JSTL的Jar包导入WEb/lib后，在jsp页面中即可直接使用。</p>
+<p>//index.jsp</p>
+<pre><code>&lt;%@ taglib uri = &quot;http://java.sun.com/jsp/jstl/functions&quot; prefix = &quot;fn&quot;%&gt;
+
+&lt;body&gt;
+    ${fun.substring(&quot;abcdefg&quot;, 2, 5)}
+    .....
+    .....
+&lt;/body&gt;
+</code></pre><h4 id="2-4-6-EL总结"><a href="#2-4-6-EL总结" class="headerlink" title="2.4.6 EL总结"></a>2.4.6 EL总结</h4><ul>
+<li>EL不能出现在java代码块、表达式块等jsp动态代码部分</li>
+<li>EL只能从pageContext、request、session、application四大域属性空间中获取数据</li>
+<li>EL不会抛出空指针异常</li>
+<li>EL不会抛出数组访问越界异常</li>
+<li>EL不具有字符串处理能力，只能通过JSTL标签库来处理</li>
+</ul>
+<h3 id="2-5-自定义标签"><a href="#2-5-自定义标签" class="headerlink" title="2.5 自定义标签"></a>2.5 自定义标签</h3><p>简化代码，替代java代码块。</p>
+<h4 id="2-5-1-基本用法"><a href="#2-5-1-基本用法" class="headerlink" title="2.5.1 基本用法"></a>2.5.1 基本用法</h4><p>（1）、需求</p>
+<p>自定义标签，输出客户端Ip</p>
+<p>（2）、定义标签处理器</p>
+<p>实现处理器接口：javax.servlet.jsp.tagext.simpleTag</p>
+<pre><code>//定义标签处理器
+public class ClientIpTag extends SimpleTagSupport {
+    @Override
+    public void doTag() throws JspException, IOException {
+        //获取pageContext
+        PageContext pc = (PageContext) this.getJspContext();
+        //获取请求对象
+        ServletRequest request = pc.getRequest();
+        //获取客户端IP
+        String clientIp = request.getRemoteAddr();
+        //获取标准输出流
+        JspWriter out = pc.getOut();
+        //输出
+        out.print(clientIp);
+    }
+}
+</code></pre><p>（3）、注册标签处理器</p>
+<p>//customTags.tld</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;taglib xmlns=&quot;http://java.sun.com/xml/ns/j2ee&quot;
+    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+    xsi:schemaLocation=&quot;http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd&quot;
+    version=&quot;2.0&quot;&gt;
+    &lt;!--配置标签库信息--&gt;
+    &lt;tlib-version&gt;1.0&lt;/tlib-version&gt;
+    &lt;short-name&gt;customTags&lt;/short-name&gt;
+    &lt;uri&gt;http://www.jstlproject.com/jsp/tags/custom&lt;/uri&gt;
+    &lt;!--注册标签--&gt;
+    &lt;tag&gt;
+        &lt;name&gt;clientIp&lt;/name&gt;
+        &lt;tag-class&gt;tags.ClientIpTag&lt;/tag-class&gt;
+        &lt;body-content&gt;empty&lt;/body-content&gt;
+    &lt;/tag&gt;
+
+&lt;/taglib&gt;
+</code></pre><p>（4）、使用自定义标签</p>
+<pre><code>&lt;%@ taglib uri = &quot;http://www.jstlproject.com/jsp/tags/custom&quot; prefix = &quot;customTags&quot; %&gt;
+&lt;body&gt;
+    &lt;% 
+        String ip = request.getRemoteAddr();
+        out.println(&quot;ip = &quot; + ip);
+    %&gt;
+    &lt;br/&gt;
+    &lt;customTags:clientIp /&gt;
+&lt;/body&gt;
+</code></pre><h4 id="2-5-2-定义带标签体的标签"><a href="#2-5-2-定义带标签体的标签" class="headerlink" title="2.5.2 定义带标签体的标签"></a>2.5.2 定义带标签体的标签</h4><p>//标签处理器 - 小写变大写</p>
+<pre><code>public class LowerToUpperTag extends SimpleTagSupport {
+    @Override
+    public void doTag() throws JspException, IOException {
+        //获取标签体对象
+        JspFragment jspbody = this.getJspBody();
+        //创建字符串输出流
+        StringWriter strWriter = new StringWriter();
+        //标签体对象写入字符串输出流
+        jspbody.invoke(strWriter);
+        //字符串输出流中的数据
+        String str = strWriter.toString();
+        //小写变大写
+        str = str.toUpperCase();
+        //写入标准输出流
+        this.getJspContext().getOut().print(str);
+    }
+}
+</code></pre><p>注册</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;taglib xmlns=&quot;http://java.sun.com/xml/ns/j2ee&quot;
+    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+    xsi:schemaLocation=&quot;http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd&quot;
+    version=&quot;2.0&quot;&gt;
+    &lt;!--配置标签库信息--&gt;
+    &lt;tlib-version&gt;1.0&lt;/tlib-version&gt;
+    &lt;short-name&gt;customTags&lt;/short-name&gt;
+    &lt;uri&gt;http://www.jstlproject.com/jsp/tags/custom&lt;/uri&gt;
+    &lt;!--注册标签--&gt;
+    &lt;tag&gt;
+        &lt;name&gt;clientIp&lt;/name&gt;
+        &lt;tag-class&gt;tags.ClientIpTag&lt;/tag-class&gt;
+        &lt;body-content&gt;empty&lt;/body-content&gt;
+    &lt;/tag&gt;
+    &lt;tag&gt;
+        &lt;name&gt;lowerToUpper&lt;/name&gt;
+        &lt;tag-class&gt;tags.LowerToUpperTag&lt;/tag-class&gt;
+        &lt;body-content&gt;scriptless&lt;/body-content&gt;
+    &lt;/tag&gt;
+
+&lt;/taglib&gt;
+</code></pre><p>附：<body-content></body-content></p>
+<ul>
+<li>empty:表示当前标签没有标签体</li>
+<li>scriptless：表示当前标签具有标签体，对el表达式解析。</li>
+<li>jsp:原样输出，已过时</li>
+<li>tagdependent: 原样输出到浏览器，不解析el表达式</li>
+</ul>
+<p>//index.jsp</p>
+<pre><code>&lt;%@ taglib uri = &quot;http://www.jstlproject.com/jsp/tags/custom&quot; prefix = &quot;customTags&quot; %&gt;
+
+&lt;body&gt;
+
+    &lt;%
+        String username = &quot;aaa&quot;;
+        pageContext.setAttribute(&quot;username&quot;, username);
+    %&gt;
+    &lt;customTags:lowerToUpper&gt;${username }&lt;/customTags:lowerToUpper&gt;
+
+&lt;/body&gt;
+</code></pre><h4 id="2-5-3-定义带属性的标签"><a href="#2-5-3-定义带属性的标签" class="headerlink" title="2.5.3 定义带属性的标签"></a>2.5.3 定义带属性的标签</h4><p>//注册标签</p>
+<pre><code>&lt;tag&gt;
+    &lt;name&gt;if&lt;/name&gt;
+    &lt;tag-class&gt;tags.IfTag&lt;/tag-class&gt;
+    &lt;body-content&gt;tagdependent&lt;/body-content&gt;
+        &lt;attribute&gt;
+            &lt;name&gt;test&lt;/name&gt;
+            &lt;required&gt;true&lt;/required&gt;
+            &lt;!-- runtime expression value 
+                true:该属性的值支持el表达式与jsp表达式
+            --&gt;
+            &lt;rtexprvalue&gt;true&lt;/rtexprvalue&gt;
+        &lt;/attribute&gt;
+&lt;/tag&gt;
+</code></pre><p>//定义标签处理器</p>
+<pre><code>public class IfTag extends SimpleTagSupport {
+    private boolean test;
+    //标签的属性反映到标签处理器中，就是一个set属性
+    public void setTest(boolean test) {
+        this.test = test;
+    }
+    @Override
+    public void doTag() throws JspException, IOException {
+        if(test) {
+            /*
+            JspFragment jspbody = this.getJspBody();
+            jspbody.invoke(this.getJspContext().getOut());
+            */
+            //以上代码等价于以下代码
+            this.getJspBody().invoke(null);
+        }
+    }
+}
+</code></pre><p>//index.jsp</p>
+<pre><code>&lt;customTages:if test = ${gender} }} }&gt;男&lt;/customTages:if&gt;
+&lt;customTages:if test = not gender }&gt;女&lt;/customTages:if&gt;
+</code></pre><h4 id="2-5-4-定义forEach标签"><a href="#2-5-4-定义forEach标签" class="headerlink" title="2.5.4 定义forEach标签"></a>2.5.4 定义forEach标签</h4><p>//定义标签处理器，遍历collection集合和数组</p>
+<pre><code>public class ForEachTag extends SimpleTagSupport {
+
+    private Object items;
+    private String var;
+
+    public void setItems(Object items) {
+        this.items = items;
+    }    
+
+    public void setVar(String var) {
+        this.var = var;
+    }
+
+    public Collection getcoll() {
+        if(items instanceof List) {
+            return (List) items;
+        }else if(items instanceof Set) {
+            return (Set) items;
+        }else if(items instanceof Map) {
+            return ((Map) items).entrySet();
+        }else if(items instanceof Object[]) {
+            return Arrays.asList((Object[])items);
+        }
+        return null;
+    }
+
+    @Override
+    public void doTag() throws JspException, IOException {
+        for (Object obj:getcoll()) {
+            this.getJspContext().setAttribute(var, obj);
+            this.getJspBody().invoke(null);
+        }
+    }
+
+}
+</code></pre><p>//注册</p>
+<pre><code> &lt;tag&gt;
+    &lt;name&gt;forEach&lt;/name&gt;
+    &lt;tag-class&gt;tags.ForEachTag&lt;/tag-class&gt;
+    &lt;body-content&gt;scriptless&lt;/body-content&gt;
+        &lt;attribute&gt;
+            &lt;name&gt;items&lt;/name&gt;
+            &lt;required&gt;true&lt;/required&gt;
+            &lt;rtexprvalue&gt;true&lt;/rtexprvalue&gt;
+        &lt;/attribute&gt;
+        &lt;attribute&gt;
+            &lt;name&gt;var&lt;/name&gt;
+            &lt;required&gt;true&lt;/required&gt;
+            &lt;rtexprvalue&gt;false&lt;/rtexprvalue&gt;
+        &lt;/attribute&gt;
+&lt;/tag&gt;
+</code></pre><p>//index.jsp</p>
+<pre><code>&lt;customTags:forEach items=&quot;${citys}&quot; var=&quot;city&quot;&gt;
+    ${city }&lt;br&gt;
+&lt;/customTags:forEach&gt;
+</code></pre><h4 id="2-5-5-将自定义标签库打包发行"><a href="#2-5-5-将自定义标签库打包发行" class="headerlink" title="2.5.5 将自定义标签库打包发行"></a>2.5.5 将自定义标签库打包发行</h4><p>1、右键export选择jar包，只打包源码。</p>
+<p>2、把.tld注册文件，放到jar包里的META-INFO里面。</p>
+<p>3、把jar包放到项目的WEB-INF的lib下。</p>
+<p>4、jsp页面中导入标签库，就可以直接用了。</p>
+<h3 id="2-6-JSTL"><a href="#2-6-JSTL" class="headerlink" title="2.6 JSTL"></a>2.6 JSTL</h3><p>jsp standard tag library，包含五个子库。</p>
+<p>核心标签库、格式化标签库、EL函数标签库、SQL操作标签库（过时）、XML操作标签库（过时）。</p>
+<p>导入jstl.jar包和standard.jar包</p>
+<h4 id="2-6-1-核心标签库"><a href="#2-6-1-核心标签库" class="headerlink" title="2.6.1 核心标签库"></a>2.6.1 核心标签库</h4><p>&lt;%@ taglib uri=”<a href="http://java.sun.com/jsp/jstl/core" target="_blank" rel="external">http://java.sun.com/jsp/jstl/core</a>“ prefix=”c” %&gt;</p>
+<p>（1）、c:set</p>
+<pre><code>//将变量存放到指定域中
+&lt;c:set var=&quot;name&quot; value=&quot;zhangsan&quot; scope=&quot;session&quot;&gt;
+name = ${sessionScope.name}
+
+//为Bean的属性赋值
+&lt;%
+    Student student = new Student();
+    pageContext.setAttribute(&quot;student&quot;, student);
+%&gt;
+&lt;c:set value=&quot;lisi&quot; property=&quot;name&quot; target=&quot;${pageScope.student}&quot;&gt;&lt;/c:set&gt;
+student = ${student}
+
+//为map赋值
+&lt;%
+    Map&lt;String, Object&gt; map = new HashMap&lt;&gt;();
+    pageContext.setAttribute(&quot;map&quot;, map);
+%&gt;
+&lt;c:set value=&quot;abc&quot; property=&quot;company&quot; target=&quot;${pageScope.map}&quot;&gt;&lt;/c:set&gt;
+map = ${map}
+</code></pre><p>（2）、c:remove</p>
+<pre><code>//从域属性空间中删除变量
+&lt;c:remove var=&quot;school&quot;&gt;
+</code></pre><p>（3）、c:out</p>
+<pre><code>//输出指定的变量
+&lt;c:set var=&quot;city&quot; value=&quot;&lt;h1&gt;beijing&lt;/h1&gt;&quot;&gt;
+
+city1 = &lt;c:out value=&quot;${city}&quot;/&gt;
+
+&lt;br /&gt;
+
+city2 = &lt;c:out value=&quot;${city}&quot; escapeXml=&quot;false&quot; /&gt;
+
+city1对h1标签进行了解析。
+
+city2对h1标签没有进行解析，直接输出。
+</code></pre><p>（4）、c:catch</p>
+<pre><code>//获取异常信息
+&lt;c:catch var=&quot;ex&quot;&gt;
+    &lt;%
+        int i = 3/0;
+    %&gt;
+&lt;/c:catch&gt;
+</code></pre><p>（5）、c:if</p>
+<pre><code>&lt;c:if test=&quot;${user == &quot;zhangsan&quot;}&quot;&gt;
+    &lt;a href=&quot;#&quot;&gt;进入系统&lt;/a&gt;
+&lt;/c:if&gt;
+</code></pre><p>（6）、c:choose</p>
+<pre><code>&lt;c:choose&gt;
+    &lt;c:when test=&quot;${pagenumber == 1}&quot;&gt;
+        第一页
+    &lt;/c:when&gt;
+    &lt;c:when test=&quot;${pagenumber == 2}&quot;&gt;
+        第二页
+    &lt;/c:when&gt;
+    &lt;c:otherwise&gt;
+        第三页
+    &lt;/c:otherwise&gt;
+&lt;/c:choose&gt;
+</code></pre><p>（7）、c:forEach</p>
+<pre><code>//遍历集合
+&lt;c:forEach items=&quot;${citys}&quot; var=&quot;city&quot; begin=&quot;0&quot; end=&quot;7&quot; step=&quot;4&quot;&gt;
+    ${city} &lt;br&gt;
+&lt;/c:forEach&gt;
+
+//输出行号
+&lt;c:forEach items=&quot;${students}&quot; var=&quot;student&quot; varStatus=&quot;vs&quot;&gt;
+    &lt;tr class=&quot;${vs.count/2 == 0 ? &apos;even&apos; : &apos;odd&apos;}&quot;&gt;
+        &lt;td&gt;${vs.count}&lt;/td&gt;
+        &lt;td&gt;${student.name}&lt;/td&gt;
+        &lt;td&gt;${student.age}&lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/c:forEach&gt;
+</code></pre><h4 id="2-6-1-格式化标签库"><a href="#2-6-1-格式化标签库" class="headerlink" title="2.6.1 格式化标签库"></a>2.6.1 格式化标签库</h4><p>&lt;%@ taglib uri=”<a href="http://java.sun.com/jsp/jstl/fmt" target="_blank" rel="external">http://java.sun.com/jsp/jstl/fmt</a>“ prefix=”fmt” %&gt;</p>
+<pre><code>&lt;%
+    Date now = new Date();
+    pageContext.setAttribute(&quot;now&quot;, now);
+%&gt;
+
+//格式化日期，输出到浏览器
+now = &lt;fmt:formatDate value=&quot;${now}&quot; pattern=&quot;yyyy-MM-dd&quot;&gt;
+
+//格式化日期，将结果放到域中的变量里
+&lt;fmt:formatDate value=&quot;${now}&quot; pattern=&quot;yyyy-MM-dd&quot; var=&quot;birth&quot;&gt;
+生日：&lt;input type=&quot;text&quot; name=&quot;birthday&quot; value=&quot;${birth}&quot; /&gt;
+</code></pre><h4 id="2-6-2-jstl下载"><a href="#2-6-2-jstl下载" class="headerlink" title="2.6.2 jstl下载"></a>2.6.2 jstl下载</h4><p>apache.org –&gt; Tomcat –&gt; Taglibs –&gt; Download</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/31/java/java-jsp/java-jsp-2/" data-id="cjegiwoen003mrvp35ojyhyru" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/jsp/">jsp</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/03/07/java/java-jsp/java-jsp-3/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          第3章 jsp系统开发模型
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/01/31/java/java-jsp/java-jsp-1/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">第1章 JSP基础</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 18.33px;">angular</a> <a href="/tags/api/" style="font-size: 15px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 16.67px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 13.33px;">jsp</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.67px;">servlet</a> <a href="/tags/thread/" style="font-size: 11.67px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/03/07/java/java-jsp/java-jsp-3/">第3章 jsp系统开发模型</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/31/java/java-jsp/java-jsp-2/">第2章 JSP核心</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/31/java/java-jsp/java-jsp-1/">第1章 JSP基础</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/25/java/java-servlet/java-servlet-1/">java Servlet 一、基础</a>
+          </li>
+        
+          <li>
+            <a href="/2018/01/25/java/java-servlet/java-servlet-2/">java Servlet 二、核心</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
