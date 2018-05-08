@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>第四章 Spring与IOC 基于注解的DI | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="基于注解的DI">
+<meta name="keywords" content="spring">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第四章 Spring与IOC 基于注解的DI">
+<meta property="og:url" content="http://yoursite.com/2018/05/05/java/spring/spring-4/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="基于注解的DI">
+<meta property="og:updated_time" content="2018-05-05T04:13:42.652Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="第四章 Spring与IOC 基于注解的DI">
+<meta name="twitter:description" content="基于注解的DI">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Zoeken"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-java/spring/spring-4" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/05/java/spring/spring-4/" class="article-date">
+  <time datetime="2018-05-05T03:00:10.000Z" itemprop="datePublished">2018-05-05</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/spring/">spring</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      第四章 Spring与IOC 基于注解的DI
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>DI-annotation</p>
+<p>对于注解DI，不再需要在spring配置文件中声明Bean实例。</p>
+<h5 id="（1）、导入AOP的jar包。"><a href="#（1）、导入AOP的jar包。" class="headerlink" title="（1）、导入AOP的jar包。"></a>（1）、导入AOP的jar包。</h5><p>注解的后台实现用到了AOP编程。</p>
+<p>####（2）、添加约束头</p>
+<p>约束在spring-framework-reference\html\xsd-configuration.html文件中</p>
+<h4 id="3-、组件扫描器"><a href="#3-、组件扫描器" class="headerlink" title="(3)、组件扫描器"></a>(3)、组件扫描器</h4><p>配置文件中添加</p>
+<pre><code>&lt;context:component-scan base-package=&quot;com.bjpowernode.di03&quot;&gt;&lt;/context:component-scan&gt;
+</code></pre><p>Student.class</p>
+<pre><code>@Component(&quot;myStudent&quot;)//组件，表示该类被容器所管理
+public class Student {
+    @Value(&quot;zhangsan&quot;)
+    private String name;
+    @Value(&quot;23&quot;)
+    private int age;
+
+    private School school;
+
+    ...
+
+}
+</code></pre><h4 id="4-1-组件扫描器的base-package"><a href="#4-1-组件扫描器的base-package" class="headerlink" title="4.1 组件扫描器的base-package"></a>4.1 组件扫描器的base-package</h4><p>扫描com.bjpowernode这个包及其子包</p>
+<pre><code>&lt;context:component-scan base-package=&quot;com.bjpowernode&quot;&gt;&lt;/context:component-scan&gt;
+</code></pre><p>扫描com.bjpowernode这个包的子包</p>
+<pre><code>&lt;context:component-scan base-package=&quot;com.bjpowernode.*&quot;&gt;&lt;/context:component-scan&gt;
+</code></pre><h4 id="4-1-基于注解的DI-Component相关注解"><a href="#4-1-基于注解的DI-Component相关注解" class="headerlink" title="4.1 基于注解的DI - @Component相关注解"></a>4.1 基于注解的DI - @Component相关注解</h4><p>与@Component注解，功能相同但是意义不同的注解还有三个：</p>
+<ul>
+<li><p>@Repository: 注解在Dao实现类上</p>
+</li>
+<li><p>@Service: 注解在Service实现类上</p>
+</li>
+<li><p>@Controller: 注解在SpringMVC的处理器上</p>
+</li>
+</ul>
+<h4 id="4-2-基于注解的DI-Scope"><a href="#4-2-基于注解的DI-Scope" class="headerlink" title="4.2 基于注解的DI - @Scope"></a>4.2 基于注解的DI - @Scope</h4><p>不指定的话，默认也是singleton</p>
+<pre><code>@Scope(&quot;prototype&quot;)
+@Component(&quot;myStudent&quot;)
+public class Student {
+    @Value(&quot;zhangsan&quot;)
+    private String name;
+    @Value(&quot;23&quot;)
+    private int age;
+</code></pre><h4 id="4-3-基于注解的DI-域属性的注入"><a href="#4-3-基于注解的DI-域属性的注入" class="headerlink" title="4.3 基于注解的DI - 域属性的注入"></a>4.3 基于注解的DI - 域属性的注入</h4><p>byName方式的注入，要求@Autowired与@Qualifier联合使用</p>
+<pre><code>@Scope(&quot;prototype&quot;)
+@Component(&quot;myStudent&quot;)
+public class Student {
+    @Value(&quot;zhangsan&quot;)
+    private String name;
+    @Value(&quot;23&quot;)
+    private int age;
+    @Autowired
+    @Qualifier(&quot;mySchool&quot;)
+    private School school;//域属性的注解注入
+    ...
+}
+</code></pre><h4 id="4-3-基于注解的DI-域属性的注入-使用-Resource注解"><a href="#4-3-基于注解的DI-域属性的注入-使用-Resource注解" class="headerlink" title="4.3 基于注解的DI - 域属性的注入 - 使用@Resource注解"></a>4.3 基于注解的DI - 域属性的注入 - 使用@Resource注解</h4><p>@Resource //byType的方式注入</p>
+<p>@Resource(name=”mySchool”) //byName方式的注解注入</p>
+<pre><code>@Component(&quot;myStudent&quot;)    
+public class Student {
+    ...
+    //@Resource //byType的方式注入
+    @Resource(name=&quot;mySchool&quot;) //byName方式的注解注入
+    private School school;//域属性的注解注入
+    ...
+}
+</code></pre><h4 id="4-4-基于注解的DI-使用Spring的JUnit4测试"><a href="#4-4-基于注解的DI-使用Spring的JUnit4测试" class="headerlink" title="4.4 基于注解的DI - 使用Spring的JUnit4测试"></a>4.4 基于注解的DI - 使用Spring的JUnit4测试</h4><h5 id="（1）、导入jar包"><a href="#（1）、导入jar包" class="headerlink" title="（1）、导入jar包"></a>（1）、导入jar包</h5><p>spring与junit4的整合jar包：spring-test.4.1.RELEASE.jar</p>
+<p>测试类</p>
+<pre><code>@RunWith(SpringJUnit4ClassRunner.class)
+//指定配置文件
+@ContextConfiguration(locations=&quot;classpath:com/bjpowernode/di03/applicationContext.xml&quot;)
+public class MyTest {
+    //注解注入student
+    @Resource(name=&quot;myStudent&quot;)
+    private Student student;
+    @Test
+    public void test01() {
+        System.out.println(student.toString());
+    }
+}
+</code></pre><h4 id="4-5-Spring与IOC-DI-XML的优先级要基于注解的DI"><a href="#4-5-Spring与IOC-DI-XML的优先级要基于注解的DI" class="headerlink" title="4.5 Spring与IOC DI-XML的优先级要基于注解的DI"></a>4.5 Spring与IOC DI-XML的优先级要基于注解的DI</h4><p>同时存在基于XML的DI和基于注解的DI，XML的优先级要高。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/05/05/java/spring/spring-4/" data-id="cjgxcg4br0055r9p3llhl6jzu" class="article-share-link">Delen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/05/05/java/spring/spring-5/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Nieuwer</strong>
+      <div class="article-nav-title">
+        
+          第五章 Spring与AOP 简介
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/05/05/java/spring/spring-3/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Ouder</strong>
+      <div class="article-nav-title">第三章 Spring与IOC 基于XML的DI</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categorieën</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Labels</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archieven</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recente berichten</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/05/08/java/spring/spring-10/">第十章 Spring事务管理</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/06/java/spring/spring-9/">第九章 spring与JDBC模板</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/06/java/spring/spring-8/">第八章 Spring与AOP AspectJ基于XML的AOP实现</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/06/java/spring/spring-7/">第七章 Spring与AOP AspectJ基于注解的AOP实现</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/05/java/spring/spring-6/">第六章 Spring与AOP AspectJ对AOP的实现</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

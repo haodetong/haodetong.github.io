@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>第十章 Spring事务管理 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="10.1 事务管理器接口事务管理器是PlatformTransactionManager接口对象。其主要用于完成事务的提交、回滚及获取事务的状态信息。 常用的两个实现类 DataSourceTransactionManager：使用JDBC或iBatis进行持久化数据时使用。  HibernateTransactionManager：使用Hibernate进行持久化数据时使用。   Spring的">
+<meta name="keywords" content="spring">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第十章 Spring事务管理">
+<meta property="og:url" content="http://yoursite.com/2018/05/08/java/spring/spring-10/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="10.1 事务管理器接口事务管理器是PlatformTransactionManager接口对象。其主要用于完成事务的提交、回滚及获取事务的状态信息。 常用的两个实现类 DataSourceTransactionManager：使用JDBC或iBatis进行持久化数据时使用。  HibernateTransactionManager：使用Hibernate进行持久化数据时使用。   Spring的">
+<meta property="og:updated_time" content="2018-05-08T07:07:38.431Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="第十章 Spring事务管理">
+<meta name="twitter:description" content="10.1 事务管理器接口事务管理器是PlatformTransactionManager接口对象。其主要用于完成事务的提交、回滚及获取事务的状态信息。 常用的两个实现类 DataSourceTransactionManager：使用JDBC或iBatis进行持久化数据时使用。  HibernateTransactionManager：使用Hibernate进行持久化数据时使用。   Spring的">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Zoeken"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-java/spring/spring-10" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/08/java/spring/spring-10/" class="article-date">
+  <time datetime="2018-05-08T01:50:30.000Z" itemprop="datePublished">2018-05-08</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/spring/">spring</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      第十章 Spring事务管理
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="10-1-事务管理器接口"><a href="#10-1-事务管理器接口" class="headerlink" title="10.1 事务管理器接口"></a>10.1 事务管理器接口</h4><p>事务管理器是PlatformTransactionManager接口对象。其主要用于完成事务的提交、回滚及获取事务的状态信息。</p>
+<h5 id="常用的两个实现类"><a href="#常用的两个实现类" class="headerlink" title="常用的两个实现类"></a>常用的两个实现类</h5><ul>
+<li><p>DataSourceTransactionManager：使用JDBC或iBatis进行持久化数据时使用。</p>
+</li>
+<li><p>HibernateTransactionManager：使用Hibernate进行持久化数据时使用。</p>
+</li>
+</ul>
+<h5 id="Spring的回滚方式"><a href="#Spring的回滚方式" class="headerlink" title="Spring的回滚方式"></a>Spring的回滚方式</h5><p>Spring事务的默认回滚方式是：发生运行异常时回滚，发生受查异常时提交。</p>
+<p>运行异常指的是继承自RuntimeException的异常类，受查异常指的是继承自Exception的异常类。</p>
+<h4 id="10-2-事务定义接口"><a href="#10-2-事务定义接口" class="headerlink" title="10.2 事务定义接口"></a>10.2 事务定义接口</h4><p>TransactionDefinition</p>
+<h5 id="隔离级别："><a href="#隔离级别：" class="headerlink" title="隔离级别："></a>隔离级别：</h5><ul>
+<li><p>static int    ISOLATION_DEFAULT          0</p>
+</li>
+<li><p>static int    ISOLATION_READ_COMMITTED   2</p>
+</li>
+<li><p>static int    ISOLATION_READ_UNCOMMITED  1 </p>
+</li>
+<li><p>static int    ISOLATION_REPEATABLE_READ  4</p>
+</li>
+<li><p>static int    ISOLATION_SERIALIZABLE     8</p>
+</li>
+</ul>
+<p>MYSQL默认的是可重复读，ORACLE默认的是读已提交</p>
+<h5 id="事务的传播行为"><a href="#事务的传播行为" class="headerlink" title="事务的传播行为"></a>事务的传播行为</h5><p>定义了七个事务传播行为。</p>
+<p>doSome()方法调用doOther()方法，或doSome()方法存在于事务中，则doOther()方法加入到该事务中执行；若doSome()方法在调用doOther()方法时没有在事务内执行，则doOther()方法会创建一个事务，并在其中执行。</p>
+<h4 id="10-3-程序举例"><a href="#10-3-程序举例" class="headerlink" title="10.3 程序举例"></a>10.3 程序举例</h4><p>两个实体：银行账户Account与股票账户Stock。当要购买股票时，从Account中扣除相应金额的存款，同时在Stock中增加相应的股票数量。在这个过程中，抛出一个用户自定义的异常，使两个操作回滚。</p>
+<h4 id="10-4-定义实体及DB表"><a href="#10-4-定义实体及DB表" class="headerlink" title="10.4 定义实体及DB表"></a>10.4 定义实体及DB表</h4><p>Account.java</p>
+<pre><code>package com.bjpowernode.beans;
+
+public class Account {
+    private Integer aid;
+    private String aname;
+    private double balance;
+    public Account() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+    public Account(String aname, double balance) {
+        super();
+        this.aname = aname;
+        this.balance = balance;
+    }
+    public Integer getAid() {
+        return aid;
+    }
+    public void setAid(Integer aid) {
+        this.aid = aid;
+    }
+    public String getAname() {
+        return aname;
+    }
+    public void setAname(String aname) {
+        this.aname = aname;
+    }
+    public double getBalance() {
+        return balance;
+    }
+    public void setBalance(double balance) {
+        this.balance = balance;
+    }
+    @Override
+    public String toString() {
+        return &quot;Account [aid=&quot; + aid + &quot;, aname=&quot; + aname + &quot;, balance=&quot; + balance + &quot;]&quot;;
+    }
+
+}
+</code></pre><p>Stock.java</p>
+<pre><code>package com.bjpowernode.beans;
+
+public class Stock {
+    private Integer sid;
+    private String sname;
+    private int count;
+
+    public Stock() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+    public Stock(String sname, int count) {
+        super();
+        this.sname = sname;
+        this.count = count;
+    }
+
+    public Integer getSid() {
+        return sid;
+    }
+
+    public void setSid(Integer sid) {
+        this.sid = sid;
+    }
+
+    public String getSname() {
+        return sname;
+    }
+
+    public void setSname(String sname) {
+        this.sname = sname;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
+
+    @Override
+    public String toString() {
+        return &quot;Stock [sid=&quot; + sid + &quot;, sname=&quot; + sname + &quot;, count=&quot; + count + &quot;]&quot;;
+    }
+
+}
+</code></pre><h4 id="10-5-定义service"><a href="#10-5-定义service" class="headerlink" title="10.5 定义service"></a>10.5 定义service</h4><p>业务接口</p>
+<pre><code>package com.bjpowernode.service;
+
+public interface IBuyStockService {
+    void openAccount(String aname, double money);
+    void openStock(String sname, int amount);
+    void buyStock(String aname, double money, String sname, int amount) throws BuyStockException;
+}
+</code></pre><p>业务实现类</p>
+<pre><code>package com.bjpowernode.service;
+
+import com.bjpowernode.Dao.IAccountDao;
+import com.bjpowernode.Dao.IStockDao;
+
+public class BuyStockServiceImpl implements IBuyStockService {
+    private IAccountDao adao;
+    private IStockDao sdao;
+
+    public void setAdao(IAccountDao adao) {
+        this.adao = adao;
+    }
+
+    public void setSdao(IStockDao sdao) {
+        this.sdao = sdao;
+    }
+
+    @Override
+    public void openAccount(String aname, double money) {
+        adao.insertAccount(aname, money);
+    }
+
+    @Override
+    public void openStock(String sname, int amount) {
+        sdao.insertStock(sname, amount);
+    }
+
+    @Override
+    public void buyStock(String aname, double money, String sname, int amount) throws BuyStockException {
+        boolean isBuy = true;
+        adao.updateAccount(aname, money, isBuy);
+        if(true) {
+            throw new BuyStockException(&quot;购买股票异常&quot;);
+        }
+        sdao.updateStock(sname, amount, isBuy);
+    }
+
+}
+</code></pre><h4 id="10-6-定义Dao"><a href="#10-6-定义Dao" class="headerlink" title="10.6 定义Dao"></a>10.6 定义Dao</h4><p>IAccountDao</p>
+<pre><code>package com.bjpowernode.Dao;
+
+public interface IAccountDao {
+
+    void insertAccount(String aname, double money);
+
+    void updateAccount(String aname, double money, boolean isBuy);
+
+}
+</code></pre><p>AccountDaoImpl</p>
+<pre><code>package com.bjpowernode.Dao;
+
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+
+public class AccountDaoImpl extends JdbcDaoSupport implements IAccountDao {
+
+    @Override
+    public void insertAccount(String aname, double money) {
+        String sql = &quot;insert into account(aname, balance) values(?,?)&quot;;
+        this.getJdbcTemplate().update(sql, aname, money);
+    }
+
+    @Override
+    public void updateAccount(String aname, double money, boolean isBuy) {
+        String sql = &quot;update account set balance = balance + ? where aname=?&quot;;
+        if(isBuy) {
+            sql = &quot;update account set balance = balance - ? where aname=?&quot;;
+        }
+        this.getJdbcTemplate().update(sql, money, aname);
+    }
+
+}
+</code></pre><p>IStockDao</p>
+<pre><code>package com.bjpowernode.Dao;
+
+public interface IStockDao {
+
+    void insertStock(String sname, int amount);
+
+    void updateStock(String sname, int amount, boolean isBuy);
+
+}
+</code></pre><p>StockDaoImpl</p>
+<pre><code>package com.bjpowernode.Dao;
+
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+
+public class StockDaoImpl extends JdbcDaoSupport implements IStockDao {
+
+    @Override
+    public void insertStock(String sname, int amount) {
+        String sql = &quot;insert into stock(sname, count) values(?,?)&quot;;
+        this.getJdbcTemplate().update(sql, sname, amount);
+    }
+
+    @Override
+    public void updateStock(String sname, int amount, boolean isBuy) {
+        String sql = &quot;update stock set count = count-? where sname=?&quot;;
+        if(isBuy) {
+            sql = &quot;update stock set count = count+? where sname=?&quot;;            
+        }
+        this.getJdbcTemplate().update(sql, amount, sname);
+    }
+
+}
+</code></pre><h4 id="10-7-定义测试类"><a href="#10-7-定义测试类" class="headerlink" title="10.7 定义测试类"></a>10.7 定义测试类</h4><p>MyTest.java</p>
+<pre><code>package com.bjpowernode.test;
+
+import java.nio.channels.AcceptPendingException;
+import java.util.List;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.cache.support.AbstractCacheManager;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.dao.support.DaoSupport;
+
+import com.bjpowernode.service.BuyStockException;
+import com.bjpowernode.service.IBuyStockService;
+
+
+public class MyTest {
+
+    private IBuyStockService service;
+
+    @Before
+    public void before() {
+        String source = &quot;applicationContext.xml&quot;;
+        ApplicationContext ac = new ClassPathXmlApplicationContext(source);
+        service = (IBuyStockService) ac.getBean(&quot;buyStockService&quot;);
+    }
+
+    @Test
+    public void test01() {
+        service.openAccount(&quot;张三&quot;, 10000);
+        service.openStock(&quot;动力节点&quot;, 0);
+    }    
+
+    @Test
+    public void test02() {
+        try {
+            service.buyStock(&quot;张三&quot;, 2000, &quot;动力节点&quot;, 5);
+        } catch (BuyStockException e) {
+            e.printStackTrace();
+        }
+    }    
+
+}
+</code></pre><h4 id="10-8-异常类"><a href="#10-8-异常类" class="headerlink" title="10.8 异常类"></a>10.8 异常类</h4><pre><code>package com.bjpowernode.service;
+
+public class BuyStockException extends Exception {
+
+    public BuyStockException() {
+        super();
+    }
+
+    public BuyStockException(String message) {
+        super(message);
+    }
+
+}
+</code></pre><h4 id="10-9-注册"><a href="#10-9-注册" class="headerlink" title="10.9 注册"></a>10.9 注册</h4><p>applicationContext.xml</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
+xmlns:tx=&quot;http://www.springframework.org/schema/tx&quot;
+xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context.xsd
+http://www.springframework.org/schema/aop
+http://www.springframework.org/schema/aop/spring-aop.xsd
+http://www.springframework.org/schema/tx
+http://www.springframework.org/schema/tx/spring-tx.xsd&quot;&gt;
+
+    &lt;!-- 注册属性文件：从属性文件读取DB连接四要素：方式二 --&gt;
+    &lt;context:property-placeholder location=&quot;classpath:jdbc.properties&quot;/&gt;
+
+    &lt;!-- 注册数据源:Spring内置的连接池 --&gt;
+    &lt;bean id=&quot;myDataSource&quot; class=&quot;org.springframework.jdbc.datasource.DriverManagerDataSource&quot;&gt;
+        &lt;property name=&quot;driverClassName&quot; value=&quot;${jdbc.driver}&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;url&quot; value=&quot;${jdbc.url}&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;username&quot; value=&quot;${jdbc.user}&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;password&quot; value=&quot;${jdbc.password}&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+    &lt;!-- 注册dao --&gt;
+    &lt;bean id=&quot;accountDao&quot; class=&quot;com.bjpowernode.Dao.AccountDaoImpl&quot;&gt;
+        &lt;property name=&quot;dataSource&quot; ref=&quot;myDataSource&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+    &lt;bean id=&quot;stockDao&quot; class=&quot;com.bjpowernode.Dao.StockDaoImpl&quot;&gt;
+        &lt;property name=&quot;dataSource&quot; ref=&quot;myDataSource&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+    &lt;!-- 注册service --&gt;
+    &lt;bean id=&quot;buyStockService&quot; class=&quot;com.bjpowernode.service.BuyStockServiceImpl&quot;&gt;
+        &lt;property name=&quot;adao&quot; ref=&quot;accountDao&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;sdao&quot; ref=&quot;stockDao&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+&lt;!-- ============================ AOP ===================================================  --&gt;
+
+    &lt;!-- 注册事务管理器 --&gt;
+    &lt;bean id=&quot;myTransactionManager&quot; class=&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;&gt;
+        &lt;property name=&quot;dataSource&quot; ref=&quot;myDataSource&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+    &lt;!-- 注册事务通知 --&gt;
+    &lt;tx:advice id=&quot;txAdvice&quot; transaction-manager=&quot;myTransactionManager&quot;&gt;
+        &lt;tx:attributes&gt;
+            &lt;!-- 这里指定的是：为每一个连接点指定所要应用的事务属性 --&gt;
+            &lt;tx:method name=&quot;open*&quot; isolation=&quot;DEFAULT&quot; propagation=&quot;REQUIRED&quot;/&gt;
+            &lt;tx:method name=&quot;buyStock&quot; isolation=&quot;DEFAULT&quot; propagation=&quot;REQUIRED&quot; rollback-for=&quot;BuyStockException&quot;/&gt;
+        &lt;/tx:attributes&gt;
+    &lt;/tx:advice&gt;
+
+    &lt;aop:config&gt;
+        &lt;!-- 这里指定的是切入点 --&gt;
+        &lt;aop:pointcut expression=&quot;execution(* *..service.*.buyStock(..))&quot; id=&quot;myPointcut&quot;/&gt;
+        &lt;aop:advisor advice-ref=&quot;txAdvice&quot; pointcut-ref=&quot;myPointcut&quot;/&gt;    
+    &lt;/aop:config&gt;
+
+&lt;/beans&gt;
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/05/08/java/spring/spring-10/" data-id="cjgxcg4bk004vr9p332isaka6" class="article-share-link">Delen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2018/05/06/java/spring/spring-9/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Ouder</strong>
+      <div class="article-nav-title">第九章 spring与JDBC模板</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categorieën</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Labels</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archieven</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recente berichten</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/05/08/java/spring/spring-10/">第十章 Spring事务管理</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/06/java/spring/spring-9/">第九章 spring与JDBC模板</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/06/java/spring/spring-8/">第八章 Spring与AOP AspectJ基于XML的AOP实现</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/06/java/spring/spring-7/">第七章 Spring与AOP AspectJ基于注解的AOP实现</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/05/java/spring/spring-6/">第六章 Spring与AOP AspectJ对AOP的实现</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

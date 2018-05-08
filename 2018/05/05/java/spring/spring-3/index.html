@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>第三章 Spring与IOC 基于XML的DI | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="基于XML的DI">
+<meta name="keywords" content="spring">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第三章 Spring与IOC 基于XML的DI">
+<meta property="og:url" content="http://yoursite.com/2018/05/05/java/spring/spring-3/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="基于XML的DI">
+<meta property="og:updated_time" content="2018-05-05T04:09:18.676Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="第三章 Spring与IOC 基于XML的DI">
+<meta name="twitter:description" content="基于XML的DI">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Zoeken"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-java/spring/spring-3" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/05/java/spring/spring-3/" class="article-date">
+  <time datetime="2018-05-05T00:53:03.000Z" itemprop="datePublished">2018-05-05</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/spring/">spring</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      第三章 Spring与IOC 基于XML的DI
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Bean实例在调用无参构造器创建了空值对象后，就要对Bean对象的属性进行初始化。初始化是由容器自动完成的，称为注入。常用方式分为设值注入和构造注入。</p>
+<h4 id="3-1-基于xml-设值注入"><a href="#3-1-基于xml-设值注入" class="headerlink" title="3.1 基于xml-设值注入"></a>3.1 基于xml-设值注入</h4><p>通过set方法注入，基本数据类型用value，引用数据类型用ref。</p>
+<p>applicationContext.xml</p>
+<pre><code>&lt;bean id=&quot;mySchool&quot; class=&quot;com.bjpowernode.di01.School&quot;&gt;
+    &lt;property name=&quot;name&quot; value=&quot;清华大学&quot; /&gt;
+&lt;/bean&gt;
+
+&lt;bean id=&quot;myStudent&quot; class=&quot;com.bjpowernode.di01.Student&quot;&gt;
+    &lt;property name=&quot;name&quot; value=&quot;张三&quot; /&gt;
+    &lt;property name=&quot;age&quot; value=&quot;23&quot;&gt;&lt;/property&gt;
+    &lt;property name=&quot;school&quot; ref=&quot;mySchool&quot;&gt;&lt;/property&gt;
+&lt;/bean&gt;
+</code></pre><p>School.class</p>
+<pre><code>public class School {
+    private String name;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+}
+</code></pre><p>Student.class</p>
+<pre><code>public class Student {
+
+    private String name;
+    private int age;
+    private School school;
+
+    public Student() {
+        super();
+    }
+
+    public void setSchool(School school) {
+        this.school = school;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return &quot;Student [name=&quot; + name + &quot;, age=&quot; + age + &quot;, school=&quot; + school + &quot;]&quot;;
+    }
+
+}
+</code></pre><h4 id="3-2-基于xml-为集合属性赋值"><a href="#3-2-基于xml-为集合属性赋值" class="headerlink" title="3.2 基于xml-为集合属性赋值"></a>3.2 基于xml-为集合属性赋值</h4><p>Some.class</p>
+<pre><code>public class Some {
+    private School[] schools;
+    private String[] myStrs;
+    private List&lt;String&gt; myList;
+    private Set&lt;String&gt; mySet;
+    private Map&lt;String,Object&gt; myMap;
+    private Properties myPros;
+    ...
+    set 方法
+    ...
+    @Override
+    public String toString() {
+        return &quot;Some [schools=&quot; + Arrays.toString(schools) + &quot;, mystrs=&quot; + Arrays.toString(myStrs) + &quot;, myList=&quot;
+                + myList + &quot;, mySet=&quot; + mySet + &quot;, myMap=&quot; + myMap + &quot;, myPros=&quot; + myPros + &quot;]&quot;;
+    }
+}
+</code></pre><p>applicationContext.xml</p>
+<pre><code>&lt;bean id=&quot;mySchool1&quot; class=&quot;com.bjpowernode.di02.School&quot;&gt;
+    &lt;property name=&quot;name&quot; value=&quot;清华大学&quot; /&gt;
+&lt;/bean&gt;
+
+&lt;bean id=&quot;mySchool2&quot; class=&quot;com.bjpowernode.di02.School&quot;&gt;
+    &lt;property name=&quot;name&quot; value=&quot;北京大学&quot; /&gt;
+&lt;/bean&gt;
+
+&lt;bean id=&quot;mySome&quot; class=&quot;com.bjpowernode.di02.Some&quot;&gt;
+    &lt;property name=&quot;schools&quot;&gt;
+        &lt;array&gt;
+            &lt;ref bean=&quot;mySchool1&quot;/&gt;
+            &lt;ref bean=&quot;mySchool2&quot;/&gt;
+        &lt;/array&gt;
+    &lt;/property&gt;
+
+    &lt;property name=&quot;myStrs&quot;&gt;
+        &lt;array&gt;
+            &lt;value&gt;山东&lt;/value&gt;
+            &lt;value&gt;临沂&lt;/value&gt;
+        &lt;/array&gt;
+    &lt;/property&gt;
+
+    &lt;property name=&quot;myList&quot;&gt;
+        &lt;list&gt;
+            &lt;value&gt;平邑&lt;/value&gt;
+            &lt;value&gt;一村&lt;/value&gt;
+        &lt;/list&gt;
+    &lt;/property&gt;
+
+    &lt;property name=&quot;mySet&quot;&gt;
+        &lt;set&gt;
+            &lt;value&gt;一街道&lt;/value&gt;
+            &lt;value&gt;二街道&lt;/value&gt;
+        &lt;/set&gt;
+    &lt;/property&gt;
+
+    &lt;property name=&quot;myMap&quot;&gt;
+        &lt;map&gt;
+            &lt;entry key=&quot;mobile&quot; value=&quot;15011111111&quot;&gt;&lt;/entry&gt;
+            &lt;entry key=&quot;qq&quot; value=&quot;11111&quot;&gt;&lt;/entry&gt;
+        &lt;/map&gt;
+    &lt;/property&gt;
+
+    &lt;property name=&quot;myPros&quot;&gt;
+        &lt;props&gt;
+            &lt;prop key=&quot;age&quot;&gt;12&lt;/prop&gt;
+            &lt;prop key=&quot;sex&quot;&gt;femal&lt;/prop&gt;
+        &lt;/props&gt;
+    &lt;/property&gt;
+&lt;/bean&gt;
+</code></pre><h4 id="3-3-基于xml-域属性-自动注入"><a href="#3-3-基于xml-域属性-自动注入" class="headerlink" title="3.3 基于xml-域属性-自动注入"></a>3.3 基于xml-域属性-自动注入</h4><h5 id="3-3-1-基于xml-autowire-quot-byName-quot"><a href="#3-3-1-基于xml-autowire-quot-byName-quot" class="headerlink" title="3.3.1 基于xml-autowire=&quot;byName&quot;"></a>3.3.1 基于xml-<code>autowire=&quot;byName&quot;</code></h5><p>会从容器中查找与Student类中域属性名scholl相同的Bean的id，并将该Bean对象自动注入给该域属性</p>
+<pre><code>&lt;bean id=&quot;school&quot; class=&quot;com.bjpowernode.di01.School&quot;&gt;
+    &lt;property name=&quot;name&quot; value=&quot;清华大学&quot; /&gt;
+&lt;/bean&gt;
+
+&lt;bean id=&quot;myStudent&quot; class=&quot;com.bjpowernode.di01.Student&quot; autowire=&quot;byName&quot;&gt;
+    &lt;property name=&quot;name&quot; value=&quot;张三&quot; /&gt;
+    &lt;property name=&quot;age&quot; value=&quot;23&quot;&gt;&lt;/property&gt;
+&lt;/bean&gt;
+</code></pre><h5 id="3-3-2-基于xml-autowire-quot-byType-quot"><a href="#3-3-2-基于xml-autowire-quot-byType-quot" class="headerlink" title="3.3.2 基于xml-autowire=&quot;byType&quot;"></a>3.3.2 基于xml-<code>autowire=&quot;byType&quot;</code></h5><p>会从容器中查找与Student类中域属性类型School具有is-a关系的Bean，并将该Bean对象自动注入给该域属性</p>
+<pre><code>&lt;bean id=&quot;mySchool&quot; class=&quot;com.bjpowernode.di01.School&quot;&gt;
+    &lt;property name=&quot;name&quot; value=&quot;清华大学&quot; /&gt;
+&lt;/bean&gt;
+
+&lt;bean id=&quot;myStudent&quot; class=&quot;com.bjpowernode.di01.Student&quot; autowire=&quot;byType&quot;&gt;
+    &lt;property name=&quot;name&quot; value=&quot;张三&quot; /&gt;
+    &lt;property name=&quot;age&quot; value=&quot;23&quot;&gt;&lt;/property&gt;
+&lt;/bean&gt;
+</code></pre><h5 id="3-3-3-基于xml-DI-SPEL注入"><a href="#3-3-3-基于xml-DI-SPEL注入" class="headerlink" title="3.3.3 基于xml-DI-SPEL注入"></a>3.3.3 基于xml-DI-SPEL注入</h5><pre><code>&lt;bean id=&quot;myPerson&quot; class=&quot;com.bjpowernode.di01.Person&quot;&gt;
+    &lt;property name=&quot;pname&quot; value=&quot;lisi&quot;&gt;&lt;/property&gt;
+    &lt;!-- 通过spring el表达式调用静态方法 --&gt;
+    &lt;property name=&quot;page&quot; value=&quot;#{T(java.lang.Math).random() * 50}&quot;&gt;&lt;/property&gt;
+&lt;/bean&gt;
+
+&lt;bean id=&quot;myStudent&quot; class=&quot;com.bjpowernode.di01.Student&quot;&gt;
+    &lt;!-- 调用其它Bean的属性 --&gt;
+    &lt;property name=&quot;name&quot; value=&quot;#{myPerson.pname}&quot;&gt;&lt;/property&gt;
+    &lt;!-- 运算 --&gt;
+    &lt;property name=&quot;age&quot; value=&quot;#{myPerson.page &gt; 25 ? 25 : myPerson.page}&quot;&gt;&lt;/property&gt;
+    &lt;!-- 调用其它Bean的成员方法 --&gt;
+    &lt;property name=&quot;age&quot; value=&quot;#{myPerson.computeAge()}&quot;&gt;&lt;/property&gt;
+&lt;/bean&gt;
+</code></pre><h4 id="3-4-为应用指定多个Spring配置文件"><a href="#3-4-为应用指定多个Spring配置文件" class="headerlink" title="3.4 为应用指定多个Spring配置文件"></a>3.4 为应用指定多个Spring配置文件</h4><h5 id="1-、平等关系的配置文件"><a href="#1-、平等关系的配置文件" class="headerlink" title="(1)、平等关系的配置文件"></a>(1)、平等关系的配置文件</h5><p>两个配置文件：</p>
+<ul>
+<li><p>com/bjpowernode/di01/spring-base.xml</p>
+</li>
+<li><p>com/bjpowernode/di01/spring-beans.xml</p>
+</li>
+</ul>
+<p>创建容器：</p>
+<pre><code>String source01 = &quot;com/bjpowernode/di01/spring-base.xml&quot;;
+String source02 = &quot;com/bjpowernode/di01/spring-beans.xml&quot;;
+ApplicationContext ac = new ClassPathXmlApplicationContext(source01,source02);
+</code></pre><p>通配符</p>
+<pre><code>String source = &quot;com/bjpowernode/di01/spring-*.xml&quot;;
+ApplicationContext ac = new ClassPathXmlApplicationContext(source);
+</code></pre><h5 id="2-、包含关系的配置文件"><a href="#2-、包含关系的配置文件" class="headerlink" title="(2)、包含关系的配置文件"></a>(2)、包含关系的配置文件</h5><p>三个配置文件：</p>
+<ul>
+<li><p>com/bjpowernode/di01/applicationContext.xml</p>
+</li>
+<li><p>com/bjpowernode/di01/spring-base.xml</p>
+</li>
+<li><p>com/bjpowernode/di01/spring-beans.xml</p>
+</li>
+</ul>
+<p>applicationContext.xml</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+...
+&gt;
+   &lt;!--引入其它的配置文件--&gt;     
+    &lt;import resource=&quot;classpath:com/bjpowernode/di01/spring-base.xml&quot; /&gt;
+    &lt;import resource=&quot;classpath:com/bjpowernode/di01/spring-beans.xml&quot; /&gt;
+
+    &lt;!--通配符--&gt;
+    &lt;import resource=&quot;classpath:com/bjpowernode/di01/spring-*.xml&quot; /&gt;
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/05/05/java/spring/spring-3/" data-id="cjgxcg4bp0052r9p3x9ksbxew" class="article-share-link">Delen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/05/05/java/spring/spring-4/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Nieuwer</strong>
+      <div class="article-nav-title">
+        
+          第四章 Spring与IOC 基于注解的DI
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/05/04/java/spring/spring-2/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Ouder</strong>
+      <div class="article-nav-title">第二章 spring与IOC</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categorieën</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Labels</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archieven</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recente berichten</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/05/08/java/spring/spring-10/">第十章 Spring事务管理</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/06/java/spring/spring-9/">第九章 spring与JDBC模板</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/06/java/spring/spring-8/">第八章 Spring与AOP AspectJ基于XML的AOP实现</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/06/java/spring/spring-7/">第七章 Spring与AOP AspectJ基于注解的AOP实现</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/05/java/spring/spring-6/">第六章 Spring与AOP AspectJ对AOP的实现</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

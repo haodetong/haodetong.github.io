@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>第七章 Spring与AOP AspectJ基于注解的AOP实现 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="7.1 AspectJ 基于注解的AOP实现 - 前置通知指定ISomeService的doFirst()接入点为切入点，并执行前置方法 主业务接口 public interface ISomeService {     void doFirst();     String doSecond(String str);     void doThird(); } 业务实现类 public class">
+<meta name="keywords" content="spring">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第七章 Spring与AOP AspectJ基于注解的AOP实现">
+<meta property="og:url" content="http://yoursite.com/2018/05/06/java/spring/spring-7/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="7.1 AspectJ 基于注解的AOP实现 - 前置通知指定ISomeService的doFirst()接入点为切入点，并执行前置方法 主业务接口 public interface ISomeService {     void doFirst();     String doSecond(String str);     void doThird(); } 业务实现类 public class">
+<meta property="og:updated_time" content="2018-05-06T03:04:54.566Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="第七章 Spring与AOP AspectJ基于注解的AOP实现">
+<meta name="twitter:description" content="7.1 AspectJ 基于注解的AOP实现 - 前置通知指定ISomeService的doFirst()接入点为切入点，并执行前置方法 主业务接口 public interface ISomeService {     void doFirst();     String doSecond(String str);     void doThird(); } 业务实现类 public class">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Zoeken"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-java/spring/spring-7" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/06/java/spring/spring-7/" class="article-date">
+  <time datetime="2018-05-06T03:01:39.000Z" itemprop="datePublished">2018-05-06</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/spring/">spring</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      第七章 Spring与AOP AspectJ基于注解的AOP实现
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="7-1-AspectJ-基于注解的AOP实现-前置通知"><a href="#7-1-AspectJ-基于注解的AOP实现-前置通知" class="headerlink" title="7.1 AspectJ 基于注解的AOP实现 - 前置通知"></a>7.1 AspectJ 基于注解的AOP实现 - 前置通知</h4><p>指定ISomeService的doFirst()接入点为切入点，并执行前置方法</p>
+<p>主业务接口</p>
+<pre><code>public interface ISomeService {
+    void doFirst();
+    String doSecond(String str);
+    void doThird();
+}
+</code></pre><p>业务实现类</p>
+<pre><code>public class SomeServiceImpl implements ISomeService {
+    @Override
+    public void doFirst() {
+        System.out.println(&quot;执行doFirst()方法&quot;);
+    }
+    @Override
+    public String doSecond(String str) {
+        System.out.println(&quot;执行doSecond()方法&quot;);
+        return str;
+    }
+    @Override
+    public void doThird() {
+        System.out.println(&quot;执行doThird()方法&quot;);
+    }
+}
+</code></pre><p>切面</p>
+<pre><code>@Aspect //表示当前类为切面
+public class MyAspect {
+    //设置前置方法及切入点
+    @Before(&quot;execution(* *..ISomeService.doFirst(..))&quot;)
+    public void myBefore(JoinPoint jp) {
+        System.out.println(&quot;执行前置方法jp=&quot;+jp);
+    }
+}
+</code></pre><p>配置文件</p>
+<pre><code>&lt;!-- 注册切面 --&gt;
+&lt;bean id=&quot;myAspect&quot; class=&quot;com.siyantu.annotation.MyAspect&quot;&gt;&lt;/bean&gt;
+
+ &lt;!-- 注册实现类 --&gt;
+&lt;bean id=&quot;someService&quot; class=&quot;com.siyantu.annotation.SomeServiceImpl&quot; /&gt;
+
+&lt;!-- aspectj自动代理 --&gt;
+&lt;aop:aspectj-autoproxy&gt;&lt;/aop:aspectj-autoproxy&gt;
+</code></pre><p>测试类</p>
+<pre><code>public class MyTest {
+    @Test
+    public void test() {
+        String resource = &quot;applicationContext.xml&quot;;
+        ApplicationContext ac = new ClassPathXmlApplicationContext(resource);
+        ISomeService service = (ISomeService) ac.getBean(&quot;someService&quot;);
+        service.doFirst();
+        System.out.println(&quot;=============&quot;);
+        service.doSecond(&quot;abcde&quot;);
+        System.out.println(&quot;=============&quot;);
+        service.doThird();
+        System.out.println(&quot;=============&quot;);
+
+    }
+
+}
+</code></pre><h4 id="7-2-AspectJ-基于注解的AOP实现-后置通知"><a href="#7-2-AspectJ-基于注解的AOP实现-后置通知" class="headerlink" title="7.2 AspectJ 基于注解的AOP实现 - 后置通知"></a>7.2 AspectJ 基于注解的AOP实现 - 后置通知</h4><pre><code>@Aspect //表示当前类为切面
+public class MyAspect {
+
+    ...
+
+    //设置后置方法及切入点，可以获取目标方法结果，但是因为没有返回值，所以没法修改
+    @AfterReturning(value=&quot;execution(* *..ISomeService.doSecond(..))&quot;,returning=&quot;result&quot;)
+    public void myAfterReturning(String result) {
+        System.out.println(&quot;执行后置方法 result=&quot;+result);
+    }
+
+}
+</code></pre><p>执行结果：</p>
+<pre><code>执行前置方法jp=execution(void com.siyantu.annotation.ISomeService.doFirst())
+执行doFirst()方法
+=============
+执行doSecond()方法
+执行后置方法 result=abcde
+=============
+执行doThird()方法
+=============
+</code></pre><h4 id="7-3-AspectJ-基于注解的AOP实现-环绕通知"><a href="#7-3-AspectJ-基于注解的AOP实现-环绕通知" class="headerlink" title="7.3 AspectJ 基于注解的AOP实现 - 环绕通知"></a>7.3 AspectJ 基于注解的AOP实现 - 环绕通知</h4><pre><code>@Aspect //表示当前类为切面
+public class MyAspect {
+
+    ...
+    //设置环绕通知及切入点
+    @Around(&quot;execution(* *..ISomeService.doSecond(..))&quot;)
+    public Object myAround(ProceedingJoinPoint pjp) throws Throwable {
+        System.out.println(&quot;执行环绕通知方法，目标方法执行之前&quot;);
+        //目标方法
+        Object result = pjp.proceed();
+        System.out.println(&quot;执行环绕通知方法，目标方法执行之后&quot;);
+        if(result != null) {
+            result = ((String)result).toUpperCase();
+        }
+        return result;
+    }
+
+}
+</code></pre><p>执行结果：</p>
+<pre><code>执行前置方法jp=execution(void com.siyantu.annotation.ISomeService.doFirst())
+执行doFirst()方法
+=============
+执行环绕通知方法，目标方法执行之前
+执行doSecond()方法
+执行环绕通知方法，目标方法执行之后
+执行后置方法 result=ABCDE
+=============
+执行doThird()方法
+=============
+</code></pre><h4 id="7-4-AspectJ-基于注解的AOP实现-异常通知"><a href="#7-4-AspectJ-基于注解的AOP实现-异常通知" class="headerlink" title="7.4 AspectJ 基于注解的AOP实现 - 异常通知"></a>7.4 AspectJ 基于注解的AOP实现 - 异常通知</h4><h5 id="异常分两类："><a href="#异常分两类：" class="headerlink" title="异常分两类："></a>异常分两类：</h5><p>1、运行时异常，不进行处理，也可以通过编译。</p>
+<p>若一个类继承自RunTimeException，则该异常就是运行时异常。</p>
+<p>2、编译时异常，受查异常，Checked Exception。不进行处理，将无法通过编译。</p>
+<p>若一个类继承自Exception，则该类就是受查异常。</p>
+<h5 id="自定义异常"><a href="#自定义异常" class="headerlink" title="自定义异常"></a>自定义异常</h5><p>主业务接口</p>
+<pre><code>public interface ISomeService {
+    void doThird(String username, String password) throws UserException;
+}
+</code></pre><p>业务实现类</p>
+<pre><code>public class SomeServiceImpl implements ISomeService {
+    @Override
+    public void doThird(String username, String password) throws UserException {
+        if(!&quot;beijing&quot;.equals(username)) {
+            throw new UsernameException(&quot;用户名有误&quot;);
+        }
+        if(!&quot;111&quot;.equals(password)) {
+            throw new PasswordException(&quot;密码有误&quot;);
+        }
+    }
+}
+</code></pre><p>切面</p>
+<pre><code>@Aspect //表示当前类为切面
+public class MyAspect {
+
+    //当目标方法抛出与指定类型的异常具有is-a关系的异常时，执行该异常通知方法    
+    @AfterThrowing(value=&quot;execution(* *..ISomeService.doThird(..))&quot;,throwing=&quot;ex&quot;)
+    public void myAfterThrowing(UsernameException ex) {
+        System.out.println(&quot;发生用户名异常:&quot;+ex.getMessage());
+    }
+
+    @AfterThrowing(value=&quot;execution(* *..ISomeService.doThird(..))&quot;,throwing=&quot;ex&quot;)
+    public void myAfterThrowing(PasswordException ex) {
+        System.out.println(&quot;发生密码异常:&quot;+ex.getMessage());
+    }
+
+    @AfterThrowing(value=&quot;execution(* *..ISomeService.doThird(..))&quot;,throwing=&quot;ex&quot;)
+    public void myAfterThrowing(Exception ex) {
+        System.out.println(&quot;发生其它异常:&quot;+ex.getMessage());
+    }
+
+}
+</code></pre><p>自定义UserException</p>
+<pre><code>public class UserException extends Exception {
+    public UserException() {
+        super();
+    }
+    public UserException(String message) {
+        super(message);
+    }
+}
+</code></pre><p>自定义UsernameException</p>
+<pre><code>public class UsernameException extends UserException {
+    public UsernameException() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+    public UsernameException(String message) {
+        super(message);
+        // TODO Auto-generated constructor stub
+    }
+}
+</code></pre><p>测试类</p>
+<pre><code>异常处理方式一：将异常继续向上抛出，抛给虚拟机
+
+public class MyTest {
+    @Test
+    public void test() throws UserException {
+        String resource = &quot;applicationContext.xml&quot;;
+        ApplicationContext ac = new ClassPathXmlApplicationContext(resource);
+        ISomeService service = (ISomeService) ac.getBean(&quot;someService&quot;);
+
+        service.doThird(&quot;beijing&quot;,&quot;1112&quot;);
+
+    }
+
+}
+
+异常处理方式二：捕捉异常，自己处理
+
+public class MyTest {
+    @Test
+    public void test() {
+        String resource = &quot;applicationContext.xml&quot;;
+        ApplicationContext ac = new ClassPathXmlApplicationContext(resource);
+        ISomeService service = (ISomeService) ac.getBean(&quot;someService&quot;);
+
+        try {
+            service.doThird(&quot;beijing&quot;,&quot;1112&quot;);
+        } catch (UserException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+    }
+
+}
+</code></pre><h4 id="7-5-AspectJ-基于注解的AOP实现-最终通知"><a href="#7-5-AspectJ-基于注解的AOP实现-最终通知" class="headerlink" title="7.5 AspectJ 基于注解的AOP实现 - 最终通知"></a>7.5 AspectJ 基于注解的AOP实现 - 最终通知</h4><p>切面</p>
+<pre><code>@Aspect //表示当前类为切面
+public class MyAspect {
+
+    //最终通知
+    @After(&quot;execution(* *..ISomeService.doThird(..))&quot;)
+    public void myAfter() {
+        System.out.println(&quot;执行最终通知&quot;);
+    }
+
+}
+</code></pre><p>不管有没有异常，最终通知都会执行</p>
+<h4 id="7-6-AspectJ-基于注解的AOP实现-定义切入点"><a href="#7-6-AspectJ-基于注解的AOP实现-定义切入点" class="headerlink" title="7.6 AspectJ 基于注解的AOP实现 - 定义切入点"></a>7.6 AspectJ 基于注解的AOP实现 - 定义切入点</h4><pre><code>@Aspect //表示当前类为切面
+public class MyAspect {
+
+    //最终通知，使用定义的切入点替代表达式
+    @After(&quot;doThirdPointcut()&quot;)
+    public void myAfter() {
+        System.out.println(&quot;执行最终通知&quot;);
+    }
+
+    //定义切入点
+    @Pointcut(&quot;execution(* *..ISomeService.doThird(..))&quot;)
+    public void doThirdPointcut() {}
+
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/05/06/java/spring/spring-7/" data-id="cjgxcg4bw005cr9p3214apq02" class="article-share-link">Delen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/05/06/java/spring/spring-8/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Nieuwer</strong>
+      <div class="article-nav-title">
+        
+          第八章 Spring与AOP AspectJ基于XML的AOP实现
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/05/05/java/spring/spring-6/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Ouder</strong>
+      <div class="article-nav-title">第六章 Spring与AOP AspectJ对AOP的实现</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categorieën</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Labels</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archieven</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recente berichten</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/05/08/java/spring/spring-10/">第十章 Spring事务管理</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/06/java/spring/spring-9/">第九章 spring与JDBC模板</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/06/java/spring/spring-8/">第八章 Spring与AOP AspectJ基于XML的AOP实现</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/06/java/spring/spring-7/">第七章 Spring与AOP AspectJ基于注解的AOP实现</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/05/java/spring/spring-6/">第六章 Spring与AOP AspectJ对AOP的实现</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

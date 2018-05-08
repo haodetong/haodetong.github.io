@@ -50,7 +50,7 @@
         
           <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Zoeken"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
@@ -61,10 +61,10 @@
       <div class="outer">
         <section id="main">
   
-    <article id="post-java/java-io/IO-9-file" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-java/java-session-cookie/session-cookie" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2018/01/10/java/java-io/IO-9-file/" class="article-date">
-  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
+    <a href="/2018/04/27/java/java-session-cookie/session-cookie/" class="article-date">
+  <time datetime="2018-04-27T02:12:04.000Z" itemprop="datePublished">2018-04-27</time>
 </a>
     
   <div class="article-category">
@@ -79,7 +79,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/10/java/java-io/IO-9-file/">IO流 - 九、File对象</a>
+      <a class="article-title" href="/2018/04/27/java/java-session-cookie/session-cookie/">session&amp;cookie</a>
     </h1>
   
 
@@ -87,694 +87,219 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h4 id="1、File对象-构造函数-amp-字段"><a href="#1、File对象-构造函数-amp-字段" class="headerlink" title="1、File对象 - 构造函数&amp;字段"></a>1、File对象 - 构造函数&amp;字段</h4><pre><code>//可以将一个已存在的，或者不存在的文件或者目录，封装为File对象
-File f1 = new File(&quot;c:\\a.txt&quot;);
-File f2 = new File(&quot;c:\\&quot;,&quot;a.txt&quot;);
-File f3 = new File(&quot;c:\\&quot;);
-File f4 = new File(f,&quot;a.txt&quot;);
-File f5 = new File(&quot;c:&quot;+File.separator+&quot;abc\\a.txt&quot;);
-System.out.println(f5);//c:\abc\a.txt
-</code></pre><h4 id="2、File对象-常用方法"><a href="#2、File对象-常用方法" class="headerlink" title="2、File对象 - 常用方法"></a>2、File对象 - 常用方法</h4><p>（1）、获取</p>
-<pre><code>获取文件名称、文件路径、文件大小、文件修改时间。
-File file = new File(&quot;a.txt&quot;);
-String name = file.getName();
-String absPath = file.getAbsolutePath();
-String path = file.getPath();
-long length = file.length();
-long time = file.lastModified();    
-</code></pre><p>（2）、创建和删除</p>
-<pre><code>创建文件：如果文件不存在则创建，存在则不创建
-File file = new File(&quot;a.txt&quot;);
-boolean b = file.createNewFile();
+        <h4 id="1-1-cookie简介"><a href="#1-1-cookie简介" class="headerlink" title="1.1 cookie简介"></a>1.1 cookie简介</h4><p>cookie是1993年由网景公司前雇员发明的一种进行网络会话状态跟踪的技术。</p>
+<p>会话是由一组请求与响应组成，是围绕着一种相关事情所进行的请求与响应。所以这些请求与响应之间一定是需要有数据传递的，即需要进行会话状态跟踪。然而HTTP协议是一种无状态协议，在不同的请求之间是无法进行数据传递的。此时就需要一种可以进行请求之间进行数据传递的会话跟踪技术，而cookie就是一种这样的技术。</p>
+<p>cookie是由服务器生成，保存在客户端的一种信息载体。这个载体中存放着用记访问该站点的会话状态信息。只在cookie没有被清空，或者cookie没有失效，那么，保存在其中的会话状态就有效。</p>
+<p>用户在提交第一次请求后，由服务器生成cookie，并将其封装到响应头中，以响应的形式发送给客户端。客户端接收到这个响应后，将cookie保存到客户端。当客户端再次发送同类请求后（资源路径相同，资源名称不同），在请求中会携带保存在客户端的cookie数据，发送到客户端，由服务器对会话进行跟踪。</p>
+<p>cookie技术并不是jvavaweb开发的专属技术，而是属于web开发的技术，是所有web开发语言均支持的技术。</p>
+<p>cookie是由若干键值对构成，键值对均为字符串。</p>
+<h4 id="1-2-javaEE中的cookie"><a href="#1-2-javaEE中的cookie" class="headerlink" title="1.2 javaEE中的cookie"></a>1.2 javaEE中的cookie</h4><p>在javaEE中的javax.servlet.http包中存在一个类Cookie，就是用于完成会话跟踪的Cookie。其只有一个带参构造器。</p>
+<h5 id="默认绑定路径"><a href="#默认绑定路径" class="headerlink" title="默认绑定路径"></a>默认绑定路径</h5><p>访问路径由资源路径与资源名称构成。默认情况下，cookie与访问路径中的资源路径绑定。只要用户发出带有绑定资源路径的请求，则在请求头部，将会自动携带与之绑定的cookie路径。</p>
+<h5 id="生成cookie"><a href="#生成cookie" class="headerlink" title="生成cookie"></a>生成cookie</h5><pre><code>public class SomeServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
 
-删除文件：
-boolean b = file.delete();    
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.getWriter().append(&quot;Served at: &quot;).append(request.getContextPath());
+        //创建两个Cookie
+        Cookie cookie = new Cookie(&quot;company&quot;,&quot;abc&quot;);
+        Cookie cookie2 = new Cookie(&quot;teacher&quot;,&quot;def&quot;);
 
-创建文件夹目录：
-File dir = new File(&quot;abc&quot;);
-boolean b = dir.mkdir();//make directory
+        //指定cookie绑定的资源路径。必须加上项目名称
+        cookie.setPath(request.getContextPath() + &quot;/aaa/bbb/ccc&quot;);
+        cookie2.setPath(request.getContextPath() + &quot;/ddd/eee/fff&quot;);
 
-删除单个文件夹目录：
-boolean b = dir.delete();
+        //设置cookie有效期
+        //大于0，表示将cookie存放到客户端硬盘
+        //小于0，与不设置一样，会将cookie存放到浏览器的缓存
+        //等于0，表示cookie一生成，马上失效
+        cookie.setMaxAge(60 * 60);
+        cookie2.setMaxAge(60 * 60 * 24 * 10);
 
-创建多级目录：
-File dir = new File(&quot;a\\b\\c\\d&quot;);
-dir.mkdirs();
-</code></pre><p>（3）、判断</p>
-<pre><code>判断文件是否存在
-File f = new File(&quot;a.txt&quot;);
-boolean b = f.exists();
+        //向响应中添加Cookie
+        response.addCookie(cookie);
+        response.addCookie(cookie2);
 
-判断是否是文件，最好先判断是否存在，不存在则为false
-boolean b = f.isFile();
-
-判断是否是目录
-boolean b = f.isDerectory();
-</code></pre><p>（4）、重命名</p>
-<pre><code>//c盘的0.mp3重命名为了9.mp3并被剪切到了d盘
-File f1 = new File(&quot;c:\\0.mp3&quot;);
-File f2 = new File(&quot;d:\\9.mp3&quot;);
-boolean b = f1.renameTo(f2);
-</code></pre><p>（5）、系统根目录和容量获取</p>
-<pre><code>系统根目录
-File[] files = File.listRoots();
-for(File file:files) {
-    System.out.println(file);
+    }
 }
-输出结果：/
+</code></pre><h5 id="获取cookie"><a href="#获取cookie" class="headerlink" title="获取cookie"></a>获取cookie</h5><pre><code>public class OhterServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
 
-File file  = new File(&quot;//&quot;);
-System.out.println(&quot;getFreeSpace:&quot;+file.getFreeSpace());
-System.out.println(&quot;getTotalSpace:&quot;+file.getTotalSpace());
-System.out.println(&quot;getUsableSpace:&quot;+file.getUsableSpace());
-</code></pre><p>（6）、获取目录内容</p>
-<pre><code>String[] list()
-获取当前目录下的文件以及文件夹的名称，包含隐藏文件。    调用list方法的File对象中封装的必须是目录。
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.getWriter().append(&quot;Served at: &quot;).append(request.getContextPath());
 
-File file = new File(&quot;//Users//haojie//Projects//hexo&quot;);
-String[] contents = file.list();
-for(String con:contents) {
-    System.out.println(con);
-}
-输出结果：
-scaffolds
-.DS_Store
-db.json
-source
-node_modules
-public
-.gitignore
-package.json
-_config.yml
-.git
-.deploy_git
-themes             
-</code></pre><p>（7）、过滤器</p>
-<p>//通过文件名进行过滤<br>String[] list(FilenameFilter filter);</p>
-<pre><code>public class ListDemo {
+        Cookie[] cookies = request.getCookies();
 
-    public static void main(String[] args) {
-        File dir = new File(&quot;//Users//haojie//Projects//hexo//source//_posts&quot;);
-        String[] names = dir.list(new FileFilterBySuffix(&quot;.md&quot;));
-        for(String name:names) {
-            System.out.println(name);
-        }
-    }
-
-}
-
-public class FileFilterBySuffix implements FilenameFilter {
-
-    private String suffix;
-
-
-    public FileFilterBySuffix(String suffix) {
-        super();
-        this.suffix = suffix;
-    }
-
-    public boolean accept(File dir, String name) {
-        //通过文件后缀名进行过滤
-        return name.endsWith(suffix);
-    }
-
-}
-</code></pre><p>//通过文件对象进行过滤<br>File[] listFiles(FileFilter filter) </p>
-<pre><code>public class ListFilesDemo {
-
-    public static void main(String[] args) {
-        File dir = new File(&quot;//Users//haojie//Projects//hexo&quot;);
-        File[] files = dir.listFiles(new FileFilterByHidden());
-
-        for(File file:files) {
-            System.out.println(file);
-        }
-    }
-
-}    
-
-public class FileFilterByHidden implements FileFilter {
-
-    @Override
-    public boolean accept(File pathname) {
-        //过滤非隐藏文件
-        return !pathname.isHidden();
-    }
-
-}    
-</code></pre><h4 id="3、File对象-练习"><a href="#3、File对象-练习" class="headerlink" title="3、File对象 - 练习"></a>3、File对象 - 练习</h4><h4 id="（1）、深度遍历文件夹"><a href="#（1）、深度遍历文件夹" class="headerlink" title="（1）、深度遍历文件夹"></a>（1）、深度遍历文件夹</h4><pre><code>//列出指定文件夹下的所有目录和文件并按层级缩进
-public class Demo3 {
-
-    public static void main(String[] args) {
-        File dir = new File(&quot;//Users//haojie//Projects//hexo//source&quot;);
-        listAll(dir,0);
-    }
-
-    private static void listAll(File dir,int level) {
-
-        System.out.println(getSpace(level)+dir.getName());                
-        level++;
-
-        //获取指定目录下当前的所有文件夹或者文件对象
-        File[] files = dir.listFiles();
-
-        for (int i = 0; i &lt; files.length; i++) {
-            if(files[i].isDirectory()) {
-                listAll(files[i],level);
-            }else {
-                System.out.println(getSpace(level)+files[i].getName());                
-            }
-        }
-    }
-
-    private static String getSpace(int level) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i &lt; level; i++) {
-            sb.append(&quot;    &quot;);
-        }
-        return sb.toString();
-    }
-
-}
-</code></pre><h4 id="（2）、递归"><a href="#（2）、递归" class="headerlink" title="（2）、递归"></a>（2）、递归</h4><p>注意：递归一定要明确条件，否则会栈溢出</p>
-<pre><code>public class Demo4 {
-
-    public static void main(String[] args) {
-        toBinary(6);
-        System.out.println(getSum(5));
-    }
-
-    //num!
-    private static int getSum(int num) {
-        if(num == 1)
-            return 1;
-        return num + getSum(num-1);
-    }
-
-    //转二进制
-    private static void toBinary(int num) {
-
-        if(num &gt; 0) {
-            toBinary(num/2);
-            System.out.println(num%2);
-        }
-
-    }
-
-}
-</code></pre><h4 id="3-、删除目录"><a href="#3-、删除目录" class="headerlink" title="(3)、删除目录"></a>(3)、删除目录</h4><p>从里往外删，删除指定目录及目录下所有的目录和文件</p>
-<pre><code>public class Demo5 {
-
-    public static void main(String[] args) {
-
-        File dir = new File(&quot;//Users//haojie//a&quot;);
-        removeDir(dir);
-
-    }
-
-    private static void removeDir(File dir) {
-        File[] files = dir.listFiles();
-
-        for(File file:files) {
-            if(file.isDirectory()) {
-                removeDir(file);
+        for(Cookie cookie:cookies) {
+            System.out.println(cookie.getName() + &quot;===&quot; + cookie.getValue());
+            if(cookie.getName().equals(&quot;teacher&quot;) &amp;&amp; cookie.getValue().equals(&quot;aaa&quot;)) {
+                //...
             } else {
-                System.out.println(file+&quot;:&quot;+file.delete());
+                //..
             }
         }
-
-        System.out.println(dir+&quot;:&quot;+dir.delete());
     }
 
 }
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-9-file/" data-id="cjegiwofb0047rvp3axe2gyn1" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
+</code></pre><h4 id="2-1-HttpSession"><a href="#2-1-HttpSession" class="headerlink" title="2.1 HttpSession"></a>2.1 HttpSession</h4><p> session，即会话，是web开发中的一种会话状态跟踪技术。不同的是,cookie是将会话状态保存在了客户端，而session是将会话状态保存在了服务器端。</p>
+<p> 在javaweb开发中，session是以javax.servlet.HttpSession的接口对象的形式出现。</p>
+<hr>
+<p>对于request的getSession()的用法：</p>
+<ul>
+<li><p>一般情况下，若要向session域中写入数据，则需要使用getSession(true)，即getSession()方法。意味着有老的session用老的，没有老的则创建新的。</p>
+</li>
+<li><p>若要从session中读取数据，则需要使用getSession(false)。意味着有老的session用老的，没有老的返回null。</p>
+</li>
+</ul>
+<hr>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;title&gt;Insert title here&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form action = &quot;FirstServlet&quot; method = &quot;POST&quot;&gt;
+        用户名：&lt;input type = &quot;text&quot; name = &quot;username&quot; /&gt;
+        &lt;input type = &quot;submit&quot; value = &quot;提交&quot; /&gt;
+    &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre><p> FirstServlet</p>
+<pre><code>public class FirstServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
 
-    </footer>
-  </div>
-  
-</article>
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //获取用户提交的数据
+        String username = request.getParameter(&quot;username&quot;);
 
+        //将参数放到request域
+        request.setAttribute(&quot;user&quot;, username);
 
-  
-    <article id="post-java/java-io/IO-7-stream-rule-demo" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/10/java/java-io/IO-7-stream-rule-demo/" class="article-date">
-  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/java/">java</a>
-  </div>
+        //获取session对象
+        HttpSession session = request.getSession();
 
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/10/java/java-io/IO-7-stream-rule-demo/">IO流 - 七、流的操作规律 - 需求体现</a>
-    </h1>
-  
+        //向session域中写入数据
+        session.setAttribute(&quot;username&quot;, username);
 
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h4 id="1、需求：复制一个文本文件"><a href="#1、需求：复制一个文本文件" class="headerlink" title="1、需求：复制一个文本文件"></a>1、需求：复制一个文本文件</h4><pre><code>FileReader fr = new FileReader(&quot;a.txt&quot;);
-
-FileWriter fw = new FileWriter(&quot;b.txt&quot;);
-
-BufferedReader bufr = new BufferedReader(fr);
-
-BufferedWriter bufw = new BufferedWriter(fw);
-</code></pre><h4 id="2、需求：读取键盘录入信息，写入到文件中"><a href="#2、需求：读取键盘录入信息，写入到文件中" class="headerlink" title="2、需求：读取键盘录入信息，写入到文件中"></a>2、需求：读取键盘录入信息，写入到文件中</h4><pre><code>源：InputStream in = System.in;
-
-转换流：InputStreamReader isr = new InputStreamReader(in);
-
-目的：FileWriter fw = new FileWriter(&quot;b.txt&quot;);
-
-高效：BufferedReader = new BufferedReader(isr);
-
-     BufferedWriter = new BufferedWriter(fw);
-</code></pre><h4 id="3、需求：将一个文本文件显示在控制台上"><a href="#3、需求：将一个文本文件显示在控制台上" class="headerlink" title="3、需求：将一个文本文件显示在控制台上"></a>3、需求：将一个文本文件显示在控制台上</h4><pre><code>源：FileReader fr = new FileReader(&quot;a.txt&quot;);
-
-读： String line = bufr.readLine();
-
-目的：OutputStream out = System.out;
-
-      OutputStreamWriter osw = new OutputStreamWriter(out);
-
-高效：BufferedReader bufr = new BufferedReader(fr);
-     BufferedWriter bufw = new BufferedWriter(osw);
-</code></pre><h4 id="4、需求：读取键盘录入数据，显示在控制台上"><a href="#4、需求：读取键盘录入数据，显示在控制台上" class="headerlink" title="4、需求：读取键盘录入数据，显示在控制台上"></a>4、需求：读取键盘录入数据，显示在控制台上</h4><pre><code>源：InputStream in = System.in    ;
-
-目的：OutputStream out = System.out;
-
-转换流：InputStreamReader isr = new InputStreamReader(in);
-        OutputStreamWriter isw = new OutputStreamWriter(out);
-
-高效：BufferedReader bufr = new BufferedReader(isr);
-      BufferedWriter bufw = new BufferedWriter(isw);
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-7-stream-rule-demo/" data-id="cjegiwoeh003frvp38gzea5cg" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/java-io/IO-3-byte-stream" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/10/java/java-io/IO-3-byte-stream/" class="article-date">
-  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/java/">java</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/10/java/java-io/IO-3-byte-stream/">IO流 - 三、字节流</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h4 id="1、操作文件基本演示"><a href="#1、操作文件基本演示" class="headerlink" title="1、操作文件基本演示"></a>1、操作文件基本演示</h4><p>写</p>
-<pre><code>public class Demo8 {
-
-    public static void main(String[] args) throws IOException {
-
-        //创建字节输出流对象
-        FileOutputStream fos = new FileOutputStream(&quot;demo.txt&quot;);
-
-        //数据直接写入目标文件，没有缓冲区
-        fos.write(&quot;aaaaaddfsdss&quot;.getBytes());
-
-        fos.close();
+        response.getWriter().print(&quot;SomeServlet&quot; + username);
 
     }
 
 }
-</code></pre><p>逐个字节读取</p>
-<p>public class Demo9 {</p>
-<pre><code>public static void main(String[] args) throws IOException {
+</code></pre><p>SecondServlet</p>
+<pre><code>public class SecondServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
 
-    FileInputStream fis = new FileInputStream(&quot;demo.txt&quot;);
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //从request域中读取user属性
+        Object user = request.getAttribute(&quot;user&quot;);
 
-    int ch = 0;
-    while((ch = fis.read()) != -1) {
-        System.out.println((char)ch);
-    }
+        //获取session
+        HttpSession session = request.getSession(false);
 
-    fis.close();
-}
-</code></pre><p>}</p>
-<p>逐个数组读取</p>
-<pre><code>public class Demo10 {
-
-    public static void main(String[] args) throws IOException {
-
-        FileInputStream fis = new FileInputStream(&quot;demo.txt&quot;);
-
-        byte[] buf = new byte[1024];
-        int length = 0;
-
-        while((length = fis.read(buf, 0, length)) != -1) {
-            System.out.println(new String(buf,0,length));
+        //从session中读取指定属性
+        String username = null;
+        if(session != null) {
+            username = (String) session.getAttribute(&quot;username&quot;);
         }
 
-        fis.close();
-
+        PrintWriter out = response.getWriter();
+        out.println(&quot;user = &quot; + user);
+        out.println(&quot;username = &quot; + username);
+        out.println(&quot;session = &quot; + session);
     }
 
 }
-</code></pre><h4 id="2、练习-复制mp3"><a href="#2、练习-复制mp3" class="headerlink" title="2、练习 - 复制mp3"></a>2、练习 - 复制mp3</h4><p>直接复制</p>
-<pre><code>public class Demo11 {
+</code></pre><h4 id="2-2-Session的工作原理"><a href="#2-2-Session的工作原理" class="headerlink" title="2.2 Session的工作原理"></a>2.2 Session的工作原理</h4><p>在服务器中系统会为每个会话维护一个Session。不同的会话，对应不同的Session。那么，系统是如何识别Session对象的？即是如何做到在同一个会话过程中，一直使用的是同一个Session对象呢？</p>
+<h5 id="（1）、写入Session列表"><a href="#（1）、写入Session列表" class="headerlink" title="（1）、写入Session列表"></a>（1）、写入Session列表</h5><p>服务器对当前应用中的Session是以Map的形式进行管理的，这个Map称为Session列表。该Map的key为一个32位长度的随机串，这个随机串称为JSessionID，value则为Session对象的引用。</p>
+<p>当用户每一次提交请求时，服务端Servlet中执行到request.getSession()方法后，会自动生成一个Map.entry对象，key为一个根据某种算法新生成的JSessionID，value则为新创建的HttpSession对象。</p>
+<h5 id="2-、服务器生成并发送cookie"><a href="#2-、服务器生成并发送cookie" class="headerlink" title="(2)、服务器生成并发送cookie"></a>(2)、服务器生成并发送cookie</h5><p>在将session信息写入session列表后，系统还会自动将“JSessionID”作为name,这个32位长度的随机串作为value，以cookie的形式存放到响应报头中，并随着响应，将该cookie发送到客户端。</p>
+<p><a href="http://localhost:8080/sessioncookie" target="_blank" rel="external">http://localhost:8080/sessioncookie</a><br>提交表单，跳转到FirstServlet后，</p>
+<pre><code>Response Headers
 
-    public static void main(String[] args) throws IOException {
+Content-Length: 13
 
-        FileInputStream fis = new FileInputStream(&quot;0.mp3&quot;);
-        FileOutputStream fos = new FileOutputStream(&quot;1.mp3&quot;);
+Date: Fri, 27 Apr 2018 07:54:40 GMT
 
-        byte[] buf = new byte[1024];
-        int length = 0;
-
-        while((length = fis.read()) != -1) {
-            fos.write(buf,0,length);
-        }
-
-        fos.close();
-        fis.close();
-    }
-
-}
-</code></pre><p>高效复制</p>
-<pre><code>public class Demo11 {
-
-    public static void main(String[] args) throws IOException {
-
-        FileInputStream fis = new FileInputStream(&quot;0.mp3&quot;);
-        BufferedInputStream bufis = new BufferedInputStream(fis);
-
-        FileOutputStream fos = new FileOutputStream(&quot;1.mp3&quot;);
-        BufferedOutputStream bufos = new BufferedOutputStream(fos);
-
-        byte[] buf = new byte[1024];
-
-        int length = 0;
-        while((length = bufis.read(buf)) != -1) {
-            bufos.write(buf, 0, length);
-        }
-
-        bufis.close();
-        bufos.close();
-
-    }
-}
-</code></pre><h4 id="3、演示键盘录入"><a href="#3、演示键盘录入" class="headerlink" title="3、演示键盘录入"></a>3、演示键盘录入</h4><p>读取键盘录入的一个数据，并打印在控制台上。</p>
-<p>键盘本身就是一个标准的输入设备。</p>
-<p>对于java而言，对于这种输入设备都有相应的对象。</p>
-<p>java.lang包里的 System类</p>
-<p>public static finael InputStream in</p>
-<p>“标准”输入流，不用关闭。</p>
-<p>键盘录入：</p>
-<pre><code>public class Demo12 {
-    public static void main(String[] args) throws IOException {
-        InputStream in = System.in;
-        int ch = in.read();
-        System.out.println(ch);
-    }
-}
-</code></pre><p>读取键盘录入：</p>
-<pre><code>public class Demo15 {
-
-    public static void main(String[] args) throws IOException {
-
-        InputStream in = System.in;
-        int ch = 0;
-        StringBuilder sb = new StringBuilder();
-        while((ch=in.read())!=-1) {
-            if(ch==&apos;\r&apos;) 
-                continue;
-            if(ch==&apos;\n&apos;) {
-                String temp = sb.toString();
-                if(&quot;over&quot;.equals(temp))
-                    break;
-                System.out.println(temp.toUpperCase());
-                sb.delete(0, sb.length());
-            } else {
-                sb.append((char)ch);
-            }
-        }
-
-    }
-
-}
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-3-byte-stream/" data-id="cjegiwods0035rvp3c0ps4j33" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/java-io/IO-2-buffered" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/10/java/java-io/IO-2-buffered/" class="article-date">
-  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/java/">java</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/10/java/java-io/IO-2-buffered/">IO流 - 二、缓冲区</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="二、缓冲区"><a href="#二、缓冲区" class="headerlink" title="二、缓冲区"></a>二、缓冲区</h3><p>提高了对数据的读写效率。</p>
-<p>对应类：</p>
-<p>BufferedWriter</p>
-<p>BufferedReader</p>
-<h4 id="1、缓冲区单个字符读写"><a href="#1、缓冲区单个字符读写" class="headerlink" title="1、缓冲区单个字符读写"></a>1、缓冲区单个字符读写</h4><pre><code>public class Demo6 {
-
-    public static void main(String[] args) throws IOException {
-        FileReader fr = new FileReader(&quot;demo.txt&quot;);
-        BufferedReader bufr = new BufferedReader(fr);
-
-        FileWriter fw = new FileWriter(&quot;buf_copy.txt&quot;);
-        BufferedWriter bufw = new BufferedWriter(fw);
-
-        int ch = 0;
-        while((ch = bufr.read())!=-1) {
-            bufw.write(ch);
-        }
-        bufw.close();
-        bufr.close();
-
-    }
-
-}
-</code></pre><h4 id="2、缓冲区逐行读写"><a href="#2、缓冲区逐行读写" class="headerlink" title="2、缓冲区逐行读写"></a>2、缓冲区逐行读写</h4><pre><code>public class Demo6 {
-
-    public static void main(String[] args) throws IOException {
-        FileReader fr = new FileReader(&quot;demo.txt&quot;);
-        BufferedReader bufr = new BufferedReader(fr);
-
-        FileWriter fw = new FileWriter(&quot;buf_copy.txt&quot;);
-        BufferedWriter bufw = new BufferedWriter(fw);
-
-        String line = null;
-
-        while((line = bufr.readLine())!=null) {
-            bufw.write(line);
-            bufw.newLine();
-            bufw.flush();
-        }
-
-        bufw.close();
-        bufr.close();
-
-    }
-
-}
-</code></pre><h4 id="3、缓冲区-装饰设计模式"><a href="#3、缓冲区-装饰设计模式" class="headerlink" title="3、缓冲区 - 装饰设计模式"></a>3、缓冲区 - 装饰设计模式</h4><p>装饰设计模式：</p>
-<p>对一组对象的功能进行增强时，就可以使用该模式解决问题。</p>
-<pre><code>public class Person {
-    public void eat() {
-        System.out.println(&quot;....eating...&quot;);
-    }
-}
-
-//通过继承进行功能扩展
-class NewPerson extends Person{
-    public void eat() {
-        System.out.println(&quot;befor...eating...&quot;);
-        super.eat();
-        System.out.println(&quot;after...eating&quot;);
-    }
-}
-
-//通过装饰类进行功能扩展
-class NewPerson2 {
-    private Person p;
-    NewPerson2(Person p){
-        this.p = p;
-    }
-    void eat() {        
-        System.out.println(&quot;befor...eating...&quot;);
-        p.eat();
-        System.out.println(&quot;after...eating&quot;);
-    }
-}
-</code></pre><p>装饰和继承的区别：</p>
-<p>Writer</p>
-<p>|– TextWriter:用于操作文本</p>
-<p>—– BufferedTextWriter:加入缓冲技术</p>
-<p>|– MediaWriter:用于操作媒体</p>
-<p>—– BufferedMediaWriter:加入缓冲技术</p>
-<p>继承导致原有类的体系越来越臃肿，不够灵活。</p>
-<p>class Buffered {<br>    Buffered(Writer w){<br>        …<br>    }<br>}</p>
-<p>装饰比继承更灵活。</p>
-<h4 id="4、缓冲区-装饰类-LineNumberReader"><a href="#4、缓冲区-装饰类-LineNumberReader" class="headerlink" title="4、缓冲区 - 装饰类 - LineNumberReader"></a>4、缓冲区 - 装饰类 - LineNumberReader</h4><pre><code>public class Demo7 {
-
-    public static void main(String[] args) throws IOException {
-
-        FileReader fr = new FileReader(&quot;demo.txt&quot;);
-        LineNumberReader lnr = new LineNumberReader(fr);
-
-        String line = null;
-        lnr.setLineNumber(100);
-        while((line = lnr.readLine()) != null) {
-            System.out.println(lnr.getLineNumber()+&quot;:&quot;+line);
-        }
-    }
-
-}
-
-输出结果：
-101:abc
-102:cde
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-2-buffered/" data-id="cjegiwodo0031rvp3vtct3f8y" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/java-io/IO-6-stream-rule" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/10/java/java-io/IO-6-stream-rule/" class="article-date">
-  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/java/">java</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/10/java/java-io/IO-6-stream-rule/">IO流 - 六、流的操作基本规律</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>转换流：</p>
-<p>InputStreamReader:字节到字符的桥梁，解码。</p>
-<p>OutputStramWriter:节符到字节的桥梁，编码。</p>
-<p>操作规律：找到应该用哪些对象</p>
-<p>1、明确源和目的</p>
-<pre><code>源：InputStream Reader
-
-目的：OutputStream Writer
-</code></pre><p>2、明确数据是否是纯文本数据</p>
-<pre><code>源：是纯文本数据：Reader；不是纯文本数据：InputStream
-
-目的：是纯文本数据：Writer；是纯文本数据：OutputStream
-</code></pre><p>3、明确具体的设备</p>
-<p>源设备</p>
-<pre><code>硬盘：File
-键盘：System.in
-内存：数组
-网络：Socket流
-</code></pre><p>目的设备<br>    硬盘：File<br>    控制台：System.out<br>    内存：数组<br>    网络：Socket流</p>
-<p>4、是否需要其它功能（装饰类）</p>
-<pre><code>1、高效缓冲区：Buffer
+Set-Cookie: JSESSIONID=DCCE10CC2F5A6FAE40B716CA91B01EB0; Path=/sessioncookie; HttpOnly
+</code></pre><h5 id="3-、客户端接收并发送cookie"><a href="#3-、客户端接收并发送cookie" class="headerlink" title="(3)、客户端接收并发送cookie"></a>(3)、客户端接收并发送cookie</h5><p>客户端接收到这个cookie后会将其存放到浏览器缓存中。即，只要客户端浏览器不关闭，浏览器缓存中的cookie就不会消失。</p>
+<p>当用户提交第二次请求时，会将缓存中的这个cookie，伴随着请求的头部信息，一块发送到服务端。</p>
+<p>再次发送请求时，<a href="http://localhost:8080/sessioncookie/SecondServlet" target="_blank" rel="external">http://localhost:8080/sessioncookie/SecondServlet</a></p>
+<pre><code>Request Headers
 
 ...
+
+Cookie: JSESSIONID=DCCE10CC2F5A6FAE40B716CA91B01EB0
+
+Host: localhost:8080
+</code></pre><p>（4）、从session列表中查找</p>
+<p>服务端从请求中读取到客户端发送来的cookie，并根据cookie的SeesionID的值，从Map中查找相应key所对应的value，即session对象。然后，该session的域属性进行读写操作。</p>
+<h4 id="2-3-Session的失效"><a href="#2-3-Session的失效" class="headerlink" title="2.3 Session的失效"></a>2.3 Session的失效</h4><p>若某个session在指定的时间内一直未被访问，那么session将超时，即将失效。</p>
+<p>在web.xml中可以通过<code>&lt;session-config /&gt;</code>标签设置session的超时时间，单位为分钟。默认的超时时间为30分钟。时间从最后一次访问开始计时。</p>
+<pre><code>&lt;session-config&gt;
+    &lt;session-timeout&gt;120&lt;/session-timeout&gt;
+&lt;/session-config&gt;
+</code></pre><p>若未到超时时间，也可以通过HttpSession中的方法invalide()，使得session失效。</p>
+<h4 id="2-4-cookie禁用后的session"><a href="#2-4-cookie禁用后的session" class="headerlink" title="2.4 cookie禁用后的session"></a>2.4 cookie禁用后的session</h4><p>cookie禁用后，从someServlet跳转到otherServlet时，</p>
+<pre><code>protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //获取用户提交的数据
+        String username = request.getParameter(&quot;username&quot;);
+
+        //获取session对象
+        HttpSession session = request.getSession();
+
+        //向session域中写入数据
+        session.setAttribute(&quot;username&quot;, username);
+
+        //跳转到otherServlet
+        response.sendRedirect(request.getContextPath() + &quot;/otherServlet&quot;);    
+    }
+</code></pre><p>someServlet发送到客户端的包含有sessionid的cookie并没有被客户端保存，所以在发送otherServlet请求时，没有将该包含有sessionid的cookie发送到服务端，因此otherServlet服务端找不到该session，也就不能读取里面的数据。</p>
+<h5 id="解决方法："><a href="#解决方法：" class="headerlink" title="解决方法："></a>解决方法：</h5><p>request.encodeRedirectURL()方法</p>
+<pre><code>protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    //获取用户提交的数据
+    String username = request.getParameter(&quot;username&quot;);
+
+    //获取session对象
+    HttpSession session = request.getSession();
+
+    //向session域中写入数据
+    session.setAttribute(&quot;username&quot;, username);
+
+    //跳转到otherServlet
+    String uri = request.getContextPath() + &quot;/otherServlet&quot;;
+    uri = request.encodeRedirectURL(uri);
+    response.sendRedirect(uri);    
+}
+</code></pre><p>这样的话，跳转到otherServlet时，会将sessionid包含到访问地址中。</p>
+<pre><code>http://localhost/8080/sessioncookie/otherServlet;jsessionid=6BD1D909077DF0798ASSSJAK8200EC12
+</code></pre><p>这样的话，发送请求到OtherServlet时，就会将该sessionid发送到服务端。</p>
+<h4 id="2-5-cookie禁用后非重定向跳转时session的跟踪"><a href="#2-5-cookie禁用后非重定向跳转时session的跟踪" class="headerlink" title="2.5 cookie禁用后非重定向跳转时session的跟踪"></a>2.5 cookie禁用后非重定向跳转时session的跟踪</h4><p>HttpServletResponse具有一个方法encdodeURL()，可以完成类似超链接这样的非重定向页面跳转的URL的重写，即在其路径后自动添加jsessionid</p>
+<pre><code>protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    //获取用户提交的数据
+    String username = request.getParameter(&quot;username&quot;);
+
+    //获取session对象
+    HttpSession session = request.getSession();
+
+    //向session域中写入数据
+    session.setAttribute(&quot;username&quot;, username);
+
+    //跳转到otherServlet
+    response.setContentType(&quot;text/html;charset=utf-8&quot;);
+    PrintWriter out = response.getWriter();
+    String uri = &quot;otherServlet&quot;;
+    uri = response.encodeURL(uri);
+    out.println(&quot;&lt;a href=&apos;&quot; + uri + &quot;&apos;&gt;跳转&lt;/a&gt;到otherservlet&quot;);
+}
 </code></pre>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-6-stream-rule/" data-id="cjegiwoex003trvp3rt3y7iig" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/04/27/java/java-session-cookie/session-cookie/" data-id="cjgxcg4b6004ir9p3wsa0xf8i" class="article-share-link">Delen</a>
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/session-cookie/">session cookie</a></li></ul>
 
     </footer>
   </div>
@@ -783,10 +308,10 @@ class NewPerson2 {
 
 
   
-    <article id="post-java/java-io/IO-18-array" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-java/java-jsp/java-jsp-3" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2018/01/10/java/java-io/IO-18-array/" class="article-date">
-  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
+    <a href="/2018/03/07/java/java-jsp/java-jsp-3/" class="article-date">
+  <time datetime="2018-03-07T03:23:34.000Z" itemprop="datePublished">2018-03-07</time>
 </a>
     
   <div class="article-category">
@@ -801,7 +326,7 @@ class NewPerson2 {
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/10/java/java-io/IO-18-array/">IO流 - 十八、操作数组的流</a>
+      <a class="article-title" href="/2018/03/07/java/java-jsp/java-jsp-3/">第3章 jsp系统开发模型</a>
     </h1>
   
 
@@ -809,180 +334,2061 @@ class NewPerson2 {
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h4 id="1、操作字节数组的流："><a href="#1、操作字节数组的流：" class="headerlink" title="1、操作字节数组的流："></a>1、操作字节数组的流：</h4><p>源和目的都是内存，没有调用底层资源，关闭流无效，关闭流后仍可用。</p>
-<p>ByteArrayInputStream与ByteArrayOutputStream</p>
-<pre><code>public class ArrayStreamDemo1 {
+        <h3 id="第3章-系统开发模型"><a href="#第3章-系统开发模型" class="headerlink" title="第3章 系统开发模型"></a>第3章 系统开发模型</h3><h4 id="3-1-1-纯jsp"><a href="#3-1-1-纯jsp" class="headerlink" title="3.1.1 纯jsp"></a>3.1.1 纯jsp</h4><h4 id="3-1-2-jsp-javaBean的Model1"><a href="#3-1-2-jsp-javaBean的Model1" class="headerlink" title="3.1.2 jsp+javaBean的Model1"></a>3.1.2 jsp+javaBean的Model1</h4><p>广义的javaBean分为数据承载Bean和业务处理Bean</p>
+<p>狭义的javaBean，需要满足javaBean规范。</p>
+<ul>
+<li>public 修饰</li>
+<li>实现Serializable接口</li>
+<li>无参构造器</li>
+<li>成员变量私有化，且提供getter和setter</li>
+</ul>
+<h4 id="3-1-3-MVC的Modle2"><a href="#3-1-3-MVC的Modle2" class="headerlink" title="3.1.3 MVC的Modle2"></a>3.1.3 MVC的Modle2</h4><h4 id="3-1-4-三层架构"><a href="#3-1-4-三层架构" class="headerlink" title="3.1.4 三层架构"></a>3.1.4 三层架构</h4><p>View层：视图层、表现层、Web层。</p>
+<p>Service层：业务层、逻辑层。</p>
+<p>Dao层：持久层、数据访问层。data access object</p>
+<p>三层架构的设计中，采用面向抽象编程。即上层对下层的调用，是通过调用接口的方法实现的。而下层对上层真正的服务提供者，是下层接口的实现类。</p>
+<p>提供报务的接口相同，服务的实现类可以更换，实现了层间解耦。</p>
+<h4 id="3-1-5-MVC-三层架构"><a href="#3-1-5-MVC-三层架构" class="headerlink" title="3.1.5 MVC+三层架构"></a>3.1.5 MVC+三层架构</h4><p>View Level：Contoller(Servlet) + View(jsp)</p>
+<p>Service Level：Interfaces + Impls</p>
+<p>Dao Level：Interfaces + Impls</p>
+<p>将MVC的Model分为了两层：Service层与Dao层，分别用于处理业务逻辑和持久化操作。</p>
+<h3 id="3-2-学生注册登录系统"><a href="#3-2-学生注册登录系统" class="headerlink" title="3.2 学生注册登录系统"></a>3.2 学生注册登录系统</h3><p>package: com.test.beans</p>
+<p>//定义狭义的javaBean Student</p>
+<pre><code>public class Sdudent implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+    private Integer id;//业务无关主键
+    private String password;
+    private String num;//学号
+    private String name;
+    private String age;
+    private double score;
+    public Sdudent() {
+        super();
+    }
+    public Sdudent(String num, String name, String age, double score) {
+        super();
+        this.num = num;
+        this.name = name;
+        this.age = age;
+        this.score = score;
+    }
+    public Integer getId() {
+        return id;
+    }
+    public void setId(Integer id) {
+        this.id = id;
+    }
+    public String getPassword() {
+        return password;
+    }
+    public void setPassword(String password) {
+        this.password = password;
+    }
+    public String getNum() {
+        return num;
+    }
+    public void setNum(String num) {
+        this.num = num;
+    }
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public String getAge() {
+        return age;
+    }
+    public void setAge(String age) {
+        this.age = age;
+    }
+    public double getScore() {
+        return score;
+    }
+    public void setScore(double score) {
+        this.score = score;
+    }
+    @Override
+    public String toString() {
+        return &quot;Sdudent [id=&quot; + id + &quot;, password=&quot; + password + &quot;, num=&quot; + num + &quot;, name=&quot; + name + &quot;, age=&quot; + age
+                + &quot;, score=&quot; + score + &quot;]&quot;;
+    }
+
+}
+</code></pre><p>建表sdudent</p>
+<p>//login.jsp 修改欢迎页面为login.jsp</p>
+<pre><code>&lt;form action=&quot;${pageContext.request.contextPath }/loginServlet&quot;&gt;
+    学号：&lt;input type=&quot;text&quot; name=&quot;num&quot; /&gt;
+    密码：&lt;input type=&quot;text&quot; name=&quot;password&quot; /&gt;
+    &lt;input type=&quot;submit&quot; value=&quot;登录&quot; /&gt;
+&lt;/form&gt;
+&lt;a href=&quot;${pageContext.request.contextPath}/register.jsp&quot;&gt;注册&lt;/a&gt;
+</code></pre><p>//register.jsp</p>
+<pre><code>${message }&lt;br /&gt;
+&lt;form action=&quot;${pageContext.request.contextPath }/registerServlet&quot;&gt;
+    学号：&lt;input type=&quot;text&quot; name=&quot;num&quot; /&gt;
+    密码：&lt;input type=&quot;text&quot; name=&quot;password&quot; /&gt;
+    &lt;input type=&quot;submit&quot; value=&quot;登录&quot; /&gt;
+&lt;/form&gt;
+</code></pre><p>//连接数据库，工具类</p>
+<pre><code>package com.test.utils;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class JdbcUtils {
+    //加载DB驱动
+    static {
+        //将驱动mysql-connector-java-5.1.7-bin.jar放到lib下
+        try {
+            Class.forName(&quot;com.mysql.jdbc.Driver&quot;);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static Connection conn;        
+
+    //获取connection对象
+    public static Connection getConnection() throws SQLException {
+
+        String url = &quot;jdbc:mysql://127.0.0.1:3306/test&quot;;
+        String user = &quot;root&quot;;
+        String password = &quot;&quot;;
+        if(conn == null || conn.isClosed()) {
+            conn = DriverManager.getConnection(url, user, password);
+        }
+        return conn;
+
+    }
+
+    //关闭资源
+    public static void close(Connection conn, Statement stmt, ResultSet rs) throws SQLException {
+
+        if(conn != null &amp;&amp; !conn.isClosed()) {
+            conn.close();
+        }
+        if(stmt != null &amp;&amp; !stmt.isClosed()) {
+            stmt.close();
+        }
+        if(rs != null &amp;&amp; !rs.isClosed()) {
+            rs.close();
+        }
+
+    }
+
+}
+</code></pre><p>//登录的servlet</p>
+<pre><code>package com.test.servlets;
+
+public class LoginServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //1、接收请求参数
+        String num = request.getParameter(&quot;num&quot;);
+        String password = request.getParameter(&quot;password&quot;);
+
+        HttpSession session = request.getSession();
+
+        if(num == null || &quot;&quot;.equals(num.trim())) {
+            session.setAttribute(&quot;message&quot;, &quot;输入不能为空&quot;);
+            response.sendRedirect(request.getContextPath() + &quot;/login.jsp&quot;);
+            return;
+        }
+
+        //2、创建Service对象
+        IStudentService service = new StudentServiceImpl();
+
+        //3、调用Service对象的checkUser验证方法
+        Student sdudent = service.checkUser(num, password);
+
+        //4、验证失败，跳转到登录页面
+        if(sdudent == null) {
+            session.setAttribute(&quot;message&quot;, &quot;输入错误&quot;);
+            response.sendRedirect(request.getContextPath() + &quot;/login.jsp&quot;);
+            return;
+        }
+
+        //5、验证通过，跳转到index.jsp
+        response.sendRedirect(request.getContextPath() + &quot;/index.jsp&quot;);
+
+    }
+}
+</code></pre><p>//注册的servlet</p>
+<pre><code>package com.test.servlets;
+public class RegisterServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        //1、获取表单参数
+        request.setCharacterEncoding(&quot;UTF-8&quot;);
+        String num = request.getParameter(&quot;num&quot;);
+        String password = request.getParameter(&quot;password&quot;);
+        String name = request.getParameter(&quot;name&quot;);
+        String ageStr = request.getParameter(&quot;age&quot;);
+        String scoreStr = request.getParameter(&quot;score&quot;);
+
+        Integer age = Integer.valueOf(ageStr);
+        Double score = Double.valueOf(scoreStr);
+
+        //2、创建Student对象
+        Student student = new Student(num,name,age,score);
+        student.setPassword(password);
+
+        //3、创建Service对象
+        IStudentService service = new StudentServiceImpl();
+
+        //4、调用Service对象的saveStudent()方法，写入DB
+        Integer id = service.saveStudent(student);
+
+        //5、写入失败，跳转到注册页面，重新注册
+        if(id == null) {
+            response.sendRedirect(request.getContextPath() + &quot;/register.jsp&quot;);
+        }
+
+        //6、写入成功，跳转到登录页面
+        response.sendRedirect(request.getContextPath() + &quot;/login.jsp&quot;);
+    }
+
+}
+</code></pre><p>service层</p>
+<p>//服务层接口</p>
+<pre><code>package com.test.service;
+
+import com.test.beans.Student;
+
+public interface IStudentService {
+    //对登录用户进行验证
+    Student checkUser(String num, String password);
+
+    //向DB中添加Student
+    Integer saveStudent(Student student);
+}
+</code></pre><p>//服务层实现类</p>
+<pre><code>package com.test.service;
+
+import com.test.beans.Student;
+import com.test.dao.IStudentDao;
+import com.test.dao.SdudentDaoImpl;
+
+public class StudentServiceImpl implements IStudentService {
+    private IStudentDao dao;
+
+    public StudentServiceImpl() {
+        dao = new SdudentDaoImpl();
+    }
+
+    @Override
+    public Student checkUser(String num, String password) {
+        return dao.selectStudentLogin(num,password);
+    }
+
+    @Override
+    public Integer saveStudent(Student student) {
+        return dao.insertStudent(student);
+    }
+
+}
+</code></pre><p>//dao层</p>
+<p>//dao层接口</p>
+<pre><code>package com.test.dao;
+
+import com.test.beans.Student;
+
+public interface IStudentDao {
+
+    Student selectStudentLogin(String num, String password);
+
+    Integer insertStudent(Student student);
+
+}
+</code></pre><p>//dao层实现类</p>
+<pre><code>package com.test.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import com.test.beans.Student;
+import com.test.utils.JdbcUtils;
+
+public class SdudentDaoImpl implements IStudentDao {
+    private Connection conn;
+    private Statement stmt;
+    private PreparedStatement ps;
+    private ResultSet rs;
+
+    @Override
+    public Student selectStudentLogin(String num, String password) {
+        Student student = null;
+        try {
+            conn = JdbcUtils.getConnection();
+            String sql = &quot;select * from student where num=? and password=?&quot;;
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, num);
+            ps.setString(2, password);
+            rs = ps.executeQuery();
+            if(rs.next()) {
+                student = new Student();
+                student.setId(rs.getInt(&quot;id&quot;));
+                student.setNum(rs.getString(&quot;num&quot;));
+                student.setPassword(rs.getString(&quot;password&quot;));
+                student.setName(rs.getString(&quot;name&quot;));
+                student.setAge(rs.getInt(&quot;age&quot;));
+                student.setScore(rs.getDouble(&quot;score&quot;));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                JdbcUtils.close(conn, ps, rs);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return student;
+    }
+
+    @Override
+    public Integer insertStudent(Student student) {
+        Integer id = null;
+        try {
+            conn = JdbcUtils.getConnection();
+            String sql = &quot;insert into student(num,password,name,age,score) values(?,?,?,?,?)&quot;;
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, student.getNum());
+            ps.setString(2, student.getPassword());
+            ps.setString(3, student.getName());
+            ps.setInt(4, student.getAge());
+            ps.setDouble(5, student.getScore());
+
+            ps.executeUpdate();
+
+            sql = &quot;select @@identity newId&quot;;
+            ps = conn.prepareStatement(sql);
+            rs = ps.executeQuery();
+            if(rs.next()) {
+                id = rs.getInt(&quot;newId&quot;);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                JdbcUtils.close(conn, ps, rs);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return id;
+    }
+
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/03/07/java/java-jsp/java-jsp-3/" data-id="cjgxcg4ao003xr9p312f989hf" class="article-share-link">Delen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/jsp/">jsp</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/java-jsp/java-jsp-2" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/31/java/java-jsp/java-jsp-2/" class="article-date">
+  <time datetime="2018-01-31T11:54:50.000Z" itemprop="datePublished">2018-01-31</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/31/java/java-jsp/java-jsp-2/">第2章 JSP核心</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="第2章-JSP核心"><a href="#第2章-JSP核心" class="headerlink" title="第2章 JSP核心"></a>第2章 JSP核心</h3><h3 id="2-1-内置对象"><a href="#2-1-内置对象" class="headerlink" title="2.1 内置对象"></a>2.1 内置对象</h3><h4 id="2-1-1-pageContext"><a href="#2-1-1-pageContext" class="headerlink" title="2.1.1 pageContext"></a>2.1.1 pageContext</h4><p>javax.servlet.jsp.PageContext</p>
+<p>页面上下文，具有一个只在当前页面范围的域属性空间，即其具有setAttribute()方法和getAttribute()方法。</p>
+<p>EL表达式，访问变量时，只能访问域属性空间内的变量。因此，可以将变量先存放到该域属性空间，或其它三个域属性空间（request、session、application）。</p>
+<p>pageContext具有一些get方法，可以获取Request、Response、Session、ServletContext、ServletConfig、page(即当前Servlet)、exception、out等其它八个内置对象</p>
+<h4 id="2-1-2-application"><a href="#2-1-2-application" class="headerlink" title="2.1.2 application"></a>2.1.2 application</h4><p>即ServletContext</p>
+<p>ServletContext所具有的方法，application都有。</p>
+<p>常用的方法，例如：</p>
+<p>void setAttribute(String name, Object object);</p>
+<p>Object getAttribute(String name);</p>
+<p>Object removeAttribute(String name);</p>
+<h4 id="2-1-3-out"><a href="#2-1-3-out" class="headerlink" title="2.1.3 out"></a>2.1.3 out</h4><p>所属类型：javax.servlet.jsp.JspWriter</p>
+<p>JspWriter类继承自IO流的Writer类。</p>
+<p>即out就是一个输出流。</p>
+<h4 id="2-1-4-page"><a href="#2-1-4-page" class="headerlink" title="2.1.4 page"></a>2.1.4 page</h4><p>查看jsp翻译的servlet，page对象即Servlet对象本身。</p>
+<p>final java.lang.Object page = this.</p>
+<h4 id="2-1-5-exception"><a href="#2-1-5-exception" class="headerlink" title="2.1.5 exception"></a>2.1.5 exception</h4><p>普通的jsp页面中，不能使用exception内置对象。因为打开jsp翻译的servlet，发现其中并没有exception对象。</p>
+<p>若要在页面中直接使用exception对象，则需要配合着page指令使用。</p>
+<h4 id="2-1-6-其它对象"><a href="#2-1-6-其它对象" class="headerlink" title="2.1.6 其它对象"></a>2.1.6 其它对象</h4><p>request,response,session,config，用法与servlet时的用法相同。</p>
+<h3 id="2-2-JSP指令-directive"><a href="#2-2-JSP指令-directive" class="headerlink" title="2.2 JSP指令(directive)"></a>2.2 JSP指令(directive)</h3><p>jsp中包含三类指令：</p>
+<h5 id="page指令"><a href="#page指令" class="headerlink" title="page指令"></a>page指令</h5><h5 id="include指令"><a href="#include指令" class="headerlink" title="include指令"></a>include指令</h5><h5 id="taglib标签库指令"><a href="#taglib标签库指令" class="headerlink" title="taglib标签库指令"></a>taglib标签库指令</h5><p>&lt;%@ 指令名称 属性名 = 属性值 属性名 = 属性值 %&gt;</p>
+<h4 id="2-1-1-page指令"><a href="#2-1-1-page指令" class="headerlink" title="2.1.1 page指令"></a>2.1.1 page指令</h4><p>（1）、pageEncodeing属性</p>
+<p>&lt;%@ page pageEncoding = “utf-8”%&gt;</p>
+<p>默认的MIME类型为text/html</p>
+<p>//servlet<br>response.setContentType(“text/html;charset=UTF-8”);</p>
+<p>(2)、contentType属性</p>
+<p>&lt;%@ page contentType = “text/html; charset=UTF-8” %&gt;</p>
+<p>//servlet<br>response.setContentType(“text/html;charset=UTF-8”);</p>
+<p>可以对pageEncoding默认的MIMe类型进行修改</p>
+<p>（3）、import属性</p>
+<p>&lt;%@ page import = “java.util.Date”%&gt;</p>
+<p>(4)、errorPage\isErrorPage属性</p>
+<pre><code>&lt;%@ page errorPage = &quot;/error.jsp&quot; %&gt;
+</code></pre><p>//error.jsp</p>
+<pre><code>&lt;%@ page isErrorPage = &quot;true&quot;%&gt;
+&lt;html&gt;
+    &lt;body&gt;
+        error page&lt;br /&gt;
+        ex = &lt;%=exception.getMessage() %&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre><p>//serlvet</p>
+<pre><code>public void _jspService(...){
+    ...
+    java.lang.Throwable exception = ...;
+    ...
+}
+</code></pre><p>(5)、Session属性</p>
+<p>//hello1.jsp</p>
+<pre><code>&lt;body&gt;
+    &lt;%
+        session.setAttribute(&quot;user&quot;,&quot;zhangsan&quot;);
+    %&gt;
+&lt;/body&gt;
+</code></pre><p>//servlet</p>
+<pre><code>session = pageContext.getSession();
+
+查看源码发现，返回的还是request.getSession()
+</code></pre><p>1、    设置</p>
+<p>HttpSession session = request.getSession(true);<br>session.setAttribute(…);</p>
+<p>设为true，意味着没有session对象时才创建，有则不创建。</p>
+<p>2、读取</p>
+<p>HttpSession session = request.getSession(false);<br>if(session != null){<br>    session.getAttribute(“…”);<br>}</p>
+<p>设为false，意味着获取现有的session对象，如果没有，也不创建。</p>
+<p>//hello2.jsp</p>
+<pre><code>&lt;%@ page contentType = &quot;text/html; charset = UTF-8&quot;%&gt;
+&lt;%-- 清除内置的Session对象 --%&gt;
+&lt;%@ page session = &quot;fasle&quot;%&gt;
+
+&lt;body&gt;
+    HttpSession session =     request.getSession(false);
+    if(session != null){
+        String user = (String) session.getAttribute(&quot;user&quot;);
+        out.print(&quot;user = &quot; + user);
+    }        
+&lt;body/&gt;
+</code></pre><h4 id="2-2-2-include指令"><a href="#2-2-2-include指令" class="headerlink" title="2.2.2 include指令"></a>2.2.2 include指令</h4><p>(1)、用法</p>
+<p>可以包含动态文件也可以包含静态页面文件。</p>
+<p>index.jsp</p>
+<pre><code>&lt;html&gt;
+&lt;body&gt;
+    index page before&lt;br /&gt;
+
+    &lt;%@ include file = &quot;/next.jsp&quot;%&gt;
+
+    index page after&lt;br /&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre><p>next.jsp</p>
+<pre><code>&lt;html&gt;
+&lt;body&gt;
+    next page
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre><p>（2）、静态联编</p>
+<p>只生成了一个index_jsp.java的servlet源文件，没有生成next_jsp.java文件。</p>
+<p>jsp翻译引擎，将include指令包含的next.jsp文件直接翻译到了index.jsp对应的servlet中，形成了一个.java文件。</p>
+<p>该包含操作是在编译之前，由jsp翻译引擎完成的，而不是在程序运行期间完成的。</p>
+<p>这种包含是一种静态包含，称为静态联编。</p>
+<p>整个过程只一个_jspService()方法。也就是说，index.jsp和next.jsp之间是可以相互访问局部变量的。</p>
+<h3 id="2-3-JSP动作（Action）"><a href="#2-3-JSP动作（Action）" class="headerlink" title="2.3 JSP动作（Action）"></a>2.3 JSP动作（Action）</h3><p>页面中，应该使用EL表达式、JSTL标签及JSP动作，来代替java代码块、表达式。</p>
+<p>JSP动作的语法格式</p>
+<p><code>&lt;jsp:动作名称 属性名 = 属性值 属性名 = 属性值 ...&gt;&lt;/jsp:动作名称&gt;</code></p>
+<p>或</p>
+<p><code>&lt;jsp:动作名称 属性名 = 属性值 属性名 = 属性值 ... /&gt;</code></p>
+<p>实际开发中，常用的就两个forward和include。</p>
+<p>底层使用的是<code>request.getRequestDispatcher(&quot;&quot;).forward(...)和.include()</code>。</p>
+<h4 id="2-3-1-forward动作"><a href="#2-3-1-forward动作" class="headerlink" title="2.3.1 forward动作"></a>2.3.1 forward动作</h4><p>index.jsp</p>
+<pre><code>&lt;body&gt;
+    index page befor &lt;br /&gt;
+
+    &lt;jsp:forward page=&quot;/next.jsp&quot;&gt;&lt;/jsp:forward&gt;
+
+    index page after &lt;br /&gt;
+
+&lt;body/&gt;
+</code></pre><p>next.jsp</p>
+<pre><code>&lt;body&gt;
+    next page
+&lt;/body&gt;
+</code></pre><p>forward跳转时，只显示</p>
+<pre><code>next page
+</code></pre><h4 id="2-3-2-include动作"><a href="#2-3-2-include动作" class="headerlink" title="2.3.2 include动作"></a>2.3.2 include动作</h4><p>index.jsp</p>
+<pre><code>&lt;body&gt;
+    index page befor &lt;br /&gt;
+
+    &lt;jsp:include page=&quot;/next.jsp&quot;&gt;&lt;/jsp:include&gt;
+
+    index page after &lt;br /&gt;
+
+&lt;body/&gt;
+</code></pre><p>next.jsp</p>
+<pre><code>&lt;body&gt;
+    next page
+&lt;/body&gt;
+</code></pre><p>include跳转时，全显示</p>
+<pre><code>index page befor
+next page
+index page after 
+</code></pre><p>(注)：</p>
+<p>生成了两个.java文件：index_jsp.java与left_jsp.java。</p>
+<p>这个包含动作是在程序运行过程中，由index_jsp文件中的_jspService()方法通过JspRuntimeLibrary类的include()方法调用了left_jsp文件中的_jspService()方法完成的。</p>
+<p>这种在运行期执行的包含，称为动态联编。    </p>
+<h3 id="2-4-EL表达式"><a href="#2-4-EL表达式" class="headerlink" title="2.4 EL表达式"></a>2.4 EL表达式</h3><p>Expression Language，表达式语言。</p>
+<p>${expression}获取到指定表达式的值。</p>
+<h4 id="2-4-1-获取数据"><a href="#2-4-1-获取数据" class="headerlink" title="2.4.1 获取数据"></a>2.4.1 获取数据</h4><p>(1)、EL只能从四大域中获取数据</p>
+<p>其查找数据的顺序是，依次按照由小到大的范围，从四大域中查找指定名称的属性值，找到后就不再继续往下查找。</p>
+<pre><code>&lt;body&gt;
+    &lt;%
+        String username = &quot;abc&quot;;
+        pageContext.setAttribute(&quot;username&quot;, username);
+        request.setAttribute(&quot;username&quot;, username);
+        session.setAttribute(&quot;username&quot;, username);
+        application.setAttribute(&quot;username&quot;, username);
+    %&gt;
+    //从四大域属性空间中依次查找
+    username = ${username}
+
+&lt;/body&gt;
+</code></pre><p>（2）、从指定域中获取数据</p>
+<pre><code>//通过EL的内置对象，从指定的域属性空间中查找
+username = ${requestScope.username}
+</code></pre><p>（3）、访问Bean的属性</p>
+<pre><code>&lt;body&gt;
+    &lt;%
+        School school = new School(&quot;qinghua&quot;,&quot;beijing&quot;);        
+        Student studentb = new Student(&quot;zhangsan&quot;,23);
+        pageContext.setAttribute(&quot;student&quot;, student);
+    %&gt;
+
+    student = ${student}
+
+    name = ${student.name}
+
+    schoolName = ${student.school.sname}
+
+&lt;/body&gt;
+</code></pre><p>（4）、获取数组中的元素</p>
+<pre><code>&lt;body&gt;
+
+    &lt;%
+        String[] names = {&quot;zhangsan&quot;, &quot;lisi&quot;, &quot;wangwu&quot;};
+        pageContext.setAttribute(&quot;names&quot;, names);
+    %&gt;
+
+    names[1] = ${names[1]}
+
+    &lt;%
+        School[] schools = new School[3];
+        schools[0] = new School(&quot;qinghua&quot;, &quot;beijing&quot;);
+        schools[1] = new School(&quot;haiyang&quot;, &quot;qingdao&quot;);
+        schools[2] = new School(&quot;shanda&quot;, &quot;shandong&quot;);
+        pageContext.setAttribute(&quot;chools&quot;, schools);
+    %&gt;
+
+    chools[2].sname = ${schools[2].sname}
+
+&lt;/body&gt;
+</code></pre><p>（5）、获取List中的元素</p>
+<pre><code>EL可以通过索引访问List，但无法访问Set。因为Set中没有索引的概念。
+
+&lt;body&gt;
+    &lt;%
+        List&lt;String&gt; names = new ArrayList&lt;String&gt;();
+        names.add(&quot;zhangsan&quot;);
+        names.add(&quot;lisi&quot;);
+        names.add(&quot;wangwu&quot;);
+        pageContext.setAttribute(&quot;names&quot;,names);
+    %&gt;
+
+    names[2] = ${names[2]};
+
+&lt;body/&gt;
+</code></pre><p>（6）、获取Map中的元素</p>
+<pre><code>&lt;body&gt;
+    &lt;%
+        Map&lt;String, Object&gt; map = new Map&lt;&gt;();
+        map.put(&quot;school&quot;, new School(&quot;qinghua&quot;, &quot;beijing&quot;));
+        map.put(&quot;mobile&quot;, &quot;1111111&quot;);
+        map.put(&quot;age&quot;, 21);
+        pageContext.setAttribute(&quot;map&quot;, map);
+    %&gt;
+
+    school.name = ${map.school.sname}
+
+    mobile = ${map.mobile};
+
+    age = ${map.age}；
+
+&lt;/body&gt;
+</code></pre><h4 id="2-4-2-运算符"><a href="#2-4-2-运算符" class="headerlink" title="2.4.2 运算符"></a>2.4.2 运算符</h4><p>算术运算符，关系运算符，逻辑运算符，条件运算符，取值运算符</p>
+<p>除了这些，还有一个empty</p>
+<p>${empty 变量}</p>
+<ul>
+<li>变量未定义，返回true</li>
+<li>变量为String类型，空串返回true</li>
+<li>变量为引用类型，其值为null返回true</li>
+<li>变量为集合类型，不包含任何元素，返回true</li>
+</ul>
+<h4 id="2-4-3-EL内置对象"><a href="#2-4-3-EL内置对象" class="headerlink" title="2.4.3 EL内置对象"></a>2.4.3 EL内置对象</h4><p>EL中表示四个域属性空间的内置对象：pageScope requestScope sessionScope applicationScope</p>
+<p>其它的常用内置对象还有：</p>
+<p>（1）、pageContext</p>
+<p>EL中的pageContext与JSP中内置对象中的pageContext是同一个对象。</p>
+<p>通过该对象，可以获取request、response、session、servletContext、servletConfig等对象。</p>
+<ul>
+<li><p><code>${pageContext.request.contextPath}</code>，获取项目根目录，一般用在JSP页面的路径前。</p>
+<form action="${pageContext.request.contextPath/register.do}" method="post"><br>   …<br></form>
+</li>
+<li><p>pageContext.request 其底层实际调用的是pageContext.getRequest()方法</p>
+</li>
+<li><p>在EL的11个内置对象中，除了pageContext外，其它10个内置对象，其类型均为java.util.Map类型。    </p>
+</li>
+</ul>
+<p>（2）、param</p>
+<p>获取请求中指定参数的值</p>
+<p>GET: http:localhost:8080/textproject/index.jsp?name=abc</p>
+<p>//index.jsp</p>
+<p>param.name = ${param.name}</p>
+<p>POST:</p>
+<pre><code>&lt;form action = &quot;${pageContext.request.contextPath/show.jsp}&quot;&gt;
+    姓名：&lt;input type = &quot;text&quot; name = &quot;name&quot; /&gt;
+    年龄：&lt;input type = &quot;text&quot; name = &quot;age&quot; /&gt;
+    爱好：
+    &lt;input type = &quot;checkbox&quot; name = &quot;hobby&quot; value = &quot;swimming&quot; /&gt;
+    &lt;input type = &quot;checkbox&quot; name = &quot;hobby&quot; value = &quot;climbing&quot; /&gt;
+    &lt;input type = &quot;checkbox&quot; name = &quot;hobby&quot; value = &quot;reading&quot; /&gt;
+&lt;/form&gt;
+</code></pre><p>//show.jsp</p>
+<pre><code>name = ${param.name}
+age = ${param.age}
+</code></pre><p>（3）、paramValues</p>
+<pre><code>hobby[0] = ${paramValues.hobby[0]}
+hobby[1] = ${paramValues.hobby[0]}
+hobby[2] = ${paramValues.hobby[0]}
+</code></pre><p>（4）、initParam</p>
+<p>获取web.xml中初始化参数</p>
+<p>web.xml</p>
+<pre><code>&lt;context-param&gt;
+    &lt;param-name&gt;company&lt;param-name/&gt;
+    &lt;param-value&gt;powernode&lt;param-value/&gt;
+&lt;/context-param&gt;
+</code></pre><p>jsp页面</p>
+<pre><code>company = ${initParam.company}
+</code></pre><h4 id="2-4-4-自定义EL函数"><a href="#2-4-4-自定义EL函数" class="headerlink" title="2.4.4 自定义EL函数"></a>2.4.4 自定义EL函数</h4><p>自定义EL函数，实际字符串连接的功能</p>
+<p>1、定义类</p>
+<pre><code>public class ELFunctions{
+    public static String lowerToUpper(String source){
+        return source.toUpperCase();
+    }
+
+    public static String upperToLower(String source){
+        return source.toLowerCase();
+    }
+}
+</code></pre><p>2、标签库定义 注册</p>
+<p>自定义的类及其函数，需要在扩展名为.tld的XML文件中进行注册</p>
+<p>XML文件是需要约束的，即需要配置文件头部。这个头部约束可以从以下文件中复制。</p>
+<p>comcat-9/webapps/examples/web-inf/jsp2/jsp2-example-taglib.tld</p>
+<p>//WEB-INF/myElFuns.tld</p>
+<pre><code>&lt;tablib ...&gt;
+
+    //定义标签库信息
+    &lt;tlib-version&gt;1.0&lt;/tlib-version&gt;
+    &lt;show-name&gt;myElFuncs&lt;/short-name&gt;
+    &lt;uri&gt;http://www.test.com/myproject/jsp/el/customElFuncs&lt;/uri&gt;
+
+    //注册函数
+    &lt;function&gt;
+        &lt;name&gt;myLowerToUpper&lt;/name&gt;
+        &lt;function-class&gt;myproject.testpackage. ELFunctions&lt;/function-class&gt;
+        &lt;function-signature&gt;java.lang.String. lowerToUpper(java.lang.String)&lt;/function-signature&gt;
+    &lt;function/&gt;
+
+    &lt;function&gt;
+        &lt;name&gt;myUpperToLower&lt;/name&gt;
+        &lt;function-class&gt;myproject.testpackage. ELFunctions&lt;/function-class&gt;
+        &lt;function-signature&gt;java.lang.String. upperToLower(java.lang.String)&lt;/function-signature&gt;
+    &lt;function/&gt;
+
+&lt;/tablib&gt;
+</code></pre><p>//index.jsp</p>
+<pre><code>&lt;%@ taglib uri = &quot;http://www.test.com/myproject/jsp/el/customElFuncs&quot; prefix = &quot;myElFuncs&quot;%&gt;
+&lt;body&gt;
+    ${myElFuncs:myLowerToUpper(&quot;abc&quot;)}
+&lt;/body&gt;
+</code></pre><h4 id="2-4-5-JSTL中的EL函数"><a href="#2-4-5-JSTL中的EL函数" class="headerlink" title="2.4.5 JSTL中的EL函数"></a>2.4.5 JSTL中的EL函数</h4><p>JSTL，JSP Standard Tag Library，即JSP标准标签库。</p>
+<p>该标签库中，定义好了一套处理字符串的函数标签库。</p>
+<p>将JSTL的Jar包导入WEb/lib后，在jsp页面中即可直接使用。</p>
+<p>//index.jsp</p>
+<pre><code>&lt;%@ taglib uri = &quot;http://java.sun.com/jsp/jstl/functions&quot; prefix = &quot;fn&quot;%&gt;
+
+&lt;body&gt;
+    ${fun.substring(&quot;abcdefg&quot;, 2, 5)}
+    .....
+    .....
+&lt;/body&gt;
+</code></pre><h4 id="2-4-6-EL总结"><a href="#2-4-6-EL总结" class="headerlink" title="2.4.6 EL总结"></a>2.4.6 EL总结</h4><ul>
+<li>EL不能出现在java代码块、表达式块等jsp动态代码部分</li>
+<li>EL只能从pageContext、request、session、application四大域属性空间中获取数据</li>
+<li>EL不会抛出空指针异常</li>
+<li>EL不会抛出数组访问越界异常</li>
+<li>EL不具有字符串处理能力，只能通过JSTL标签库来处理</li>
+</ul>
+<h3 id="2-5-自定义标签"><a href="#2-5-自定义标签" class="headerlink" title="2.5 自定义标签"></a>2.5 自定义标签</h3><p>简化代码，替代java代码块。</p>
+<h4 id="2-5-1-基本用法"><a href="#2-5-1-基本用法" class="headerlink" title="2.5.1 基本用法"></a>2.5.1 基本用法</h4><p>（1）、需求</p>
+<p>自定义标签，输出客户端Ip</p>
+<p>（2）、定义标签处理器</p>
+<p>实现处理器接口：javax.servlet.jsp.tagext.simpleTag</p>
+<pre><code>//定义标签处理器
+public class ClientIpTag extends SimpleTagSupport {
+    @Override
+    public void doTag() throws JspException, IOException {
+        //获取pageContext
+        PageContext pc = (PageContext) this.getJspContext();
+        //获取请求对象
+        ServletRequest request = pc.getRequest();
+        //获取客户端IP
+        String clientIp = request.getRemoteAddr();
+        //获取标准输出流
+        JspWriter out = pc.getOut();
+        //输出
+        out.print(clientIp);
+    }
+}
+</code></pre><p>（3）、注册标签处理器</p>
+<p>//customTags.tld</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;taglib xmlns=&quot;http://java.sun.com/xml/ns/j2ee&quot;
+    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+    xsi:schemaLocation=&quot;http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd&quot;
+    version=&quot;2.0&quot;&gt;
+    &lt;!--配置标签库信息--&gt;
+    &lt;tlib-version&gt;1.0&lt;/tlib-version&gt;
+    &lt;short-name&gt;customTags&lt;/short-name&gt;
+    &lt;uri&gt;http://www.jstlproject.com/jsp/tags/custom&lt;/uri&gt;
+    &lt;!--注册标签--&gt;
+    &lt;tag&gt;
+        &lt;name&gt;clientIp&lt;/name&gt;
+        &lt;tag-class&gt;tags.ClientIpTag&lt;/tag-class&gt;
+        &lt;body-content&gt;empty&lt;/body-content&gt;
+    &lt;/tag&gt;
+
+&lt;/taglib&gt;
+</code></pre><p>（4）、使用自定义标签</p>
+<pre><code>&lt;%@ taglib uri = &quot;http://www.jstlproject.com/jsp/tags/custom&quot; prefix = &quot;customTags&quot; %&gt;
+&lt;body&gt;
+    &lt;% 
+        String ip = request.getRemoteAddr();
+        out.println(&quot;ip = &quot; + ip);
+    %&gt;
+    &lt;br/&gt;
+    &lt;customTags:clientIp /&gt;
+&lt;/body&gt;
+</code></pre><h4 id="2-5-2-定义带标签体的标签"><a href="#2-5-2-定义带标签体的标签" class="headerlink" title="2.5.2 定义带标签体的标签"></a>2.5.2 定义带标签体的标签</h4><p>//标签处理器 - 小写变大写</p>
+<pre><code>public class LowerToUpperTag extends SimpleTagSupport {
+    @Override
+    public void doTag() throws JspException, IOException {
+        //获取标签体对象
+        JspFragment jspbody = this.getJspBody();
+        //创建字符串输出流
+        StringWriter strWriter = new StringWriter();
+        //标签体对象写入字符串输出流
+        jspbody.invoke(strWriter);
+        //字符串输出流中的数据
+        String str = strWriter.toString();
+        //小写变大写
+        str = str.toUpperCase();
+        //写入标准输出流
+        this.getJspContext().getOut().print(str);
+    }
+}
+</code></pre><p>注册</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;taglib xmlns=&quot;http://java.sun.com/xml/ns/j2ee&quot;
+    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+    xsi:schemaLocation=&quot;http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd&quot;
+    version=&quot;2.0&quot;&gt;
+    &lt;!--配置标签库信息--&gt;
+    &lt;tlib-version&gt;1.0&lt;/tlib-version&gt;
+    &lt;short-name&gt;customTags&lt;/short-name&gt;
+    &lt;uri&gt;http://www.jstlproject.com/jsp/tags/custom&lt;/uri&gt;
+    &lt;!--注册标签--&gt;
+    &lt;tag&gt;
+        &lt;name&gt;clientIp&lt;/name&gt;
+        &lt;tag-class&gt;tags.ClientIpTag&lt;/tag-class&gt;
+        &lt;body-content&gt;empty&lt;/body-content&gt;
+    &lt;/tag&gt;
+    &lt;tag&gt;
+        &lt;name&gt;lowerToUpper&lt;/name&gt;
+        &lt;tag-class&gt;tags.LowerToUpperTag&lt;/tag-class&gt;
+        &lt;body-content&gt;scriptless&lt;/body-content&gt;
+    &lt;/tag&gt;
+
+&lt;/taglib&gt;
+</code></pre><p>附：<body-content></body-content></p>
+<ul>
+<li>empty:表示当前标签没有标签体</li>
+<li>scriptless：表示当前标签具有标签体，对el表达式解析。</li>
+<li>jsp:原样输出，已过时</li>
+<li>tagdependent: 原样输出到浏览器，不解析el表达式</li>
+</ul>
+<p>//index.jsp</p>
+<pre><code>&lt;%@ taglib uri = &quot;http://www.jstlproject.com/jsp/tags/custom&quot; prefix = &quot;customTags&quot; %&gt;
+
+&lt;body&gt;
+
+    &lt;%
+        String username = &quot;aaa&quot;;
+        pageContext.setAttribute(&quot;username&quot;, username);
+    %&gt;
+    &lt;customTags:lowerToUpper&gt;${username }&lt;/customTags:lowerToUpper&gt;
+
+&lt;/body&gt;
+</code></pre><h4 id="2-5-3-定义带属性的标签"><a href="#2-5-3-定义带属性的标签" class="headerlink" title="2.5.3 定义带属性的标签"></a>2.5.3 定义带属性的标签</h4><p>//注册标签</p>
+<pre><code>&lt;tag&gt;
+    &lt;name&gt;if&lt;/name&gt;
+    &lt;tag-class&gt;tags.IfTag&lt;/tag-class&gt;
+    &lt;body-content&gt;tagdependent&lt;/body-content&gt;
+        &lt;attribute&gt;
+            &lt;name&gt;test&lt;/name&gt;
+            &lt;required&gt;true&lt;/required&gt;
+            &lt;!-- runtime expression value 
+                true:该属性的值支持el表达式与jsp表达式
+            --&gt;
+            &lt;rtexprvalue&gt;true&lt;/rtexprvalue&gt;
+        &lt;/attribute&gt;
+&lt;/tag&gt;
+</code></pre><p>//定义标签处理器</p>
+<pre><code>public class IfTag extends SimpleTagSupport {
+    private boolean test;
+    //标签的属性反映到标签处理器中，就是一个set属性
+    public void setTest(boolean test) {
+        this.test = test;
+    }
+    @Override
+    public void doTag() throws JspException, IOException {
+        if(test) {
+            /*
+            JspFragment jspbody = this.getJspBody();
+            jspbody.invoke(this.getJspContext().getOut());
+            */
+            //以上代码等价于以下代码
+            this.getJspBody().invoke(null);
+        }
+    }
+}
+</code></pre><p>//index.jsp</p>
+<pre><code>&lt;customTages:if test = ${gender} }} }&gt;男&lt;/customTages:if&gt;
+&lt;customTages:if test = not gender }&gt;女&lt;/customTages:if&gt;
+</code></pre><h4 id="2-5-4-定义forEach标签"><a href="#2-5-4-定义forEach标签" class="headerlink" title="2.5.4 定义forEach标签"></a>2.5.4 定义forEach标签</h4><p>//定义标签处理器，遍历collection集合和数组</p>
+<pre><code>public class ForEachTag extends SimpleTagSupport {
+
+    private Object items;
+    private String var;
+
+    public void setItems(Object items) {
+        this.items = items;
+    }    
+
+    public void setVar(String var) {
+        this.var = var;
+    }
+
+    public Collection getcoll() {
+        if(items instanceof List) {
+            return (List) items;
+        }else if(items instanceof Set) {
+            return (Set) items;
+        }else if(items instanceof Map) {
+            return ((Map) items).entrySet();
+        }else if(items instanceof Object[]) {
+            return Arrays.asList((Object[])items);
+        }
+        return null;
+    }
+
+    @Override
+    public void doTag() throws JspException, IOException {
+        for (Object obj:getcoll()) {
+            this.getJspContext().setAttribute(var, obj);
+            this.getJspBody().invoke(null);
+        }
+    }
+
+}
+</code></pre><p>//注册</p>
+<pre><code> &lt;tag&gt;
+    &lt;name&gt;forEach&lt;/name&gt;
+    &lt;tag-class&gt;tags.ForEachTag&lt;/tag-class&gt;
+    &lt;body-content&gt;scriptless&lt;/body-content&gt;
+        &lt;attribute&gt;
+            &lt;name&gt;items&lt;/name&gt;
+            &lt;required&gt;true&lt;/required&gt;
+            &lt;rtexprvalue&gt;true&lt;/rtexprvalue&gt;
+        &lt;/attribute&gt;
+        &lt;attribute&gt;
+            &lt;name&gt;var&lt;/name&gt;
+            &lt;required&gt;true&lt;/required&gt;
+            &lt;rtexprvalue&gt;false&lt;/rtexprvalue&gt;
+        &lt;/attribute&gt;
+&lt;/tag&gt;
+</code></pre><p>//index.jsp</p>
+<pre><code>&lt;customTags:forEach items=&quot;${citys}&quot; var=&quot;city&quot;&gt;
+    ${city }&lt;br&gt;
+&lt;/customTags:forEach&gt;
+</code></pre><h4 id="2-5-5-将自定义标签库打包发行"><a href="#2-5-5-将自定义标签库打包发行" class="headerlink" title="2.5.5 将自定义标签库打包发行"></a>2.5.5 将自定义标签库打包发行</h4><p>1、右键export选择jar包，只打包源码。</p>
+<p>2、把.tld注册文件，放到jar包里的META-INFO里面。</p>
+<p>3、把jar包放到项目的WEB-INF的lib下。</p>
+<p>4、jsp页面中导入标签库，就可以直接用了。</p>
+<h3 id="2-6-JSTL"><a href="#2-6-JSTL" class="headerlink" title="2.6 JSTL"></a>2.6 JSTL</h3><p>jsp standard tag library，包含五个子库。</p>
+<p>核心标签库、格式化标签库、EL函数标签库、SQL操作标签库（过时）、XML操作标签库（过时）。</p>
+<p>导入jstl.jar包和standard.jar包</p>
+<h4 id="2-6-1-核心标签库"><a href="#2-6-1-核心标签库" class="headerlink" title="2.6.1 核心标签库"></a>2.6.1 核心标签库</h4><p>&lt;%@ taglib uri=”<a href="http://java.sun.com/jsp/jstl/core" target="_blank" rel="external">http://java.sun.com/jsp/jstl/core</a>“ prefix=”c” %&gt;</p>
+<p>（1）、c:set</p>
+<pre><code>//将变量存放到指定域中
+&lt;c:set var=&quot;name&quot; value=&quot;zhangsan&quot; scope=&quot;session&quot;&gt;
+name = ${sessionScope.name}
+
+//为Bean的属性赋值
+&lt;%
+    Student student = new Student();
+    pageContext.setAttribute(&quot;student&quot;, student);
+%&gt;
+&lt;c:set value=&quot;lisi&quot; property=&quot;name&quot; target=&quot;${pageScope.student}&quot;&gt;&lt;/c:set&gt;
+student = ${student}
+
+//为map赋值
+&lt;%
+    Map&lt;String, Object&gt; map = new HashMap&lt;&gt;();
+    pageContext.setAttribute(&quot;map&quot;, map);
+%&gt;
+&lt;c:set value=&quot;abc&quot; property=&quot;company&quot; target=&quot;${pageScope.map}&quot;&gt;&lt;/c:set&gt;
+map = ${map}
+</code></pre><p>（2）、c:remove</p>
+<pre><code>//从域属性空间中删除变量
+&lt;c:remove var=&quot;school&quot;&gt;
+</code></pre><p>（3）、c:out</p>
+<pre><code>//输出指定的变量
+&lt;c:set var=&quot;city&quot; value=&quot;&lt;h1&gt;beijing&lt;/h1&gt;&quot;&gt;
+
+city1 = &lt;c:out value=&quot;${city}&quot;/&gt;
+
+&lt;br /&gt;
+
+city2 = &lt;c:out value=&quot;${city}&quot; escapeXml=&quot;false&quot; /&gt;
+
+city1对h1标签进行了解析。
+
+city2对h1标签没有进行解析，直接输出。
+</code></pre><p>（4）、c:catch</p>
+<pre><code>//获取异常信息
+&lt;c:catch var=&quot;ex&quot;&gt;
+    &lt;%
+        int i = 3/0;
+    %&gt;
+&lt;/c:catch&gt;
+</code></pre><p>（5）、c:if</p>
+<pre><code>&lt;c:if test=&quot;${user == &quot;zhangsan&quot;}&quot;&gt;
+    &lt;a href=&quot;#&quot;&gt;进入系统&lt;/a&gt;
+&lt;/c:if&gt;
+</code></pre><p>（6）、c:choose</p>
+<pre><code>&lt;c:choose&gt;
+    &lt;c:when test=&quot;${pagenumber == 1}&quot;&gt;
+        第一页
+    &lt;/c:when&gt;
+    &lt;c:when test=&quot;${pagenumber == 2}&quot;&gt;
+        第二页
+    &lt;/c:when&gt;
+    &lt;c:otherwise&gt;
+        第三页
+    &lt;/c:otherwise&gt;
+&lt;/c:choose&gt;
+</code></pre><p>（7）、c:forEach</p>
+<pre><code>//遍历集合
+&lt;c:forEach items=&quot;${citys}&quot; var=&quot;city&quot; begin=&quot;0&quot; end=&quot;7&quot; step=&quot;4&quot;&gt;
+    ${city} &lt;br&gt;
+&lt;/c:forEach&gt;
+
+//输出行号
+&lt;c:forEach items=&quot;${students}&quot; var=&quot;student&quot; varStatus=&quot;vs&quot;&gt;
+    &lt;tr class=&quot;${vs.count/2 == 0 ? &apos;even&apos; : &apos;odd&apos;}&quot;&gt;
+        &lt;td&gt;${vs.count}&lt;/td&gt;
+        &lt;td&gt;${student.name}&lt;/td&gt;
+        &lt;td&gt;${student.age}&lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/c:forEach&gt;
+</code></pre><h4 id="2-6-1-格式化标签库"><a href="#2-6-1-格式化标签库" class="headerlink" title="2.6.1 格式化标签库"></a>2.6.1 格式化标签库</h4><p>&lt;%@ taglib uri=”<a href="http://java.sun.com/jsp/jstl/fmt" target="_blank" rel="external">http://java.sun.com/jsp/jstl/fmt</a>“ prefix=”fmt” %&gt;</p>
+<pre><code>&lt;%
+    Date now = new Date();
+    pageContext.setAttribute(&quot;now&quot;, now);
+%&gt;
+
+//格式化日期，输出到浏览器
+now = &lt;fmt:formatDate value=&quot;${now}&quot; pattern=&quot;yyyy-MM-dd&quot;&gt;
+
+//格式化日期，将结果放到域中的变量里
+&lt;fmt:formatDate value=&quot;${now}&quot; pattern=&quot;yyyy-MM-dd&quot; var=&quot;birth&quot;&gt;
+生日：&lt;input type=&quot;text&quot; name=&quot;birthday&quot; value=&quot;${birth}&quot; /&gt;
+</code></pre><h4 id="2-6-2-jstl下载"><a href="#2-6-2-jstl下载" class="headerlink" title="2.6.2 jstl下载"></a>2.6.2 jstl下载</h4><p>apache.org –&gt; Tomcat –&gt; Taglibs –&gt; Download</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/31/java/java-jsp/java-jsp-2/" data-id="cjgxcg4av0044r9p3rtv8zayi" class="article-share-link">Delen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/jsp/">jsp</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/java-jsp/java-jsp-1" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/31/java/java-jsp/java-jsp-1/" class="article-date">
+  <time datetime="2018-01-31T11:27:10.000Z" itemprop="datePublished">2018-01-31</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/31/java/java-jsp/java-jsp-1/">第1章 JSP基础</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="第1章-JSP基础"><a href="#第1章-JSP基础" class="headerlink" title="第1章 JSP基础"></a>第1章 JSP基础</h3><h4 id="1-1-JSP"><a href="#1-1-JSP" class="headerlink" title="1.1 JSP"></a>1.1 JSP</h4><p>JSP文件的本质是Servlet。只不过，JSP与Servlet不同的是，JSP是专门用于进行数据展示的Servlet，其有特殊的写法。而普通的Servlet是用于完成业务逻辑处理的。由于Servlet是运行在单例多线程环境下的，所以JSP同样也是运行在单例多线程环境下的。</p>
+<h4 id="1-2-JSP规范"><a href="#1-2-JSP规范" class="headerlink" title="1.2 JSP规范"></a>1.2 JSP规范</h4><p>将JSP页面翻译为Servlet的过程，是由Tomcat完成的。在Tomcat中内置了一个JSP的翻译引擎，当第一次访问该JSP页面时，翻译引擎会将JSP页面翻译为Servlet的.java文件，再将其编译为.class文件进行运行。</p>
+<p>SUN公司制定的JavaEE规范中包含两个很重要的子规范，Servlet规范和JSP规范。其中，JSP规范中就包含了如何将JSP页面翻译为Servlet。例如，JSP页面中的html、css、javascript、普通文件部分，均会被翻译到out.write()中。</p>
+<h4 id="1-3-JSP注释"><a href="#1-3-JSP注释" class="headerlink" title="1.3 JSP注释"></a>1.3 JSP注释</h4><p>JSP注释：<code>&lt;%-- --%&gt;</code></p>
+<p>HTML注释：<code>&lt;!-- --&gt;</code></p>
+<p>JSP注释与HTML注释区别：</p>
+<p>（1）、HTML注释会被JSP翻译引擎翻译到Servlet的out.write()中；而JSP注释会被翻译引擎忽略，在Servlet中看不到。</p>
+<p>（2）、客户端浏览器查看源码时，HTML注释是可以查看到的；JSP注释查看不到。</p>
+<h4 id="1-4-JSP的java代码块"><a href="#1-4-JSP的java代码块" class="headerlink" title="1.4 JSP的java代码块"></a>1.4 JSP的java代码块</h4><p><code>&lt;% %&gt;</code> java代码块出现在Servlet的_jspService()方法中，不能定义方法，不能定义静态语句块。</p>
+<pre><code>&lt;html&gt;
+    &lt;% double b = 2; %&gt;
+    &lt;body&gt;
+        &lt;% int a = 1; %&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre><h4 id="1-5-JSP的声明语句块"><a href="#1-5-JSP的声明语句块" class="headerlink" title="1.5 JSP的声明语句块"></a>1.5 JSP的声明语句块</h4><p><code>&lt;%!  %&gt;</code> 声明语句块中的内容，将出现在Servlet类体中，没有包含到哪个方法体中。有线程安全隐患</p>
+<pre><code>&lt;%! 
+    private int amount = 3;
+
+    public void showData(){
+        syso(&quot;aaaaa&quot;);
+    }
+ %&gt;
+</code></pre><h4 id="1-6-JSP的表达式块"><a href="#1-6-JSP的表达式块" class="headerlink" title="1.6 JSP的表达式块"></a>1.6 JSP的表达式块</h4><p><code>&lt;%= %&gt;</code> 表达式块出现的_jspService()方法的out.write()方法中。</p>
+<pre><code>count = &lt;%=count %&gt;
+
+//Servlet
+out.write(&quot;count = &quot;);
+out.write(count);
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/31/java/java-jsp/java-jsp-1/" data-id="cjgxcg4ak003tr9p3tgalma7d" class="article-share-link">Delen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/jsp/">jsp</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/java-servlet/java-servlet-2" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/25/java/java-servlet/java-servlet-2/" class="article-date">
+  <time datetime="2018-01-25T12:30:10.000Z" itemprop="datePublished">2018-01-25</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/25/java/java-servlet/java-servlet-2/">java Servlet 二、核心</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="二、Servlet核心"><a href="#二、Servlet核心" class="headerlink" title="二、Servlet核心"></a>二、Servlet核心</h3><h4 id="2-1-GenericServlet"><a href="#2-1-GenericServlet" class="headerlink" title="2.1 GenericServlet"></a>2.1 GenericServlet</h4><h4 id="2-1-1-GenericServlet-源码"><a href="#2-1-1-GenericServlet-源码" class="headerlink" title="2.1.1 GenericServlet 源码"></a>2.1.1 GenericServlet 源码</h4><pre><code>//缺省适配器设计模式
+public abstract class GenericServlet implements Servlet, ServletConfig,
+        java.io.Serializable {
+
+    private transient ServletConfig config;
+
+    @Override
+    public void destroy() {
+        // NOOP by default
+    }
+
+    @Override
+    public String getInitParameter(String name) {
+        return getServletConfig().getInitParameter(name);
+    }
+
+    @Override
+    public Enumeration&lt;String&gt; getInitParameterNames() {
+        return getServletConfig().getInitParameterNames();
+    }
+
+    @Override
+    public ServletConfig getServletConfig() {
+        return config;
+    }
+
+
+    @Override
+    public ServletContext getServletContext() {
+        return getServletConfig().getServletContext();
+    }
+
+
+    @Override
+    public String getServletInfo() {
+        return &quot;&quot;;
+    }
+
+    //模板设计模式
+    public void init(ServletConfig config) throws ServletException {
+        this.config = config;
+        //调用无参的init()方法
+        this.init();
+    }
+
+       //该无参的init()方法，就是要让子类来重写的
+    public void init() throws ServletException {
+        // NOOP by default
+    }
+
+    //抽象化service方法，让子类去实现
+    public abstract void service(ServletRequest req, ServletResponse res)
+            throws ServletException, IOException;
+
+
+    @Override
+    public String getServletName() {
+        return config.getServletName();
+    }
+}
+</code></pre><p>实现了servlet接口，并抽象化了service方法，让子类去实现。</p>
+<p>实现了servletconfig接口，子类可以直接调用servletconfig的方法。</p>
+<h4 id="2-1-2-获取请求的提交方式"><a href="#2-1-2-获取请求的提交方式" class="headerlink" title="2.1.2 获取请求的提交方式"></a>2.1.2 获取请求的提交方式</h4><pre><code>public class genericSevletDemo extends GenericServlet {
+    private static final long serialVersionUID = 1L;
+
+    public void service(ServletRequest request, ServletResponse response) throws ServletException, IOException {
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse res = (HttpServletResponse) response;
+        String method = req.getMethod();
+
+        if(&quot;POSt&quot;.equals(method)){
+            doPost(req,res);
+        }else if(&quot;GET&quot;.equals(method)){
+            doGet(req,res);
+        }
+    }
+
+}
+</code></pre><p>继续封装doPost和doGet为HttpServlet类</p>
+<h4 id="2-2-HttpServlet"><a href="#2-2-HttpServlet" class="headerlink" title="2.2 HttpServlet"></a>2.2 HttpServlet</h4><p>HttpServlet源码</p>
+<pre><code>public abstract class HttpServlet extends GenericServlet {
+
+    @Override
+public void service(ServletRequest req, ServletResponse res){
+     HttpServletRequest  request;
+    HttpServletResponse response;
+
+    try {
+        request = (HttpServletRequest) req;
+        response = (HttpServletResponse) res;
+    } catch (ClassCastException e) {
+        throw new ServletException(&quot;non-HTTP request or response&quot;);
+    }
+    service(request, response);
+}
+
+     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+        throws ServletException, IOException {
+            ...
+        }
+
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+        throws ServletException, IOException {
+        ...
+        }
+} 
+</code></pre><p>//servlet继承httpservlet类</p>
+<pre><code>public class HttpservDemo extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.getWriter().append(&quot;Served at: &quot;).append(request.getContextPath());
+    }
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doGet(request, response);
+    }
+
+}
+</code></pre><h4 id="2-3-HttpServletRequest"><a href="#2-3-HttpServletRequest" class="headerlink" title="2.3 HttpServletRequest"></a>2.3 HttpServletRequest</h4><h5 id="2-3-1-请求的生命周期"><a href="#2-3-1-请求的生命周期" class="headerlink" title="2.3.1 请求的生命周期"></a>2.3.1 请求的生命周期</h5><p>当客户端浏览器将请求发送到服务器后，服务器会根据HTTP请求协议的格式对请求进行解析。同时，服务器会创建HttpServletRequest的实现类RequestFacade的对象，即请求对象。然后再调用相应的set方法，将解析出的数据封装到请示对象中。此时HttpServletRequest实例就创建并初始化完成了。也就是说，请求对象是由服务器创建的的。</p>
+<p>当服务器向客户端发送响应结束后，HttpServletRequest实例对象就被服务器销毁。</p>
+<p>一次请求对应一个请求对象，别外一次请求对应另一个请求对象，与之前的请求对象没有任何关系。HttpServletRequest实例的生命周期很短暂。</p>
+<h5 id="2-3-2-请求参数"><a href="#2-3-2-请求参数" class="headerlink" title="2.3.2 请求参数"></a>2.3.2 请求参数</h5><p>HttpServletRequest对于请求中所携带的参数是以Map的形式接收的，并且该Map的key为String，value为String数组（一个请求参数可能会有多个值的情况出现）。</p>
+<pre><code>public class HttpservDemo extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //getParameter()方法，获取指定key对应的value，等同于getParameterValues()[0]
+        String name = request.getParameter(&quot;name&quot;);
+        String ageStr = request.getParameter(&quot;age&quot;);
+        Integer age = Integer.valueOf(ageStr);
+        System.out.println(&quot;name = &quot;+name);
+        System.out.println(&quot;age = &quot;+age);
+
+        //getParameterName()方法,获取所有keys
+        Enumeration&lt;String&gt; names = request.getParameterNames();
+        while(names.hasMoreElements()) {
+            String eleName = names.nextElement();
+            String eleValue = request.getParameter(eleName);
+            System.out.println(eleName + &quot;-----&quot; + eleValue);
+        }
+
+        //getParameterValues()方法,获取指定key对应的所有values，
+        //如&lt;checkbox name = &quot;hobby&quot;&gt;running&lt;/checkbox&gt;
+        //如&lt;checkbox name = &quot;hobby&quot;&gt;reading&lt;/checkbox&gt;
+        String[] hobby = request.getParameterValues(&quot;hobby&quot;);
+        for(String h : hobby) {
+            System.out.println(h);
+        }
+
+        //getParameterMap()方法,获取存放请求参数的Map
+        Map&lt;String, String[]&gt; map = request.getParameterMap();
+        for(String key : map.keySet()) {
+            System.out.println(key+&quot;-----&quot;+request.getParameter(key));
+        }
+    }
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doGet(request, response);
+    }
+
+}
+</code></pre><h5 id="2-3-3-域属性"><a href="#2-3-3-域属性" class="headerlink" title="2.3.3 域属性"></a>2.3.3 域属性</h5><p>Request中也存在域属性空间，用于存放有名称的数据。该数据只在当前Request请求中可以访问。</p>
+<p>对于Request中的域属性操作的常用方法：</p>
+<p>设置</p>
+<pre><code>void setAttribute(String name, Object object);
+</code></pre><p>获取</p>
+<pre><code>Object getAttribute(String name);
+</code></pre><p>在FirstServlet中设置，跳转到otherServlet中获取</p>
+<pre><code>public class FirstServlet extends HttpServlet {   
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setAttribute(&quot;address&quot;, &quot;zhuhaijinwan&quot;);
+        request.setAttribute(&quot;phone&quot;, &quot;15011112222&quot;);
+
+        request.getRequestDispatcher(&quot;/other&quot;).forward(request, response);
+    }
+}
+
+public class OtherServlet extends HttpServlet {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String address = (String) request.getAttribute(&quot;address&quot;);
+        String phone = (String) request.getAttribute(&quot;phone&quot;);
+
+        Enumeration&lt;String&gt; names = request.getAttributeNames();
+        while(names.hasMoreElements()) {
+            String name = names.nextElement();
+            String value = (String) request.getAttribute(name);
+        }
+    }
+}
+</code></pre><h5 id="2-3-4-服务器相关信息"><a href="#2-3-4-服务器相关信息" class="headerlink" title="2.3.4 服务器相关信息"></a>2.3.4 服务器相关信息</h5><p>1、获取请求的URL，如：“<a href="http://localhost:8080/httpServlet/some”" target="_blank" rel="external">http://localhost:8080/httpServlet/some”</a></p>
+<pre><code>StringBuffer getRequestURL();
+</code></pre><p>2、获取请求的URI，如：”/httpServlet/some”</p>
+<pre><code>String getRequestURI();
+</code></pre><p>3、获取当前应用在Web容器中的名称，如：”httpServlet”</p>
+<pre><code>String getContext();    
+</code></pre><p>4、获取路径中与web.xml中注册servlet时的<code>&lt;url-pattern/&gt;</code>相匹配的路径信息</p>
+<pre><code>//servletPath指的是与&lt;url-pattern&gt;精确部分相匹配的路径
+String getServletPath()
+
+//pathInfo指的是与非精确部分相匹配的路径
+String getPathInfo()
+</code></pre><p>a、例如:<code>&lt;url-pattern/&gt;</code>的值为/xxx/ooo/*，用户提交的请求为：<a href="http://localhost:8080/httpServlet/xxx/ooo/abc/def。" target="_blank" rel="external">http://localhost:8080/httpServlet/xxx/ooo/abc/def。</a></p>
+<p>servletPath就是：/xxx/ooo</p>
+<p>pathInfo就是：/abc/def</p>
+<p>b、若用户提交的请求为后辍方式，如:<a href="http://localhost:8080/httpServlet/aaa/bbb/ccc.do。" target="_blank" rel="external">http://localhost:8080/httpServlet/aaa/bbb/ccc.do。</a></p>
+<p>servletpath就是：/aaa/bbb/ccc.do</p>
+<p>pathInfo: null</p>
+<p>c、URI = ServletContext + ServletPath + PathInfo</p>
+<p>5、获取请求的方式是post还是get等</p>
+<pre><code>String getMethod()
+</code></pre><p>6、获取客户端浏览器的IP</p>
+<pre><code>//对于服务器端来说，客户端就是远程端
+String getRemoteAddr()
+</code></pre><h4 id="2-4-中文乱码问题"><a href="#2-4-中文乱码问题" class="headerlink" title="2.4 中文乱码问题"></a>2.4 中文乱码问题</h4><p>当页面中提交一个包含中文的请求时，在服务器端有可能会出现中文乱码问题。</p>
+<h5 id="2-4-1-乱码产生的原因"><a href="#2-4-1-乱码产生的原因" class="headerlink" title="2.4.1 乱码产生的原因"></a>2.4.1 乱码产生的原因</h5><p>Http协议中规定，数据传输采用字节码编码方式，即无论浏览器提交的数据包含的中文是什么字符编码格式，一旦由浏览器经过Http传输协议传输，则这些数据均将以字节码的形式上传给服务器。</p>
+<p>因为Http协议的底层使用的TCP（Transmission Contrl Protocol）传输协议。传输控制协议是一种面向连接的、可靠的、基于字节流的、端对端的通信协议。在请求中，这些字节均以%开头，并以十六进制形式出现。如%5A%3D等。</p>
+<p>那么乱码是如何产生的呢？</p>
+<p>当用户通过浏览器提交一个包含 UTF-8编码格式的两个字的中文请求时，浏览器会将这两个中文字符变为六个字节，即形成六个类似%8E的字节表示形式，并将这六个字节上传到tomcat服务器。</p>
+<p>tomcat服务器接收到这六个字节后，并不知道它们原来采用的是什么字符编码。而tomcat默认的编码格式为ISO-8859-1。所以会将这个六个字符按照这种格式进行编码，编码后在控制台显示，所以在控制台会显示乱码。</p>
+<h5 id="2-4-3-乱码的解决方法"><a href="#2-4-3-乱码的解决方法" class="headerlink" title="2.4.3 乱码的解决方法"></a>2.4.3 乱码的解决方法</h5><p>1、tomcat9已经解决了GET提交时的中文乱码问题。</p>
+<p>2、request.setCharacterEncoding(“UTF-8”);解决了POST提交中文时的乱码问题。无法解决GET提交时的中文乱码问题。</p>
+<p>3、Get提交时中文乱码解决方案有两种：</p>
+<p>（1）、修改tomcat/conf/server.xml，添加URIEncoding</p>
+<pre><code>&lt;Connector port=&quot;8080&quot; protocol=&quot;HTTP/1.1&quot;
+    connectionTimeOut=&quot;20000&quot; redirectPort=&quot;8443&quot; URIEncoding=&quot;UTF-8&quot;
+/&gt;
+</code></pre><p>(2)、无论Post还是get都可以</p>
+<pre><code>String name = request.getParaeter(&quot;name&quot;);
+byte[] bytes = name.getBytes(&quot;ISO8859-1&quot;);
+name = new String(bytes,&quot;UTF-8&quot;);
+</code></pre><h4 id="2-5-HttpServletResponse"><a href="#2-5-HttpServletResponse" class="headerlink" title="2.5 HttpServletResponse"></a>2.5 HttpServletResponse</h4><p>web服务器收到一个Http请求后，会针对每个请求创建一个HttpServletRequest对象和HttpServletResponse对象。若需要获取客户端提交请求的相关信息，刚需要HttpServletRequest对象来完成。若需要向客户端发送数据，则需要通过HttpServletResponse对象来完成。</p>
+<h5 id="2-5-1-向客户端发送数据"><a href="#2-5-1-向客户端发送数据" class="headerlink" title="2.5.1 向客户端发送数据"></a>2.5.1 向客户端发送数据</h5><p>ServletResonse接口有一个方法getWriter()，用于获取到一个输出流对象PrintWriter，该输出流对象是专门用于向客户端浏览器中输出字符数据的，称为标准输出流。</p>
+<pre><code>response.getWriter().append(&quot;Served at: &quot;).append(request.getContextPath());
+
+PrintWriter out = response.getWriter();
+out.append(&quot;dddd&quot;);
+out.print(&quot;aaa&quot;);
+out.pirntln(&quot;bbbb&quot;);
+out.Write(&quot;ccc&quot;);
+</code></pre><h5 id="2-5-2-响应乱码的产生"><a href="#2-5-2-响应乱码的产生" class="headerlink" title="2.5.2 响应乱码的产生"></a>2.5.2 响应乱码的产生</h5><p>两种方法：</p>
+<p>1、设置MIME类型，设置字符编码格式</p>
+<pre><code>response.setContentType(&quot;text/html&quot;);
+response.setCharacterEncoding(&quot;UTF-8&quot;);
+</code></pre><p>2、同时设置MIME类型和字符编码格式</p>
+<pre><code>response.setContentType(&quot;text/html;charset=UTF-8&quot;);
+</code></pre><h4 id="2-6-请求转发与重定向"><a href="#2-6-请求转发与重定向" class="headerlink" title="2.6 请求转发与重定向"></a>2.6 请求转发与重定向</h4><p>通过HttpServletRequest获取到的RequestDispatcher对象的forward()方法，可以完成请求转发功能。</p>
+<p>而通过HttpServletResponse的sendRedirect()方法，可以完成重定向功能。</p>
+<h5 id="2-6-1什么是请求转发与重定向"><a href="#2-6-1什么是请求转发与重定向" class="headerlink" title="2.6.1什么是请求转发与重定向"></a>2.6.1什么是请求转发与重定向</h5><p>请求转发：一次请求，一次响应。</p>
+<p>重定向：多次请求，多次响应。</p>
+<h5 id="2-6-2-请求转发程序举例"><a href="#2-6-2-请求转发程序举例" class="headerlink" title="2.6.2 请求转发程序举例"></a>2.6.2 请求转发程序举例</h5><pre><code>public class SomServlet extends HttpServlet {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String name = req.getParameter(&quot;name&quot;);
+        String age = req.getParameter(&quot;age&quot;);
+        req.setAttribute(&quot;ageStr&quot;, age);
+        //请求转发
+        req.getRequestDispatcher(&quot;other&quot;).forward(req, resp);
+    }
+}
+
+public class OtherServlet extends HttpServlet {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //可以继续使用request,response,也可以获取someServlet中设置的域属性
+        String name = request.getParameter(&quot;name&quot;);
+        request.getAttribute(&quot;ageStr&quot;);
+
+        PrintWriter out = response.getWriter();
+        out.print(&quot;this is otherServlet&quot;);
+    }
+}
+</code></pre><h5 id="2-6-3-重定向举例"><a href="#2-6-3-重定向举例" class="headerlink" title="2.6.3 重定向举例"></a>2.6.3 重定向举例</h5><pre><code>public class SomServlet extends HttpServlet {
+
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String name = req.getParameter(&quot;name&quot;);
+        String age = req.getParameter(&quot;age&quot;);
+        req.setAttribute(&quot;ageStr&quot;, age);
+        req.getRequestDispatcher(&quot;other&quot;).forward(req, resp);
+
+        //重定向
+        resp.sendRedirect(&quot;other&quot;);
+    }
+}
+
+public class OtherServlet extends HttpServlet {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //不能再继续使用request,response,也不能获取someServlet中设置的域属性
+        PrintWriter out = response.getWriter();
+        out.print(&quot;this is otherServlet&quot;);
+    }
+
+}
+</code></pre><h5 id="2-6-4-重定向时的数据传递"><a href="#2-6-4-重定向时的数据传递" class="headerlink" title="2.6.4 重定向时的数据传递"></a>2.6.4 重定向时的数据传递</h5><p>//重定向数据传递，及乱码解决方案</p>
+<pre><code>public class SomServlet extends HttpServlet {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String name = req.getParameter(&quot;name&quot;);
+        //解决中文乱码
+        name = new String(name.getBytes(&quot;ISO8859-1&quot;),&quot;UTF-8&quot;);
+
+        String age = req.getParameter(&quot;age&quot;);
+        req.setAttribute(&quot;ageStr&quot;, age);
+        req.getRequestDispatcher(&quot;other&quot;).forward(req, resp);
+
+        //编码，解决重定向传递时乱码问题
+        name =  URLEncoder.encode(name,&quot;UTF-8&quot;);
+
+        //重定向
+        resp.sendRedirect(&quot;other?pname=&quot;+name+&quot;&amp;page=&quot;+age);
+    }
+
+}    
+
+public class OtherServlet extends HttpServlet {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        String pname = request.getParameter(&quot;pname&quot;);
+        //解码
+        pname = URLDecoder.decode(pname,&quot;UTF-8&quot;);
+
+        //打散组装
+        pname = new String(pname.getBytes(&quot;ISO8859-1&quot;),&quot;UTF-8&quot;);
+
+        String page = request.getParameter(&quot;page&quot;);
+
+        System.out.println(&quot;pname====&quot; +pname);
+        System.out.println(&quot;page====&quot; +page);
+
+        PrintWriter out = response.getWriter();
+        out.print(&quot;this is otherServlet&quot;);
+    }
+
+}
+</code></pre><h5 id="2-6-5-重定向到其它应用"><a href="#2-6-5-重定向到其它应用" class="headerlink" title="2.6.5 重定向到其它应用"></a>2.6.5 重定向到其它应用</h5><p>重定向与请求转发还有一点很重要的不同点是，重定向可以跳转到其它应用中，而请求转发只能在当前应用中跳转。也正因为如此，所以sendRedirect()的参数中，必须要添加request.getContext(),即当前应用的根目录，指定要跳转到哪个应用的哪个资源。</p>
+<pre><code>//重定向到另一个应用的名称为other的servlet
+response.sendRedirect(&quot;/redirect-two/other&quot;);
+</code></pre><h5 id="2-6-6-请求转发与重定向对比"><a href="#2-6-6-请求转发与重定向对比" class="headerlink" title="2.6.6 请求转发与重定向对比"></a>2.6.6 请求转发与重定向对比</h5><p>(1)、请求转发</p>
+<p>A、浏览器只发出一次请求，收到一次响应</p>
+<p>B、请求所转发到的资源中可以直接获取到请求中所携带的数据</p>
+<p>C、浏览器地址栏显示的是用户所提交的路径</p>
+<p>D、只能跳转到当前应用中的资源</p>
+<p>(2)、</p>
+<p>A、浏览器发出两次请求，接收到两次响应</p>
+<p>B、重定向到的资源不能直接获取到用户提交请求中所携带的数据</p>
+<p>C、浏览器地址栏显示的是重定向的请求路径，而非用户提交请求的路径。也正因为如此，重定向有一个很重要的作用：防止表单重复提交</p>
+<p>D、重定向不仅可以跳转到当前应用的其它资源，也可以跳转到其它应用中的资源</p>
+<h5 id="2-6-7-请求转发与重定向的选择"><a href="#2-6-7-请求转发与重定向的选择" class="headerlink" title="2.6.7 请求转发与重定向的选择"></a>2.6.7 请求转发与重定向的选择</h5><p>（1）、若需跳转到其它应用，只能选择重定向</p>
+<p>（2）、若是处理表单数据的servlet，要跳转到其它servlet，则需要选择重定向。为了防止表单重复提交。</p>
+<p>（3）、若对某一请求进行处理的servlet的执行需要消耗大量的服务器资源（cpu,内存），此时这个servlet执行完毕后，也需要重定向。</p>
+<p>（4）、其它情况，一般使用请求转发。</p>
+<h4 id="2-7-RequestDispatcher"><a href="#2-7-RequestDispatcher" class="headerlink" title="2.7 RequestDispatcher"></a>2.7 RequestDispatcher</h4><p>RequestDispatcher是javax.servlet包下的一个接口，通过HttpServletRequest可以获取到其接口对象，该对象就是用于完成转发功能的。</p>
+<h4 id="2-7-1-forward-与include"><a href="#2-7-1-forward-与include" class="headerlink" title="2.7.1 forward()与include()"></a>2.7.1 forward()与include()</h4><p>SomeServlet</p>
+<pre><code>public class SomServlet extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        System.out.println(&quot;some request = &quot; + req);
+        System.out.println(&quot;some resp = &quot; + resp);
+        req.getRequestDispatcher(&quot;other&quot;).forward(req, resp);
+    }
+
+}
+</code></pre><p>OtherServlet</p>
+<pre><code>public class OtherServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        System.out.println(&quot;other response = &quot; + response);
+        System.out.println(&quot;other request = &quot; + request);
+    }
+
+}
+</code></pre><p>输出结果中的request：</p>
+<pre><code>some request = org.apache.catalina.connector.RequestFacade@289113c7
+other request = org.apache.catalina.core.ApplicationHttpRequest@4d0d88e6
+</code></pre><p>1、other中的HttpServletRequest request是对some中的HttpServletRequest req的增强，实际上是将用户请求和转发请求这两次请求进行了合并。</p>
+<p>2、将req.getRequestDispatcher(“other”).forward(req, resp);改为req.getRequestDispatcher(“other”).include(req, resp);后，输出结果和上面的相同。说明对于request，forward与include没有区别。</p>
+<p>输出结果中的response:</p>
+<pre><code>//forward()方法跳转时    
+some resp = org.apache.catalina.connector.ResponseFacade@6451e20e
+other response = org.apache.catalina.connector.ResponseFacade@6451e20e
+
+//include()方法跳转时
+some resp = org.apache.catalina.connector.ResponseFacade@48202e11
+other response = org.apache.catalina.core.ApplicationHttpResponse@5f53ab27
+</code></pre><p>1、forward()方法跳转时，some中的resp与other中的response一样，都是ResponseFacade。</p>
+<p>2、include()方法跳转时，some中的resp为ResponseFacade，other中的response为ApplicationHttpResponse。</p>
+<p>3、说明requestDispatcher的forward()与include()的区别，主要集中在响应对象上。</p>
+<h4 id="2-7-2-代码测试"><a href="#2-7-2-代码测试" class="headerlink" title="2.7.2 代码测试"></a>2.7.2 代码测试</h4><p>SomeServlet</p>
+<pre><code>public class SomServlet extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        PrintWriter out = resp.getWriter();
+        out.print(&quot;someServlet:forward() before &quot;);
+
+        req.getRequestDispatcher(&quot;other&quot;).forward(req, resp);
+
+        out.print(&quot;someServlet:forward() after &quot;);
+    }
+
+}
+</code></pre><p>OtherServlet</p>
+<pre><code>public class OtherServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        PrintWriter out = response.getWriter();
+        out.print(&quot;other servlet data&quot;);
+    }
+
+}
+</code></pre><p>客户端浏览器输出结果：</p>
+<p>forward()方法跳转的输出结果：</p>
+<pre><code>other servlet data
+</code></pre><p>incluce()方法跳转的输出结果：</p>
+<pre><code>someServlet:forward() before 
+other servlet data
+someServlet:forward() after 
+</code></pre><p>1、forward()与include()的区别，主要表现在标准输出流的开启时间不同。</p>
+<p>2、说明在SomeServlet中，用forward()方法向前跳转时，请求此时还并没有结束，所以reqp还没有开启，因此两个输出语句没有执行。</p>
+<p>3、include()方法跳转时，some和other中的输出语句全部执行。说明，include不仅将other的数据写入到了标准输出流中，也将some中的数据包含到了自己的输出流中，</p>
+<p>4、forward的转发示意：</p>
+<p>浏览器—&gt;发送请求—&gt;服务器中的SomeServlet—-&gt;发送请求—-&gt;服务器中的OtherServlet—&gt;OtherServlet对浏览器做出响应。</p>
+<p>向浏览器给出响应的是OtherServlet，输出流是在OtherServlet中开启的。</p>
+<p>5、include的转发示意：</p>
+<p>浏览器—&gt;发送请求—&gt;服务器中的SomeServlet—-&gt;发送请求—&gt;服务器中的OtherServlet—-&gt;OtherServlet将SomeServlet进行了包含，并向SomeServlet做出响应 —&gt; SomeServle对浏览器做出响应。</p>
+<p>向浏览器给出响应的是SomeServlet，输出流在SomeServlet中就开启了。</p>
+<p>包含的过程就是由ApplicationHttpResponse这个增强的response来完成的。</p>
+<h3 id="2-9-Servlet的线程安全问题"><a href="#2-9-Servlet的线程安全问题" class="headerlink" title="2.9 Servlet的线程安全问题"></a>2.9 Servlet的线程安全问题</h3><p>Servlet是单例多线程环境下运行的，其运行可能会产生线程安全问题。</p>
+<h4 id="2-9-1-线程安全问题"><a href="#2-9-1-线程安全问题" class="headerlink" title="2.9.1 线程安全问题"></a>2.9.1 线程安全问题</h4><p>1、同时满足以下两个条件，则会出现线程安全问题。</p>
+<p>（1）、存在多线程并发访问</p>
+<p>（2）、存在可修改的共享数据</p>
+<p>2、JVM中可能存在线程安全问题的数据分析</p>
+<p>（1）、栈内存数据分析</p>
+<p>栈内存是是多例的，即JVM会为每个线程创建一个栈，所以其中的数据是不共享的。另外，栈里面放的是方法栈帧，一个方法在栈里面，以一个栈帧的形式出现，方法的栈帧中放的是方法的签名（头部信息）、局部变量、返回的信息等，方法中的局部变量存放在Stack的栈帧中，方法执行完毕，栈帧弹栈，局部变量消失。局部变量是局部的，不是共享的。所以栈内存中的数据不存在线程安全问题。</p>
+<p>（2）、堆内存数据分析</p>
+<p> 一个JVM中只存放一个堆内存，堆内存是共享的。被创建出的对象存放在堆内存中，而存放在堆内存中的对象，实际就是对象成员变量的集合。即成员变量是存放在堆内存的。堆内存中的数据是多线程共享的，也就是说，堆内存中的数据是存在线程安全隐患的。</p>
+<p>（3）、方法区数据分析</p>
+<p>一个JVM中只存在一个方法区。方法的代码片段，静态变量与常量都存放在方法区，方法区是多线程共享的。常量是不能修改的，所以常量不存在安全问题。静态变量是多线程共享的，所以静态变量存在安全隐患。 </p>
+<p>3、线程安全问题的解决方案</p>
+<p>（1）、对于一般性的类，不要定义为单例的。除非项目有特殊需求，或该类对象属于重量级对象。所谓重量级对象是指，创建该类对象是会占用较大的系统资源。</p>
+<p>（2）、无论类是否为单例类，尽量不要使用静态变量。</p>
+<p>（3）、若需要定义为单例类，则单例类尽量不使用成员变量（例如Servlet类）。</p>
+<p>（4）、若单例类中必须要使用成员变量，则对成员变量的操作添加串行化锁synchronized，实现线程同步。不过，最好不要使用线程同步机制，因为一旦操作进入串行化的排队状态，将大大降低程序的执行效率。</p>
+<h4 id="2-9-2-Servlet的线程安全问题"><a href="#2-9-2-Servlet的线程安全问题" class="headerlink" title="2.9.2 Servlet的线程安全问题"></a>2.9.2 Servlet的线程安全问题</h4><p>Servlet是单例多线程并发访问的，所以存在线程安全问题。</p>
+<p>为了避免问题产生，对用Servlet类的使用，一般是不声明成员变量的。</p>
+<p>若项目中必须要求声明成员变量，则只能通过同步机制synchronize避免。</p>
+<h4 id="2-9-3-对线程安全问题的合理利用"><a href="#2-9-3-对线程安全问题的合理利用" class="headerlink" title="2.9.3 对线程安全问题的合理利用"></a>2.9.3 对线程安全问题的合理利用</h4><p>Servlet中的成员变量是每一个线程均可修改和访问的，所以可以利用这一点，实现计数器功能，用于统计当前Servlet的被访问的次数。</p>
+<pre><code>public class SomeServlet extends HttpServle{
+    //定义成员变量 - 计数器
+    private int count;
+    public void doGet(...){
+        count++;
+        response.setContentType(&quot;text/html;charset=UTF-8&quot;);
+        PrinterWriter out = resp.getWriter();
+        out.print(&quot;当前网页的访问次数：&quot; + count);
+
+    }
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/25/java/java-servlet/java-servlet-2/" data-id="cjgxcg4b1004er9p3idzjxa2z" class="article-share-link">Delen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/servlet/">servlet</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/java-servlet/java-servlet-1" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/25/java/java-servlet/java-servlet-1/" class="article-date">
+  <time datetime="2018-01-25T12:30:10.000Z" itemprop="datePublished">2018-01-25</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/25/java/java-servlet/java-servlet-1/">java Servlet 一、基础</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>创建工程时：</p>
+<p>1、选择Dynamic Web Project</p>
+<p>2、Dynamic Web Module version 选择2.5</p>
+<h3 id="一、Servlet基础"><a href="#一、Servlet基础" class="headerlink" title="一、Servlet基础"></a>一、Servlet基础</h3><h4 id="1-1-Servlet生命周期"><a href="#1-1-Servlet生命周期" class="headerlink" title="1.1 Servlet生命周期"></a>1.1 Servlet生命周期</h4><h4 id="1-1-1生命周期方法执行流程"><a href="#1-1-1生命周期方法执行流程" class="headerlink" title="1.1.1生命周期方法执行流程"></a>1.1.1生命周期方法执行流程</h4><p>实例化 —&gt; 初始化 —&gt; 服务 —&gt; 销毁</p>
+<p>Servlet的整个生命周期过程的执行，均由web服务器负责管理。即Servlet从创建到服务到销毁的整个过程中方法的调用，都是由web服务器调用执行，程序员无法控制其执行流程。</p>
+<p>但程序员可以获取到Servlet的这些生命周期的时间点，并可以指定让Servlet做一些具体业务相关的事情。</p>
+<p>实现Servlet接口，重写五个方法</p>
+<pre><code>public class SomServlet implements Servlet {
+
+    public void init(ServletConfig config) throws ServletException {
+        // TODO Auto-generated method stub
+    }
+
+    public void destroy() {
+        // TODO Auto-generated method stub
+    }
+
+    public ServletConfig getServletConfig() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public String getServletInfo() {
+        // TODO Auto-generated method stub
+        return null; 
+    }
+
+    public void service(ServletRequest request, ServletResponse response) throws ServletException, IOException {
+        // TODO Auto-generated method stub
+    }
+
+}
+</code></pre><p>对于以上代码的执行，注意以下几个时间点：</p>
+<p>（1）、项目部署后启动服务器发现并没有执行Servlet的无参构造器，说明在Web容器启动时并没有创建Servlet对象</p>
+<p>（2）、用户提交请求后，马上可以看到无参构造器、init()方法、service()方法均执行。</p>
+<p>（3）、刷新页面，发现只会执行service()方法，每刷新一次，即每提交一次请求，就会执行一次service()方法。</p>
+<p>（4）、让另外一个浏览器也发现同样的请求，会发现只执行service()方法，而无参构造器、init()方法均未执行。</p>
+<p>（5）、正常关闭Tomcat(使用右键stop server关闭，不能使用Terminate关闭)，发现destroy()方法也会执行。</p>
+<h4 id="1-1-2-Servlet特征"><a href="#1-1-2-Servlet特征" class="headerlink" title="1.1.2 Servlet特征"></a>1.1.2 Servlet特征</h4><p>（1）、Servlet是单例多线程的</p>
+<p>（2）、一个Servlet实例只会执行一次无参构造器方法与init()方法，并且是在第一次访问时执行。</p>
+<p>（3）、每提交一次对当前Servlet的请求，就会执行一次service()方法</p>
+<p>（4）、一个Servlet实例只会执行一次destroy()方法，在应用停止时执行。</p>
+<p>（5）、由于Servlet是单例多线程的，为了保证其线程的安全性，一般情况下是不为Servlet类定义可修改的成员变量的。因为每个线程均可修改这个成员变量，会出现线程安全问题。</p>
+<p>（6）、默认情况下，Servlet在Web容器启动时是不会被实例化的。</p>
+<h4 id="1-1-3-Web容器启动时创建Servlet实例"><a href="#1-1-3-Web容器启动时创建Servlet实例" class="headerlink" title="1.1.3 Web容器启动时创建Servlet实例"></a>1.1.3 Web容器启动时创建Servlet实例</h4><p>Servlet注册时，添加<load-on-startup> int x </load-on-startup>，x大于等于0，值越小，越优先被实例化。</p>
+<pre><code>&lt;servlet&gt;
+  &lt;servlet-name&gt;SomServlet&lt;/servlet-name&gt;
+  &lt;servlet-class&gt;servlet01.SomServlet&lt;/servlet-class&gt;
+  &lt;load-on-startup&gt;0&lt;/load-on-startup&gt;
+&lt;/servlet&gt;
+&lt;servlet-mapping&gt;
+  &lt;servlet-name&gt;SomServlet&lt;/servlet-name&gt;
+  &lt;url-pattern&gt;/SomServlet&lt;/url-pattern&gt;
+&lt;/servlet-mapping&gt;
+</code></pre><h4 id="1-1-4-Servlet中的两个Map"><a href="#1-1-4-Servlet中的两个Map" class="headerlink" title="1.1.4 Servlet中的两个Map"></a>1.1.4 Servlet中的两个Map</h4><p>服务器中存在有两个Map</p>
+<p>Map-one </p>
+<p>key —————— value</p>
+<p>url-pattern ———– Servlet引用</p>
+<p>提交请求,解析url，获取uri，查找map-one中的key，找到后，运行该Servlet的service()方法</p>
+<p>Map-two</p>
+<p>key —————- value</p>
+<p>url-pattern ——— <servlet-class></servlet-class></p>
+<p>如果map-one中找不到对应的url-pattern，就会查找map-two，找到对应注册的servlet-class名，应用反射机制，创建该servlet实例，<br>把实例的引用放到map-one中，执行service()方法</p>
+<h4 id="1-2、ServletConfig"><a href="#1-2、ServletConfig" class="headerlink" title="1.2、ServletConfig"></a>1.2、ServletConfig</h4><h4 id="1-2-1-什么是ServletConfig"><a href="#1-2-1-什么是ServletConfig" class="headerlink" title="1.2.1 什么是ServletConfig"></a>1.2.1 什么是ServletConfig</h4><p>其实就是封装的注册中的servlet</p>
+<pre><code>&lt;servlet&gt;
+   &lt;description&gt;&lt;/description&gt;
+   &lt;display-name&gt;SomServlet&lt;/display-name&gt;
+   &lt;servlet-name&gt;SomServlet&lt;/servlet-name&gt;
+   &lt;servlet-class&gt;servlet01.SomServlet&lt;/servlet-class&gt;
+ &lt;/servlet&gt;
+</code></pre><h4 id="1-2-2-获取ServletConfig"><a href="#1-2-2-获取ServletConfig" class="headerlink" title="1.2.2 获取ServletConfig"></a>1.2.2 获取ServletConfig</h4><pre><code>public class SomServlet implements Servlet {
+    private ServletConfig config;
+    public void init(ServletConfig config) throws ServletException {
+        this.config = config;
+        System.out.println(config);
+    }
+
+    public void destroy() {
+    }
+
+    public ServletConfig getServletConfig() {
+        return null;
+    }
+
+    public String getServletInfo() {
+        return null; 
+    }
+
+    public void service(ServletRequest request, ServletResponse response) throws ServletException, IOException {
+    }
+
+}
+</code></pre><p>tomcat服务器会通过init方法将ServletConfig对象传给servlet类</p>
+<h4 id="1-2-3-ServletConfig中的方法"><a href="#1-2-3-ServletConfig中的方法" class="headerlink" title="1.2.3 ServletConfig中的方法"></a>1.2.3 ServletConfig中的方法</h4><p>public String getServletName();</p>
+<p>public ServletContext getServletContext();</p>
+<p>public String getInitParameter(String name);</p>
+<p>public Enumeration<string> getInitParameterNames();</string></p>
+<h5 id="web-xml"><a href="#web-xml" class="headerlink" title="web.xml"></a>web.xml</h5><pre><code>  &lt;servlet&gt;
+  &lt;description&gt;&lt;/description&gt;
+  &lt;display-name&gt;SomServlet&lt;/display-name&gt;
+  &lt;servlet-name&gt;SomServlet&lt;/servlet-name&gt;
+  &lt;servlet-class&gt;servlet01.SomServlet&lt;/servlet-class&gt;
+  &lt;init-param&gt;
+          &lt;param-name&gt;adress&lt;/param-name&gt;
+          &lt;param-value&gt;beijing&lt;/param-value&gt;
+  &lt;/init-param&gt;
+  &lt;init-param&gt;
+          &lt;param-name&gt;phone&lt;/param-name&gt;
+          &lt;param-value&gt;15022222222&lt;/param-value&gt;
+  &lt;/init-param&gt;
+&lt;/servlet&gt;
+&lt;servlet-mapping&gt;
+  &lt;servlet-name&gt;SomServlet&lt;/servlet-name&gt;
+  &lt;url-pattern&gt;/SomServlet&lt;/url-pattern&gt;
+&lt;/servlet-mapping&gt;
+</code></pre><h5 id="SomServlet-class"><a href="#SomServlet-class" class="headerlink" title="SomServlet.class"></a>SomServlet.class</h5><pre><code>public class SomServlet implements Servlet {
+    private ServletConfig config;
+    public void init(ServletConfig config) throws ServletException {
+        this.config = config;
+        System.out.println(&quot;servletconfig:&quot;+config);
+    }
+
+    public void destroy() {
+    }
+
+    public ServletConfig getServletConfig() {
+        return null;
+    }
+
+    public String getServletInfo() {
+        return null; 
+    }
+
+    public void service(ServletRequest request, ServletResponse response) throws ServletException, IOException {
+        //获取servlet名称
+        String servletName = config.getServletName();
+        System.out.println(&quot;servletName:&quot; + servletName);
+
+        //获取servletcontext对象
+        ServletContext  servletContext = config.getServletContext();
+        System.out.println(&quot;ServletContext:&quot; + servletContext);
+
+        //获取该servlet里边的所有的初始化参数
+        Enumeration&lt;String&gt; names = config.getInitParameterNames();
+        while(names.hasMoreElements()) {
+            String name = names.nextElement();
+            String value = config.getInitParameter(name);
+            System.out.println(name + &quot;=&quot; + value);
+        }
+    }
+
+}
+</code></pre><h5 id="输出结果："><a href="#输出结果：" class="headerlink" title="输出结果："></a>输出结果：</h5><pre><code>servletconfig:org.apache.catalina.core.StandardWrapperFacade@79bfdb2d
+servletName:SomServlet
+ServletContext:org.apache.catalina.core.ApplicationContextFacade@e11d81f
+phone=15022222222
+adress=beijing
+</code></pre><h4 id="1-3-ServletContext"><a href="#1-3-ServletContext" class="headerlink" title="1.3 ServletContext"></a>1.3 ServletContext</h4><p>代表整个应用，一个应用只有一个ServletContext</p>
+<p>返回应用的名称</p>
+<pre><code>String getContextPath()
+</code></pre><p>获取所有的servlet共享的初始化参数</p>
+<pre><code>Enumeration&lt;String&gt; getInitParameterNames();
+String getInitParameter(String name)
+</code></pre><p>获取真正的路径</p>
+<pre><code>String getRealPath(String path)
+</code></pre><p>域属性空间：存放所有的servlet可以共享的属性</p>
+<p>设置域属性，可以实现在一个servlet中设置，另一个servlet中获取</p>
+<pre><code>setAttribute(key,vlaue)
+getAttribute(key)
+removeAttribute(key)
+</code></pre><h4 id="1-4、设置欢迎页面"><a href="#1-4、设置欢迎页面" class="headerlink" title="1.4、设置欢迎页面"></a>1.4、设置欢迎页面</h4><h4 id="1-5、设置与匹配"><a href="#1-5、设置与匹配" class="headerlink" title="1.5、设置与匹配"></a>1.5、<url-pattern>设置与匹配</url-pattern></h4><h4 id="1-5-1-设置"><a href="#1-5-1-设置" class="headerlink" title="1.5.1 设置"></a>1.5.1 <url-pattern>设置</url-pattern></h4><p>（1）、精确路径模式</p>
+<pre><code>&lt;servlet-mapping&gt;
+    &lt;servlet-name&gt;some-servlet&lt;/servlet-name&gt;
+    &lt;url-pattern&gt;/some&lt;/url-pattern&gt;
+    &lt;url-pattern&gt;/test/other&lt;/url-pattern&gt;
+    &lt;url-pattern&gt;/aaa/bbb/ccc&lt;/url-pattern&gt;
+&lt;servlet-mapping/&gt;
+</code></pre><p>（2）、通配符路径模式</p>
+<pre><code>&lt;url-pattern&gt;/some/*&lt;/url-pattern&gt;
+</code></pre><p>（3）、全路径模式</p>
+<pre><code>/*与/都是全路径模式，但他们还是不同的。
+
+/*是真正的全路径模式，可以拦截所有请求，无论是动态资源还是表态资源请求，均会被拦截（service方法）。
+
+/只会拦截静态资源请求    
+</code></pre><p>（4）、后辍名模式</p>
+<pre><code>*.do
+</code></pre><h4 id="1-5-2-注意事项"><a href="#1-5-2-注意事项" class="headerlink" title="1.5.2 注意事项"></a>1.5.2 注意事项</h4><p>后辍名模式的用法限制</p>
+<pre><code>带/的通配符路径模式与后辍名模式不能同时使用。例如：不能使用/*.do，/xxx/*.do
+</code></pre><h4 id="1-5-3-匹配原则"><a href="#1-5-3-匹配原则" class="headerlink" title="1.5.3 匹配原则"></a>1.5.3 匹配原则</h4><p>（1）、路径优先后辍</p>
+<pre><code>例如SomServlet的&lt;url-patten&gt;为*.do，OtherServlet的&lt;url-pattern&gt;为/xx/*，请求提交的url为：http://localhost:8080/oa/xxx/abc.do，同时匹配两个url-pattern时，会按照路径优先于后辍的匹配原则，选择OtherServlet。
+</code></pre><p>（2）、精确路径优先</p>
+<pre><code>http://localhost:8080/oa/some    请求 同时匹配/some与/*时，优先配置/some
+</code></pre><p>（3）、最长路径优先</p>
+<pre><code>http://localhost:8080/oa/some/other 请求 同时匹配/some/*和/some/other/*。优先选择/some/other对应的servlet
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/25/java/java-servlet/java-servlet-1/" data-id="cjgxcg4az004br9p3ztb33mtv" class="article-share-link">Delen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/servlet/">servlet</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/java-regex/java-regex-1" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/17/java/java-regex/java-regex-1/" class="article-date">
+  <time datetime="2018-01-17T12:50:07.000Z" itemprop="datePublished">2018-01-17</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/17/java/java-regex/java-regex-1/">java-正则表达式</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>正则表达式用于操作字符串数据。</p>
+<h4 id="1、匹配："><a href="#1、匹配：" class="headerlink" title="1、匹配："></a>1、匹配：</h4><pre><code>匹配手机号码
+String tel = &quot;15022443344&quot;;
+String regex = &quot;1[3578][0-9]{9}&quot;;
+String regex2 = &quot;1[3578]\\d{9}&quot;;
+
+boolean r = tel.matches(regex);
+sosy(tel+&quot;:&quot;+r);
+
+1[3578][0-9]{9}
+1[3578]\\d{9}
+
+1:第一位固定是1 
+[3578]:第二位是3578中的一个
+[0-9]:第三位是0-9中的一个
+{9}：第三位共出现9次
+\:对\进行转义
+\d:代表[0-9]
+</code></pre><h4 id="2、切割："><a href="#2、切割：" class="headerlink" title="2、切割："></a>2、切割：</h4><p>其实使用的就是String类中的split(String regex)方法</p>
+<pre><code>*:任意次数，0次，1次或多次
+?:0次或1次
++:1次或多次
+
+String str = &quot;adf djs    sfjjs&quot;;
+String names = str.split(&quot; +&quot;);//空格出现一次或多次
+
+===========================
+
+.:代表任意字符
+String str = &quot;adf.djss.fjjs&quot;;
+String names = str.split(&quot;\\.&quot;);
+
+():代表组
+//根据重复的t和重复的m切割三个字段
+String str = &quot;zhangsantttttttxiaoqiangmmmmmmmmzhaoliu&quot;;
+String names = str.split(&quot;(.)\\1+&quot;);
+
+(.)\\1+
+.:代表第一个字符是任意字符，可以是t,也可以是m
+(.):默认代表的是第1组
+\\1:代表第二个字符是第1组的重复
++:代表重复的组出现1次或多次
+
+组：((A)(B(C)))
+最外边的()代表第1组
+(A)是第2组
+(B(C))是第3组
+(C)是第4组
+</code></pre><h4 id="3、替换："><a href="#3、替换：" class="headerlink" title="3、替换："></a>3、替换：</h4><pre><code>replaceAll(regex,replacement)
+
+//用#代替所有的连续的重复字符
+ String str = &quot;zhangsantttttttxiaoqiangmmmmmmmmzhaoliu&quot;;
+ str = str.replaceAll(&quot;(.)\\1+&quot;, &quot;#&quot;);
+ syso(str);
+ 输出结果：
+ zhangsan#xiaoqiang#zhaoliu
+
+========================
+
+//将所有连续的重复字符变成单个,重复的t变成1个t，重复的m变成一个m
+String str = &quot;zhangsantttttttxiaoqiangmmmmmmmmzhaoliu&quot;;
+ str = str.replaceAll(&quot;(.)\\1+&quot;, &quot;$1&quot;);
+syso(str);
+ 输出结果：
+ zhangsantxiaoqiangmzhaoliu
+
+$1:代表获取前一个参数中的组1
+
+============================
+
+String tel = &quot;15022229999&quot;;
+tel = tel.replaceAll(&quot;(\\d{3})\\d{4}(\\d{4})&quot;,&quot;$1****$2&quot;);
+syso(tel);
+输出结果：
+150****9999
+</code></pre><h4 id="4、获取"><a href="#4、获取" class="headerlink" title="4、获取"></a>4、获取</h4><pre><code>//取三个字符组成的字符串
+public class RegexGetDemo {
 
     public static void main(String[] args) {
 
-        ByteArrayInputStream bis = new ByteArrayInputStream(&quot;abcde&quot;.getBytes());
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        int ch = 0;
-        while((ch = bis.read()) != -1) {
-            bos.write(ch);
-        }
-        System.out.println(bos.toString());
+        String str = &quot;hao jlalal jie lskqjx wxm jajlw&quot;;
+        String regex = &quot;\\b[a-z]{3}\\b&quot;;
+        //将正则封装成对象
+        Pattern p = Pattern.compile(regex);
+        //获取匹配器对象
+        Matcher m = p.matcher(str);
+        //查找
+        while(m.find()) {
+            System.out.println(m.group());
+        }    
     }
+}    
+输出结果：
+hao
+jie
+wxm
 
+\b:表示边界
+</code></pre><h4 id="5、练习"><a href="#5、练习" class="headerlink" title="5、练习"></a>5、练习</h4><pre><code>String str = &quot;我我...我我我....我我我要...要要要.....学学学....编编....程程程&quot;;
+//去掉.
+str = str.replaceAll(&quot;\\.+&quot;, &quot;&quot;);
+//去掉叠词
+str = str.replaceAll(&quot;(.)\\1+&quot;,&quot;$1&quot;);
+System.out.println(str);    
+
+输出结果：
+我要学编程
+</code></pre><hr>
+<pre><code>//ip地址排序
+String ip_str = &quot;192.168.9.30 127.0.0.1 4.4.4.5 101.80.8.44&quot;;
+
+System.out.println(&quot;str:&quot;+ip_str);
+
+//补0，ip地址四段数字，不足3位的补足3位
+ip_str = ip_str.replaceAll(&quot;(\\d+)&quot;, &quot;00$1&quot;);
+
+//四段数字全都保留32位
+ip_str = ip_str.replaceAll(&quot;0*(\\d{3})&quot;, &quot;$1&quot;);
+
+//分割
+String[] ips = ip_str.split(&quot; +&quot;);
+
+//treeSet排序
+TreeSet&lt;String&gt; ts = new TreeSet&lt;String&gt;();
+for(String ip:ips) {
+    ts.add(ip);
 }
-</code></pre><p>操作字符数组的流：</p>
-<p>CharArrayInputStream与CharArrayOutputStream</p>
-<p>操作字符串的流</p>
-<p>StringReader与StringWriter</p>
 
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-18-array/" data-id="cjegiwodg002vrvp3b6iijada" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/java-io/IO-17-dataStream" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/10/java/java-io/IO-17-dataStream/" class="article-date">
-  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/java/">java</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/10/java/java-io/IO-17-dataStream/">IO流 - 十七、操作基本数据类型的流对象 - DataStream</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>DataInputStream与DataOutputStream</p>
-<pre><code>public class DataStream {
-
-    public static void main(String[] args) throws IOException {
-
-        writeData();
-        readData();
-
-    }
-
-    private static void readData() throws IOException {
-        DataInputStream dis = new DataInputStream(new FileInputStream(&quot;abc.txt&quot;));
-        String str = dis.readUTF();
-        System.out.println(str);
-        dis.close();
-    }
-
-    private static void writeData() throws IOException {
-        DataOutputStream dos = new DataOutputStream(new FileOutputStream(&quot;abc.txt&quot;));
-        dos.writeUTF(&quot;你好&quot;);
-        dos.close();
-    }
-
+//去掉补足3位的0
+System.out.println(&quot;排序&quot;);
+for(String ip:ts) {
+    System.out.println(ip.replaceAll(&quot;0*(\\d+)&quot;,&quot;$1&quot;));            
 }
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-17-dataStream/" data-id="cjegiwod9002srvp3gdttdqlh" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/java-io/IO-4-transform-stream" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/10/java/java-io/IO-4-transform-stream/" class="article-date">
-  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/java/">java</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/10/java/java-io/IO-4-transform-stream/">IO流 - 四、转换流</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>字节流通向字符流的转换流:字符流Reader的子类InputStreamReader </p>
-<pre><code>public class Demo16 {
-    public static void main(String[] args) throws IOException {
-        //字节流
-        InputStream in = System.in;
-
-        //字节流转换成字符流，转换流
-        InputStreamReader isr = new InputStreamReader(in);
-
-        //高效字符流
-        BufferedReader bufr = new BufferedReader(isr);
-
-        String line = null;
-        while((line = bufr.readLine()) != null) {
-            if(line.equals(&quot;over&quot;))
-                break;
-            System.out.println(line.toUpperCase());
-        }
-    }
-}
-</code></pre><p>字符通向字节流的转换流:字符流Writer的子类outputStreamWriter</p>
-<p>public class Demo17 {</p>
-<pre><code>public static void main(String[] args) throws IOException {
-
-    BufferedReader bufr = new BufferedReader(new InputStreamReader(System.in));
-
-    BufferedWriter bufw = new BufferedWriter(new OutputStreamWriter(System.out));
-
+</code></pre><hr>
+<pre><code>//校验邮箱地址
+String mail = &quot;test@126.com&quot;;//.cn .com.cn
+String regex = &quot;[a-zA-Z0-9_]+@[a-zA-Z0-9]+(\\.[a-zA-Z]{1,3})+&quot;;
+boolean b = mail.matches(regex);
+System.out.println(b);
+</code></pre><hr>
+<p>网页爬虫，获取指定网页里所有的邮箱</p>
+<pre><code>public static List&lt;String&gt; getMails() throws IOException {
+    //源
+    URL url = new URL(&quot;http://www.baidu.com/web/aaa.html&quot;);
+    //读取源
+    BufferedReader bufIn = new BufferedReader(new InputStreamReader(url.openStream()));
+    //对源中的数据进行规则匹配
+    String mail_regex = &quot;\\w+@\\w+(\\.\\w)+&quot;;
+    List&lt;String&gt; list = new ArrayList&lt;String&gt;();
+    Pattern p = Pattern.compile(mail_regex);
     String line = null;
-    while((line=bufr.readLine()) != null) {
-        if(&quot;over&quot;.equals(line))
-            break;
-        bufw.write(line.toUpperCase());
-        bufw.newLine();
-        bufw.flush();
+    while((line = bufIn.readLine()) != null) {
+        Matcher m = p.matcher(line);
+        while(m.find()) {
+            //数据写入集合
+            list.add(m.group());
+        }        
     }
+    bufIn.close();
+    return list;
 }
-</code></pre><p>}</p>
-
+</code></pre>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-4-transform-stream/" data-id="cjegiwoe90038rvp3myc9s8xt" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/01/17/java/java-regex/java-regex-1/" data-id="cjgxcg4ax0047r9p3d05y12ba" class="article-share-link">Delen</a>
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/regex/">regex</a></li></ul>
 
     </footer>
   </div>
@@ -991,10 +2397,10 @@ class NewPerson2 {
 
 
   
-    <article id="post-java/java-io/IO-16-pipedStream" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-java/java-reflect/java-reflect-1" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2018/01/10/java/java-io/IO-16-pipedStream/" class="article-date">
-  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
+    <a href="/2018/01/17/java/java-reflect/java-reflect-1/" class="article-date">
+  <time datetime="2018-01-17T11:06:09.000Z" itemprop="datePublished">2018-01-17</time>
 </a>
     
   <div class="article-category">
@@ -1009,7 +2415,7 @@ class NewPerson2 {
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/10/java/java-io/IO-16-pipedStream/">IO流 - 十六、管道流 - PipedStream</a>
+      <a class="article-title" href="/2018/01/17/java/java-reflect/java-reflect-1/">java反射机制</a>
     </h1>
   
 
@@ -1017,63 +2423,173 @@ class NewPerson2 {
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>PipedInputStream和PipedOutputStream</p>
-<p>输入输出可以直接进行连接，通过结合线程使用。</p>
-<pre><code>public class PipedStreamDemo1 {
-
-    public static void main(String[] args) throws IOException {
-        PipedInputStream input = new PipedInputStream();
-        PipedOutputStream out = new PipedOutputStream();
-        input.connect(out);
-
-        new Thread(new Input(input)).start();
-        new Thread(new Output(out)).start();
+        <h4 id="1、概述"><a href="#1、概述" class="headerlink" title="1、概述"></a>1、概述</h4><p>java反射机制是在运行状态中，对于任意一个类，都能够知道这个类的所有属性和方法，对于任意一个类，都能够调用它的任意方法和属性，这种动态的获取信息以及动态调用对象的方法的功能就称为java语言的反射机制。</p>
+<p>可以理解为对类的解剖。</p>
+<h4 id="2、获取Class类的对象的三种方式"><a href="#2、获取Class类的对象的三种方式" class="headerlink" title="2、获取Class类的对象的三种方式"></a>2、获取Class类的对象的三种方式</h4><p>（1）、Object类中的getClass()方法</p>
+<pre><code>Person p = new Person();
+Class pc = p.getClass();
+</code></pre><p>（2）、通过静态属性class</p>
+<pre><code>Class pc = Person.class;
+</code></pre><p>（3）、通过Class类中的forName方法</p>
+<pre><code>String className = &quot;src/reflect/Person&quot;;//带包的路径
+Class pc = Class.forName(className);
+</code></pre><h4 id="3、获取Class中的构造函数"><a href="#3、获取Class中的构造函数" class="headerlink" title="3、获取Class中的构造函数"></a>3、获取Class中的构造函数</h4><pre><code>class Person {
+    public String name;
+    private int age;
+    Person() {
 
     }
-
+    Person(int age, String name) {
+        this.name = name;
+        this.age = age;
+    }
 }
 
-class Input implements Runnable {
-    private PipedInputStream in;
-    Input(PipedInputStream in) {
-        this.in = in;
+//字节码文件对象，class对象的类
+Class pc = Class.forName(className);
+
+//生成该字节码文件对象，class对象，调用的是空参的构造函数
+Object obj = pc.newInstance();
+
+//实参的构造函数，生成对象，先获取构造函数
+Constructor ct = pc.getConstructor(int.class,String.class);
+
+//通过构造器对象的newInstance方法生成对象
+Object obj = ct.newInstance(38,&quot;小明&quot;);
+</code></pre><h4 id="4、获取Class中的字段"><a href="#4、获取Class中的字段" class="headerlink" title="4、获取Class中的字段"></a>4、获取Class中的字段</h4><pre><code>//字节码文件对象，class对象的类
+Class pc = Class.forName(className);
+
+//只能获取public字段
+Field nameField = pc.getField(&quot;name&quot;);
+
+//能获取public和private字段
+Field ageField = pc.getDeclaredField(&quot;age&quot;);
+
+//对私有字段的访问取消权限检查，暴力访问
+ageField.setAccessible(true);
+
+//生成对象
+Object obj = pc.newInstance();
+
+//age赋值
+ageField.set(obj,22);
+
+//age取值
+Object ageValue = field.get(obj);
+
+syso(ageValue);//22
+</code></pre><h4 id="5、获取Class中的方法"><a href="#5、获取Class中的方法" class="headerlink" title="5、获取Class中的方法"></a>5、获取Class中的方法</h4><pre><code>//字节码文件对象，class对象的类
+Class pc = Class.forName(className);
+
+//获取所有的public方法，包含父类中的
+Method[] methods = pc.getMethods();
+
+//获取本类中所有的public和private方法，不包含父类中的
+methods = pc.getDeclaredMethods();
+
+//获取指定的空参方法show，null代表空参
+Method showMethod = pc.getMethod(&quot;show&quot;,null);
+
+//生成对象
+Object obj = pc.newInstance();
+
+//调用show方法，null代表实参
+showMethod.invoke(obj,null);
+
+//获取指定的带参数的方法paramMethod
+Method paramMethod = pc.getMethod(&quot;paramMethod&quot;, String.class, int.class);
+
+//调用paramMethod方法
+paramMethod.invoke(obj,&quot;小强&quot;,22);
+</code></pre><h4 id="6、反射练习"><a href="#6、反射练习" class="headerlink" title="6、反射练习"></a>6、反射练习</h4><pre><code>public class ReflectPractice {
+    public static void main(String[] args) throws IOException, ReflectiveOperationException {
+        //主板开启
+        Mainboard mb = new Mainboard();
+        mb.run();
+
+        //加载声卡，网卡等设备
+        //读取配置文件，获取设备类名称
+        File configFile = new File(&quot;pci.properties&quot;);
+        if(!configFile.exists())
+            configFile.createNewFile();
+        Properties prop = new Properties();
+        FileInputStream fis = new FileInputStream(configFile);
+        prop.load(fis);
+        for(int x=0; x&lt;prop.size(); x++) {
+            String pciName = prop.getProperty(&quot;pci&quot;+(x+1));
+            //根据设备名，获取该设备字节码文件对象
+            Class clazz = Class.forName(pciName);
+            //实例化设备对象
+            PCI p = (PCI)clazz.newInstance();
+            //运行设备
+            mb.usePCI(p);
+        }
+        fis.close();
     }
+}
+
+public interface PCI {
+    public void open();
+    public void close();
+}    
+
+public class Mainboard {
 
     public void run() {
-        try {
-            byte[] buf = new byte[1024];
-            int length = in.read(buf);
-            String s = new String(buf,0,length);
-            System.out.println(&quot;s=&quot;+s);
-            in.close();
-        } catch (Exception e) {
-            // TODO: handle exception
-        }
-    }
-}
-
-class Output implements Runnable {
-    private PipedOutputStream out;
-    Output(PipedOutputStream out) {
-        this.out = out;
+        System.out.println(&quot;mainboard run&quot;);
     }
 
-    public void run() {
-        try {
-            out.write(&quot;aaaaaaaaa&quot;.getBytes());
-        } catch (Exception e) {
-            // TODO: handle exception
+    public void usePCI(PCI p) {
+        if(p != null) {            
+            p.open();
+            p.close();
         }
     }
+
 }
+
+public class NetCard implements PCI {
+
+    @Override
+    public void open() {
+        System.out.println(&quot;netcard open&quot;);
+    }
+
+    @Override
+    public void close() {
+        System.out.println(&quot;netcard close&quot;);
+    }
+
+}
+
+public class SoundCard implements PCI{
+
+    @Override
+    public void open() {
+        System.out.println(&quot;sound open&quot;);
+    }
+
+    @Override
+    public void close() {
+        System.out.println(&quot;sound close&quot;);
+    }
+
+}
+
+file pci.properties
+
+pci1=reflect.SoundCard
+pci2=reflect.NetCard
+
+只需要向配置文件中添加设备名称即可，不用再修改mainborad文件，增加了程序的扩展性。
 </code></pre>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-16-pipedStream/" data-id="cjegiwod6002prvp32e4lnht3" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/01/17/java/java-reflect/java-reflect-1/" data-id="cjgxcg4as0040r9p3bidyuggz" class="article-share-link">Delen</a>
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/reflect/">reflect</a></li></ul>
 
     </footer>
   </div>
@@ -1082,10 +2598,10 @@ class Output implements Runnable {
 
 
   
-    <article id="post-java/java-io/IO-15-randomAccessFile" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-java/java-io/IO-19-practice-cutstring" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2018/01/10/java/java-io/IO-15-randomAccessFile/" class="article-date">
-  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
+    <a href="/2018/01/15/java/java-io/IO-19-practice-cutstring/" class="article-date">
+  <time datetime="2018-01-15T02:52:46.000Z" itemprop="datePublished">2018-01-15</time>
 </a>
     
   <div class="article-category">
@@ -1100,7 +2616,7 @@ class Output implements Runnable {
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/10/java/java-io/IO-15-randomAccessFile/">IO流 - 十五、RandomAccessFile</a>
+      <a class="article-title" href="/2018/01/15/java/java-io/IO-19-practice-cutstring/">IO流 - 十九：练习 - 按字节截取字符串</a>
     </h1>
   
 
@@ -1108,66 +2624,288 @@ class Output implements Runnable {
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>随机访问文件，自身具备读写的方法。</p>
-<p>通过skipBytes(int x)，seek(int x)来达到随机访问。</p>
-<p>特点：</p>
-<p>1、不是IO体系中的子类。</p>
-<p>2、该对象既能读也能写。</p>
-<p>3、该对象内部维护了一个byte数组，并通过指针可以操作数组中的元素。</p>
-<p>4、可以通过getFilePointer方法获取指针的位置，和通过seek方法设置指针的位置。</p>
-<p>5、其实该对象就是将字节输入流和输出流进行了封装。</p>
-<p>6、该对象的源或目的只能是文件。通过构造函数就可以看出。可以是文本文件，也可是媒体文件。</p>
-<pre><code>public class RandomAccessDemo1 {
+        <p>练习</p>
+<pre><code>public class CutStringByByte {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws UnsupportedEncodingException {
+        /**
+         * &quot;ab你好&quot;
+         * 97 98 -60 -29 -70 -60
+         * 
+         * 在java中，字符串&quot;abcd&quot;与字符串&quot;ab你好&quot;的长度是一样的，都是四个字符。
+         * 但是，对应的字节数不同，一个汉字占两个字节。
+         * 定义一个方法：按照最大的字节数来截取子串。
+         * 如：&quot;ab你好&quot;，如果取三个字节，那么子串就是ab与你的半个字节，半个字节需要舍弃
+         * 如果取四个字节，就是&quot;ab你&quot;，取五个字节还是舍弃半个字节，还是&quot;ab你&quot;。
+         */
+        String str = &quot;ab你好cd谢谢&quot;;
+        int length = str.getBytes(&quot;gbk&quot;).length;
+        for(int x=0; x&lt;length; x++) {
+            System.out.println(&quot;截取&quot;+(x+1)+&quot;个字节结果是：&quot;+cutStringByByte(str, x+1));
+        }
 
-        //randomWrite();
+        System.out.println(&quot;=================================&quot;);
 
-        randomRead();
+        /**
+         * utf-8 一个汉字对应三个字节，而且都是负数
+         * 
+         */
+        String str2 = &quot;ab你好cd谢谢&quot;;
+        int length2 = str2.getBytes(&quot;utf-8&quot;).length;
+        for(int x=0; x&lt;length2; x++) {
+            System.out.println(&quot;截取&quot;+(x+1)+&quot;个字节结果是：&quot;+cutStringByutf8(str2, x+1));
+        }
 
     }
 
-    public static void randomRead() throws FileNotFoundException, IOException {
-        RandomAccessFile raf = new RandomAccessFile(&quot;ranacc.txt&quot;,&quot;r&quot;);
-        //读4个字节，获取张三
-        byte[] buf = new byte[4];
-        raf.read(buf);
-        String name = new String(buf);
-        System.out.println(&quot;name=&quot;+name);
+    private static String cutStringByutf8(String str, int length) throws UnsupportedEncodingException {
+        byte[] buf = str.getBytes(&quot;utf-8&quot;);
 
-        //再读4个字节，读取年龄
-        int age = raf.readInt();
-        System.out.println(&quot;age=&quot;+age);
+        //从后向前计算负数（代表汉字的字节）的个数
+        int count = 0;
+        for(int x = length-1; x&gt;=0; x--) {
+            if(buf[x]&lt;0)
+                count++;
+            else
+                break;
+        }
 
-        //获取指针位置
-        System.out.println(&quot;pos:&quot;+raf.getFilePointer());//pos:8
-
-        //设置指针位置，raf.seek(8);//随机读取，只要指定指针的位置即可
-
-        raf.close();
+        if(count%3 == 0)
+            return new String(buf,0,length,&quot;utf-8&quot;);
+        else if(count%3 == 1)
+            return new String(buf,0,length-1,&quot;utf-8&quot;);
+        else
+            return new String(buf,0,length-2,&quot;utf-8&quot;);
     }
 
-    public static void randomWrite() throws FileNotFoundException, IOException {
-        RandomAccessFile raf = new RandomAccessFile(&quot;ranacc.txt&quot;,&quot;rw&quot;);
+    public static String cutStringByByte(String str, int length) throws UnsupportedEncodingException {
+        byte[] buf = str.getBytes(&quot;gbk&quot;);
 
-        raf.write(&quot;张三&quot;.getBytes());
-        raf.writeInt(97);
-
-        raf.close();
+        //从后向前计算负数（代表汉字的字节）的个数
+        int count = 0;
+        for(int x = length-1; x&gt;=0; x--) {
+            if(buf[x]&lt;0)
+                count++;
+            else
+                break;
+        }
+        //偶数个负数
+        if(count%2 == 0)
+            return new String(buf,0,length,&quot;gbk&quot;);
+        //奇数个负数
+        else
+            return new String(buf,0,length-1,&quot;gbk&quot;);
     }
 
 }
-</code></pre><p>随机写入&amp;细节</p>
-<p>//往指定位置写入数据</p>
-<pre><code>raf.seek(3*8);
-raf.write(&quot;哈哈&quot;.getBytes());
-raf.writeInt(108);
-raf.close;
 </code></pre>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-15-randomAccessFile/" data-id="cjegiwod4002mrvp354sfihir" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/01/15/java/java-io/IO-19-practice-cutstring/" data-id="cjgxcg49w002yr9p3rsnh8m8k" class="article-share-link">Delen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/java-io/IO-1-instruction" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/15/java/java-io/IO-1-instruction/" class="article-date">
+  <time datetime="2018-01-15T02:09:36.000Z" itemprop="datePublished">2018-01-15</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/15/java/java-io/IO-1-instruction/">IO流 - 一、概述</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="（一）、字节流-amp-字符流"><a href="#（一）、字节流-amp-字符流" class="headerlink" title="（一）、字节流&amp;字符流"></a>（一）、字节流&amp;字符流</h4><p>输入流和输出流是相对于内存设备而言。</p>
+<p>将外设中的数据读取到内存中：输入。</p>
+<p>将内存的数据写入到外设中：输出。</p>
+<p>字符流的由来：字节流读取文字字节数据后，不直接操作，而是先查指定的编码表，获取对应的文字，再对文字进行操作。</p>
+<p>简单说，字符流就是字节流+编码表。</p>
+<h4 id="（二）、IO流常用基类"><a href="#（二）、IO流常用基类" class="headerlink" title="（二）、IO流常用基类"></a>（二）、IO流常用基类</h4><h4 id="1、字节流的抽象基类："><a href="#1、字节流的抽象基类：" class="headerlink" title="1、字节流的抽象基类："></a>1、字节流的抽象基类：</h4><p>InputStream, OutputStream</p>
+<h4 id="2、字符流的抽象基类："><a href="#2、字符流的抽象基类：" class="headerlink" title="2、字符流的抽象基类："></a>2、字符流的抽象基类：</h4><p>Reader, Writer</p>
+<h4 id="三-、字符流-FileWriter"><a href="#三-、字符流-FileWriter" class="headerlink" title="(三)、字符流-FileWriter"></a>(三)、字符流-FileWriter</h4><p>换行和续写</p>
+<pre><code>public class IoDemo1 {
+
+    private static final String LINE_SPERATOR = System.getProperty(&quot;line.separator&quot;);
+
+    public static void main(String[] args) throws IOException {
+
+        FileWriter fw = new FileWriter(&quot;demo.php&quot;,true);
+
+        //临时存储到缓存区中
+        fw.write(&quot;abc&quot;+LINE_SPERATOR);
+
+        //刷新，将数据写入文件
+        fw.flush();
+
+        //继续添加到缓存区
+        fw.write(&quot;cde&quot;);
+
+        //关闭流，关闭前会先调用flush刷新缓冲区中的数据到文件中。
+        fw.close();
+
+    }
+
+}
+</code></pre><p>异常处理</p>
+<p>public class IoDemo2 {</p>
+<pre><code>private static final String LINE_SPERATOR = System.getProperty(&quot;line.separator&quot;);
+
+public static void main(String[] args) {
+
+    FileWriter fw = null;
+    try {
+        fw = new FileWriter(&quot;demo.php&quot;,true);
+        fw.write(&quot;abc&quot;+LINE_SPERATOR);
+        fw.flush();        
+        fw.write(&quot;cde&quot;);
+    } catch (IOException e) {
+        e.printStackTrace();
+    } finally {
+        try {
+            if(fw != null)
+                fw.close();
+        } catch (IOException e) {
+            throw new RuntimeException(&quot;关闭异常&quot;);
+        }            
+    }
+
+
+}
+</code></pre><h4 id="四-、字符流-FileReader"><a href="#四-、字符流-FileReader" class="headerlink" title="(四)、字符流-FileReader"></a>(四)、字符流-FileReader</h4><h4 id="1、读取方式一-read-读取字符"><a href="#1、读取方式一-read-读取字符" class="headerlink" title="1、读取方式一 read()读取字符"></a>1、读取方式一 read()读取字符</h4><pre><code>public class IoDemo3 {
+
+    public static void main(String[] args) throws IOException {
+
+        FileReader fr = new FileReader(&quot;demo.txt&quot;);
+
+        int ch = fr.read();
+
+        while(ch &gt; -1) {
+            System.out.println((char)ch);
+        }
+
+    }
+
+}
+</code></pre><h4 id="2、读取方式二"><a href="#2、读取方式二" class="headerlink" title="2、读取方式二"></a>2、读取方式二</h4><p>int read(char[])将数据存储到数组中，并返回数据的长度</p>
+<pre><code>public class IoDemo3 {
+
+    public static void main(String[] args) throws IOException {
+        /*
+        FileReader fr = new FileReader(&quot;demo.txt&quot;);
+
+        int ch = fr.read();
+
+        while(ch &gt; -1) {
+            System.out.println((char)ch);
+        }
+        */
+        FileReader fr = new FileReader(&quot;demo.txt&quot;);
+        char[] buf = new char[1024];
+        //将数据存储到buf数组中，并返回长度
+        int length = fr.read(buf);
+        while(length &gt; -1) {
+            System.out.println(new String(buf,0,length));
+        }
+        fr.close();
+
+    }
+
+}
+</code></pre><h4 id="五-、练习"><a href="#五-、练习" class="headerlink" title="(五)、练习"></a>(五)、练习</h4><p>读取一个文件数据，并复写到另一个文件。</p>
+<h4 id="1、逐个字符读写"><a href="#1、逐个字符读写" class="headerlink" title="1、逐个字符读写"></a>1、逐个字符读写</h4><pre><code>public class Demo4 {
+
+    public static void main(String[] args) throws IOException {
+
+        //字符读取流
+        FileReader fr = new FileReader(&quot;demo.txt&quot;);
+
+        //字符写入流
+        FileWriter fw = new FileWriter(&quot;copy.txt&quot;);
+
+        //读写
+        int ch = 0;
+        while((ch=fr.read()) &gt; -1) {
+            fw.write(ch);
+        }
+
+        //关闭流
+        fr.close();
+        fw.close();
+
+    }
+
+}
+</code></pre><h4 id="2、数组读写"><a href="#2、数组读写" class="headerlink" title="2、数组读写"></a>2、数组读写</h4><pre><code>public class Demo5 {
+
+    private static final int BUFFER_SIZE = 1024;
+
+    public static void main(String[] args) {
+        FileReader fr = null;
+        FileWriter fw= null;
+
+        try {
+            //读写流
+            fr = new FileReader(&quot;demo.txt&quot;);
+            fw = new FileWriter(&quot;copy.txt&quot;);
+
+            //临时容器
+            char[] buf = new char[BUFFER_SIZE];
+
+            //定义变量记录读取到的字符，就是往数组里装的字符数
+            int length = 0;
+            while((length = fr.read(buf)) != -1) {
+                fw.write(buf,0,length);
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(&quot;读写失败&quot;);
+        } finally {
+            if(fr != null)
+                try {
+                    fr.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            if(fw != null)
+                try {
+                    fw.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+        }
+    }
+
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/15/java/java-io/IO-1-instruction/" data-id="cjgxcg48l0025r9p352exhbwn" class="article-share-link">Delen</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
@@ -1182,7 +2920,7 @@ raf.close;
 
 
   <nav id="page-nav">
-    <a class="extend prev" rel="prev" href="/">&laquo; __('prev')</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/3/">__('next') &raquo;</a>
+    <a class="extend prev" rel="prev" href="/">&laquo; __('prev')</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/3/">__('next') &raquo;</a>
   </nav>
 </section>
         
@@ -1190,9 +2928,9 @@ raf.close;
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Categories</h3>
+    <h3 class="widget-title">Categorieën</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
     </div>
   </div>
 
@@ -1200,9 +2938,9 @@ raf.close;
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Tags</h3>
+    <h3 class="widget-title">Labels</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
     </div>
   </div>
 
@@ -1212,16 +2950,16 @@ raf.close;
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 18.33px;">angular</a> <a href="/tags/api/" style="font-size: 15px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 16.67px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 13.33px;">jsp</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.67px;">servlet</a> <a href="/tags/thread/" style="font-size: 11.67px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
     </div>
   </div>
 
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Archives</h3>
+    <h3 class="widget-title">Archieven</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
     </div>
   </div>
 
@@ -1229,28 +2967,28 @@ raf.close;
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
+    <h3 class="widget-title">Recente berichten</h3>
     <div class="widget">
       <ul>
         
           <li>
-            <a href="/2018/03/07/java/java-jsp/java-jsp-3/">第3章 jsp系统开发模型</a>
+            <a href="/2018/05/08/java/spring/spring-10/">第十章 Spring事务管理</a>
           </li>
         
           <li>
-            <a href="/2018/01/31/java/java-jsp/java-jsp-2/">第2章 JSP核心</a>
+            <a href="/2018/05/06/java/spring/spring-9/">第九章 spring与JDBC模板</a>
           </li>
         
           <li>
-            <a href="/2018/01/31/java/java-jsp/java-jsp-1/">第1章 JSP基础</a>
+            <a href="/2018/05/06/java/spring/spring-8/">第八章 Spring与AOP AspectJ基于XML的AOP实现</a>
           </li>
         
           <li>
-            <a href="/2018/01/25/java/java-servlet/java-servlet-1/">java Servlet 一、基础</a>
+            <a href="/2018/05/06/java/spring/spring-7/">第七章 Spring与AOP AspectJ基于注解的AOP实现</a>
           </li>
         
           <li>
-            <a href="/2018/01/25/java/java-servlet/java-servlet-2/">java Servlet 二、核心</a>
+            <a href="/2018/05/05/java/spring/spring-6/">第六章 Spring与AOP AspectJ对AOP的实现</a>
           </li>
         
       </ul>

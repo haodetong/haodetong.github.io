@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>第九章 spring与JDBC模板 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="为了避免直接使用JDBC而带来的复杂且冗长的代码，Spring提供了一个强有力的模板类-JdbcTemplate来简化JDBC操作。并且，数据源DataSource对象与模板JdbcTemplate对象均通过Bean的形式定义在配置文件中，充分发挥了依赖注入的威力。 9.1 导入jar包spring-jdbc-*.jar spring的事务 spring-tx-*.jar c3p0: com.sp">
+<meta name="keywords" content="spring">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第九章 spring与JDBC模板">
+<meta property="og:url" content="http://yoursite.com/2018/05/06/java/spring/spring-9/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="为了避免直接使用JDBC而带来的复杂且冗长的代码，Spring提供了一个强有力的模板类-JdbcTemplate来简化JDBC操作。并且，数据源DataSource对象与模板JdbcTemplate对象均通过Bean的形式定义在配置文件中，充分发挥了依赖注入的威力。 9.1 导入jar包spring-jdbc-*.jar spring的事务 spring-tx-*.jar c3p0: com.sp">
+<meta property="og:updated_time" content="2018-05-07T10:07:26.059Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="第九章 spring与JDBC模板">
+<meta name="twitter:description" content="为了避免直接使用JDBC而带来的复杂且冗长的代码，Spring提供了一个强有力的模板类-JdbcTemplate来简化JDBC操作。并且，数据源DataSource对象与模板JdbcTemplate对象均通过Bean的形式定义在配置文件中，充分发挥了依赖注入的威力。 9.1 导入jar包spring-jdbc-*.jar spring的事务 spring-tx-*.jar c3p0: com.sp">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Zoeken"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-java/spring/spring-9" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/06/java/spring/spring-9/" class="article-date">
+  <time datetime="2018-05-06T08:17:07.000Z" itemprop="datePublished">2018-05-06</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/spring/">spring</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      第九章 spring与JDBC模板
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>为了避免直接使用JDBC而带来的复杂且冗长的代码，Spring提供了一个强有力的模板类-JdbcTemplate来简化JDBC操作。并且，数据源DataSource对象与模板JdbcTemplate对象均通过Bean的形式定义在配置文件中，充分发挥了依赖注入的威力。</p>
+<h4 id="9-1-导入jar包"><a href="#9-1-导入jar包" class="headerlink" title="9.1 导入jar包"></a>9.1 导入jar包</h4><p>spring-jdbc-*.jar</p>
+<p>spring的事务 spring-tx-*.jar</p>
+<p>c3p0: com.springsource.com.mchange.v2.c3p0-**.jar</p>
+<p>dbcp: </p>
+<ul>
+<li><p>com.springsource.org.apache.commons.dbcp-*.osgi.jar</p>
+</li>
+<li><p>com.springsource.org.apache.commons.pool-*.jar</p>
+</li>
+</ul>
+<p>mysql驱动：mysql-connector-java-*-bin.jar</p>
+<h4 id="9-3-定义实体类与DB表"><a href="#9-3-定义实体类与DB表" class="headerlink" title="9.3 定义实体类与DB表"></a>9.3 定义实体类与DB表</h4><p>student类</p>
+<pre><code>package com.bjpowernode.beans;
+
+public class Student {
+    private Integer id;
+    private String name;
+    private int age;
+
+    public Student() {
+        super();
+    }
+
+
+    public Student(Integer id, String name, int age) {
+        super();
+        this.id = id;
+        this.name = name;
+        this.age = age;
+    }
+
+
+    public Student(String name, int age) {
+        super();
+        this.name = name;
+        this.age = age;
+    }
+
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+
+    public Integer getId() {
+        return id;
+    }
+
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+
+    @Override
+    public String toString() {
+        return &quot;Student [name=&quot; + name + &quot;, age=&quot; + age + &quot;]&quot;;
+    }
+
+}
+</code></pre><p>导出student.sql放入项目中</p>
+<h4 id="9-4-定义Service"><a href="#9-4-定义Service" class="headerlink" title="9.4 定义Service"></a>9.4 定义Service</h4><p>IStudentService接口</p>
+<pre><code>package com.bjpowernode.service;
+
+import java.util.List;
+
+import com.bjpowernode.beans.Student;
+
+public interface IStudentService {
+
+    void addStudent(Student student);
+    void removeById(int id);
+    void modifyStudent(Student student);
+
+    List&lt;String&gt; findAllStudentsNames();
+    String findStudentNameById(int id);
+
+    List&lt;Student&gt; findAllStudents();
+    Student findStudentById(int id);
+
+}
+</code></pre><p>StudentServiceImpl实现类</p>
+<pre><code>package com.bjpowernode.service;
+
+import java.util.List;
+
+import com.bjpowernode.Dao.IStudentDao;
+import com.bjpowernode.beans.Student;
+
+public class StudentServiceImpl implements IStudentService {
+
+    private IStudentDao dao;
+
+    public void setDao(IStudentDao dao) {
+        this.dao = dao;
+    }
+
+
+    @Override
+    public void addStudent(Student student) {
+        dao.insertStudent(student);
+    }
+
+    @Override
+    public void removeById(int id) {
+        dao.deleteById(id);
+    }
+
+    @Override
+    public void modifyStudent(Student student) {
+        dao.updateStudent(student);
+    }
+
+    @Override
+    public List&lt;String&gt; findAllStudentsNames() {
+        return dao.selectAllStudentsNames();
+    }
+
+    @Override
+    public String findStudentNameById(int id) {
+        return dao.selectStudentNameById(id);
+    }
+
+    @Override
+    public List&lt;Student&gt; findAllStudents() {
+        return dao.selectAllStudents();
+    }
+
+    @Override
+    public Student findStudentById(int id) {
+        return dao.selectStudentById(id);
+    }    
+}
+</code></pre><h4 id="9-5-定义Dao"><a href="#9-5-定义Dao" class="headerlink" title="9.5 定义Dao"></a>9.5 定义Dao</h4><p>IStudentDao</p>
+<pre><code>package com.bjpowernode.Dao;
+
+import java.util.List;
+
+import com.bjpowernode.beans.Student;
+
+public interface IStudentDao {
+
+
+    void insertStudent(Student student);
+    void deleteById(int id);
+    void updateStudent(Student student);
+
+    List&lt;String&gt; selectAllStudentsNames();
+    String selectStudentNameById(int id);
+
+    List&lt;Student&gt; selectAllStudents();
+    Student selectStudentById(int id); 
+}
+</code></pre><p>StudentDaoImpl</p>
+<pre><code>package com.bjpowernode.Dao;
+
+import java.util.List;
+
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+
+import com.bjpowernode.beans.Student;
+
+//继承JdbcDaoSupport
+public class StudentDaoImpl extends JdbcDaoSupport implements IStudentDao {
+
+    //增
+    @Override
+    public void insertStudent(Student student) {
+        String sql = &quot;insert into student(name,age) values(?,?)&quot;;
+        this.getJdbcTemplate().update(sql, student.getName(), student.getAge());
+    }
+
+    //删
+    @Override
+    public void deleteById(int id) {
+        String sql = &quot;delete from student where id=?&quot;;
+        this.getJdbcTemplate().update(sql,id);
+    }
+
+    //改
+    @Override
+    public void updateStudent(Student student) {
+        String sql = &quot;update student set name=?, age=? where id=?&quot;;
+        this.getJdbcTemplate().update(sql, student.getName(), student.getAge(), student.getId());
+    }
+
+    //查
+    @Override
+    public List&lt;String&gt; selectAllStudentsNames() {
+        String sql = &quot;select name from student&quot;;
+        return this.getJdbcTemplate().queryForList(sql, String.class);
+    }
+
+    @Override
+    public String selectStudentNameById(int id) {
+        String sql = &quot;select name from student where id=?&quot;;
+        return this.getJdbcTemplate().queryForObject(sql, String.class, id);
+    }
+
+    @Override
+    public List&lt;Student&gt; selectAllStudents() {
+        String sql = &quot;select id,name,age from student&quot;;
+        //手动封装查询的数据集
+        return this.getJdbcTemplate().query(sql, new StudentRowMapper());
+    }
+
+    @Override
+    public Student selectStudentById(int id) {
+        String sql = &quot;select id,name,age from student where id=?&quot;;
+        return this.getJdbcTemplate().queryForObject(sql, new StudentRowMapper(), id);
+    }
+
+
+}
+</code></pre><h4 id="9-6-定义测试类"><a href="#9-6-定义测试类" class="headerlink" title="9.6 定义测试类"></a>9.6 定义测试类</h4><p>MyTest.java</p>
+<pre><code>package com.bjpowernode.test;
+
+public class MyTest {
+
+    private IStudentService service;
+
+    @Before
+    public void before() {
+        String source = &quot;applicationContext.xml&quot;;
+        ApplicationContext ac = new ClassPathXmlApplicationContext(source);
+        service = (IStudentService) ac.getBean(&quot;studentService&quot;);
+    }
+
+    //增
+    @Test
+    public void test01() {
+        Student student = new Student(&quot;王五2&quot;, 26);
+        service.addStudent(student);
+    }
+
+    //删
+    @Test
+    public void test02() {
+        service.removeById(2);
+    }
+
+    //改
+    @Test
+    public void test03() {
+        Student student = new Student(1,&quot;李四2&quot;,23);
+        service.modifyStudent(student);
+    }
+
+    //查所有学生的名字
+    @Test
+    public void test04() {
+        List&lt;String&gt; names = service.findAllStudentsNames();
+        System.out.println(names);
+    }
+
+    //查某个学生的名字
+    @Test
+    public void test05() {
+        String name = service.findStudentNameById(1);
+        System.out.println(name);
+    }
+
+    //查所有学生
+    @Test
+    public void test06() {
+        List&lt;Student&gt; students = service.findAllStudents();
+        for(Student student:students) {
+            System.out.println(student);
+        }
+    }
+
+    //查某个学生
+    @Test
+    public void test07() {
+        Student student = service.findStudentById(1);
+        System.out.println(student);
+    }
+
+}
+</code></pre><h4 id="9-7-配置"><a href="#9-7-配置" class="headerlink" title="9.7 配置"></a>9.7 配置</h4><p>jdbc.properties 连接四要素</p>
+<pre><code>jdbc.driver=com.mysql.jdbc.Driver
+jdbc.url=jdbc:mysql://127.0.0.1:3306/test
+jdbc.user=root
+jdbc.password=haojie_123456
+</code></pre><p>applicationContext.xml</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+    xmlns:context=&quot;http://www.springframework.org/schema/context&quot; xsi:schemaLocation=&quot;
+        http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd&quot;&gt;
+
+    &lt;!-- 注册数据源:Spring内置的连接池 --&gt;
+    &lt;!-- &lt;bean id=&quot;myDataSource&quot; class=&quot;org.springframework.jdbc.datasource.DriverManagerDataSource&quot;&gt;
+        &lt;property name=&quot;driverClassName&quot; value=&quot;com.mysql.jdbc.Driver&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;url&quot; value=&quot;jdbc:mysql://127.0.0.1:3306/mydatabase&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;username&quot; value=&quot;root&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;password&quot; value=&quot;haojie_123456&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt; --&gt;
+
+    &lt;!-- 注册数据源:DBCP --&gt;
+    &lt;!-- &lt;bean id=&quot;myDataSource&quot; class=&quot;org.apache.tomcat.dbcp.dbcp.BasicDataSource&quot;&gt;
+        &lt;property name=&quot;driverClassName&quot; value=&quot;com.mysql.jdbc.Driver&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;url&quot; value=&quot;jdbc:mysql://127.0.0.1:3306/mydatabase&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;username&quot; value=&quot;root&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;password&quot; value=&quot;haojie_123456&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt; --&gt;
+
+    &lt;!-- 注册数据源:C3P0 --&gt;
+    &lt;!-- &lt;bean id=&quot;myDataSource&quot; class=&quot;com.mchange.v2.c3p0.ComboPooledDataSource&quot;&gt;
+        &lt;property name=&quot;driverClass&quot; value=&quot;com.mysql.jdbc.Driver&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;jdbcurl&quot; value=&quot;jdbc:mysql://127.0.0.1:3306/mydatabase&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;user&quot; value=&quot;root&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;password&quot; value=&quot;haojie_123456&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt; --&gt;
+
+    &lt;!-- 注册属性文件：从属性文件读取DB连接四要素：方式一 --&gt;
+    &lt;!-- &lt;bean class=&quot;org.springframework.beans.factory.config.PropertyPlaceholderConfigurer&quot;&gt;
+        &lt;property name=&quot;location&quot; value=&quot;classpath:jdbc.properties&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt; --&gt;
+
+    &lt;!-- 注册属性文件：从属性文件读取DB连接四要素：方式二 --&gt;
+    &lt;!-- &lt;context:property-placeholder location=&quot;classpath:jdbc.properties&quot;/&gt; --&gt;
+
+    &lt;bean id=&quot;myDataSource&quot; class=&quot;org.springframework.jdbc.datasource.DriverManagerDataSource&quot;&gt;
+        &lt;property name=&quot;driverClassName&quot; value=&quot;com.mysql.jdbc.Driver&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;url&quot; value=&quot;jdbc:mysql://127.0.0.1:3306/mydatabase&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;username&quot; value=&quot;root&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;password&quot; value=&quot;haojie_123456&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+    &lt;!-- 将数据源注入给dao：方式一 --&gt;
+
+            &lt;!-- 注册jdbctemplate --&gt;
+            &lt;!-- &lt;bean id=&quot;myJdbcTemplate&quot; class=&quot;org.springframework.jdbc.core.JdbcTemplate&quot;&gt;
+                &lt;property name=&quot;dataSource&quot; ref=&quot;myDataSource&quot;&gt;&lt;/property&gt;
+            &lt;/bean&gt; --&gt;
+
+            &lt;!-- 注册dao --&gt;
+            &lt;!-- &lt;bean id=&quot;studentDao&quot; class=&quot;com.bjpowernode.Dao.StudentDaoImpl&quot;&gt;
+                &lt;property name=&quot;jdbcTemplate&quot; ref=&quot;myJdbcTemplate&quot;&gt;&lt;/property&gt;
+            &lt;/bean&gt; --&gt;
+
+    &lt;!-- 将数据源注入给dao：方式二 --&gt;
+
+            &lt;!-- 注册dao --&gt;
+            &lt;bean id=&quot;studentDao&quot; class=&quot;com.bjpowernode.Dao.StudentDaoImpl&quot;&gt;
+                &lt;property name=&quot;dataSource&quot; ref=&quot;myDataSource&quot;&gt;&lt;/property&gt;
+            &lt;/bean&gt;
+
+
+    &lt;!-- 注册实现类 --&gt;
+    &lt;bean id=&quot;studentService&quot; class=&quot;com.bjpowernode.service.StudentServiceImpl&quot;&gt;
+        &lt;property name=&quot;dao&quot; ref=&quot;studentDao&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+&lt;/beans&gt;
+</code></pre><h4 id="9-8-Jdbc模板的对象是多例的"><a href="#9-8-Jdbc模板的对象是多例的" class="headerlink" title="9.8 Jdbc模板的对象是多例的"></a>9.8 Jdbc模板的对象是多例的</h4><p>JdbcTemplate对象是多例的，即系统会为每一个使用模板对象的线程（方法）创建一个JdbcTemplate实例，并且在该线程（方法）结束时，自动释放JdbcTemplate实例。所以在每次使用JdbcTemplate对象时，都需要通过getJdbcTemplate()方法获取。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/05/06/java/spring/spring-9/" data-id="cjgxcg4c1005jr9p3gvp86mx3" class="article-share-link">Delen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/05/08/java/spring/spring-10/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Nieuwer</strong>
+      <div class="article-nav-title">
+        
+          第十章 Spring事务管理
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/05/06/java/spring/spring-8/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Ouder</strong>
+      <div class="article-nav-title">第八章 Spring与AOP AspectJ基于XML的AOP实现</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categorieën</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Labels</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archieven</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recente berichten</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/05/08/java/spring/spring-10/">第十章 Spring事务管理</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/06/java/spring/spring-9/">第九章 spring与JDBC模板</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/06/java/spring/spring-8/">第八章 Spring与AOP AspectJ基于XML的AOP实现</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/06/java/spring/spring-7/">第七章 Spring与AOP AspectJ基于注解的AOP实现</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/05/java/spring/spring-6/">第六章 Spring与AOP AspectJ对AOP的实现</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

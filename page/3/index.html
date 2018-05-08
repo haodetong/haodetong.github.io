@@ -50,7 +50,7 @@
         
           <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Zoeken"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
@@ -61,9 +61,9 @@
       <div class="outer">
         <section id="main">
   
-    <article id="post-java/java-io/IO-14-serializable" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-java/java-io/IO-8-transform-coding" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2018/01/10/java/java-io/IO-14-serializable/" class="article-date">
+    <a href="/2018/01/10/java/java-io/IO-8-transform-coding/" class="article-date">
   <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
 </a>
     
@@ -79,7 +79,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/10/java/java-io/IO-14-serializable/">IO流 - 十四、IO流 - 对象的序列化、反序列化</a>
+      <a class="article-title" href="/2018/01/10/java/java-io/IO-8-transform-coding/">IO流 - 八、转换流的编码解码</a>
     </h1>
   
 
@@ -87,44 +87,190 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>ObjectInputStream与ObjectOutputStream</p>
-<p>被操作的对象需要实现Serializable标记接口</p>
-<h4 id="1、ObjectOutputStream-对象序列化"><a href="#1、ObjectOutputStream-对象序列化" class="headerlink" title="1、ObjectOutputStream-对象序列化"></a>1、ObjectOutputStream-对象序列化</h4><p>将对象写到硬盘上。</p>
-<pre><code>FileOutputStream fos = new FileOutputStream(&quot;t.tmp&quot;);
-ObjectOutputStream oos = new ObjectOutputStream(fos);
+        <h4 id="1、OutputStreamWriter转换流。字符转换成字节：编码。"><a href="#1、OutputStreamWriter转换流。字符转换成字节：编码。" class="headerlink" title="1、OutputStreamWriter转换流。字符转换成字节：编码。"></a>1、OutputStreamWriter转换流。字符转换成字节：编码。</h4><p>需求：将一个中文字符串按照指定的编码表，写入到一个文本文件中。其实就是需要将内存中的“你好”字符转成字节存到硬盘中。</p>
+<p>分析：</p>
+<p>明确使用指定编码表，就不可以使用FileWriter，因为FileWriter内部是使用默认的本地编码表。只能使用其父类OutputStreamWriter类。</p>
+<p>OutputStreamWriter接收一个字节流对象，既然是操作文本，那么就应该是FileOutputStream。</p>
+<p>OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(“a.txt”),charsetName);</p>
+<p>需要高效</p>
+<p>BufferedWriter bufw = new BufferedWriter(osw);</p>
+<pre><code>默认编码表：
+FileWriter fw = new FileWriter(&quot;a.txt&quot;);
+fw.write(&quot;你好&quot;);
+fw.close;
 
-oos.writeInt(12345);
-oos.writeObject(&quot;Today&quot;);
-oos.writeObject(new Date());
+指定编码表：
+OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(&quot;a.txt&quot;),&quot;UTF-8&quot;);
+osw.write(&quot;你好&quot;);
+osw.close;
+</code></pre><p>FileWriter fw = new FileWriter(“a.txt”);</p>
+<p>OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(“a.txt”),”GBK”);</p>
+<p>这两句代码的功能是等同的。</p>
+<p>FileWriter：其实就是转换流并指定了本机默认编码表，而且是这个转换流的子类，用于方便的操作文本文件。</p>
+<p>如果操作文件需要明确具体的编码。FileWriter就不可行了，必须用转换流。</p>
+<h4 id="2、InputStreamReader转换流。字节转换成字符：解码。"><a href="#2、InputStreamReader转换流。字节转换成字符：解码。" class="headerlink" title="2、InputStreamReader转换流。字节转换成字符：解码。"></a>2、InputStreamReader转换流。字节转换成字符：解码。</h4><p>需求：读取硬盘中的文件内容，到控制台输出。</p>
+<p>其实就是通过转换流，读取硬盘中的字节转换为字符到内存，再从内存通过System.out转换流，将字符转换为字节输出到控制台。</p>
+<pre><code>默认编码表：
+FileReader fr = new FileReader(&quot;a.txt&quot;);
+char[] buf = new char[10];
+int length = fr.read(buf);
+String str = new String(buf,0,length);
+System.out.println(str);
 
-oos.close;
-</code></pre><p>存储自定义对象时，要实现对象序列化，对象要实现Serializable接口</p>
-<pre><code>class Person implements Serializable{
-    ...
-}
-
-ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(&quot;obj.object&quot;));
-oos.writeObject(new Person(&quot;小强&quot;,30));
-oos.close;
-</code></pre><h4 id="2、ObjectInputStream-对象反序列化"><a href="#2、ObjectInputStream-对象反序列化" class="headerlink" title="2、ObjectInputStream-对象反序列化"></a>2、ObjectInputStream-对象反序列化</h4><p>读取存储在硬盘上的对象。</p>
-<p>ObjectInputStream ois = new ObjectInputStream(new FileInputStream(“obj.object”));</p>
-<p>Person p = ois.readObject();<br>System.out.println(p.getName()+p.getAge());</p>
-<p>ois.close();</p>
-<h4 id="3、序列化接口-Seriallizable"><a href="#3、序列化接口-Seriallizable" class="headerlink" title="3、序列化接口 - Seriallizable"></a>3、序列化接口 - Seriallizable</h4><p>显示化序列号</p>
-<pre><code>class Person {
-    private static final long serialVersionUID = 97274;
-}
-</code></pre><p>将对象存储到硬盘后，即使改动了Person类，依然能识别该类和取出的对象是同一个版本。</p>
-<h4 id="4、关键字-transient"><a href="#4、关键字-transient" class="headerlink" title="4、关键字 - transient"></a>4、关键字 - transient</h4><p>静态属性不会加入序列化写入到硬盘中。</p>
-<p>非静态属性，如果不想写入到硬盘中，需要关键字transient（短暂的）修饰。</p>
-<p>private static int age;</p>
-<p>private transient String name;</p>
-<p>都不会被序列化写入硬盘中。</p>
-
+指定编码表：
+InputStreamReader isr = new InputStreamReader(new FileInputStream(&quot;a.txt&quot;),&quot;&quot;utf-8&quot;&quot;);
+char[] buf = new char[10];
+int length = isr.read(buf);
+String str = new String(buf,0,length);
+System.out.println(str);
+</code></pre>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-14-serializable/" data-id="cjegiwod1002jrvp30tb5a1bc" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-8-transform-coding/" data-id="cjgxcg4ac003mr9p3ljhs5cu0" class="article-share-link">Delen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/java-io/IO-7-stream-rule-demo" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/10/java/java-io/IO-7-stream-rule-demo/" class="article-date">
+  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/10/java/java-io/IO-7-stream-rule-demo/">IO流 - 七、流的操作规律 - 需求体现</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="1、需求：复制一个文本文件"><a href="#1、需求：复制一个文本文件" class="headerlink" title="1、需求：复制一个文本文件"></a>1、需求：复制一个文本文件</h4><pre><code>FileReader fr = new FileReader(&quot;a.txt&quot;);
+
+FileWriter fw = new FileWriter(&quot;b.txt&quot;);
+
+BufferedReader bufr = new BufferedReader(fr);
+
+BufferedWriter bufw = new BufferedWriter(fw);
+</code></pre><h4 id="2、需求：读取键盘录入信息，写入到文件中"><a href="#2、需求：读取键盘录入信息，写入到文件中" class="headerlink" title="2、需求：读取键盘录入信息，写入到文件中"></a>2、需求：读取键盘录入信息，写入到文件中</h4><pre><code>源：InputStream in = System.in;
+
+转换流：InputStreamReader isr = new InputStreamReader(in);
+
+目的：FileWriter fw = new FileWriter(&quot;b.txt&quot;);
+
+高效：BufferedReader = new BufferedReader(isr);
+
+     BufferedWriter = new BufferedWriter(fw);
+</code></pre><h4 id="3、需求：将一个文本文件显示在控制台上"><a href="#3、需求：将一个文本文件显示在控制台上" class="headerlink" title="3、需求：将一个文本文件显示在控制台上"></a>3、需求：将一个文本文件显示在控制台上</h4><pre><code>源：FileReader fr = new FileReader(&quot;a.txt&quot;);
+
+读： String line = bufr.readLine();
+
+目的：OutputStream out = System.out;
+
+      OutputStreamWriter osw = new OutputStreamWriter(out);
+
+高效：BufferedReader bufr = new BufferedReader(fr);
+     BufferedWriter bufw = new BufferedWriter(osw);
+</code></pre><h4 id="4、需求：读取键盘录入数据，显示在控制台上"><a href="#4、需求：读取键盘录入数据，显示在控制台上" class="headerlink" title="4、需求：读取键盘录入数据，显示在控制台上"></a>4、需求：读取键盘录入数据，显示在控制台上</h4><pre><code>源：InputStream in = System.in    ;
+
+目的：OutputStream out = System.out;
+
+转换流：InputStreamReader isr = new InputStreamReader(in);
+        OutputStreamWriter isw = new OutputStreamWriter(out);
+
+高效：BufferedReader bufr = new BufferedReader(isr);
+      BufferedWriter bufw = new BufferedWriter(isw);
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-7-stream-rule-demo/" data-id="cjgxcg4aa003jr9p3ki2mglbd" class="article-share-link">Delen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/java-io/IO-17-dataStream" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/10/java/java-io/IO-17-dataStream/" class="article-date">
+  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/10/java/java-io/IO-17-dataStream/">IO流 - 十七、操作基本数据类型的流对象 - DataStream</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>DataInputStream与DataOutputStream</p>
+<pre><code>public class DataStream {
+
+    public static void main(String[] args) throws IOException {
+
+        writeData();
+        readData();
+
+    }
+
+    private static void readData() throws IOException {
+        DataInputStream dis = new DataInputStream(new FileInputStream(&quot;abc.txt&quot;));
+        String str = dis.readUTF();
+        System.out.println(str);
+        dis.close();
+    }
+
+    private static void writeData() throws IOException {
+        DataOutputStream dos = new DataOutputStream(new FileOutputStream(&quot;abc.txt&quot;));
+        dos.writeUTF(&quot;你好&quot;);
+        dos.close();
+    }
+
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-17-dataStream/" data-id="cjgxcg49c002sr9p3xf6u5dr6" class="article-share-link">Delen</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
@@ -444,85 +590,7 @@ wangwu=32
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-10-properties/" data-id="cjegiwocm0025rvp3h64ufqdj" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/java-io/IO-8-transform-coding" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/10/java/java-io/IO-8-transform-coding/" class="article-date">
-  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/java/">java</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/10/java/java-io/IO-8-transform-coding/">IO流 - 八、转换流的编码解码</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h4 id="1、OutputStreamWriter转换流。字符转换成字节：编码。"><a href="#1、OutputStreamWriter转换流。字符转换成字节：编码。" class="headerlink" title="1、OutputStreamWriter转换流。字符转换成字节：编码。"></a>1、OutputStreamWriter转换流。字符转换成字节：编码。</h4><p>需求：将一个中文字符串按照指定的编码表，写入到一个文本文件中。其实就是需要将内存中的“你好”字符转成字节存到硬盘中。</p>
-<p>分析：</p>
-<p>明确使用指定编码表，就不可以使用FileWriter，因为FileWriter内部是使用默认的本地编码表。只能使用其父类OutputStreamWriter类。</p>
-<p>OutputStreamWriter接收一个字节流对象，既然是操作文本，那么就应该是FileOutputStream。</p>
-<p>OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(“a.txt”),charsetName);</p>
-<p>需要高效</p>
-<p>BufferedWriter bufw = new BufferedWriter(osw);</p>
-<pre><code>默认编码表：
-FileWriter fw = new FileWriter(&quot;a.txt&quot;);
-fw.write(&quot;你好&quot;);
-fw.close;
-
-指定编码表：
-OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(&quot;a.txt&quot;),&quot;UTF-8&quot;);
-osw.write(&quot;你好&quot;);
-osw.close;
-</code></pre><p>FileWriter fw = new FileWriter(“a.txt”);</p>
-<p>OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(“a.txt”),”GBK”);</p>
-<p>这两句代码的功能是等同的。</p>
-<p>FileWriter：其实就是转换流并指定了本机默认编码表，而且是这个转换流的子类，用于方便的操作文本文件。</p>
-<p>如果操作文件需要明确具体的编码。FileWriter就不可行了，必须用转换流。</p>
-<h4 id="2、InputStreamReader转换流。字节转换成字符：解码。"><a href="#2、InputStreamReader转换流。字节转换成字符：解码。" class="headerlink" title="2、InputStreamReader转换流。字节转换成字符：解码。"></a>2、InputStreamReader转换流。字节转换成字符：解码。</h4><p>需求：读取硬盘中的文件内容，到控制台输出。</p>
-<p>其实就是通过转换流，读取硬盘中的字节转换为字符到内存，再从内存通过System.out转换流，将字符转换为字节输出到控制台。</p>
-<pre><code>默认编码表：
-FileReader fr = new FileReader(&quot;a.txt&quot;);
-char[] buf = new char[10];
-int length = fr.read(buf);
-String str = new String(buf,0,length);
-System.out.println(str);
-
-指定编码表：
-InputStreamReader isr = new InputStreamReader(new FileInputStream(&quot;a.txt&quot;),&quot;&quot;utf-8&quot;&quot;);
-char[] buf = new char[10];
-int length = isr.read(buf);
-String str = new String(buf,0,length);
-System.out.println(str);
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-8-transform-coding/" data-id="cjegiwof50040rvp37chvkemg" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-10-properties/" data-id="cjgxcg48n0027r9p3lpis0c6h" class="article-share-link">Delen</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
@@ -610,7 +678,7 @@ public class PrintWriterDemo1 {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-11-printSream/" data-id="cjegiwocq002arvp31sdxtq5a" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-11-printSream/" data-id="cjgxcg48q002ar9p3cyn4kadb" class="article-share-link">Delen</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
@@ -622,9 +690,9 @@ public class PrintWriterDemo1 {
 
 
   
-    <article id="post-java/java-io/IO-5-transform-stream-demo" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-java/java-io/IO-12-sequenceInputStream" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2018/01/10/java/java-io/IO-5-transform-stream-demo/" class="article-date">
+    <a href="/2018/01/10/java/java-io/IO-12-sequenceInputStream/" class="article-date">
   <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
 </a>
     
@@ -640,7 +708,7 @@ public class PrintWriterDemo1 {
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/10/java/java-io/IO-5-transform-stream-demo/">IO流 - 五、需求演示</a>
+      <a class="article-title" href="/2018/01/10/java/java-io/IO-12-sequenceInputStream/">IO流 - 十二、序列流 - SequenceInputStream</a>
     </h1>
   
 
@@ -648,50 +716,56 @@ public class PrintWriterDemo1 {
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h4 id="1、需求：将键盘录入的数据写入到一个文件中"><a href="#1、需求：将键盘录入的数据写入到一个文件中" class="headerlink" title="1、需求：将键盘录入的数据写入到一个文件中"></a>1、需求：将键盘录入的数据写入到一个文件中</h4><pre><code>public static void main(String[] args) throws IOException {
+        <p>对多个流进行合并</p>
+<h4 id="1、构造方法"><a href="#1、构造方法" class="headerlink" title="1、构造方法"></a>1、构造方法</h4><p>SequenceInputStream(Enumeration&lt;? extends InputStream&gt; e)</p>
+<pre><code>public class demo1 {
 
-        BufferedReader bufr = new BufferedReader(new InputStreamReader(System.in));
+    public static void main(String[] args) throws IOException {
+        /**
+         * 将1.txt，2.txt，3.txt文件中的数据合并到一个文件4.txt中
+         */
+        Vector&lt;FileInputStream&gt; v = new Vector&lt;FileInputStream&gt;();
+        v.add(new FileInputStream(&quot;1.txt&quot;));
+        v.add(new FileInputStream(&quot;2.txt&quot;));
+        v.add(new FileInputStream(&quot;3.txt&quot;));
 
-        BufferedWriter bufw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(&quot;demo.txt&quot;)));
+        Enumeration&lt;FileInputStream&gt; en = v.elements();
 
-        String line = null;
-        while((line=bufr.readLine()) != null) {
-            if(&quot;over&quot;.equals(line))
-                break;
-            bufw.write(line.toUpperCase());
-            bufw.newLine();
-            bufw.flush();
+        SequenceInputStream sis = new SequenceInputStream(en);
+
+        FileOutputStream fos = new FileOutputStream(&quot;4.txt&quot;);
+
+        byte[] buf = new byte[1024];
+
+        int length = 0;
+
+        while((length = sis.read(buf)) != -1 ) {
+            fos.write(buf,0,length);
         }
+
+        fos.close();
+        sis.close();
     }
-</code></pre><h4 id="2、需求：将一个文本文件内容显示在控制台上"><a href="#2、需求：将一个文本文件内容显示在控制台上" class="headerlink" title="2、需求：将一个文本文件内容显示在控制台上"></a>2、需求：将一个文本文件内容显示在控制台上</h4><pre><code>BufferedReader bufr = new BufferedReader(new InputStreamReader(new FileInputStream(&quot;demo.txt&quot;)));
 
-BufferedWriter bufw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(System.out)));
-
-String line = null;
-while((line=bufr.readLine()) != null) {
-    if(&quot;over&quot;.equals(line))
-        break;
-    bufw.write(line.toUpperCase());
-    bufw.newLine();
-    bufw.flush();
 }
-</code></pre><h4 id="3、需求：将一个文本文件中的内容复制到另一个文件中"><a href="#3、需求：将一个文本文件中的内容复制到另一个文件中" class="headerlink" title="3、需求：将一个文本文件中的内容复制到另一个文件中"></a>3、需求：将一个文本文件中的内容复制到另一个文件中</h4><pre><code>BufferedReader bufr = new BufferedReader(new InputStreamReader(new FileInputStream(&quot;a.txt&quot;)));
+</code></pre><h4 id="2、枚举和迭代"><a href="#2、枚举和迭代" class="headerlink" title="2、枚举和迭代"></a>2、枚举和迭代</h4><pre><code>//Vctor集合效率低。
 
-BufferedWriter bufw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(&quot;b.txt&quot;)));
+Vector&lt;FileInputStream&gt; v = new Vector&lt;FileInputStream&gt;();
+v.add(new FileInputStream(&quot;1.txt&quot;));
+v.add(new FileInputStream(&quot;2.txt&quot;));
+v.add(new FileInputStream(&quot;3.txt&quot;));
 
-String line = null;
-while((line=bufr.readLine()) != null) {
-    if(&quot;over&quot;.equals(line))
-        break;
-    bufw.write(line.toUpperCase());
-    bufw.newLine();
-    bufw.flush();
-}
+Enumeration&lt;FileInputStream&gt; en = v.elements();
+
+//ArrayList集合代替
+ArrayList&lt;FileInputStream&gt; al = new ArrayList&lt;FileInputStream&gt;();
+//用集合工具类中的方法，返回Enumeration类对象
+Enumeration&lt;FileInputStream&gt; en = Collections.enumeration(al);
 </code></pre>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-5-transform-stream-demo/" data-id="cjegiwoee003crvp3f6e9o96d" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-12-sequenceInputStream/" data-id="cjgxcg48u002dr9p3uaic3ndy" class="article-share-link">Delen</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
@@ -923,7 +997,7 @@ public class SuffixFilter implements FilenameFilter {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-13-file-coperate/" data-id="cjegiwocy002grvp3kexpyyja" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-13-file-coperate/" data-id="cjgxcg48z002gr9p3d6fius2l" class="article-share-link">Delen</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
@@ -935,10 +1009,10 @@ public class SuffixFilter implements FilenameFilter {
 
 
   
-    <article id="post-java/java-api/java-api-otherObjects" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-java/java-io/IO-14-serializable" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2018/01/09/java/java-api/java-api-otherObjects/" class="article-date">
-  <time datetime="2018-01-09T07:16:19.000Z" itemprop="datePublished">2018-01-09</time>
+    <a href="/2018/01/10/java/java-io/IO-14-serializable/" class="article-date">
+  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
 </a>
     
   <div class="article-category">
@@ -953,7 +1027,7 @@ public class SuffixFilter implements FilenameFilter {
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/09/java/java-api/java-api-otherObjects/">其它对象API</a>
+      <a class="article-title" href="/2018/01/10/java/java-io/IO-14-serializable/">IO流 - 十四、IO流 - 对象的序列化、反序列化</a>
     </h1>
   
 
@@ -961,222 +1035,47 @@ public class SuffixFilter implements FilenameFilter {
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h3 id="一、System类"><a href="#一、System类" class="headerlink" title="一、System类"></a>一、System类</h3><p>System类中的方法和属性都是静态的。</p>
-<p>常见方法：</p>
-<p>long currentTimeMillis():获取当前时间的毫秒值</p>
-<p>Properties getProperties():获取当前系统的属性信息    </p>
-<pre><code>public class SystemApi {
-    public static void main(String[] args) {
+        <p>ObjectInputStream与ObjectOutputStream</p>
+<p>被操作的对象需要实现Serializable标记接口</p>
+<h4 id="1、ObjectOutputStream-对象序列化"><a href="#1、ObjectOutputStream-对象序列化" class="headerlink" title="1、ObjectOutputStream-对象序列化"></a>1、ObjectOutputStream-对象序列化</h4><p>将对象写到硬盘上。</p>
+<pre><code>FileOutputStream fos = new FileOutputStream(&quot;t.tmp&quot;);
+ObjectOutputStream oos = new ObjectOutputStream(fos);
 
-        long millisTime = System.currentTimeMillis();
-        System.out.println(millisTime);
+oos.writeInt(12345);
+oos.writeObject(&quot;Today&quot;);
+oos.writeObject(new Date());
 
-        Properties prop = System.getProperties();
-
-        Set&lt;String&gt; nameSet = prop.stringPropertyNames();
-
-        for(String name:nameSet) {
-            String value = prop.getProperty(name);
-            System.out.println(name+&quot;::&quot;+value);
-        }
-
-
-    }
+oos.close;
+</code></pre><p>存储自定义对象时，要实现对象序列化，对象要实现Serializable接口</p>
+<pre><code>class Person implements Serializable{
+    ...
 }
-</code></pre><h3 id="二、Runtime类"><a href="#二、Runtime类" class="headerlink" title="二、Runtime类"></a>二、Runtime类</h3><p>Runtime:</p>
-<p>没有构造方法摘要，说明该类不可以创建对象。</p>
-<p>又发现该类有非静态方法，说明该类应该有提供的静态的返回该类对象的方法。</p>
-<p>而且只有一个这种方法，说明Runtime类使用了单例设计模式。</p>
-<pre><code>public class RuntimeApi {
 
-    public static void main(String[] args) throws IOException, InterruptedException {
-
-        Runtime r = Runtime.getRuntime();
-
-        Process p = r.exec(&quot;open -a Safari.app http://www.baidu.com&quot;);
-        Thread.sleep(2000);
-        p.destroy();
-    }
-
+ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(&quot;obj.object&quot;));
+oos.writeObject(new Person(&quot;小强&quot;,30));
+oos.close;
+</code></pre><h4 id="2、ObjectInputStream-对象反序列化"><a href="#2、ObjectInputStream-对象反序列化" class="headerlink" title="2、ObjectInputStream-对象反序列化"></a>2、ObjectInputStream-对象反序列化</h4><p>读取存储在硬盘上的对象。</p>
+<p>ObjectInputStream ois = new ObjectInputStream(new FileInputStream(“obj.object”));</p>
+<p>Person p = ois.readObject();<br>System.out.println(p.getName()+p.getAge());</p>
+<p>ois.close();</p>
+<h4 id="3、序列化接口-Seriallizable"><a href="#3、序列化接口-Seriallizable" class="headerlink" title="3、序列化接口 - Seriallizable"></a>3、序列化接口 - Seriallizable</h4><p>显示化序列号</p>
+<pre><code>class Person {
+    private static final long serialVersionUID = 97274;
 }
-</code></pre><h3 id="三、Math类"><a href="#三、Math类" class="headerlink" title="三、Math类"></a>三、Math类</h3><p>常用方法：</p>
-<p>double ceil():返回大于参数的最小整数。</p>
-<p>double floor():返回小于参数的最大整数。</p>
-<p>double round():返回四舍五入的整数。</p>
-<p>max(a,b):返回最大值</p>
-<p>pow(a,b):a的b次方</p>
-<p>double random():返回大于等于0.0小于1.0的随机double值，与java.util中的Random类相似。</p>
-<h3 id="四、Date类"><a href="#四、Date类" class="headerlink" title="四、Date类"></a>四、Date类</h3><h4 id="（一）、日期对象和毫秒值之间的转换"><a href="#（一）、日期对象和毫秒值之间的转换" class="headerlink" title="（一）、日期对象和毫秒值之间的转换"></a>（一）、日期对象和毫秒值之间的转换</h4><h5 id="毫秒值–-gt-日期对象"><a href="#毫秒值–-gt-日期对象" class="headerlink" title="毫秒值–&gt;日期对象"></a>毫秒值–&gt;日期对象</h5><p>1、通过Date对象的构造方法 new Date(timeMills);</p>
-<p>2、通过setTime方法。</p>
-<p>目的是通过Date对象的方法，对该日期中的年月日等字段进行操作。</p>
-<h5 id="日期对象–-gt-毫秒值"><a href="#日期对象–-gt-毫秒值" class="headerlink" title="日期对象–&gt;毫秒值"></a>日期对象–&gt;毫秒值</h5><p>1、通过getTime方法。</p>
-<p>目的是通过具体的数值进行运算。</p>
-<pre><code>public static void thord1() {
-        //long time = System.currentTimeMillis();//1515489394135
+</code></pre><p>将对象存储到硬盘后，即使改动了Person类，依然能识别该类和取出的对象是同一个版本。</p>
+<h4 id="4、关键字-transient"><a href="#4、关键字-transient" class="headerlink" title="4、关键字 - transient"></a>4、关键字 - transient</h4><p>静态属性不会加入序列化写入到硬盘中。</p>
+<p>非静态属性，如果不想写入到硬盘中，需要关键字transient（短暂的）修饰。</p>
+<p>private static int age;</p>
+<p>private transient String name;</p>
+<p>都不会被序列化写入硬盘中。</p>
 
-        Date date1 = new Date();//将当前日期和时间封装成Date对象
-        System.out.println(date1);//Tue Jan 09 17:16:34 CST 2018
-
-        Date date2 = new Date(1515489367117l);//将指定毫秒封装成Date对象
-        System.out.println(date2);//Tue Jan 09 17:16:07 CST 2018
-}
-</code></pre><h4 id="（二）、日期对象转成字符串"><a href="#（二）、日期对象转成字符串" class="headerlink" title="（二）、日期对象转成字符串"></a>（二）、日期对象转成字符串</h4><pre><code>public class DateDemo {
-
-    public static void main(String[] args) {
-
-        Date date = new Date();
-
-        //获取日期格式对象。具备着默认的风格
-        DateFormat dateFormat = DateFormat.getDateInstance();
-        String str_date = dateFormat.format(date);
-        System.out.println(str_date); //Jan 9, 2018
-
-        DateFormat dateFormat2 = DateFormat.getDateTimeInstance();
-        String str_date2 = dateFormat2.format(date);
-        System.out.println(str_date2);//Jan 9, 2018 5:48:43 PM
-
-        //其它风格 FULL LONG SHORT MEDIUM
-        //DateFormat dateFormat3 = DateFormat.getDateInstance(DateFormat.FULL);//Tuesday, January 9, 2018
-
-        //DateFormat dateFormat3 = DateFormat.getDateInstance(DateFormat.LONG);//January 9, 2018
-
-        //DateFormat dateFormat3 = DateFormat.getDateInstance(DateFormat.SHORT);//1/9/18
-
-        DateFormat dateFormat3 = DateFormat.getDateInstance(DateFormat.MEDIUM);//Jan 9, 2018
-
-        String str_date3 = dateFormat3.format(date);
-        System.out.println(str_date3);
-
-        //日期和时间
-        DateFormat dateFormat4 = DateFormat.getDateTimeInstance(DateFormat.LONG,DateFormat.LONG);//Jan 9, 2018
-
-        String str_date4 = dateFormat4.format(date);
-        System.out.println(str_date4);
-
-        //自定义风格
-        DateFormat dateFormats = DateFormat.getDateInstance();
-        dateFormats = new SimpleDateFormat(&quot;yyyy-MM-dd&quot;);
-        String str_date5 = dateFormats.format(date);
-        System.out.println(str_date5);//2018-01-09
-
-
-    }
-}
-</code></pre><h4 id="（三）、字符串转成日期对象"><a href="#（三）、字符串转成日期对象" class="headerlink" title="（三）、字符串转成日期对象"></a>（三）、字符串转成日期对象</h4><p>使用的是DateFormat类中的parse方法。</p>
-<pre><code>public class DateFormatDemo {
-
-    public static void main(String[] args) throws ParseException {
-
-        //默认的日期字符串格式转成日期对象
-        String str_date = &quot;Jan 9, 2018 5:48:43 PM&quot;;
-        DateFormat dateFormat = DateFormat.getDateInstance();
-        Date date = dateFormat.parse(str_date);
-        System.out.println(date);
-
-        //将自定义的日期字符串格式转成日期对象
-        String str_date2 = &quot;2018--1--10&quot;;
-        DateFormat dateFormat2 = DateFormat.getDateInstance(DateFormat.LONG);
-        dateFormat2 = new SimpleDateFormat(&quot;yyyy--MM--dd&quot;);
-        Date date2 = dateFormat2.parse(str_date2);
-        System.out.println(date2);
-
-    }
-
-}
-</code></pre><h4 id="（四）、Date类-练习"><a href="#（四）、Date类-练习" class="headerlink" title="（四）、Date类 - 练习"></a>（四）、Date类 - 练习</h4><pre><code>public class Demo1 {
-
-    public static void main(String[] args) throws ParseException {
-
-        /**
-         * 练习：
-         * &quot;2017.12.20&quot;到&quot;2018.1.10&quot;中间相隔多少天
-         * 
-         * 思路：
-         * 1、日期字符串转日期对象
-         * 2、日期对象方法获取毫秒数
-         * 3、毫秒数相减，再计算天数
-         */
-
-        String str_date1 = &quot;2017.12.20&quot;;
-        String str_date2 = &quot;2018.1.10&quot;;
-
-        //DateFormat dateFormat = DateFormat.getDateInstance();
-        SimpleDateFormat dateFormat = new SimpleDateFormat(&quot;yyyy.MM.dd&quot;);
-        Date date1 = dateFormat.parse(str_date1);
-        Date date2 = dateFormat.parse(str_date2);
-
-        long date1Millis = date1.getTime();
-        long date2millis = date2.getTime();
-
-        int day = (int) Math.abs(date1Millis - date2millis)/1000/60/60/24;
-
-
-        System.out.println(day);
-    }
-
-}
-</code></pre><h3 id="四、Calendar类"><a href="#四、Calendar类" class="headerlink" title="四、Calendar类"></a>四、Calendar类</h3><p>常见方法：</p>
-<p>set()</p>
-<p>get()</p>
-<p>add():偏移</p>
-<h5 id="一、基本演示"><a href="#一、基本演示" class="headerlink" title="一、基本演示"></a>一、基本演示</h5><pre><code>public class CalendarDemo {
-
-    public static void main(String[] args) {
-
-        Calendar c = Calendar.getInstance();
-        int year = c.get(Calendar.YEAR);
-        int month = c.get(Calendar.MONTH)+1;
-        int day = c.get(Calendar.DAY_OF_MONTH);
-        int week = c.get(Calendar.DAY_OF_WEEK);
-
-        System.out.println(year+&quot;年&quot;+month+&quot;月&quot;+day+&quot;日&quot;+getWeek(week));
-
-    }
-
-    private static String getWeek(int i) {
-        String[] weeks = {&quot;&quot;,&quot;星期日&quot;,&quot;星期一&quot;,&quot;星期二&quot;,&quot;星期三&quot;,&quot;星期四&quot;,&quot;星期五&quot;,&quot;星期六&quot;};
-        return weeks[i];
-    }
-}
-</code></pre><h5 id="二、练习"><a href="#二、练习" class="headerlink" title="二、练习"></a>二、练习</h5><pre><code>public class CalendarDemo {
-
-    public static void main(String[] args) {
-
-        Calendar c = Calendar.getInstance();
-        //指定日期
-        c.set(2018, 0, 20);
-        showDate(c);
-
-        //日期偏移
-        c.add(Calendar.YEAR, 2);
-        showDate(c);
-
-    }
-
-    public static void showDate(Calendar c) {
-        //Calendar c = Calendar.getInstance();
-        int year = c.get(Calendar.YEAR);
-        int month = c.get(Calendar.MONTH)+1;
-        int day = c.get(Calendar.DAY_OF_MONTH);
-        int week = c.get(Calendar.DAY_OF_WEEK);
-
-        System.out.println(year+&quot;年&quot;+month+&quot;月&quot;+day+&quot;日&quot;+getWeek(week));
-    }
-
-    private static String getWeek(int i) {
-        String[] weeks = {&quot;&quot;,&quot;星期日&quot;,&quot;星期一&quot;,&quot;星期二&quot;,&quot;星期三&quot;,&quot;星期四&quot;,&quot;星期五&quot;,&quot;星期六&quot;};
-        return weeks[i];
-    }
-
-}
-</code></pre>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/09/java/java-api/java-api-otherObjects/" data-id="cjegiwoby001lrvp3jqpke2aq" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-14-serializable/" data-id="cjgxcg494002jr9p303ki3zog" class="article-share-link">Delen</a>
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/api/">api</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
 
     </footer>
   </div>
@@ -1185,10 +1084,10 @@ public class SuffixFilter implements FilenameFilter {
 
 
   
-    <article id="post-java/java-collections/java-collection-utilities" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-java/java-io/IO-15-randomAccessFile" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2018/01/09/java/java-collections/java-collection-utilities/" class="article-date">
-  <time datetime="2018-01-09T06:45:51.000Z" itemprop="datePublished">2018-01-09</time>
+    <a href="/2018/01/10/java/java-io/IO-15-randomAccessFile/" class="article-date">
+  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
 </a>
     
   <div class="article-category">
@@ -1203,7 +1102,7 @@ public class SuffixFilter implements FilenameFilter {
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/09/java/java-collections/java-collection-utilities/">集合框架五 - 工具类</a>
+      <a class="article-title" href="/2018/01/10/java/java-io/IO-15-randomAccessFile/">IO流 - 十五、RandomAccessFile</a>
     </h1>
   
 
@@ -1211,393 +1110,69 @@ public class SuffixFilter implements FilenameFilter {
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h3 id="五、集合框架-工具类"><a href="#五、集合框架-工具类" class="headerlink" title="五、集合框架 - 工具类"></a>五、集合框架 - 工具类</h3><p>Utilities</p>
-<p>|– Collections</p>
-<p>|– Arrays</p>
-<h4 id="1、Collections-排序"><a href="#1、Collections-排序" class="headerlink" title="1、Collections - 排序"></a>1、Collections - 排序</h4><p>需求：对有重复元素的集合排序。</p>
-<pre><code>public class Demo1 {
+        <p>随机访问文件，自身具备读写的方法。</p>
+<p>通过skipBytes(int x)，seek(int x)来达到随机访问。</p>
+<p>特点：</p>
+<p>1、不是IO体系中的子类。</p>
+<p>2、该对象既能读也能写。</p>
+<p>3、该对象内部维护了一个byte数组，并通过指针可以操作数组中的元素。</p>
+<p>4、可以通过getFilePointer方法获取指针的位置，和通过seek方法设置指针的位置。</p>
+<p>5、其实该对象就是将字节输入流和输出流进行了封装。</p>
+<p>6、该对象的源或目的只能是文件。通过构造函数就可以看出。可以是文本文件，也可是媒体文件。</p>
+<pre><code>public class RandomAccessDemo1 {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
-        List&lt;String&gt; list = new ArrayList&lt;String&gt;();
+        //randomWrite();
 
-        list.add(&quot;afgds&quot;);
-        list.add(&quot;jlojaio&quot;);
-        list.add(&quot;haljasld&quot;);
-        list.add(&quot;xjvis&quot;);
-        list.add(&quot;afgds&quot;);
+        randomRead();
 
-        System.out.println(list);
+    }
 
-        //对list集合进行指定顺序的排序。
-        Collections.sort(list);
-        System.out.println(list);
+    public static void randomRead() throws FileNotFoundException, IOException {
+        RandomAccessFile raf = new RandomAccessFile(&quot;ranacc.txt&quot;,&quot;r&quot;);
+        //读4个字节，获取张三
+        byte[] buf = new byte[4];
+        raf.read(buf);
+        String name = new String(buf);
+        System.out.println(&quot;name=&quot;+name);
 
-        //对list按长度排序，传入自定义比较器
-        Collections.sort(list,new ComparatorByLength());
-        System.out.println(list);
+        //再读4个字节，读取年龄
+        int age = raf.readInt();
+        System.out.println(&quot;age=&quot;+age);
 
+        //获取指针位置
+        System.out.println(&quot;pos:&quot;+raf.getFilePointer());//pos:8
+
+        //设置指针位置，raf.seek(8);//随机读取，只要指定指针的位置即可
+
+        raf.close();
+    }
+
+    public static void randomWrite() throws FileNotFoundException, IOException {
+        RandomAccessFile raf = new RandomAccessFile(&quot;ranacc.txt&quot;,&quot;rw&quot;);
+
+        raf.write(&quot;张三&quot;.getBytes());
+        raf.writeInt(97);
+
+        raf.close();
     }
 
 }
-
-public class ComparatorByLength implements Comparator&lt;String&gt; {
-
-    @Override
-    public int compare(String o1, String o2) {
-        int temp = o1.length() - o2.length();
-        return temp == 0 ? o1.compareTo(o2) : temp;
-    }
-
-}
-
-输出结果：
-[afgds, jlojaio, haljasld, xjvis, afgds]
-[afgds, afgds, haljasld, jlojaio, xjvis]    
-</code></pre><p>自定义Collections工具类的static sort(List<t> list) </t></p>
-<pre><code>public static &lt;T extends Comparable&lt;? super T&gt;&gt; void mysort(List&lt;T&gt; list) {
-
-    for (int i = 0; i &lt; list.size()-1; i++) {
-        for (int j = i+1; j &lt; list.size(); j++) {
-            if(list.get(i).compareTo(list.get(j)) &gt; 0) {
-                /*
-                T temp = list.get(i);
-                list.set(i, list.get(j));
-                list.set(j, temp);
-                */
-                Collections.swap(list, i, j);
-            }
-        }
-    }
-
-
-}
-</code></pre><p>自定义Collections工具类的static  sort(List<t> list, Comparator&lt;? super T&gt; c) </t></p>
-<pre><code>public static &lt;T&gt; void mySort(List&lt;T&gt; list,Comparator&lt;? super T&gt; comp) {
-        for (int i = 0; i &lt; list.size()-1; i++) {
-            for (int j = i+1; j &lt; list.size(); j++) {
-                if(comp.compare(list.get(i), list.get(j)) &gt; 0) {
-                    Collections.swap(list, i, j);
-                }
-            }
-        }
-    }
-</code></pre><h4 id="2、Collections-折半-amp-最值"><a href="#2、Collections-折半-amp-最值" class="headerlink" title="2、Collections - 折半&amp;最值"></a>2、Collections - 折半&amp;最值</h4><p>折半查找，必须是对有序元素。</p>
-<pre><code>public class Demo2 {
-
-    public static void main(String[] args) {
-
-        List&lt;String&gt; list = new ArrayList&lt;String&gt;();
-
-        list.add(&quot;afgds&quot;);
-        list.add(&quot;jlojaio&quot;);
-        list.add(&quot;haljasld&quot;);
-        list.add(&quot;xjvis&quot;);
-        list.add(&quot;afgds&quot;);
-
-        System.out.println(list);
-
-        Collections.sort(list);
-
-        int index = Collections.binarySearch(list, &quot;afgds&quot;);
-
-        System.out.println(index);
-
-    }    
-}
-
-输出结果：
-[afgds, jlojaio, haljasld, xjvis, afgds]
-0
-</code></pre><p>最值：有没有序都可以。</p>
-<pre><code>public class Demo2 {
-
-    public static void main(String[] args) {
-
-        List&lt;String&gt; list = new ArrayList&lt;String&gt;();
-
-        list.add(&quot;afgds&quot;);
-        list.add(&quot;jlojaio&quot;);
-        list.add(&quot;haljasld&quot;);
-        list.add(&quot;xjvis&quot;);
-        list.add(&quot;afgds&quot;);
-
-        System.out.println(list);
-
-        //取最大值
-        String max = Collections.max(list);
-        System.out.println(&quot;max:&quot;+max);
-
-        //取最长值
-        String longest = Collections.max(list, new ComparatorByLength());
-        System.out.println(&quot;longest:&quot;+longest);
-
-    }
-
-}
-</code></pre><h4 id="3、Collections-逆序-amp-替换"><a href="#3、Collections-逆序-amp-替换" class="headerlink" title="3、Collections - 逆序&amp;替换"></a>3、Collections - 逆序&amp;替换</h4><p>逆序：reverseOrder方法，返回一个比较器，可以将具备自然排序的集合进行逆序。</p>
-<pre><code>public class Demo3 {
-
-    public static void main(String[] args) {
-        TreeSet&lt;String&gt; ts = new TreeSet&lt;String&gt;(Collections.reverseOrder());
-
-        ts.add(&quot;afgds&quot;);
-        ts.add(&quot;jlojaio&quot;);
-        ts.add(&quot;haljasld&quot;);
-        ts.add(&quot;xjvis&quot;);
-        ts.add(&quot;afgds&quot;);
-
-        System.out.println(ts);
-
-    }
-
-}    
-
-输出结果：倒序排列
-[xjvis, jlojaio, haljasld, afgds]
-</code></pre><p>也可对已有的比较器进行逆转</p>
-<pre><code>public class Demo3 {
-
-    public static void main(String[] args) {
-
-        TreeSet&lt;String&gt; ts = new TreeSet&lt;String&gt;(Collections.reverseOrder(new ComparatorByLength()));
-
-        ts.add(&quot;afgds&quot;);
-        ts.add(&quot;jlojaio&quot;);
-        ts.add(&quot;haljasld&quot;);
-        ts.add(&quot;xjvis&quot;);
-        ts.add(&quot;afgds&quot;);
-
-        System.out.println(ts);
-    }
-
-}
-
-输出结果：从长到短排列
-[haljasld, jlojaio, xjvis, afgds]
-</code></pre><p>static <t> boolean    replaceAll(List<t> list, T oldVal, T newVal) 使用另一个值替换列表中出现的所有某一指定值。</t></t></p>
-<pre><code>public class Demo4 {
-
-    public static void main(String[] args) {
-
-        List&lt;String&gt; list = new ArrayList&lt;String&gt;();
-
-        list.add(&quot;afgds&quot;);
-        list.add(&quot;jloj&quot;);
-        list.add(&quot;halj&quot;);
-
-        System.out.println(list);
-
-        Collections.replaceAll(list, &quot;halj&quot;, &quot;haojie&quot;);
-
-        System.out.println(list);
-    }
-
-}
-
-输出结果：
-[afgds, jloj, halj]
-[afgds, jloj, haojie]
-</code></pre><h4 id="4、Collections-其它方法-amp-将非同步集合转成同步集合的方法"><a href="#4、Collections-其它方法-amp-将非同步集合转成同步集合的方法" class="headerlink" title="4、Collections - 其它方法&amp;将非同步集合转成同步集合的方法"></a>4、Collections - 其它方法&amp;将非同步集合转成同步集合的方法</h4><p>使用指定元素替换指定列表中的所有元素。    </p>
-<pre><code>static &lt;T&gt; void    fill(List&lt;? super T&gt; list, T obj) 
-</code></pre><p>使用默认随机源对指定列表进行置换。随机排序，洗牌</p>
-<pre><code>static void    shuffle(List&lt;?&gt; list) 
-</code></pre><p>返回指定 collection 支持的同步（线程安全的）collection。</p>
-<pre><code>static &lt;T&gt; Collection&lt;T&gt; synchronizedCollection(Collection&lt;T&gt; c) 
-</code></pre><p>返回指定列表支持的同步（线程安全的）列表。<br>    static <t> List<t>    synchronizedList(List<t> list) </t></t></t></p>
-<p>返回由指定映射支持的同步（线程安全的）映射。</p>
-<pre><code>static &lt;K,V&gt; Map&lt;K,V&gt;    synchronizedMap(Map&lt;K,V&gt; m) 
-</code></pre><p>返回指定 set 支持的同步（线程安全的）set。</p>
-<pre><code>static &lt;T&gt; Set&lt;T&gt;    synchronizedSet(Set&lt;T&gt; s) 
-</code></pre><h4 id="5、Arrays-toString方法"><a href="#5、Arrays-toString方法" class="headerlink" title="5、Arrays - toString方法"></a>5、Arrays - toString方法</h4><p>Arrays.toString方法</p>
-<pre><code>public class Demo1 {
-
-    public static void main(String[] args) {
-
-        int[] arr = {3,2,1,4,5,6};
-        System.out.println(Arrays.toString(arr));
-    }
-
-}
-
-经典实现
-
-public static String toString(int[] a) {
-    if (a == null)
-        return &quot;null&quot;;
-    int iMax = a.length - 1;
-    if (iMax == -1)
-        return &quot;[]&quot;;
-
-    StringBuilder b = new StringBuilder();
-    b.append(&apos;[&apos;);
-    for (int i = 0; ; i++) {
-        b.append(a[i]);
-        if (i == iMax)
-            return b.append(&apos;]&apos;).toString();
-        b.append(&quot;, &quot;);
-    }
-}
-</code></pre><h4 id="6、Arrays-asList方法"><a href="#6、Arrays-asList方法" class="headerlink" title="6、Arrays - asList方法"></a>6、Arrays - asList方法</h4><p>将数组转成集合</p>
-<pre><code>static &lt;T&gt; List&lt;T&gt; asList(T... a) 
-</code></pre><p>好处：可以使用集合中的方法来操作数组中的元素，除了改变长度的方法。</p>
-<p>a、注意：数组的长度是固定的，所以对于集合的增删方法是不可以使用的。否则会发生UnsupportedOperationException</p>
-<pre><code>public class Demo2 {
-    public static void main(String[] args) {
-
-        String[] arr = {&quot;aaa&quot;,&quot;bbb&quot;,&quot;ccc&quot;};
-
-        List&lt;String&gt; list = Arrays.asList(arr);
-
-        boolean b = list.contains(&quot;aaa&quot;);
-
-        System.out.println(b);
-
-    }
-}
-</code></pre><p>b、如果数组中的元素是对象，那么转成集合时，直接将数组中的对象元素，作为集合中的元素进行存储。</p>
-<p>如果数组中的元素是基本类型数值，那么会将该数组作为集合中的元素进行存储，因为集合中只能存储对象，而不能存储基本类型数据。</p>
-<pre><code>public class Demo3 {
-    public static void main(String[] args) {
-
-        int[] arr = {31,22,44,12};
-
-        List&lt;int[]&gt; list = Arrays.asList(arr);
-
-        System.out.println(list.size());
-
-    }
-}
-
-输出结果：
-1
-</code></pre><h4 id="7、Collection-toArray方法"><a href="#7、Collection-toArray方法" class="headerlink" title="7、Collection-toArray方法"></a>7、Collection-toArray方法</h4><p>集合转数组：可以对集合中的元素操作的方法进行限定，不允许对其增删。</p>
-<p>使用的是Collecion接口中的toArray方法</p>
-<p>toArray方法需要传入一个指定类型的数组。</p>
-<p>如果长度小于集合的size，那么该方法会创建一个同类型并和集合相同size的数组。</p>
-<p>如果长度大于集合的size，那么该方法就会使用指定的数组，存储集合中的元素，其它位置默认为null。</p>
-<p>建议，最好长度就指定为集合的size。</p>
-<pre><code>public class Demo4 {
-
-    public static void main(String[] args) {
-
-        List&lt;String&gt; list = new ArrayList&lt;String&gt;();
-        list.add(&quot;ab3&quot;);
-        list.add(&quot;sds&quot;);
-        list.add(&quot;asfa&quot;);
-
-        String[] arr = list.toArray(new String[5]);
-
-        System.out.println(Arrays.toString(arr));
-
-    }
-
-}
-
-输出结果：
-[ab3, sds, asfa, null, null]
-</code></pre><h4 id="8、集合框架-jdk5-0特性-ForEach循环"><a href="#8、集合框架-jdk5-0特性-ForEach循环" class="headerlink" title="8、集合框架 - jdk5.0特性 - ForEach循环"></a>8、集合框架 - jdk5.0特性 - ForEach循环</h4><pre><code>public class Demo5 {
-
-    public static void main(String[] args) {
-
-        /**
-         * foreach语句：
-         * 格式：
-         * for(类型 变量: Collection集合|数组){
-         * 
-         * }
-         * 
-         * 传统for循环和高级for循环的区别：
-         * 传统for循环可以对语句执行很多次，因为可以控制循环的增量和条件。
-         * 高级for循环是一种简化形式，必须有遍历的目标，可以是数组，也可以是Collecion单列集合。
-         * 
-         * 对数组的遍历，如果仅仅是为了获取数组中的元素，可以使用高级for循环。
-         * 如果要对数组的角标进行操作建议使用传统for循环。
-         */
-
-        List&lt;String&gt; list = new ArrayList&lt;String&gt;();
-
-        list.add(&quot;abc&quot;);
-        list.add(&quot;def&quot;);
-        list.add(&quot;ghi&quot;);
-        list.add(&quot;jkl&quot;);
-
-        //迭代器
-        Iterator&lt;String&gt; it = list.iterator();
-
-        while(it.hasNext()) {
-            System.out.println(it.next());
-        }
-
-        //高级for循环，通常只用于遍历，简化书写
-        for(String s : list) {
-            System.out.println(s);
-        }
-
-        //遍历数组
-        int[] arr = {3,8,2,1,7};
-        for(int i : arr) {
-            System.out.println(i);
-        }
-
-        //高级for循环遍历map集合，要先把map集合转为单列集合。
-        Map&lt;Integer,String&gt; map = new HashMap&lt;Integer,String&gt;();
-
-        map.put(3, &quot;zhangsan&quot;);
-        map.put(4, &quot;lisi&quot;);
-        map.put(5, &quot;wangwu&quot;);
-        map.put(7, &quot;zhaoliu&quot;);
-
-        for(Integer key : map.keySet()) {
-            String value = map.get(key);
-            System.out.println(key+&quot;:&quot;+value);
-        }
-
-        for(Map.Entry&lt;Integer, String&gt; merryEntry : map.entrySet()) {
-            Integer key = merryEntry.getKey();
-            String value = merryEntry.getValue();
-            System.out.println(key+&quot;::&quot;+value);
-        }
-
-    }
-
-}
-</code></pre><h4 id="9、集合框架-jdk5-0特性-函数可变参数"><a href="#9、集合框架-jdk5-0特性-函数可变参数" class="headerlink" title="9、集合框架 - jdk5.0特性 - 函数可变参数"></a>9、集合框架 - jdk5.0特性 - 函数可变参数</h4><pre><code>public class Demo6 {
-
-    public static void main(String[] args) {
-
-        int sum = newAdd(5,1,4,7,3);
-        System.out.println(&quot;sum=&quot;+sum);
-
-        int sum1 = newAdd(3,5,2,5,3,2,2);
-        System.out.println(&quot;sum1=&quot;+sum1);
-
-    }
-
-    /**
-     * 函数是可变参数。
-     * 其实就是一个数组，但是接收的是数组元素。
-     * 自动将这些元素封装为数组。简化了调用者的书写。
-     * 注意：可变参数类型，必须定义参数列表的结尾。
-     */
-
-    private static int newAdd(int a,int... arr) {
-        int sum = 0;
-        for (int i = 0; i &lt; arr.length; i++) {
-            sum+=arr[i];
-        }
-        return sum;
-    }
-
-}
+</code></pre><p>随机写入&amp;细节</p>
+<p>//往指定位置写入数据</p>
+<pre><code>raf.seek(3*8);
+raf.write(&quot;哈哈&quot;.getBytes());
+raf.writeInt(108);
+raf.close;
 </code></pre>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/09/java/java-collections/java-collection-utilities/" data-id="cjegiwocj0021rvp37maejn38" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-15-randomAccessFile/" data-id="cjgxcg497002mr9p3y248yn9i" class="article-share-link">Delen</a>
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
 
     </footer>
   </div>
@@ -1606,10 +1181,10 @@ public static String toString(int[] a) {
 
 
   
-    <article id="post-java/java-collections/java-collection-map" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-java/java-io/IO-16-pipedStream" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2018/01/09/java/java-collections/java-collection-map/" class="article-date">
-  <time datetime="2018-01-09T06:44:18.000Z" itemprop="datePublished">2018-01-09</time>
+    <a href="/2018/01/10/java/java-io/IO-16-pipedStream/" class="article-date">
+  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
 </a>
     
   <div class="article-category">
@@ -1624,7 +1199,7 @@ public static String toString(int[] a) {
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/09/java/java-collections/java-collection-map/">集合框架四 - Map集合</a>
+      <a class="article-title" href="/2018/01/10/java/java-io/IO-16-pipedStream/">IO流 - 十六、管道流 - PipedStream</a>
     </h1>
   
 
@@ -1632,407 +1207,63 @@ public static String toString(int[] a) {
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h3 id="四、集合框架-Map集合"><a href="#四、集合框架-Map集合" class="headerlink" title="四、集合框架 - Map集合"></a>四、集合框架 - Map集合</h3><h4 id="1、集合特点-amp-常用方法"><a href="#1、集合特点-amp-常用方法" class="headerlink" title="1、集合特点&amp;常用方法"></a>1、集合特点&amp;常用方法</h4><p>Collection：一次添加一个元素，集合称为单列集合。</p>
-<p>Map：一次添加一对元素，存储的是键值对，集合中必须保证键的唯一性。</p>
-<p>常用方法：</p>
-<p>添加：</p>
-<pre><code>value put(key,value):返回前一个和key关联的值，如果没有返回null
-</code></pre><p>删除：</p>
-<pre><code>void clear():清空map集合
-value remove(key):根据指定的key删除这个键值对，返回被删除键值对的value。
-</code></pre><p>判断：</p>
-<pre><code>boolean containskey(key)
-boolean containsValue(value)
-boolean isEmpty()
-</code></pre><p>获取：</p>
-<pre><code>value get(key):通过键获取值，如果没有该键返回null。因此，可以通过返回null，来判断是否包含指定键。
-int size():获取键值对的个数。
-</code></pre><p>方法演示：</p>
-<pre><code>public class MapDemo1 {
+        <p>PipedInputStream和PipedOutputStream</p>
+<p>输入输出可以直接进行连接，通过结合线程使用。</p>
+<pre><code>public class PipedStreamDemo1 {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        PipedInputStream input = new PipedInputStream();
+        PipedOutputStream out = new PipedOutputStream();
+        input.connect(out);
 
-        Map&lt;Integer,String&gt; map = new HashMap&lt;Integer,String&gt;();
-
-        method(map);
-
-    }
-
-    private static void method(Map&lt;Integer, String&gt; map) {
-
-        //添加
-        System.out.println(map.put(8, &quot;wangcai&quot;));
-        System.out.println(map.put(8, &quot;xiaoqiang&quot;));
-        map.put(2, &quot;zhangsan&quot;);
-        map.put(4, &quot;lisi&quot;);
-        System.out.println(map);
-
-        //删除
-        System.out.println(&quot;remove:&quot;+map.remove(2));
-
-        //判断
-        System.out.println(&quot;containskey:&quot;+map.containsKey(7));
-
-        //获取
-        System.out.println(&quot;get:&quot;+map.get(6));
-
-
-    }
-
-}
-</code></pre><h4 id="2、重点方法keySet"><a href="#2、重点方法keySet" class="headerlink" title="2、重点方法keySet"></a>2、重点方法keySet</h4><p>取出map中的所有元素。</p>
-<p>原理：通过keySet方法取出map中的所有键所在的Set集合，再通过Set的迭代器获取每一个键，再通过map集合的get方法获取每个键所对应的值。</p>
-<pre><code>public class MapDemo2 {
-
-    public static void main(String[] args) {
-
-        Map&lt;Integer,String&gt; map = new HashMap&lt;Integer,String&gt;();
-
-        method(map);
-
-    }
-
-    private static void method(Map&lt;Integer, String&gt; map) {
-
-        map.put(2, &quot;zhangsan&quot;);
-        map.put(8, &quot;lisi&quot;);
-        map.put(7, &quot;wangwu&quot;);
-        map.put(6, &quot;zhaoliu&quot;);
-
-        Set&lt;Integer&gt; keySet = map.keySet();
-        Iterator&lt;Integer&gt; it = keySet.iterator();
-
-        while(it.hasNext()) {
-            Integer key = it.next();
-            String value = map.get(key);
-            System.out.println(key+&quot;:&quot;+value);
-        }
+        new Thread(new Input(input)).start();
+        new Thread(new Output(out)).start();
 
     }
 
 }
 
-输出结果：
-2:zhangsan
-6:zhaoliu
-7:wangwu
-8:lisi
-</code></pre><h4 id="3、重点方法entrySet"><a href="#3、重点方法entrySet" class="headerlink" title="3、重点方法entrySet"></a>3、重点方法entrySet</h4><p>该方法将键和值的映射关系作为对象存储到了Set集合中，而这个映射关系的类型就是Map.Entry类型（结婚证）。</p>
-<pre><code>public class MapDemo3 {
-
-    public static void main(String[] args) {
-
-        Map&lt;Integer,String&gt; map = new HashMap&lt;Integer,String&gt;();
-
-        method(map);
-
+class Input implements Runnable {
+    private PipedInputStream in;
+    Input(PipedInputStream in) {
+        this.in = in;
     }
 
-    private static void method(Map&lt;Integer, String&gt; map) {
-
-        map.put(2, &quot;zhangsan&quot;);
-        map.put(8, &quot;lisi&quot;);
-        map.put(7, &quot;wangwu&quot;);
-        map.put(6, &quot;zhaoliu&quot;);
-
-        Set&lt;Map.Entry&lt;Integer,String&gt;&gt; entrySet = map.entrySet();
-
-        Iterator&lt;Map.Entry&lt;Integer,String&gt;&gt; it = entrySet.iterator();
-
-        while(it.hasNext()) {
-            Map.Entry&lt;Integer, String&gt; merryEntry = it.next();
-            Integer key = merryEntry.getKey();
-            String value = merryEntry.getValue();
-            System.out.println(key+&quot;:&quot;+value);
-        }
-
-    }
-
-}
-</code></pre><h4 id="4、values方法"><a href="#4、values方法" class="headerlink" title="4、values方法"></a>4、values方法</h4><p>Collection<v> values()</v></p>
-<p>返回此映射中包含的值的Collection视图。</p>
-<pre><code>public class MapDemo4 {
-
-    public static void main(String[] args) {
-
-        Map&lt;Integer,String&gt; map = new HashMap&lt;Integer,String&gt;();
-
-        method(map);
-
-    }
-
-    public static void method(Map&lt;Integer, String&gt; map) {
-        map.put(2, &quot;zhangsan&quot;);
-        map.put(8, &quot;lisi&quot;);
-        map.put(7, &quot;wangwu&quot;);
-        map.put(6, &quot;zhaoliu&quot;);
-
-        Collection&lt;String&gt; values = map.values();
-
-        Iterator&lt;String&gt; it = values.iterator();
-
-        while(it.hasNext()) {
-            System.out.println(it.next());
-        }
-
-    }
-
-}
-</code></pre><h4 id="5、Map集合-常见子类对象"><a href="#5、Map集合-常见子类对象" class="headerlink" title="5、Map集合-常见子类对象"></a>5、Map集合-常见子类对象</h4><p>Map常见子类：</p>
-<p>|– Hashtable：</p>
-<p>内部结构是哈希表，是同步的。不允许null作为键和值。</p>
-<p>|—— Properties：</p>
-<p>可以用来存储键值对型的配置文件的信息，可以和IO技术相结合。</p>
-<p>|– HashMap：</p>
-<p>内部结构是哈希表，不是同步的。允许null作为键和值。</p>
-<p>|– TreeMap：</p>
-<p>内部结构是二叉树，不是同步的。可以对Map集合中的键排序。</p>
-<h4 id="6、HashMap存储自定义对象"><a href="#6、HashMap存储自定义对象" class="headerlink" title="6、HashMap存储自定义对象"></a>6、HashMap存储自定义对象</h4><pre><code>public class MapDemo5 {
-
-    public static void main(String[] args) {
-
-        /**
-         * 将学生对象和学生的归属地通过键与值存储到map集合中。
-         */
-
-        HashMap&lt;Student,String&gt; hm = new HashMap&lt;Student,String&gt;();
-
-        hm.put(new Student(&quot;zhangsan&quot;,20),&quot;上海&quot;);
-        hm.put(new Student(&quot;lisi&quot;,21),&quot;北京&quot;);
-        hm.put(new Student(&quot;wangwu&quot;,30),&quot;临沂&quot;);
-        hm.put(new Student(&quot;wangwu&quot;,30),&quot;临沂&quot;);
-
-        Set&lt;Student&gt; keySet = hm.keySet();
-
-        Iterator&lt;Student&gt; it = keySet.iterator();
-
-        while(it.hasNext()) {
-            Student key = it.next();
-            String value = hm.get(key);
-            System.out.println(key.getName()+&quot;:&quot;+key.getAge()+&quot;:&quot;+value);
-        }
-
-
-    }
-
-}
-
-输出结果：
-zhangsan:20:上海
-wangwu:30:临沂
-wangwu:30:临沂
-lisi:21:北京
-
-Student类继承自Person2类，通过在Person2类中覆盖重写hashCode和equals方法，去重，保证唯一性。
-</code></pre><h4 id="7、TreeMap存储自定义对象"><a href="#7、TreeMap存储自定义对象" class="headerlink" title="7、TreeMap存储自定义对象"></a>7、TreeMap存储自定义对象</h4><pre><code>public class MapDemo6 {
-
-    public static void main(String[] args) {
-
-        /**
-         * 将学生对象和学生的归属地通过键与值存储到map集合中。
-         * 按姓名排序
-         */
-
-        TreeMap&lt;Student,String&gt; tm = new TreeMap&lt;Student,String&gt;(new ComparatorByName());
-
-        tm.put(new Student(&quot;zhangsan&quot;,20),&quot;上海&quot;);
-        tm.put(new Student(&quot;lisi&quot;,21),&quot;北京&quot;);
-        tm.put(new Student(&quot;wangwu&quot;,30),&quot;临沂&quot;);
-        tm.put(new Student(&quot;wangwu&quot;,30),&quot;临沂&quot;);
-
-        Set&lt;Map.Entry&lt;Student,String&gt;&gt; entrySet = tm.entrySet();
-
-        Iterator&lt;Map.Entry&lt;Student, String&gt;&gt; it = entrySet.iterator();
-
-        while(it.hasNext()) {
-            Map.Entry&lt;Student, String&gt; merryEntry = it.next();
-            Student key = merryEntry.getKey();
-            String value = merryEntry.getValue();
-            System.out.println(key.getName()+&quot;:&quot;+key.getAge()+&quot;:&quot;+value);
+    public void run() {
+        try {
+            byte[] buf = new byte[1024];
+            int length = in.read(buf);
+            String s = new String(buf,0,length);
+            System.out.println(&quot;s=&quot;+s);
+            in.close();
+        } catch (Exception e) {
+            // TODO: handle exception
         }
     }
-
 }
 
-public class ComparatorByName implements Comparator&lt;Person2&gt; {
+class Output implements Runnable {
+    private PipedOutputStream out;
+    Output(PipedOutputStream out) {
+        this.out = out;
+    }
 
-    @Override
-    public int compare(Person2 o1, Person2 o2) {
-        Person2 p1 = (Person2)o1;
-        Person2 p2 = (Person2)o2;
-        int temp = p1.getName().compareTo(p2.getName());
-        return temp==0?p1.getAge()-p2.getAge():temp;
-    }    
-
-}
-</code></pre><h4 id="8、LinkedHashMap"><a href="#8、LinkedHashMap" class="headerlink" title="8、LinkedHashMap"></a>8、LinkedHashMap</h4><pre><code>public class MapDemo7 {
-
-    public static void main(String[] args) {
-
-        HashMap&lt;Integer,String&gt; hm = new LinkedHashMap&lt;Integer,String&gt;();
-
-        hm.put(7, &quot;aaaa&quot;);
-        hm.put(2, &quot;bbbb&quot;);
-        hm.put(1, &quot;dddd&quot;);
-        hm.put(10, &quot;ccc&quot;);
-
-        Iterator&lt;Map.Entry&lt;Integer,String&gt;&gt; it = hm.entrySet().iterator();
-
-        while(it.hasNext()) {
-            Map.Entry&lt;Integer, String&gt; merryEntry = it.next();
-            Integer key = merryEntry.getKey();
-            String value = merryEntry.getValue();
-
-            System.out.println(key+&quot;:&quot;+value);
+    public void run() {
+        try {
+            out.write(&quot;aaaaaaaaa&quot;.getBytes());
+        } catch (Exception e) {
+            // TODO: handle exception
         }
-
     }
-
 }
-
-输出结果：
-7:aaaa
-2:bbbb
-1:dddd
-10:ccc
-
-由HashMap变为LinkedHashMap之后，存和取的顺序保持了一致。
-</code></pre><h4 id="9、Map集合练习-按自然顺序，记录字母出现次数"><a href="#9、Map集合练习-按自然顺序，记录字母出现次数" class="headerlink" title="9、Map集合练习 - 按自然顺序，记录字母出现次数"></a>9、Map集合练习 - 按自然顺序，记录字母出现次数</h4><pre><code>public class MapDemp8 {
-
-
-    public static void main(String[] args) {
-
-        String str = &quot;jslsjflAAsCCjl  ++js--lajaslasjfsala&quot;;
-
-        String s = getCarCount(str);
-
-        System.out.println(s);
-
-    }
-
-    private static String getCarCount(String str) {
-
-        //字符串变字符数组
-        char[] charArr = str.toCharArray();
-
-        //TreeSet集合
-        TreeMap&lt;Character,Integer&gt; tm = new TreeMap&lt;Character,Integer&gt;();
-
-        for (int i = 0; i &lt; charArr.length; i++) {
-
-            if(!(charArr[i] &gt;= &apos;a&apos; &amp;&amp; charArr[i] &lt;= &apos;z&apos; || charArr[i] &gt;= &apos;A&apos; &amp;&amp; charArr[i] &lt;= &apos;Z&apos;)) {
-                continue;
-            }
-
-            Character chara = charArr[i];
-            Integer val = tm.get(chara);
-            if(val == null) {
-                tm.put(chara, 1);
-            }else {
-                Integer count = tm.get(chara) + 1;
-                tm.put(chara,count);
-            }
-
-
-        }
-
-        return mapToString(tm);
-    }
-
-    private static String mapToString(TreeMap&lt;Character, Integer&gt; tm) {
-        StringBuilder sb = new StringBuilder();
-
-        Set&lt;Character&gt; keySet = tm.keySet();
-
-        Iterator&lt;Character&gt; it = keySet.iterator();
-
-        while(it.hasNext()) {
-            Character key = it.next();
-            Integer value = tm.get(key);
-            sb.append(key+&quot;(&quot;+value+&quot;)&quot;);
-        }
-
-        return sb.toString();
-    }
-
-}
-
-输出结果：
-A(2)C(2)a(5)f(2)j(6)l(6)s(7)
 </code></pre>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/09/java/java-collections/java-collection-map/" data-id="cjegiwocc001urvp3w0bn0h4z" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-16-pipedStream/" data-id="cjgxcg499002pr9p3sv9rueqd" class="article-share-link">Delen</a>
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/java-collections/java-collection-notes" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/09/java/java-collections/java-collection-notes/" class="article-date">
-  <time datetime="2018-01-09T06:42:46.000Z" itemprop="datePublished">2018-01-09</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/java/">java</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/09/java/java-collections/java-collection-notes/">集合框架三 - 查阅技巧</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="三、集合框架-集合查阅的技巧"><a href="#三、集合框架-集合查阅的技巧" class="headerlink" title="三、集合框架-集合查阅的技巧"></a>三、集合框架-集合查阅的技巧</h3><p>唯一性？</p>
-<p>– 需要唯一：Set</p>
-<p>—- 需要顺序？</p>
-<p>—— 需要： TreeSet</p>
-<p>—— 不需要： HashSet</p>
-<p>—— 和存储一致的顺序：LinkedHashSet</p>
-<p>– 不需要唯一：List</p>
-<p>—- 频繁增删？</p>
-<p>—– 需要：LinkedList</p>
-<p>—— 不需要：ArrayList</p>
-<p>结构体系：</p>
-<p>List</p>
-<p>|– ArrayList</p>
-<p>|– LinkedList</p>
-<p>Set </p>
-<p>|– HashSet</p>
-<p>|– TreeSet</p>
-<p>后缀名就是该集合所属的体系。</p>
-<p>前缀名就是该集合的数据结构。</p>
-<p>看到array：就要想到数组，查询快，有角标。</p>
-<p>看到Link：就要想到增删快，想到add get remove+first last的方法。</p>
-<p>看到hash：就要想到hash表，唯一性，元素需要覆盖hashCode方法和equals方法。</p>
-<p>看到tree：就要想到二叉树，排序，两个接口Compareble和Comparator。</p>
-<p>而且这些常用的集合容器都是不同步的。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/09/java/java-collections/java-collection-notes/" data-id="cjegiwocg001zrvp3dxzwft03" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
 
     </footer>
   </div>
@@ -2044,7 +1275,7 @@ A(2)C(2)a(5)f(2)j(6)l(6)s(7)
 
 
   <nav id="page-nav">
-    <a class="extend prev" rel="prev" href="/page/2/">&laquo; __('prev')</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/4/">__('next') &raquo;</a>
+    <a class="extend prev" rel="prev" href="/page/2/">&laquo; __('prev')</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/4/">__('next') &raquo;</a>
   </nav>
 </section>
         
@@ -2052,9 +1283,9 @@ A(2)C(2)a(5)f(2)j(6)l(6)s(7)
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Categories</h3>
+    <h3 class="widget-title">Categorieën</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
     </div>
   </div>
 
@@ -2062,9 +1293,9 @@ A(2)C(2)a(5)f(2)j(6)l(6)s(7)
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Tags</h3>
+    <h3 class="widget-title">Labels</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
     </div>
   </div>
 
@@ -2074,16 +1305,16 @@ A(2)C(2)a(5)f(2)j(6)l(6)s(7)
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 18.33px;">angular</a> <a href="/tags/api/" style="font-size: 15px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 16.67px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 13.33px;">jsp</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.67px;">servlet</a> <a href="/tags/thread/" style="font-size: 11.67px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
     </div>
   </div>
 
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Archives</h3>
+    <h3 class="widget-title">Archieven</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
     </div>
   </div>
 
@@ -2091,28 +1322,28 @@ A(2)C(2)a(5)f(2)j(6)l(6)s(7)
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
+    <h3 class="widget-title">Recente berichten</h3>
     <div class="widget">
       <ul>
         
           <li>
-            <a href="/2018/03/07/java/java-jsp/java-jsp-3/">第3章 jsp系统开发模型</a>
+            <a href="/2018/05/08/java/spring/spring-10/">第十章 Spring事务管理</a>
           </li>
         
           <li>
-            <a href="/2018/01/31/java/java-jsp/java-jsp-2/">第2章 JSP核心</a>
+            <a href="/2018/05/06/java/spring/spring-9/">第九章 spring与JDBC模板</a>
           </li>
         
           <li>
-            <a href="/2018/01/31/java/java-jsp/java-jsp-1/">第1章 JSP基础</a>
+            <a href="/2018/05/06/java/spring/spring-8/">第八章 Spring与AOP AspectJ基于XML的AOP实现</a>
           </li>
         
           <li>
-            <a href="/2018/01/25/java/java-servlet/java-servlet-1/">java Servlet 一、基础</a>
+            <a href="/2018/05/06/java/spring/spring-7/">第七章 Spring与AOP AspectJ基于注解的AOP实现</a>
           </li>
         
           <li>
-            <a href="/2018/01/25/java/java-servlet/java-servlet-2/">java Servlet 二、核心</a>
+            <a href="/2018/05/05/java/spring/spring-6/">第六章 Spring与AOP AspectJ对AOP的实现</a>
           </li>
         
       </ul>

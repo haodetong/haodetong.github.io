@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>session&amp;cookie | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="java-session-cookie">
+<meta name="keywords" content="java, session, cookie">
+<meta property="og:type" content="article">
+<meta property="og:title" content="session&amp;cookie">
+<meta property="og:url" content="http://yoursite.com/2018/04/27/java/java-session-cookie/session-cookie/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="java-session-cookie">
+<meta property="og:updated_time" content="2018-04-27T09:27:13.356Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="session&amp;cookie">
+<meta name="twitter:description" content="java-session-cookie">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Zoeken"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-java/java-session-cookie/session-cookie" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/04/27/java/java-session-cookie/session-cookie/" class="article-date">
+  <time datetime="2018-04-27T02:12:04.000Z" itemprop="datePublished">2018-04-27</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      session&amp;cookie
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="1-1-cookie简介"><a href="#1-1-cookie简介" class="headerlink" title="1.1 cookie简介"></a>1.1 cookie简介</h4><p>cookie是1993年由网景公司前雇员发明的一种进行网络会话状态跟踪的技术。</p>
+<p>会话是由一组请求与响应组成，是围绕着一种相关事情所进行的请求与响应。所以这些请求与响应之间一定是需要有数据传递的，即需要进行会话状态跟踪。然而HTTP协议是一种无状态协议，在不同的请求之间是无法进行数据传递的。此时就需要一种可以进行请求之间进行数据传递的会话跟踪技术，而cookie就是一种这样的技术。</p>
+<p>cookie是由服务器生成，保存在客户端的一种信息载体。这个载体中存放着用记访问该站点的会话状态信息。只在cookie没有被清空，或者cookie没有失效，那么，保存在其中的会话状态就有效。</p>
+<p>用户在提交第一次请求后，由服务器生成cookie，并将其封装到响应头中，以响应的形式发送给客户端。客户端接收到这个响应后，将cookie保存到客户端。当客户端再次发送同类请求后（资源路径相同，资源名称不同），在请求中会携带保存在客户端的cookie数据，发送到客户端，由服务器对会话进行跟踪。</p>
+<p>cookie技术并不是jvavaweb开发的专属技术，而是属于web开发的技术，是所有web开发语言均支持的技术。</p>
+<p>cookie是由若干键值对构成，键值对均为字符串。</p>
+<h4 id="1-2-javaEE中的cookie"><a href="#1-2-javaEE中的cookie" class="headerlink" title="1.2 javaEE中的cookie"></a>1.2 javaEE中的cookie</h4><p>在javaEE中的javax.servlet.http包中存在一个类Cookie，就是用于完成会话跟踪的Cookie。其只有一个带参构造器。</p>
+<h5 id="默认绑定路径"><a href="#默认绑定路径" class="headerlink" title="默认绑定路径"></a>默认绑定路径</h5><p>访问路径由资源路径与资源名称构成。默认情况下，cookie与访问路径中的资源路径绑定。只要用户发出带有绑定资源路径的请求，则在请求头部，将会自动携带与之绑定的cookie路径。</p>
+<h5 id="生成cookie"><a href="#生成cookie" class="headerlink" title="生成cookie"></a>生成cookie</h5><pre><code>public class SomeServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.getWriter().append(&quot;Served at: &quot;).append(request.getContextPath());
+        //创建两个Cookie
+        Cookie cookie = new Cookie(&quot;company&quot;,&quot;abc&quot;);
+        Cookie cookie2 = new Cookie(&quot;teacher&quot;,&quot;def&quot;);
+
+        //指定cookie绑定的资源路径。必须加上项目名称
+        cookie.setPath(request.getContextPath() + &quot;/aaa/bbb/ccc&quot;);
+        cookie2.setPath(request.getContextPath() + &quot;/ddd/eee/fff&quot;);
+
+        //设置cookie有效期
+        //大于0，表示将cookie存放到客户端硬盘
+        //小于0，与不设置一样，会将cookie存放到浏览器的缓存
+        //等于0，表示cookie一生成，马上失效
+        cookie.setMaxAge(60 * 60);
+        cookie2.setMaxAge(60 * 60 * 24 * 10);
+
+        //向响应中添加Cookie
+        response.addCookie(cookie);
+        response.addCookie(cookie2);
+
+    }
+}
+</code></pre><h5 id="获取cookie"><a href="#获取cookie" class="headerlink" title="获取cookie"></a>获取cookie</h5><pre><code>public class OhterServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.getWriter().append(&quot;Served at: &quot;).append(request.getContextPath());
+
+        Cookie[] cookies = request.getCookies();
+
+        for(Cookie cookie:cookies) {
+            System.out.println(cookie.getName() + &quot;===&quot; + cookie.getValue());
+            if(cookie.getName().equals(&quot;teacher&quot;) &amp;&amp; cookie.getValue().equals(&quot;aaa&quot;)) {
+                //...
+            } else {
+                //..
+            }
+        }
+    }
+
+}
+</code></pre><h4 id="2-1-HttpSession"><a href="#2-1-HttpSession" class="headerlink" title="2.1 HttpSession"></a>2.1 HttpSession</h4><p> session，即会话，是web开发中的一种会话状态跟踪技术。不同的是,cookie是将会话状态保存在了客户端，而session是将会话状态保存在了服务器端。</p>
+<p> 在javaweb开发中，session是以javax.servlet.HttpSession的接口对象的形式出现。</p>
+<hr>
+<p>对于request的getSession()的用法：</p>
+<ul>
+<li><p>一般情况下，若要向session域中写入数据，则需要使用getSession(true)，即getSession()方法。意味着有老的session用老的，没有老的则创建新的。</p>
+</li>
+<li><p>若要从session中读取数据，则需要使用getSession(false)。意味着有老的session用老的，没有老的返回null。</p>
+</li>
+</ul>
+<hr>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;title&gt;Insert title here&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form action = &quot;FirstServlet&quot; method = &quot;POST&quot;&gt;
+        用户名：&lt;input type = &quot;text&quot; name = &quot;username&quot; /&gt;
+        &lt;input type = &quot;submit&quot; value = &quot;提交&quot; /&gt;
+    &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre><p> FirstServlet</p>
+<pre><code>public class FirstServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //获取用户提交的数据
+        String username = request.getParameter(&quot;username&quot;);
+
+        //将参数放到request域
+        request.setAttribute(&quot;user&quot;, username);
+
+        //获取session对象
+        HttpSession session = request.getSession();
+
+        //向session域中写入数据
+        session.setAttribute(&quot;username&quot;, username);
+
+        response.getWriter().print(&quot;SomeServlet&quot; + username);
+
+    }
+
+}
+</code></pre><p>SecondServlet</p>
+<pre><code>public class SecondServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //从request域中读取user属性
+        Object user = request.getAttribute(&quot;user&quot;);
+
+        //获取session
+        HttpSession session = request.getSession(false);
+
+        //从session中读取指定属性
+        String username = null;
+        if(session != null) {
+            username = (String) session.getAttribute(&quot;username&quot;);
+        }
+
+        PrintWriter out = response.getWriter();
+        out.println(&quot;user = &quot; + user);
+        out.println(&quot;username = &quot; + username);
+        out.println(&quot;session = &quot; + session);
+    }
+
+}
+</code></pre><h4 id="2-2-Session的工作原理"><a href="#2-2-Session的工作原理" class="headerlink" title="2.2 Session的工作原理"></a>2.2 Session的工作原理</h4><p>在服务器中系统会为每个会话维护一个Session。不同的会话，对应不同的Session。那么，系统是如何识别Session对象的？即是如何做到在同一个会话过程中，一直使用的是同一个Session对象呢？</p>
+<h5 id="（1）、写入Session列表"><a href="#（1）、写入Session列表" class="headerlink" title="（1）、写入Session列表"></a>（1）、写入Session列表</h5><p>服务器对当前应用中的Session是以Map的形式进行管理的，这个Map称为Session列表。该Map的key为一个32位长度的随机串，这个随机串称为JSessionID，value则为Session对象的引用。</p>
+<p>当用户每一次提交请求时，服务端Servlet中执行到request.getSession()方法后，会自动生成一个Map.entry对象，key为一个根据某种算法新生成的JSessionID，value则为新创建的HttpSession对象。</p>
+<h5 id="2-、服务器生成并发送cookie"><a href="#2-、服务器生成并发送cookie" class="headerlink" title="(2)、服务器生成并发送cookie"></a>(2)、服务器生成并发送cookie</h5><p>在将session信息写入session列表后，系统还会自动将“JSessionID”作为name,这个32位长度的随机串作为value，以cookie的形式存放到响应报头中，并随着响应，将该cookie发送到客户端。</p>
+<p><a href="http://localhost:8080/sessioncookie" target="_blank" rel="external">http://localhost:8080/sessioncookie</a><br>提交表单，跳转到FirstServlet后，</p>
+<pre><code>Response Headers
+
+Content-Length: 13
+
+Date: Fri, 27 Apr 2018 07:54:40 GMT
+
+Set-Cookie: JSESSIONID=DCCE10CC2F5A6FAE40B716CA91B01EB0; Path=/sessioncookie; HttpOnly
+</code></pre><h5 id="3-、客户端接收并发送cookie"><a href="#3-、客户端接收并发送cookie" class="headerlink" title="(3)、客户端接收并发送cookie"></a>(3)、客户端接收并发送cookie</h5><p>客户端接收到这个cookie后会将其存放到浏览器缓存中。即，只要客户端浏览器不关闭，浏览器缓存中的cookie就不会消失。</p>
+<p>当用户提交第二次请求时，会将缓存中的这个cookie，伴随着请求的头部信息，一块发送到服务端。</p>
+<p>再次发送请求时，<a href="http://localhost:8080/sessioncookie/SecondServlet" target="_blank" rel="external">http://localhost:8080/sessioncookie/SecondServlet</a></p>
+<pre><code>Request Headers
+
+...
+
+Cookie: JSESSIONID=DCCE10CC2F5A6FAE40B716CA91B01EB0
+
+Host: localhost:8080
+</code></pre><p>（4）、从session列表中查找</p>
+<p>服务端从请求中读取到客户端发送来的cookie，并根据cookie的SeesionID的值，从Map中查找相应key所对应的value，即session对象。然后，该session的域属性进行读写操作。</p>
+<h4 id="2-3-Session的失效"><a href="#2-3-Session的失效" class="headerlink" title="2.3 Session的失效"></a>2.3 Session的失效</h4><p>若某个session在指定的时间内一直未被访问，那么session将超时，即将失效。</p>
+<p>在web.xml中可以通过<code>&lt;session-config /&gt;</code>标签设置session的超时时间，单位为分钟。默认的超时时间为30分钟。时间从最后一次访问开始计时。</p>
+<pre><code>&lt;session-config&gt;
+    &lt;session-timeout&gt;120&lt;/session-timeout&gt;
+&lt;/session-config&gt;
+</code></pre><p>若未到超时时间，也可以通过HttpSession中的方法invalide()，使得session失效。</p>
+<h4 id="2-4-cookie禁用后的session"><a href="#2-4-cookie禁用后的session" class="headerlink" title="2.4 cookie禁用后的session"></a>2.4 cookie禁用后的session</h4><p>cookie禁用后，从someServlet跳转到otherServlet时，</p>
+<pre><code>protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //获取用户提交的数据
+        String username = request.getParameter(&quot;username&quot;);
+
+        //获取session对象
+        HttpSession session = request.getSession();
+
+        //向session域中写入数据
+        session.setAttribute(&quot;username&quot;, username);
+
+        //跳转到otherServlet
+        response.sendRedirect(request.getContextPath() + &quot;/otherServlet&quot;);    
+    }
+</code></pre><p>someServlet发送到客户端的包含有sessionid的cookie并没有被客户端保存，所以在发送otherServlet请求时，没有将该包含有sessionid的cookie发送到服务端，因此otherServlet服务端找不到该session，也就不能读取里面的数据。</p>
+<h5 id="解决方法："><a href="#解决方法：" class="headerlink" title="解决方法："></a>解决方法：</h5><p>request.encodeRedirectURL()方法</p>
+<pre><code>protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    //获取用户提交的数据
+    String username = request.getParameter(&quot;username&quot;);
+
+    //获取session对象
+    HttpSession session = request.getSession();
+
+    //向session域中写入数据
+    session.setAttribute(&quot;username&quot;, username);
+
+    //跳转到otherServlet
+    String uri = request.getContextPath() + &quot;/otherServlet&quot;;
+    uri = request.encodeRedirectURL(uri);
+    response.sendRedirect(uri);    
+}
+</code></pre><p>这样的话，跳转到otherServlet时，会将sessionid包含到访问地址中。</p>
+<pre><code>http://localhost/8080/sessioncookie/otherServlet;jsessionid=6BD1D909077DF0798ASSSJAK8200EC12
+</code></pre><p>这样的话，发送请求到OtherServlet时，就会将该sessionid发送到服务端。</p>
+<h4 id="2-5-cookie禁用后非重定向跳转时session的跟踪"><a href="#2-5-cookie禁用后非重定向跳转时session的跟踪" class="headerlink" title="2.5 cookie禁用后非重定向跳转时session的跟踪"></a>2.5 cookie禁用后非重定向跳转时session的跟踪</h4><p>HttpServletResponse具有一个方法encdodeURL()，可以完成类似超链接这样的非重定向页面跳转的URL的重写，即在其路径后自动添加jsessionid</p>
+<pre><code>protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    //获取用户提交的数据
+    String username = request.getParameter(&quot;username&quot;);
+
+    //获取session对象
+    HttpSession session = request.getSession();
+
+    //向session域中写入数据
+    session.setAttribute(&quot;username&quot;, username);
+
+    //跳转到otherServlet
+    response.setContentType(&quot;text/html;charset=utf-8&quot;);
+    PrintWriter out = response.getWriter();
+    String uri = &quot;otherServlet&quot;;
+    uri = response.encodeURL(uri);
+    out.println(&quot;&lt;a href=&apos;&quot; + uri + &quot;&apos;&gt;跳转&lt;/a&gt;到otherservlet&quot;);
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/04/27/java/java-session-cookie/session-cookie/" data-id="cjgxcg4b6004ir9p3wsa0xf8i" class="article-share-link">Delen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/session-cookie/">session cookie</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/05/04/java/spring/spring-1/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Nieuwer</strong>
+      <div class="article-nav-title">
+        
+          第一章 spring概述
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/03/07/java/java-jsp/java-jsp-3/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Ouder</strong>
+      <div class="article-nav-title">第3章 jsp系统开发模型</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categorieën</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Labels</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archieven</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recente berichten</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/05/08/java/spring/spring-10/">第十章 Spring事务管理</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/06/java/spring/spring-9/">第九章 spring与JDBC模板</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/06/java/spring/spring-8/">第八章 Spring与AOP AspectJ基于XML的AOP实现</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/06/java/spring/spring-7/">第七章 Spring与AOP AspectJ基于注解的AOP实现</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/05/java/spring/spring-6/">第六章 Spring与AOP AspectJ对AOP的实现</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
