@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>第一章 MyBatis单表的CURD操作 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="1.1 简介MyBatis是一个优秀的基于java的持久层框架，它内部封装了JDBC，使开发者只需关注SQL语句本身，不用再花费精力去处理诸如注册驱动、创建Connection、配置Statement等繁杂过程。 MyBatis通过xml或注解的方式将要执行的各种statement配置起来，并通过Java对象和Statement中的SQL动态参数进行映射生成最终执行的SQL语句，最后由MyBati">
+<meta name="keywords" content="mybatis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第一章 MyBatis单表的CURD操作">
+<meta property="og:url" content="http://yoursite.com/2018/05/08/java/mybatis/mybatis-1/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="1.1 简介MyBatis是一个优秀的基于java的持久层框架，它内部封装了JDBC，使开发者只需关注SQL语句本身，不用再花费精力去处理诸如注册驱动、创建Connection、配置Statement等繁杂过程。 MyBatis通过xml或注解的方式将要执行的各种statement配置起来，并通过Java对象和Statement中的SQL动态参数进行映射生成最终执行的SQL语句，最后由MyBati">
+<meta property="og:updated_time" content="2018-05-12T09:28:58.380Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="第一章 MyBatis单表的CURD操作">
+<meta name="twitter:description" content="1.1 简介MyBatis是一个优秀的基于java的持久层框架，它内部封装了JDBC，使开发者只需关注SQL语句本身，不用再花费精力去处理诸如注册驱动、创建Connection、配置Statement等繁杂过程。 MyBatis通过xml或注解的方式将要执行的各种statement配置起来，并通过Java对象和Statement中的SQL动态参数进行映射生成最终执行的SQL语句，最后由MyBati">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-java/mybatis/mybatis-1" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/08/java/mybatis/mybatis-1/" class="article-date">
+  <time datetime="2018-05-08T07:25:25.000Z" itemprop="datePublished">2018-05-08</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mybatis/">mybatis</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      第一章 MyBatis单表的CURD操作
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="1-1-简介"><a href="#1-1-简介" class="headerlink" title="1.1 简介"></a>1.1 简介</h4><p>MyBatis是一个优秀的基于java的持久层框架，它内部封装了JDBC，使开发者只需关注SQL语句本身，不用再花费精力去处理诸如注册驱动、创建Connection、配置Statement等繁杂过程。</p>
+<p>MyBatis通过xml或注解的方式将要执行的各种statement配置起来，并通过Java对象和Statement中的SQL动态参数进行映射生成最终执行的SQL语句，最后由MyBatis框架执行SQL并将结果映射成Java对象并返回。</p>
+<h4 id="1-2-MyBatis与Hibernate"><a href="#1-2-MyBatis与Hibernate" class="headerlink" title="1.2 MyBatis与Hibernate"></a>1.2 MyBatis与Hibernate</h4><p>Hibernate框架是提供了全面的封装机制的“全自动”ORM，即实现了POJO和数据库表之间的映射，以及SQL的自动生成和执行。</p>
+<p>相对于此，MyBatis只能算作是“半自动”ORM。其着力点，是在POJO与SQL语句之间的映射。也就是说，MyBatis并不会为程序员自动生成SQL语句。具体的SQL需要程序员自己编写，然后通过SQL语句映射文件，将SQL所需要的参数，以及返回的结果字段映射到指定的POJO。因此MyBatis成为了“全自动”ORM的一种有益补充。</p>
+<p>与Hibernate相比，MyBaits具有以下几个特点：</p>
+<p>（1）、在XML文件中配置SQL语句，实现了SQL语句与代码的分离，给程序的维护带来了很大便利。</p>
+<p>（2）、因为需要程序员自己编写SQL语句，程序员可以结合数据库自身的特点灵活控制SQL语句，因此能够实现比Hibernate等全自动ORM框架更高的查询效率，能够完成复杂查询。</p>
+<p>（3）、简单、易于学习，易于使用，上手快。</p>
+<h4 id="1-3-Mapper动态代理"><a href="#1-3-Mapper动态代理" class="headerlink" title="1.3 Mapper动态代理"></a>1.3 Mapper动态代理</h4><p>Mybatis框架抛开了Dao的实现类，直接定位到映射文件mapper中的相应SQL语句，对DB进行操作。这种对Dao的实现方式称为Mapper的动态代理方式。</p>
+<p>Mapper动态代理方式无需程序员实现Dao接口。接口是由MyBatis结合映射文件自动生成的动态代理实现的。</p>
+<p>动态代理的实现：</p>
+<ul>
+<li><p>将mapper的namespace设为接口的全限制性类名</p>
+</li>
+<li><p>将mapper的sql语句的id设为接口的方法名</p>
+</li>
+</ul>
+<p>Dao的获取：</p>
+<pre><code>SqlSession sqlSession = MyBatisUtils.getSqlSession();
+studentDao = sqlSession.getMappper(IStudentDao.class);
+</code></pre><h4 id="1-4-CURD-单表操作"><a href="#1-4-CURD-单表操作" class="headerlink" title="1.4 CURD 单表操作"></a>1.4 CURD 单表操作</h4><p>POJO: Student.java</p>
+<pre><code>package com.bjpowernode.beans;
+
+public class Student {
+    private Integer id;
+    private String name;
+    private int age;
+    private double score;
+    public Student() {
+        super();
+    }
+    public Student(String name, int age, double score) {
+        super();
+        this.name = name;
+        this.age = age;
+        this.score = score;
+    }
+    public Integer getId() {
+        return id;
+    }
+    public void setId(Integer id) {
+        this.id = id;
+    }
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public int getAge() {
+        return age;
+    }
+    public void setAge(int age) {
+        this.age = age;
+    }
+    public double getScore() {
+        return score;
+    }
+    public void setScore(double score) {
+        this.score = score;
+    }
+    @Override
+    public String toString() {
+        return &quot;Student [id=&quot; + id + &quot;, name=&quot; + name + &quot;, age=&quot; + age + &quot;, score=&quot; + score + &quot;]&quot;;
+    }
+
+}
+</code></pre><p>接口：IStudentDao.java</p>
+<pre><code>package com.bjpowernode.dao;
+
+import java.util.List;
+import java.util.Map;
+
+import com.bjpowernode.beans.Student;
+
+public interface IStudentDao {
+    //插入
+    void insertStudent(Student student);
+    //插入后获取id
+    void insertStudentCatchId(Student student);
+    //删除
+    void deleteStudentById(int id);
+    //修改
+    void updateStudent(Student student);
+    //查询所有学生对象
+    List&lt;Student&gt; selectAllStudents();
+
+    //根据id查询某个学生
+    Student selectStudentById(int id);
+
+    //根据名字模糊查询
+    List&lt;Student&gt; selectStudentsByName(String name);
+}
+</code></pre><p>工具类：</p>
+<pre><code>package com.bjpowernode.utils;
+
+public class MyBatisUtils {
+    private static SqlSessionFactory sqlSessionFactory;
+
+    public static SqlSession getSqlSession() {
+        try {
+            InputStream inputStream = Resources.getResourceAsStream(&quot;mybatis.xml&quot;);
+            if(sqlSessionFactory == null) {
+                sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+            }
+            return sqlSessionFactory.openSession();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+}    
+</code></pre><p>数据库连接四要素配置文件：jdbc_mysql.properties</p>
+<pre><code>jdbc.driver=com.mysql.jdbc.Driver
+jdbc.url=jdbc:mysql:///mydatabase
+jdbc.user=root
+jdbc.password=haojie_123456
+</code></pre><p>主配置文件：mybatis.xml</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE configuration
+PUBLIC &quot;-//mybatis.org//DTD Config 3.0//EN&quot;
+&quot;http://mybatis.org/dtd/mybatis-3-config.dtd&quot;&gt;
+
+&lt;configuration&gt;
+    &lt;!-- 注册DB连接四要素属性文件 --&gt;
+    &lt;properties resource=&quot;jdbc_mysql.properties&quot;&gt;&lt;/properties&gt;
+
+    &lt;!-- 设置别名 --&gt;
+    &lt;typeAliases&gt;
+        &lt;!-- 将指定包中所有类的简单类名当作别名 --&gt;
+        &lt;package name=&quot;com.bjpowernode.beans&quot;/&gt;
+    &lt;/typeAliases&gt;
+
+    &lt;!-- 配置运行环境 --&gt;
+    &lt;environments default=&quot;mysqlEM&quot;&gt;
+        &lt;environment id=&quot;mysqlEM&quot;&gt;
+            &lt;transactionManager type=&quot;JDBC&quot;&gt;&lt;/transactionManager&gt;
+            &lt;dataSource type=&quot;POOLED&quot;&gt;
+                &lt;property name=&quot;driver&quot; value=&quot;${jdbc.driver}&quot;/&gt;
+                &lt;property name=&quot;url&quot; value=&quot;${jdbc.url}&quot;/&gt;
+                &lt;property name=&quot;username&quot; value=&quot;${jdbc.user}&quot;/&gt;
+                &lt;property name=&quot;password&quot; value=&quot;${jdbc.password}&quot;/&gt;
+            &lt;/dataSource&gt;
+        &lt;/environment&gt;
+    &lt;/environments&gt;
+
+    &lt;!-- 注册映射文件 --&gt;
+    &lt;mappers&gt;
+        &lt;mapper resource=&quot;com/bjpowernode/dao/mapper.xml&quot; /&gt;    
+    &lt;/mappers&gt;
+
+&lt;/configuration&gt;
+</code></pre><p>映射文件：mapper.xml</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE mapper
+PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+
+&lt;mapper namespace=&quot;com.bjpowernode.dao.IStudentDao&quot;&gt;
+
+    &lt;insert id=&quot;insertStudent&quot; parameterType=&quot;Student&quot;&gt;
+        insert into student(name,age,score) values(#{name},#{age},#{score})
+    &lt;/insert&gt;
+
+    &lt;insert id=&quot;insertStudentCatchId&quot;&gt;
+        insert into student(name,age,score) values(#{name},#{age},#{score})
+        &lt;selectKey resultType=&quot;int&quot; keyProperty=&quot;id&quot; order=&quot;AFTER&quot;&gt;
+            select @@identity
+        &lt;/selectKey&gt;
+    &lt;/insert&gt;
+
+    &lt;delete id=&quot;deleteStudentById&quot;&gt;
+        delete from student where id=#{aaa} &lt;!-- 这里的#{}仅仅是个占位符，里面放什么都行 --&gt;
+    &lt;/delete&gt;
+
+    &lt;update id=&quot;updateStudent&quot;&gt;
+        update student set name=#{name}, age=#{age}, score=#{score} where id=#{id}
+    &lt;/update&gt;
+
+    &lt;select id=&quot;selectAllStudents&quot; resultType=&quot;Student&quot;&gt;
+        select id,name,age,score from student
+    &lt;/select&gt;
+
+    &lt;!-- 
+        resultType: 表示通过反映机制，调用set+属性名的方式，将结果封装为Student对象
+        如果属性名和字段名不一致，表中的字段为tid,tname,tage,score，属性名为id,name,age,score
+        解决方式一：字段别名 select tid id, tname name, tage age, score frome student
+        解决方式二：resultMap 
+            &lt;resultMap type=&quot;Student&quot; id=&quot;studentMapper&quot;&gt;
+                &lt;id column=&quot;tid&quot; property=&quot;id&quot; /&gt;
+                &lt;result column=&quot;tname&quot; property=&quot;name&quot; /&gt;
+                &lt;result column=&quot;tage&quot; property=&quot;age&quot; /&gt;
+            &lt;/resultMap&gt;
+            &lt;select id=&quot;selectAllStudents&quot; resultMap=&quot;studentMapper&quot;&gt;
+                select id,name,age,score from student
+            &lt;/select&gt;        
+     --&gt;    
+
+    &lt;select id=&quot;selectStudentById&quot; resultType=&quot;Student&quot;&gt;
+        select id,name,age,score from student where id=#{bbbbbb}
+    &lt;/select&gt;
+
+    &lt;select id=&quot;selectStudentsByName&quot; resultType=&quot;Student&quot;&gt;
+        &lt;!-- select id,name,age,score from student where name like concat(&apos;%&apos;,#{xxx},&apos;%&apos;) --&gt;
+        select id,name,age,score from student where name like &apos;%&apos; #{xxx} &apos;%&apos;
+    &lt;/select&gt;
+
+&lt;/mapper&gt;
+</code></pre><p>测试文件：Mytest.java</p>
+<pre><code>package com.bjpowernode.test;
+
+public class MyTest {
+
+    private IStudentDao dao;
+    private SqlSession sqlSession;
+
+    @Before
+    public void Before() {
+        sqlSession = MyBatisUtils.getSqlSession();
+        //dao:是一个动态代理
+        dao = sqlSession.getMapper(IStudentDao.class);
+    }
+
+    @After
+    public void after() {
+        if(sqlSession != null) {
+            sqlSession.close();
+        }
+    }
+
+    @Test
+    public void testInsertStudent() {
+        Student student = new Student(&quot;zhangsan2&quot;, 24, 1);
+        dao.insertStudent(student);
+        sqlSession.commit();
+    }
+
+    @Test
+    public void insertStudentCatchId() {
+        Student student = new Student(&quot;lisi&quot;, 24, 94);
+        System.out.println(&quot;插入前：student=&quot;+student);
+        dao.insertStudentCatchId(student);
+        System.out.println(&quot;插入后：student=&quot;+student);
+    }
+
+    @Test
+    public void testDeleteStudentById() {
+        dao.deleteStudentById(13);
+    }
+
+    @Test
+    public void testUpdateStudent() {
+        Student student = new Student(&quot;wangwu&quot;,25,95);
+        student.setId(14);
+        dao.updateStudent(student);
+    }
+
+    @Test
+    public void testSelectAllStudents() {
+        List&lt;Student&gt; students = dao.selectAllStudents();
+        for(Student student:students) {
+            System.out.println(student);
+        }
+    }
+
+    @Test
+    public void testSelectStudentById() {
+        Student student = dao.selectStudentById(14);
+        System.out.println(student);
+    }
+
+    @Test
+    public void testSelectStudentByName() {
+        List&lt;Student&gt; students = dao.selectStudentsByName(&quot;zhang&quot;);
+        for(Student student:students) {
+            System.out.println(student);
+        }
+    }
+}
+</code></pre><h4 id="1-5-多条件查询问题-根据Map查询"><a href="#1-5-多条件查询问题-根据Map查询" class="headerlink" title="1.5 多条件查询问题 - 根据Map查询"></a>1.5 多条件查询问题 - 根据Map查询</h4><p>接口：IStudentDao.java</p>
+<pre><code>package com.bjpowernode.dao;
+
+public interface IStudentDao {    
+    List&lt;Student&gt; selectStudentsByCondition(Map&lt;String, Object&gt; map);
+}
+</code></pre><p>映射文件：</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE mapper
+PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+
+&lt;mapper namespace=&quot;com.bjpowernode.dao.IStudentDao&quot;&gt;
+
+
+    &lt;select id=&quot;selectStudentsByCondition&quot; resultType=&quot;Student&quot;&gt;
+        &lt;!-- #{}里面可以放对象的属性名，也可以放map的key，也可以直接通过对象获取属性：如student.score --&gt;
+        select id,name,age,score from student where name like &apos;%&apos; #{nameCondition} &apos;%&apos; and age &gt; #{ageCondition}
+    &lt;/select&gt;
+
+&lt;/mapper&gt;
+</code></pre><p>测试类：MyTest.java</p>
+<pre><code>package com.bjpowernode.test;
+
+public class MyTest {
+
+    private IStudentDao dao;
+    private SqlSession sqlSession;
+
+    @Before
+    public void Before() {
+        sqlSession = MyBatisUtils.getSqlSession();
+        //dao:是一个动态代理
+        dao = sqlSession.getMapper(IStudentDao.class);
+    }
+
+    @After
+    public void after() {
+        if(sqlSession != null) {
+            sqlSession.close();
+        }
+    }
+
+    @Test
+    public void testSelectStudentsByCondition() {
+         Map&lt;String, Object&gt; map = new HashMap&lt;String, Object&gt;();
+         map.put(&quot;nameCondition&quot;, &quot;zhang&quot;);
+         map.put(&quot;ageCondition&quot;, 10);
+
+         List&lt;Student&gt; students = dao.selectStudentsByCondition(map);
+         for(Student student:students) {
+             System.out.println(student);
+         }
+    }
+}
+</code></pre><h4 id="1-6-多条件查询问题-使用索引号"><a href="#1-6-多条件查询问题-使用索引号" class="headerlink" title="1.6 多条件查询问题 - 使用索引号"></a>1.6 多条件查询问题 - 使用索引号</h4><p>接口类</p>
+<pre><code>package com.bjpowernode.dao;
+
+public interface IStudentDao {    
+    List&lt;Student&gt; selectStudentsByCondition(String name, int age);
+}
+</code></pre><p>映射文件：</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE mapper
+PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+
+&lt;mapper namespace=&quot;com.bjpowernode.dao.IStudentDao&quot;&gt;
+
+
+    &lt;select id=&quot;selectStudentsByCondition&quot; resultType=&quot;Student&quot;&gt;
+        &lt;!-- 
+            #{}里面可以放:
+            1、对象的属性名，
+            2、参数为map时，可以放map的key，
+            3、参数为map时，或key所对应的value为对象，则可以放入对象的属性如：Student.score 
+            4、也可以放索引
+            5、当#{}是个占位符时，可以放随意字符
+        --&gt;
+        select id,name,age,score 
+        from student 
+        where name like &apos;%&apos; #{0} &apos;%&apos; 
+        and age &gt; #{1}
+    &lt;/select&gt;
+
+&lt;/mapper&gt;
+</code></pre><p>测试类</p>
+<pre><code>package com.bjpowernode.test;
+
+public class MyTest {
+
+    private IStudentDao dao;
+    private SqlSession sqlSession;
+
+    @Before
+    public void Before() {
+        sqlSession = MyBatisUtils.getSqlSession();
+        //dao:是一个动态代理
+        dao = sqlSession.getMapper(IStudentDao.class);
+    }
+
+    @After
+    public void after() {
+        if(sqlSession != null) {
+            sqlSession.close();
+        }
+    }
+
+
+    @Test
+    public void testSelectStudentsByCondition() {
+
+         List&lt;Student&gt; students = dao.selectStudentsByCondition(&quot;zhang&quot;,23);
+         for(Student student:students) {
+             System.out.println(student);
+         }
+    }
+}
+</code></pre><h4 id="1-7-动态SQL"><a href="#1-7-动态SQL" class="headerlink" title="1.7 动态SQL"></a>1.7 动态SQL</h4><p>动态SQL，主要用于解决查询条件不确定的情况：在程序运行期间，根据用户提交的查询条件进行查询。提交的查询条件不同，执行的SQL语句不同。若将每种情况均逐一列出，对所有条件进行排列组合，将会出现大理的SQL语句。此时，可使用动态SQL来解决这样的问题。</p>
+<h5 id="动态SQL-if、where、choose、foreach、foreach-list、foreach-泛型自定义类型list"><a href="#动态SQL-if、where、choose、foreach、foreach-list、foreach-泛型自定义类型list" class="headerlink" title="动态SQL - if、where、choose、foreach、foreach-list、foreach-泛型自定义类型list"></a>动态SQL - if、where、choose、foreach、foreach-list、foreach-泛型自定义类型list</h5><p>测试类：</p>
+<pre><code>package com.bjpowernode.test;
+
+public class MyTest {
+
+    private IStudentDao dao;
+    private SqlSession sqlSession;
+
+    @Before
+    public void Before() {
+        sqlSession = MyBatisUtils.getSqlSession();
+        //dao:是一个动态代理
+        dao = sqlSession.getMapper(IStudentDao.class);
+    }
+
+    @After
+    public void after() {
+        if(sqlSession != null) {
+            sqlSession.close();
+        }
+    }
+
+    @Test
+    public void testSelectStudentsByIf() {
+        Student student = new Student(&quot;zhang&quot;,23,0);
+         List&lt;Student&gt; students = dao.selectStudentsByIf(student);
+         for(Student student1:students) {
+             System.out.println(student1);
+         }
+    }
+
+    @Test
+    public void testSelectStudentsByWhere() {
+        Student student = new Student(&quot;&quot;,0,0);
+         List&lt;Student&gt; students = dao.selectStudentsByWhere(student);
+         for(Student student1:students) {
+             System.out.println(student1);
+         }
+    }
+
+    @Test
+    public void testSelectStudentsByChoose() {
+        Student student = new Student(&quot;&quot;,0,0);
+         List&lt;Student&gt; students = dao.selectStudentsByChoose(student);
+         for(Student student1:students) {
+             System.out.println(student1);
+         }
+    }
+
+    @Test
+    public void testForeach() {
+        int[] ids = {14,16,18};
+        List&lt;Student&gt; students = dao.selectStudentsByForeach(ids);
+        for(Student student1:students) {
+            System.out.println(student1);
+        }
+    }
+
+    @Test
+    public void testForeachList() {
+        List&lt;Integer&gt; ids = new ArrayList&lt;&gt;();
+        ids.add(14);
+        ids.add(16);
+        ids.add(18);
+        List&lt;Student&gt; students = dao.selectStudentsByForeachList(ids);
+        for(Student student1:students) {
+            System.out.println(student1);
+        }
+    }
+
+    @Test
+    public void testForeachObject() {
+        Student stu1 = new Student();
+        stu1.setId(14);
+
+        Student stu2 = new Student();
+        stu2.setId(16);
+
+        List&lt;Student&gt; stus = new ArrayList&lt;&gt;();
+        stus.add(stu1);
+        stus.add(stu2);
+
+        List&lt;Student&gt; students = dao.selectStudentsByForeachObject(stus);
+        for(Student student1:students) {
+            System.out.println(student1);
+        }
+    }
+}
+</code></pre><p>接口</p>
+<pre><code>package com.bjpowernode.dao;
+
+public interface IStudentDao {
+    List&lt;Student&gt; selectStudentsByIf(Student student);
+
+    List&lt;Student&gt; selectStudentsByWhere(Student student);
+
+    List&lt;Student&gt; selectStudentsByChoose(Student student);
+
+    List&lt;Student&gt; selectStudentsByForeach(int[] ids);
+
+    List&lt;Student&gt; selectStudentsByForeachList(List&lt;Integer&gt; ids);
+
+    List&lt;Student&gt; selectStudentsByForeachObject(List&lt;Student&gt; students);
+
+}
+</code></pre><p>映射文件</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE mapper
+PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+
+&lt;mapper namespace=&quot;com.bjpowernode.dao.IStudentDao&quot;&gt;
+
+    &lt;select id=&quot;selectStudentsByIf&quot; resultType=&quot;Student&quot;&gt;
+        select id,name,age,score 
+        from student 
+        where 1 = 1 
+        &lt;if test=&quot;name != null and name !=&apos;&apos;&quot;&gt;
+            and name like &apos;%&apos; #{name} &apos;%&apos;
+        &lt;/if&gt;
+        &lt;if test=&quot;age &gt; 0&quot;&gt;
+            and age &gt; #{age}
+        &lt;/if&gt;
+    &lt;/select&gt;
+
+    &lt;select id=&quot;selectStudentsByWhere&quot; resultType=&quot;Student&quot;&gt;
+        select id,name,age,score 
+        from student 
+        &lt;where&gt;
+            &lt;if test=&quot;name != null and name !=&apos;&apos;&quot;&gt;
+                and name like &apos;%&apos; #{name} &apos;%&apos;
+            &lt;/if&gt;
+            &lt;if test=&quot;age &gt; 0&quot;&gt;
+                and age &gt; #{age}
+            &lt;/if&gt;
+        &lt;/where&gt;
+    &lt;/select&gt;
+
+    &lt;!-- 
+        若姓名不空，则按姓名查询；若年龄不空，则按年龄查询；都为空，不查询。
+     --&gt;
+    &lt;select id=&quot;selectStudentsByChoose&quot; resultType=&quot;Student&quot;&gt;
+        select id,name,age,score 
+        from student 
+        &lt;where&gt;
+            &lt;choose&gt;
+                &lt;when test=&quot;name != null and name != &apos;&apos;&quot;&gt;
+                    and name like &apos;%&apos; #{name} &apos;%&apos;
+                &lt;/when&gt;
+                &lt;when test=&quot;age &gt; 0&quot;&gt;
+                    and age &gt; #{age}
+                &lt;/when&gt;
+                &lt;otherwise&gt;
+                    1 &gt; 2
+                &lt;/otherwise&gt;
+            &lt;/choose&gt;
+        &lt;/where&gt;
+    &lt;/select&gt;
+
+    &lt;select id=&quot;selectStudentsByForeach&quot; resultType=&quot;Student&quot;&gt;
+        &lt;!-- select id,name,age,score from student where id in (1,3,5) --&gt;
+        select id,name,age,score 
+        from student 
+        &lt;if test=&quot;array.length &gt; 0&quot;&gt;
+            where id in 
+            &lt;foreach collection=&quot;array&quot; item=&quot;myid&quot; open=&quot;(&quot; close=&quot;)&quot; separator=&quot;,&quot;&gt;
+                #{myid}
+            &lt;/foreach&gt;
+        &lt;/if&gt;
+    &lt;/select&gt;
+
+    &lt;select id=&quot;selectStudentsByForeachList&quot; resultType=&quot;Student&quot;&gt;
+        &lt;!-- select id,name,age,score from student where id in (1,3,5) --&gt;
+        select id,name,age,score 
+        from student 
+        &lt;if test=&quot;list.size &gt; 0&quot;&gt;
+            where id in 
+            &lt;foreach collection=&quot;list&quot; item=&quot;myid&quot; open=&quot;(&quot; close=&quot;)&quot; separator=&quot;,&quot;&gt;
+                #{myid}
+            &lt;/foreach&gt;
+        &lt;/if&gt;
+    &lt;/select&gt;
+
+    &lt;select id=&quot;selectStudentsByForeachObject&quot; resultType=&quot;Student&quot;&gt;
+        select id,name,age,score 
+        from student 
+        &lt;if test=&quot;list.size &gt; 0&quot;&gt;
+            where id in 
+            &lt;foreach collection=&quot;list&quot; item=&quot;stu&quot; open=&quot;(&quot; close=&quot;)&quot; separator=&quot;,&quot;&gt;
+                #{stu.id}
+            &lt;/foreach&gt;
+        &lt;/if&gt;
+    &lt;/select&gt;
+
+    &lt;sql id=&quot;&quot;&gt;
+
+    &lt;/sql&gt;
+
+&lt;/mapper&gt;    
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/05/08/java/mybatis/mybatis-1/" data-id="cjh4911le004emtp3pryz22si" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mybatis/">mybatis</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/05/12/java/mybatis/mybatis-2/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          第二章 MyBatis关联关系查询 - 一对多
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/05/08/java/spring/spring-10/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">第十章 Spring事务管理</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/mybatis/">mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/mybatis/" style="font-size: 17.14px;">mybatis</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/05/13/java/mybatis/mybatis-7/">第七章 MyBatis - 查询缓存</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/12/java/mybatis/mybatis-6/">第六章 MyBatis - 延迟加载</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/12/java/mybatis/mybatis-5/">第五章 MyBatis关联关系查询 - 多对多</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/12/java/mybatis/mybatis-4/">第四章 MyBatis关联关系查询 - 自关联</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/12/java/mybatis/mybatis-3/">第三章 MyBatis关联关系查询 - 多对一</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

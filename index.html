@@ -50,7 +50,7 @@
         
           <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Zoeken"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
@@ -60,6 +60,1662 @@
 </header>
       <div class="outer">
         <section id="main">
+  
+    <article id="post-java/mybatis/mybatis-7" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/13/java/mybatis/mybatis-7/" class="article-date">
+  <time datetime="2018-05-13T01:51:37.000Z" itemprop="datePublished">2018-05-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mybatis/">mybatis</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/05/13/java/mybatis/mybatis-7/">第七章 MyBatis - 查询缓存</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="7-1-一级缓存与二级缓存"><a href="#7-1-一级缓存与二级缓存" class="headerlink" title="7.1 一级缓存与二级缓存"></a>7.1 一级缓存与二级缓存</h4><p>MyBatis的查询缓存机制，根据缓存区的作用域与生命周期，可划分为两种：一级缓存与二级缓存。</p>
+<p>MyBatis查询缓存的作用域是根据映射文件mapper的namespace划分的，相同的namespace的mapper查询数据存放在同一个缓存区域。不同namespace下的数据互不干扰。无论是一级缓存还是二级缓存，都是按照namespace进行分别存放的。</p>
+<p>但一、二级缓存的不同之处在于，SqlSession一旦关闭，则SqlSession中的数据将不存在。而二级缓存的生命周期会与整个应用同步，与SqlSession是否关闭无关。换句话说，一级缓存是在同一线程（同一SqlSession）间共享数据，而二级缓存是在不同线程（不同SqlSession）间共享数据。</p>
+<h4 id="7-2-一级缓存"><a href="#7-2-一级缓存" class="headerlink" title="7.2 一级缓存"></a>7.2 一级缓存</h4><p>MyBatis一级缓存是基于org.apache.ibatis.cache.impl.PerpetualCache类的HashMap本地缓存，其作用域是SqlSession。在同一个SqlSession中两次执行相同的sql查询语句，第一次执行完毕后，会将查询结果写入到缓存中，第二次会从缓存中直接获取数据，而不再到数据库中进行查询，从而提高查询效率。</p>
+<p>当一个SqlSession结束后，该SqlSession中的一级缓存也就不存在了。<strong>MyBatis默认一级缓存是开启状态，且不能关闭。</strong></p>
+<pre><code>public void testSelectStudentsByCondition() {
+
+    Student student = dao.selectStudentById(20);
+    System.out.println(student);
+
+    Student students = dao.selectStudentById(20);
+    System.out.println(students);
+
+}
+</code></pre><p>查看控制台</p>
+<pre><code>[DEBUG][2018-05-13 10:08:15] com.bjpowernode.dao.IStudentDao.selectStudentById 159 ==&gt;  Preparing: select id,name,age,score from students where id=? 
+[DEBUG][2018-05-13 10:08:15] com.bjpowernode.dao.IStudentDao.selectStudentById 159 ==&gt; Parameters: 20(Integer)
+[DEBUG][2018-05-13 10:08:15] com.bjpowernode.dao.IStudentDao.selectStudentById 159 &lt;==      Total: 1
+Student [id=20, name=zhangsan2, age=24, score=1.0]
+Student [id=20, name=zhangsan2, age=24, score=1.0]
+</code></pre><p>sql语句只执行了一次，说明第二次是从缓存中读取的数据，证明了一级缓存是存在的。</p>
+<h4 id="7-3-一级缓存-从缓存中查找数据的依据"><a href="#7-3-一级缓存-从缓存中查找数据的依据" class="headerlink" title="7.3 一级缓存 - 从缓存中查找数据的依据"></a>7.3 一级缓存 - 从缓存中查找数据的依据</h4><p> 缓存底层对应的是map集合</p>
+<ul>
+<li>key: 即查询依据，使用的ORM架构不同，查询依据不同。</li>
+<li>value: 查询结果</li>
+</ul>
+<p>一级缓存中读取数据的依据是：</p>
+<ul>
+<li>mybatis的查询依据是：sql的id + sql语句</li>
+<li>hibernate的查询依据是：查询结果的id</li>
+</ul>
+<h4 id="7-4-一级缓存-增删改对一级缓存的影响"><a href="#7-4-一级缓存-增删改对一级缓存的影响" class="headerlink" title="7.4 一级缓存 - 增删改对一级缓存的影响"></a>7.4 一级缓存 - 增删改对一级缓存的影响</h4><p>增、删、改都会清空一级缓存，无论是否提交。</p>
+<h4 id="7-5-二级缓存-内置二级缓存的开启"><a href="#7-5-二级缓存-内置二级缓存的开启" class="headerlink" title="7.5 二级缓存 - 内置二级缓存的开启"></a>7.5 二级缓存 - 内置二级缓存的开启</h4><p>由于MyBatis从缓存中读取数据的依据与SQL的id相关，所以MyBatis使用二级缓存的目的是为了防止同一查询（相同的Sql id、相同的Sql语句）的反复执行。</p>
+<p>而Hibernate由于从缓存中读取数据的依据是查询结果的id，所以Hibernate使用二级缓存的目的是为了在多个查询间共享查询结果。比如第一次查询出了所有的学生，第二次查询id为5的学生，可以从缓存中直接读取。</p>
+<p>MyBatis内置的二级缓存为org.apache.ibatis.cache.impl.PerpetualCache</p>
+<p><strong>内置二级缓存的开启：</strong></p>
+<p>(1)、映射文件中加cache</p>
+<pre><code>&lt;mapper namespace=&quot;com.bjpowernode.dao.IStudentDao&quot;&gt;
+
+    &lt;cache /&gt;
+    ...
+    ...
+&lt;/mapper&gt;
+</code></pre><p>(2)、实体类实现序列化</p>
+<p>Student.java</p>
+<pre><code>public class Student implements Serializable {
+    ...
+}
+</code></pre><p>测试类</p>
+<pre><code>@Test
+public void testSelectStudentsByCondition() {
+
+    sqlSession = MyBatisUtils.getSqlSession();
+    dao = sqlSession.getMapper(IStudentDao.class);
+    Student student = dao.selectStudentById(20);
+    System.out.println(student);
+
+    //清空一级缓存        
+    sqlSession.close();
+
+    sqlSession = MyBatisUtils.getSqlSession();
+    dao = sqlSession.getMapper(IStudentDao.class);
+    Student students = dao.selectStudentById(20);
+    System.out.println(students);
+
+}
+</code></pre><p>查看控制台</p>
+<pre><code>[DEBUG][2018-05-13 10:30:19] com.bjpowernode.dao.IStudentDao 62 Cache Hit Ratio [com.bjpowernode.dao.IStudentDao]: 0.0
+Sun May 13 10:30:19 CST 2018 WARN: Establishing SSL connection without server&apos;s identity verification is not recommended. According to MySQL 5.5.45+, 5.6.26+ and 5.7.6+ requirements SSL connection must be established by default if explicit option isn&apos;t set. For compliance with existing applications not using SSL the verifyServerCertificate property is set to &apos;false&apos;. You need either to explicitly disable SSL by setting useSSL=false, or set useSSL=true and provide truststore for server certificate verification.
+[DEBUG][2018-05-13 10:30:20] com.bjpowernode.dao.IStudentDao.selectStudentById 159 ==&gt;  Preparing: select id,name,age,score from students where id=? 
+[DEBUG][2018-05-13 10:30:21] com.bjpowernode.dao.IStudentDao.selectStudentById 159 ==&gt; Parameters: 20(Integer)
+[DEBUG][2018-05-13 10:30:21] com.bjpowernode.dao.IStudentDao.selectStudentById 159 &lt;==      Total: 1
+Student [id=20, name=zhangsan2, age=24, score=1.0]
+[DEBUG][2018-05-13 10:30:21] com.bjpowernode.dao.IStudentDao 62 Cache Hit Ratio [com.bjpowernode.dao.IStudentDao]: 0.5
+Student [id=20, name=zhangsan2, age=24, score=1.0]
+</code></pre><p>sql语句也只执行了一次，说明了第二次读取数据是从二级缓存中读取的。</p>
+<p>缓存命中率</p>
+<pre><code>Cache Hit Ratio [com.bjpowernode.dao.IStudentDao]: 0.5
+</code></pre><h4 id="7-6-二级缓存-增删改对二级缓存的影响"><a href="#7-6-二级缓存-增删改对二级缓存的影响" class="headerlink" title="7.6 二级缓存 - 增删改对二级缓存的影响"></a>7.6 二级缓存 - 增删改对二级缓存的影响</h4><p>1、增、删、改同样也会清空二级缓存</p>
+<p>2、对于二级缓存的清空，实质上是对所查找key对应的value置为null，而并非将<key,value>对，即Entry对象删除。</key,value></p>
+<p>3、从DB中进行select查询的条件是：</p>
+<ul>
+<li>缓存中根本就不存在key</li>
+<li>缓存中存在该key所对应的Entry对象，但其value为null</li>
+</ul>
+<h4 id="7-7-二级缓存-内置二级缓存的配置"><a href="#7-7-二级缓存-内置二级缓存的配置" class="headerlink" title="7.7 二级缓存 - 内置二级缓存的配置"></a>7.7 二级缓存 - 内置二级缓存的配置</h4><pre><code>&lt;cache eviction=&quot;FIFO&quot; flushInterval=&quot;10800000&quot; readOnly=&quot;true&quot; size=&quot;512&quot; /&gt;
+</code></pre><p><strong>eviction:</strong> 逐出策略。当二级缓存中的对象达到最大值时，就需要通过逐出策略将缓存中的对象移出缓存。默认为LRU。常用策略有：</p>
+<ul>
+<li><p>FIFO：First In First Out，先进先出。</p>
+</li>
+<li><p>LRU：Least Recently Used：未被使用时间最长的。</p>
+</li>
+</ul>
+<p><strong>flushInterval:</strong> 刷新缓存的时间间隔，单位毫秒。即清空缓存间隔时间，一般不指定，即当执行增、删、改时刷新缓存。</p>
+<p><strong>readOnly:</strong> 设置缓存中数据是否只读。只读的缓存会给所有调用者返回缓存对象的相同实例，因此这些对象是不能被修改的，这提供了很重要的性能优势。但读写的缓存会返回缓存对象的拷贝，速度会慢一些，但是安全，因此默认是false。</p>
+<p><strong>flushInterval:</strong> 二级缓存中可以存放的最多对象个数。默认是1024个。</p>
+<h4 id="7-8-二级缓存-二级缓存的关闭"><a href="#7-8-二级缓存-二级缓存的关闭" class="headerlink" title="7.8 二级缓存 - 二级缓存的关闭"></a>7.8 二级缓存 - 二级缓存的关闭</h4><p>全局关闭</p>
+<pre><code>&lt;configuration&gt;
+    &lt;!-- 注册DB连接四要素属性文件 --&gt;
+    &lt;properties resource=&quot;jdbc_mysql.properties&quot;&gt;&lt;/properties&gt;
+
+    &lt;settings&gt;
+        &lt;!-- 关闭二级缓存 --&gt;
+        &lt;setting name=&quot;cacheEnabled&quot; value=&quot;false&quot;/&gt;
+    &lt;/settings&gt;
+
+    ...
+
+&lt;/configuration&gt; 
+</code></pre><p>局部关闭</p>
+<pre><code>&lt;mapper namespace=&quot;com.bjpowernode.dao.IStudentDao&quot;&gt;
+
+    &lt;cache /&gt;
+
+    &lt;select id=&quot;selectStudentById&quot; useCache=&quot;false&quot; resultType=&quot;Student&quot;&gt;
+        select id,name,age,score 
+        from students 
+        where id=#{xxx}
+    &lt;/select&gt;
+    ...
+&lt;/mapper&gt;
+</code></pre><h4 id="7-9-二级缓存-使用原则"><a href="#7-9-二级缓存-使用原则" class="headerlink" title="7.9 二级缓存 - 使用原则"></a>7.9 二级缓存 - 使用原则</h4><p>#####（1）、多个namespace不要操作同一张表</p>
+<p>由于二级缓存中的数据是基于namespace的，即不同的namespace中的数据互不干扰。若某个用户在某个namespace下对表执行了增删改操作，该操作只会引发当前namespace下的二级缓存的刷新，而对其它namespace下的二级缓存没有影响。这样的话，其它二级缓存中的数据依然是未更新的数据，也就出现了多个namespace中的数据不一致的现象。</p>
+<h5 id="（2）、不要在关联关系表上执行增删改操作"><a href="#（2）、不要在关联关系表上执行增删改操作" class="headerlink" title="（2）、不要在关联关系表上执行增删改操作"></a>（2）、不要在关联关系表上执行增删改操作</h5><p>一个namespace一般是对同一个表进行操作，若表间存在关联关系，也就意味着同一个表可能就会出现在多个namespace中。</p>
+<h5 id="（3）、查询多于修改时使用二级缓存"><a href="#（3）、查询多于修改时使用二级缓存" class="headerlink" title="（3）、查询多于修改时使用二级缓存"></a>（3）、查询多于修改时使用二级缓存</h5><p>在查询操作远多于增删改操作的情况下可以使用二级缓存。因为任何增删改操作都将刷新二级缓存，对二级缓存的频繁刷新将降低系统性能。</p>
+<h4 id="7-10-二级缓存-ehCache"><a href="#7-10-二级缓存-ehCache" class="headerlink" title="7.10 二级缓存 - ehCache"></a>7.10 二级缓存 - ehCache</h4><p>mybatis的特长是sql操作，缓存数据管理不是其特长，为了提高缓存性能，mybatis允许使用第三方缓存产品。ecCache就是其中的一种。</p>
+<p>注意，使用ehCache二级缓存，实体类无需实现序列化接口。</p>
+<p>两个jar包：</p>
+<p>一个是ehCache的核心jar包，一个是整合jar包。</p>
+<p>下载地址：<a href="https://github.com/mybatis/ehcache-cache/releases" target="_blank" rel="external">https://github.com/mybatis/ehcache-cache/releases</a></p>
+<h4 id="7-11-二级缓存-ehCache-开启"><a href="#7-11-二级缓存-ehCache-开启" class="headerlink" title="7.11 二级缓存 - ehCache - 开启"></a>7.11 二级缓存 - ehCache - 开启</h4><p>（1）、导入jar包</p>
+<p>（2）、映射文件</p>
+<pre><code>&lt;mapper namespace=&quot;com.bjpowernode.dao.IStudentDao&quot;&gt;
+
+    &lt;cache type=&quot;org.mybatis.caches.ehcache.EhcacheCache&quot; /&gt;
+    ...
+&lt;/mapper&gt;     
+</code></pre><p>（3）、ehcache.xml</p>
+<pre><code>&lt;defaultCache
+        maxElementsInMemory=&quot;10000&quot;
+        eternal=&quot;false&quot;
+        timeToIdleSeconds=&quot;120&quot;
+        timeToLiveSeconds=&quot;120&quot;
+        maxElementsOnDisk=&quot;10000000&quot;
+        diskExpiryThreadIntervalSeconds=&quot;120&quot;
+        memoryStoreEvictionPolicy=&quot;LRU&quot;&gt;
+    &lt;persistence strategy=&quot;localTempSwap&quot;/&gt;
+&lt;/defaultCache&gt;
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/05/13/java/mybatis/mybatis-7/" data-id="cjh4911ly0050mtp39uyeiifc" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mybatis/">mybatis</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/mybatis/mybatis-6" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/12/java/mybatis/mybatis-6/" class="article-date">
+  <time datetime="2018-05-12T11:19:53.000Z" itemprop="datePublished">2018-05-12</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mybatis/">mybatis</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/05/12/java/mybatis/mybatis-6/">第六章 MyBatis - 延迟加载</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="6-1-延迟加载"><a href="#6-1-延迟加载" class="headerlink" title="6.1 延迟加载"></a>6.1 延迟加载</h4><p>MyBatis中的延迟加载，也称为懒加载，是指在进行<strong>关联查询</strong>时，按照设置的延迟规则推迟对关联对象的select查询。延迟加载可以有效的减少数据库压力。</p>
+<p>需要注意的是，MyBatis的延迟加载只是对关联对象的查询有延迟设置，对于主加载对象都是直接执行查询语句的。</p>
+<h4 id="6-2-关联对象加载时机"><a href="#6-2-关联对象加载时机" class="headerlink" title="6.2 关联对象加载时机"></a>6.2 关联对象加载时机</h4><p>MyBatis根据对关联对象查询的select语句的执行时机，分为三种类型：直接加载、侵入式延迟加载与深度延迟加载。</p>
+<p><strong>直接加载：</strong> 执行完对主加载对象的select语句，马上执行对关联对象的select查询。</p>
+<p><strong>侵入式延迟：</strong> 执行完对主加载对象的查询时，不会执行对关联对象的select查询。但当要访问主加载对象的详情时，就会马上执行关联对象的select查询。即对关联对象的查询执行，侵入到了主加载对象的详情访问中。也可以这样理解：将关联对象的详情侵入到了主加载对象的详情中，即将关联对象的详情作为主加载对象的详情的一部分出现了。</p>
+<p><strong>深度延迟：</strong> 执行对主加载对象的查询时，不会执行对关联对象的查询。访问主加载对象的详情时也不会执行关联对象的select查询。只有当真正访问关联对象的详情时，才会执行对关联对象的select查询。</p>
+<p>需要注意的是，延迟加载的应用要求，关联对象的查询与主加载对象的查询必须是分别进行的select语句，不能使用多表连接所进行的查询。因为，多表连接查询，其实质是对一张表的查询，对由多个表连接后形成的一张表的查询。会一次性将多张表的所有信息查询出来。</p>
+<p>MyBatis中对于延迟加载设置，可以应用到一对一、一对多、多对一、多对多的所有关联关系查询中。</p>
+<h4 id="6-3-懒加载配置"><a href="#6-3-懒加载配置" class="headerlink" title="6.3 懒加载配置"></a>6.3 懒加载配置</h4><p>主配置文件：mybatis.xml</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE configuration
+PUBLIC &quot;-//mybatis.org//DTD Config 3.0//EN&quot;
+&quot;http://mybatis.org/dtd/mybatis-3-config.dtd&quot;&gt;
+
+&lt;configuration&gt;
+    &lt;!-- 注册DB连接四要素属性文件 --&gt;
+    &lt;properties resource=&quot;jdbc_mysql.properties&quot;&gt;&lt;/properties&gt;
+
+    &lt;!-- 设置整个应用所使用的常量 --&gt;
+    &lt;settings&gt;
+        &lt;!-- 懒加载总开关 --&gt;
+        &lt;setting name=&quot;lazyLoadingEnabled&quot; value=&quot;true&quot;/&gt;
+        &lt;!-- 侵入式延迟，默认值为true
+            执行主加载对象的查询时dao.selectCountryById(2)，不会执行关联对象的查询。
+            但是当访问主加载对象的详情时System.out.println(country.getCname())，就会马上执行关联对象的查询。
+         --&gt;
+        &lt;setting name=&quot;aggressiveLazyLoading&quot; value=&quot;false&quot;/&gt;
+        &lt;!-- 深度延迟 ：将侵入式延迟开关关闭
+            执行对主加载对象的查询时dao.selectCountryById(2)，不会执行关联对象的查询。
+            访问主加载对象的详情时System.out.println(country.getCname())，也不会执行关联对象的查询。
+            只有当访问关联对象的详情时System.out.println(ministers.size())，才会执行关联查询。
+        --&gt;
+    &lt;/settings&gt;
+
+    &lt;!-- 设置别名 --&gt;
+    &lt;typeAliases&gt;
+        &lt;!-- 将指定包中所有类的简单类名当作别名 --&gt;
+        &lt;package name=&quot;com.bjpowernode.beans&quot;/&gt;
+    &lt;/typeAliases&gt;
+
+    &lt;!-- 配置运行环境 --&gt;
+    &lt;environments default=&quot;mysqlEM&quot;&gt;
+        &lt;environment id=&quot;mysqlEM&quot;&gt;
+            &lt;transactionManager type=&quot;JDBC&quot;&gt;&lt;/transactionManager&gt;
+            &lt;dataSource type=&quot;POOLED&quot;&gt;
+                &lt;property name=&quot;driver&quot; value=&quot;${jdbc.driver}&quot;/&gt;
+                &lt;property name=&quot;url&quot; value=&quot;${jdbc.url}&quot;/&gt;
+                &lt;property name=&quot;username&quot; value=&quot;${jdbc.user}&quot;/&gt;
+                &lt;property name=&quot;password&quot; value=&quot;${jdbc.password}&quot;/&gt;
+            &lt;/dataSource&gt;
+        &lt;/environment&gt;
+    &lt;/environments&gt;
+
+    &lt;!-- 注册映射文件 --&gt;
+    &lt;mappers&gt;
+        &lt;mapper resource=&quot;com/bjpowernode/dao/mapper.xml&quot; /&gt;    
+    &lt;/mappers&gt;
+
+&lt;/configuration&gt;
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/05/12/java/mybatis/mybatis-6/" data-id="cjh4911lv004xmtp35kbxxrql" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mybatis/">mybatis</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/mybatis/mybatis-5" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/12/java/mybatis/mybatis-5/" class="article-date">
+  <time datetime="2018-05-12T11:06:57.000Z" itemprop="datePublished">2018-05-12</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mybatis/">mybatis</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/05/12/java/mybatis/mybatis-5/">第五章 MyBatis关联关系查询 - 多对多</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="5-1-多对多关联关系"><a href="#5-1-多对多关联关系" class="headerlink" title="5.1 多对多关联关系"></a>5.1 多对多关联关系</h4><p>一个学生可以选多门课程，而一门课程可以由多个学生选。这就是典型的多对多关系。所谓多对多，其实是由两个互反的一对多关系组成。</p>
+<p>一般情况下，多对多关系都会通过一个中间表来建立。course表，middle表，student表。</p>
+<p>定义实体类：Course.java</p>
+<pre><code>package com.bjpowernode.beans;
+
+public class Course {
+    private Integer cid;
+    private String cname;
+    private Set&lt;Student&gt; students;
+    public Integer getCid() {
+        return cid;
+    }
+    ...
+    getter and setter methods
+    ...
+}
+</code></pre><p>定义实体类：Student.java</p>
+<pre><code>package com.bjpowernode.beans;
+
+public class Student {
+    private Integer sid;
+    private String sname;
+    private Set&lt;Course&gt; courses;
+    public Integer getSid() {
+        return sid;
+    }
+    ...
+    getter and setter methods
+    ...        
+}
+</code></pre><p>接口</p>
+<pre><code>package com.bjpowernode.dao;
+
+public interface IStudentDao {
+    Student selectStudentById(int sid);
+}
+</code></pre><p>映射文件</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE mapper
+PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+
+&lt;mapper namespace=&quot;com.bjpowernode.dao.IStudentDao&quot;&gt;
+
+    &lt;resultMap type=&quot;Student&quot; id=&quot;studentlMapper&quot;&gt;
+        &lt;id column=&quot;sid&quot; property=&quot;sid&quot;/&gt;
+        &lt;result column=&quot;sname&quot; property=&quot;sname&quot;/&gt;
+        &lt;collection property=&quot;courses&quot; ofType=&quot;Course&quot;&gt;
+            &lt;id column=&quot;cid&quot; property=&quot;cid&quot;/&gt;
+            &lt;result column=&quot;cname&quot; property=&quot;cname&quot;/&gt;
+        &lt;/collection&gt;
+    &lt;/resultMap&gt;
+
+    &lt;select id=&quot;selectStudentById&quot; resultMap=&quot;studentlMapper&quot;&gt;
+        select sid, sname, cid, cname 
+        from student, middle, course
+        where sid=studentId and cid=courseId and sid=#{xxx}
+    &lt;/select&gt;
+
+&lt;/mapper&gt;
+</code></pre><p>测试类</p>
+<pre><code>package com.bjpowernode.test;
+
+public class MyTest {
+
+    private IStudentDao dao;
+    private SqlSession sqlSession;
+
+    @Before
+    public void Before() {
+        sqlSession = MyBatisUtils.getSqlSession();
+        //dao:是一个动态代理
+        dao = sqlSession.getMapper(IStudentDao.class);
+    }
+
+    @After
+    public void after() {
+        if(sqlSession != null) {
+            sqlSession.close();
+        }
+    }
+
+    @Test
+    public void test01() {
+        Student student = dao.selectStudentById(1);
+        System.out.println(student);
+    }
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/05/12/java/mybatis/mybatis-5/" data-id="cjh4911lr004tmtp3720t6ixn" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mybatis/">mybatis</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/mybatis/mybatis-4" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/12/java/mybatis/mybatis-4/" class="article-date">
+  <time datetime="2018-05-12T10:37:09.000Z" itemprop="datePublished">2018-05-12</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mybatis/">mybatis</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/05/12/java/mybatis/mybatis-4/">第四章 MyBatis关联关系查询 - 自关联</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="4-1-自关联查询"><a href="#4-1-自关联查询" class="headerlink" title="4.1 自关联查询"></a>4.1 自关联查询</h4><p>所谓自关联查询是指，自己既充当一方，又充当多方。例如，对于新闻栏目NewsLabel表，既有充当一方的父栏目，也有充当多方的子栏目。而反映到DB表中，只有一张表，这张表中具有一个外键pid，用于表示该栏目的父栏目。一级栏目没有父栏目，其外键值pid为0，而子栏目则具有外键值。</p>
+<p>定义DB表 newslabel : </p>
+<ul>
+<li>id，name，pid</li>
+<li>1， 新闻娱乐，0</li>
+<li>2，    体育新闻，0</li>
+<li>3，    NBA</li>
+<li>4，    CBA</li>
+<li>5，    火箭，    3</li>
+<li>6，    湖人，    3</li>
+<li>7，    北京金隅，    4</li>
+<li>8，    浙江广厦，    4</li>
+<li>9，    青岛双星，    4</li>
+<li>10，港台明星，    1</li>
+<li>11，内地影展，    1</li>
+</ul>
+<h4 id="4-2-自关联查询-以一对多的方式实现-查询指定栏目的所有子孙栏目"><a href="#4-2-自关联查询-以一对多的方式实现-查询指定栏目的所有子孙栏目" class="headerlink" title="4.2 自关联查询 - 以一对多的方式实现 - 查询指定栏目的所有子孙栏目"></a>4.2 自关联查询 - 以一对多的方式实现 - 查询指定栏目的所有子孙栏目</h4><p>定义实体类：NewsLabel.java</p>
+<pre><code>package com.bjpowernode.beans;
+
+import java.util.Set;
+
+//新闻栏目:当前的新闻栏目被看作是一方，即父栏目
+public class NewsLabel {
+    private Integer id;
+    private String name;
+    //定义关联属性子栏目
+    private Set&lt;NewsLabel&gt; children;
+    ...
+    getter and setter methods
+    ...
+}
+</code></pre><p>接口</p>
+<pre><code>package com.bjpowernode.dao;
+
+public interface INewsLabelDao {
+    List&lt;NewsLabel&gt; selectChildrenByParent(int pid);
+}
+</code></pre><p>映射文件</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE mapper
+PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+
+&lt;mapper namespace=&quot;com.bjpowernode.dao.INewsLabelDao&quot;&gt;
+
+    &lt;!-- &lt;select id=&quot;&quot;&gt;
+        select id,name from newslabel where pid=#{ooo}
+    &lt;/select&gt; --&gt;
+
+    &lt;resultMap type=&quot;NewsLabel&quot; id=&quot;newsLabelMapper&quot;&gt;
+        &lt;id column=&quot;id&quot; property=&quot;id&quot;/&gt;
+        &lt;result column=&quot;name&quot; property=&quot;name&quot;/&gt;
+        &lt;collection property=&quot;children&quot;
+                    ofType=&quot;NewsLabel&quot;
+                    select=&quot;selectChildrenByParent&quot;
+                    column=&quot;id&quot;
+        /&gt;
+    &lt;/resultMap&gt;
+
+    &lt;select id=&quot;selectChildrenByParent&quot; resultMap=&quot;newsLabelMapper&quot;&gt;
+        select id,name from newslabel where pid=#{xxx}
+    &lt;/select&gt;
+
+&lt;/mapper&gt;
+</code></pre><p>测试类</p>
+<pre><code>package com.bjpowernode.test;
+
+public class MyTest {
+
+    private INewsLabelDao dao;
+    private SqlSession sqlSession;
+
+    @Before
+    public void Before() {
+        sqlSession = MyBatisUtils.getSqlSession();
+        //dao:是一个动态代理
+        dao = sqlSession.getMapper(INewsLabelDao.class);
+    }
+
+    @After
+    public void after() {
+        if(sqlSession != null) {
+            sqlSession.close();
+        }
+    }
+
+    @Test
+    public void test01() {
+        List&lt;NewsLabel&gt; children = dao.selectChildrenByParent(2);
+        for(NewsLabel newsLabel:children) {
+            System.out.println(newsLabel);
+        }
+    }
+}
+</code></pre><h4 id="4-3-自关联查询-以一对多的方式实现-查询指定栏目及其所有子孙栏目"><a href="#4-3-自关联查询-以一对多的方式实现-查询指定栏目及其所有子孙栏目" class="headerlink" title="4.3 自关联查询 - 以一对多的方式实现 - 查询指定栏目及其所有子孙栏目"></a>4.3 自关联查询 - 以一对多的方式实现 - 查询指定栏目及其所有子孙栏目</h4><p>实体类不变</p>
+<p>接口</p>
+<pre><code>import com.bjpowernode.beans.NewsLabel;
+
+public interface INewsLabelDao {
+    NewsLabel selectNewsLabelById(int id);
+}
+</code></pre><p>映射文件</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE mapper
+PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+
+&lt;mapper namespace=&quot;com.bjpowernode.dao.INewsLabelDao&quot;&gt;
+
+    &lt;select id=&quot;selectNewsLabelByParent&quot; resultMap=&quot;newsLabelMapper&quot;&gt;
+        select id,name from newslabel where pid = #{ooo}
+    &lt;/select&gt;
+
+    &lt;resultMap type=&quot;NewsLabel&quot; id=&quot;newsLabelMapper&quot;&gt;
+        &lt;id column=&quot;id&quot; property=&quot;id&quot;/&gt;
+        &lt;result column=&quot;name&quot; property=&quot;name&quot;/&gt;
+        &lt;collection property=&quot;children&quot;
+                    ofType=&quot;NewsLabel&quot;
+                    select=&quot;selectNewsLabelByParent&quot;
+                    column=&quot;id&quot;
+        /&gt;
+    &lt;/resultMap&gt;
+
+    &lt;select id=&quot;selectNewsLabelById&quot; resultMap=&quot;newsLabelMapper&quot;&gt;
+        select id,name from newslabel where id=#{xxx}
+    &lt;/select&gt;
+
+&lt;/mapper&gt;
+</code></pre><h4 id="4-3-自关联查询-以多对一的方式实现-查询指定栏目及其父栏目"><a href="#4-3-自关联查询-以多对一的方式实现-查询指定栏目及其父栏目" class="headerlink" title="4.3 自关联查询 - 以多对一的方式实现 - 查询指定栏目及其父栏目"></a>4.3 自关联查询 - 以多对一的方式实现 - 查询指定栏目及其父栏目</h4><p>定义实体类</p>
+<pre><code>package com.bjpowernode.beans;
+
+import java.util.Set;
+
+//新闻栏目:当前的新闻栏目被看作是多方，即子栏目
+public class NewsLabel {
+    private Integer id;
+    private String name;
+    //定义关联属性父栏目
+    private NewsLabel parent;
+    ...
+    getter and setter methods
+    ...
+}
+</code></pre><p>定义接口</p>
+<pre><code>package com.bjpowernode.dao;
+
+public interface INewsLabelDao {
+    NewsLabel selectNewsLabelById(int id);
+}
+</code></pre><p>映射文件</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE mapper
+PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+
+&lt;mapper namespace=&quot;com.bjpowernode.dao.INewsLabelDao&quot;&gt;
+    &lt;!-- 
+    &lt;select id=&quot;&quot; resultMap=&quot;&quot;&gt;
+        select id,name,pid from newslabel where id = #{ooo}
+    &lt;/select&gt;
+    --&gt;
+    &lt;resultMap type=&quot;NewsLabel&quot; id=&quot;newsLabelMapper&quot;&gt;
+        &lt;id column=&quot;id&quot; property=&quot;id&quot;/&gt;
+        &lt;result column=&quot;name&quot; property=&quot;name&quot;/&gt;
+        &lt;association property=&quot;parent&quot; 
+                     javaType=&quot;NewsLabel&quot;
+                     select=&quot;selectNewsLabelById&quot;
+                     column=&quot;pid&quot;
+        /&gt;
+    &lt;/resultMap&gt;
+
+    &lt;select id=&quot;selectNewsLabelById&quot; resultMap=&quot;newsLabelMapper&quot;&gt;
+        select id,name,pid from newslabel where id=#{xxx}
+    &lt;/select&gt;
+
+&lt;/mapper&gt;
+</code></pre><p>测试类</p>
+<pre><code>package com.bjpowernode.test;
+
+public class MyTest {
+
+    private INewsLabelDao dao;
+    private SqlSession sqlSession;
+
+    @Before
+    public void Before() {
+        sqlSession = MyBatisUtils.getSqlSession();
+        //dao:是一个动态代理
+        dao = sqlSession.getMapper(INewsLabelDao.class);
+    }
+
+    @After
+    public void after() {
+        if(sqlSession != null) {
+            sqlSession.close();
+        }
+    }
+
+
+    @Test
+    public void test01() {
+        NewsLabel newsLabel = dao.selectNewsLabelById(7);
+        System.out.println(newsLabel);
+    }
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/05/12/java/mybatis/mybatis-4/" data-id="cjh4911lk004mmtp3m8rhqzlf" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mybatis/">mybatis</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/mybatis/mybatis-3" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/12/java/mybatis/mybatis-3/" class="article-date">
+  <time datetime="2018-05-12T10:35:04.000Z" itemprop="datePublished">2018-05-12</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mybatis/">mybatis</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/05/12/java/mybatis/mybatis-3/">第三章 MyBatis关联关系查询 - 多对一</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="3-1-多对一关联查询-通过多表连接查询方式实现"><a href="#3-1-多对一关联查询-通过多表连接查询方式实现" class="headerlink" title="3.1 多对一关联查询 - 通过多表连接查询方式实现"></a>3.1 多对一关联查询 - 通过多表连接查询方式实现</h4><p>以部长Minister与国家Countr与间的多对一关系而言，查询部长时，将这个部长所属的国家查询出来。</p>
+<p>DB数据模型不变，还是在多表minister中定义外键。</p>
+<p>定义实体类：Country.java</p>
+<pre><code>package com.bjpowernode.beans;
+
+public class Country {
+    private Integer cid;
+    private String cname;
+
+    public Country() {
+        super();
+    }
+
+    ...
+    getter and setter methods
+    ...        
+}
+</code></pre><p>定义实体类：Minister.java</p>
+<pre><code>package com.bjpowernode.beans;
+
+public class Minister {
+    private Integer mid;
+    private String mname;
+    //关联属性
+    private Country country;
+
+    public Minister() {
+        super();
+    }
+
+    public Minister(Integer mid, String mname) {
+        super();
+        this.mid = mid;
+        this.mname = mname;
+    }
+
+    ...
+    getter and setter methods
+    ...    
+}
+</code></pre><p>接口</p>
+<pre><code>package com.bjpowernode.dao;
+
+public interface IMinisterDao {
+    Minister selectMinisterById(int mid);
+}
+</code></pre><p>映射文件：</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE mapper
+PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+
+&lt;mapper namespace=&quot;com.bjpowernode.dao.IMinisterDao&quot;&gt;
+
+    &lt;resultMap type=&quot;Minister&quot; id=&quot;ministerMapper&quot;&gt;
+        &lt;id column=&quot;mid&quot; property=&quot;mid&quot;/&gt;
+        &lt;result column=&quot;mname&quot; property=&quot;mname&quot;/&gt;
+        &lt;association property=&quot;country&quot; javaType=&quot;Country&quot;&gt;
+            &lt;id column=&quot;cid&quot; property=&quot;cid&quot;/&gt;
+            &lt;result column=&quot;cname&quot; property=&quot;cname&quot;/&gt;
+        &lt;/association&gt;
+    &lt;/resultMap&gt;
+
+    &lt;select id=&quot;selectMinisterById&quot; resultMap=&quot;ministerMapper&quot;&gt;
+        select mid,mname,cid,cname
+        from minister,country
+        where countryId=cid and mid=#{ooo}
+    &lt;/select&gt;
+
+&lt;/mapper&gt;
+</code></pre><p>测试类：</p>
+<pre><code>package com.bjpowernode.test;
+
+public class MyTest {
+
+    private IMinisterDao dao;
+    private SqlSession sqlSession;
+
+    @Before
+    public void Before() {
+        sqlSession = MyBatisUtils.getSqlSession();
+        //dao:是一个动态代理
+        dao = sqlSession.getMapper(IMinisterDao.class);
+    }
+
+    @After
+    public void after() {
+        if(sqlSession != null) {
+            sqlSession.close();
+        }
+    }
+
+    @Test
+    public void test01() {
+        Minister minister = dao.selectMinisterById(2);
+        System.out.println(minister);
+    }
+}
+</code></pre><h4 id="3-2-多对一关联查询-通过多表单独查询方式实现"><a href="#3-2-多对一关联查询-通过多表单独查询方式实现" class="headerlink" title="3.2 多对一关联查询 - 通过多表单独查询方式实现"></a>3.2 多对一关联查询 - 通过多表单独查询方式实现</h4><p>映射文件：</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE mapper
+PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+
+&lt;mapper namespace=&quot;com.bjpowernode.dao.IMinisterDao&quot;&gt;
+
+    &lt;select id=&quot;selectCountryByCountryId&quot; resultType=&quot;Country&quot;&gt;
+        select cid,cname from country where cid=#{ooo}
+    &lt;/select&gt;
+
+    &lt;resultMap type=&quot;Minister&quot; id=&quot;ministerMapper&quot;&gt;
+        &lt;id column=&quot;mid&quot; property=&quot;mid&quot;/&gt;
+        &lt;result column=&quot;mname&quot; property=&quot;mname&quot;/&gt;
+        &lt;association 
+            property=&quot;country&quot; 
+            javaType=&quot;Country&quot; 
+            select=&quot;selectCountryByCountryId&quot;
+            column=&quot;countryId&quot;
+        /&gt;
+
+    &lt;/resultMap&gt;
+
+    &lt;select id=&quot;selectMinisterById&quot; resultMap=&quot;ministerMapper&quot;&gt;
+        select mid,mname,countryId from minister where mid=#{ooo}
+    &lt;/select&gt;
+
+&lt;/mapper&gt;
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/05/12/java/mybatis/mybatis-3/" data-id="cjh4911lp004qmtp3h2n0i4sz" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mybatis/">mybatis</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/mybatis/mybatis-2" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/12/java/mybatis/mybatis-2/" class="article-date">
+  <time datetime="2018-05-12T09:30:02.000Z" itemprop="datePublished">2018-05-12</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mybatis/">mybatis</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/05/12/java/mybatis/mybatis-2/">第二章 MyBatis关联关系查询 - 一对多</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="2-1-关联查询"><a href="#2-1-关联查询" class="headerlink" title="2.1 关联查询"></a>2.1 关联查询</h4><p>当查询的内容涉及到具有关联关系的多个表时，就需要使用关联查询。根据表与表之间的关联关系的不同，关联查询分为四种：</p>
+<p>（1）一对一关联查询</p>
+<p>（2）一对多关联查询</p>
+<p>（3）多对一关联查询</p>
+<p>（4）多对多关联查询</p>
+<p>日常工作中最常见的关联关系是一对多、多对一与多对多，一对一的解决方案与多对一的解决方案是相同的。</p>
+<h5 id="外键定义在多方表中，反过来说，如果一个表里面有外键，那么和某一个其它表相比，它肯定充当着多方。"><a href="#外键定义在多方表中，反过来说，如果一个表里面有外键，那么和某一个其它表相比，它肯定充当着多方。" class="headerlink" title="外键定义在多方表中，反过来说，如果一个表里面有外键，那么和某一个其它表相比，它肯定充当着多方。"></a>外键定义在多方表中，反过来说，如果一个表里面有外键，那么和某一个其它表相比，它肯定充当着多方。</h5><p>定义DB</p>
+<ul>
+<li><p>country: cid, cname</p>
+</li>
+<li><p>minister: mid, mname, countryId     </p>
+</li>
+</ul>
+<h4 id="2-2-一对多关联查询-通过多表连接查询方式实现"><a href="#2-2-一对多关联查询-通过多表连接查询方式实现" class="headerlink" title="2.2 一对多关联查询 - 通过多表连接查询方式实现"></a>2.2 一对多关联查询 - 通过多表连接查询方式实现</h4><p>这里的一对多关联查询是指，在查询一方对象的时候，同时将其所关联的多方对象也都查询出来。</p>
+<p>以国家Country与部长Minister间的一对多关系而言，查询某一个国家时，将这个国家所有的部长查询出来。</p>
+<p>定义实体类：Country.java</p>
+<pre><code>package com.bjpowernode.beans;
+
+import java.util.Set;
+
+public class Country {
+    private Integer cid;
+    private String cname;
+    //关联属性
+    private Set&lt;Minister&gt; ministers;
+
+    public Country() {
+        super();
+    }
+
+    ...
+    getter and setter methods
+    ...
+
+}
+</code></pre><p>定义实体类：Minister.java    </p>
+<pre><code>package com.bjpowernode.beans;
+
+public class Minister {
+    private Integer mid;
+    private String mname;
+
+    public Minister() {
+        super();
+    }
+
+    ...
+    getter and setter methods
+    ...
+
+}
+</code></pre><p>接口：ICountryDao</p>
+<pre><code>package com.bjpowernode.dao;
+
+public interface ICountryDao {
+    Country selectCountryById(int cid);
+}
+</code></pre><p>测试类：</p>
+<pre><code>package com.bjpowernode.test;
+
+public class MyTest {
+
+    private ICountryDao dao;
+    private SqlSession sqlSession;
+
+    @Before
+    public void Before() {
+        sqlSession = MyBatisUtils.getSqlSession();
+        //dao:是一个动态代理
+        dao = sqlSession.getMapper(ICountryDao.class);
+    }
+
+    @After
+    public void after() {
+        if(sqlSession != null) {
+            sqlSession.close();
+        }
+    }
+
+    @Test
+    public void test01() {
+        Country country = dao.selectCountryById(2);
+        System.out.println(country);
+    }
+}
+</code></pre><p>映射文件：</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE mapper
+PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+
+&lt;mapper namespace=&quot;com.bjpowernode.dao.ICountryDao&quot;&gt;
+
+    &lt;resultMap type=&quot;Country&quot; id=&quot;countryMapper&quot;&gt;
+        &lt;id column=&quot;cid&quot; property=&quot;cid&quot;/&gt;
+        &lt;result column=&quot;cname&quot; property=&quot;cname&quot;/&gt;
+        &lt;collection property=&quot;ministers&quot; ofType=&quot;Minister&quot;&gt;
+            &lt;id column=&quot;mid&quot; property=&quot;mid&quot;/&gt;
+            &lt;result column=&quot;mname&quot; property=&quot;mname&quot;/&gt;
+        &lt;/collection&gt;
+    &lt;/resultMap&gt;
+
+    &lt;select id=&quot;selectCountryById&quot; resultMap=&quot;countryMapper&quot;&gt;
+        select cid,cname,mid,mname
+        from country,minister
+        where countryId=cid and cid=#{xxx}
+    &lt;/select&gt;
+
+&lt;/mapper&gt;
+</code></pre><h4 id="2-3-一对多关联查询-通过多表单独查询方式实现"><a href="#2-3-一对多关联查询-通过多表单独查询方式实现" class="headerlink" title="2.3 一对多关联查询 - 通过多表单独查询方式实现"></a>2.3 一对多关联查询 - 通过多表单独查询方式实现</h4><p>映射文件</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE mapper
+PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+
+&lt;mapper namespace=&quot;com.bjpowernode.dao.ICountryDao&quot;&gt;
+
+    &lt;!-- 这使用种方式比多表联合查询方式多，因为这种方式可以使用延迟加载 --&gt;
+
+    &lt;select id=&quot;selectMinisterByCountry&quot; resultType=&quot;Minister&quot;&gt;
+        select mid,mname from minister where countryId=#{000}
+    &lt;/select&gt;
+
+    &lt;resultMap type=&quot;Country&quot; id=&quot;countryMapper&quot;&gt;
+        &lt;id column=&quot;cid&quot; property=&quot;cid&quot;/&gt;
+        &lt;result column=&quot;cname&quot; property=&quot;cname&quot;/&gt;
+        &lt;collection property=&quot;ministers&quot; 
+                    ofType=&quot;Minister&quot; 
+                    select=&quot;selectMinisterByCountry&quot;
+                    column=&quot;cid&quot;
+        /&gt;
+    &lt;/resultMap&gt;
+
+    &lt;select id=&quot;selectCountryById&quot; resultMap=&quot;countryMapper&quot;&gt;
+        select cid,cname from country where cid=#{xxx}
+    &lt;/select&gt;
+
+&lt;/mapper&gt;
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/05/12/java/mybatis/mybatis-2/" data-id="cjh4911li004imtp3bt84bhrj" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mybatis/">mybatis</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/mybatis/mybatis-1" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/08/java/mybatis/mybatis-1/" class="article-date">
+  <time datetime="2018-05-08T07:25:25.000Z" itemprop="datePublished">2018-05-08</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mybatis/">mybatis</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/05/08/java/mybatis/mybatis-1/">第一章 MyBatis单表的CURD操作</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="1-1-简介"><a href="#1-1-简介" class="headerlink" title="1.1 简介"></a>1.1 简介</h4><p>MyBatis是一个优秀的基于java的持久层框架，它内部封装了JDBC，使开发者只需关注SQL语句本身，不用再花费精力去处理诸如注册驱动、创建Connection、配置Statement等繁杂过程。</p>
+<p>MyBatis通过xml或注解的方式将要执行的各种statement配置起来，并通过Java对象和Statement中的SQL动态参数进行映射生成最终执行的SQL语句，最后由MyBatis框架执行SQL并将结果映射成Java对象并返回。</p>
+<h4 id="1-2-MyBatis与Hibernate"><a href="#1-2-MyBatis与Hibernate" class="headerlink" title="1.2 MyBatis与Hibernate"></a>1.2 MyBatis与Hibernate</h4><p>Hibernate框架是提供了全面的封装机制的“全自动”ORM，即实现了POJO和数据库表之间的映射，以及SQL的自动生成和执行。</p>
+<p>相对于此，MyBatis只能算作是“半自动”ORM。其着力点，是在POJO与SQL语句之间的映射。也就是说，MyBatis并不会为程序员自动生成SQL语句。具体的SQL需要程序员自己编写，然后通过SQL语句映射文件，将SQL所需要的参数，以及返回的结果字段映射到指定的POJO。因此MyBatis成为了“全自动”ORM的一种有益补充。</p>
+<p>与Hibernate相比，MyBaits具有以下几个特点：</p>
+<p>（1）、在XML文件中配置SQL语句，实现了SQL语句与代码的分离，给程序的维护带来了很大便利。</p>
+<p>（2）、因为需要程序员自己编写SQL语句，程序员可以结合数据库自身的特点灵活控制SQL语句，因此能够实现比Hibernate等全自动ORM框架更高的查询效率，能够完成复杂查询。</p>
+<p>（3）、简单、易于学习，易于使用，上手快。</p>
+<h4 id="1-3-Mapper动态代理"><a href="#1-3-Mapper动态代理" class="headerlink" title="1.3 Mapper动态代理"></a>1.3 Mapper动态代理</h4><p>Mybatis框架抛开了Dao的实现类，直接定位到映射文件mapper中的相应SQL语句，对DB进行操作。这种对Dao的实现方式称为Mapper的动态代理方式。</p>
+<p>Mapper动态代理方式无需程序员实现Dao接口。接口是由MyBatis结合映射文件自动生成的动态代理实现的。</p>
+<p>动态代理的实现：</p>
+<ul>
+<li><p>将mapper的namespace设为接口的全限制性类名</p>
+</li>
+<li><p>将mapper的sql语句的id设为接口的方法名</p>
+</li>
+</ul>
+<p>Dao的获取：</p>
+<pre><code>SqlSession sqlSession = MyBatisUtils.getSqlSession();
+studentDao = sqlSession.getMappper(IStudentDao.class);
+</code></pre><h4 id="1-4-CURD-单表操作"><a href="#1-4-CURD-单表操作" class="headerlink" title="1.4 CURD 单表操作"></a>1.4 CURD 单表操作</h4><p>POJO: Student.java</p>
+<pre><code>package com.bjpowernode.beans;
+
+public class Student {
+    private Integer id;
+    private String name;
+    private int age;
+    private double score;
+    public Student() {
+        super();
+    }
+    public Student(String name, int age, double score) {
+        super();
+        this.name = name;
+        this.age = age;
+        this.score = score;
+    }
+    public Integer getId() {
+        return id;
+    }
+    public void setId(Integer id) {
+        this.id = id;
+    }
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public int getAge() {
+        return age;
+    }
+    public void setAge(int age) {
+        this.age = age;
+    }
+    public double getScore() {
+        return score;
+    }
+    public void setScore(double score) {
+        this.score = score;
+    }
+    @Override
+    public String toString() {
+        return &quot;Student [id=&quot; + id + &quot;, name=&quot; + name + &quot;, age=&quot; + age + &quot;, score=&quot; + score + &quot;]&quot;;
+    }
+
+}
+</code></pre><p>接口：IStudentDao.java</p>
+<pre><code>package com.bjpowernode.dao;
+
+import java.util.List;
+import java.util.Map;
+
+import com.bjpowernode.beans.Student;
+
+public interface IStudentDao {
+    //插入
+    void insertStudent(Student student);
+    //插入后获取id
+    void insertStudentCatchId(Student student);
+    //删除
+    void deleteStudentById(int id);
+    //修改
+    void updateStudent(Student student);
+    //查询所有学生对象
+    List&lt;Student&gt; selectAllStudents();
+
+    //根据id查询某个学生
+    Student selectStudentById(int id);
+
+    //根据名字模糊查询
+    List&lt;Student&gt; selectStudentsByName(String name);
+}
+</code></pre><p>工具类：</p>
+<pre><code>package com.bjpowernode.utils;
+
+public class MyBatisUtils {
+    private static SqlSessionFactory sqlSessionFactory;
+
+    public static SqlSession getSqlSession() {
+        try {
+            InputStream inputStream = Resources.getResourceAsStream(&quot;mybatis.xml&quot;);
+            if(sqlSessionFactory == null) {
+                sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+            }
+            return sqlSessionFactory.openSession();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+}    
+</code></pre><p>数据库连接四要素配置文件：jdbc_mysql.properties</p>
+<pre><code>jdbc.driver=com.mysql.jdbc.Driver
+jdbc.url=jdbc:mysql:///mydatabase
+jdbc.user=root
+jdbc.password=haojie_123456
+</code></pre><p>主配置文件：mybatis.xml</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE configuration
+PUBLIC &quot;-//mybatis.org//DTD Config 3.0//EN&quot;
+&quot;http://mybatis.org/dtd/mybatis-3-config.dtd&quot;&gt;
+
+&lt;configuration&gt;
+    &lt;!-- 注册DB连接四要素属性文件 --&gt;
+    &lt;properties resource=&quot;jdbc_mysql.properties&quot;&gt;&lt;/properties&gt;
+
+    &lt;!-- 设置别名 --&gt;
+    &lt;typeAliases&gt;
+        &lt;!-- 将指定包中所有类的简单类名当作别名 --&gt;
+        &lt;package name=&quot;com.bjpowernode.beans&quot;/&gt;
+    &lt;/typeAliases&gt;
+
+    &lt;!-- 配置运行环境 --&gt;
+    &lt;environments default=&quot;mysqlEM&quot;&gt;
+        &lt;environment id=&quot;mysqlEM&quot;&gt;
+            &lt;transactionManager type=&quot;JDBC&quot;&gt;&lt;/transactionManager&gt;
+            &lt;dataSource type=&quot;POOLED&quot;&gt;
+                &lt;property name=&quot;driver&quot; value=&quot;${jdbc.driver}&quot;/&gt;
+                &lt;property name=&quot;url&quot; value=&quot;${jdbc.url}&quot;/&gt;
+                &lt;property name=&quot;username&quot; value=&quot;${jdbc.user}&quot;/&gt;
+                &lt;property name=&quot;password&quot; value=&quot;${jdbc.password}&quot;/&gt;
+            &lt;/dataSource&gt;
+        &lt;/environment&gt;
+    &lt;/environments&gt;
+
+    &lt;!-- 注册映射文件 --&gt;
+    &lt;mappers&gt;
+        &lt;mapper resource=&quot;com/bjpowernode/dao/mapper.xml&quot; /&gt;    
+    &lt;/mappers&gt;
+
+&lt;/configuration&gt;
+</code></pre><p>映射文件：mapper.xml</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE mapper
+PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+
+&lt;mapper namespace=&quot;com.bjpowernode.dao.IStudentDao&quot;&gt;
+
+    &lt;insert id=&quot;insertStudent&quot; parameterType=&quot;Student&quot;&gt;
+        insert into student(name,age,score) values(#{name},#{age},#{score})
+    &lt;/insert&gt;
+
+    &lt;insert id=&quot;insertStudentCatchId&quot;&gt;
+        insert into student(name,age,score) values(#{name},#{age},#{score})
+        &lt;selectKey resultType=&quot;int&quot; keyProperty=&quot;id&quot; order=&quot;AFTER&quot;&gt;
+            select @@identity
+        &lt;/selectKey&gt;
+    &lt;/insert&gt;
+
+    &lt;delete id=&quot;deleteStudentById&quot;&gt;
+        delete from student where id=#{aaa} &lt;!-- 这里的#{}仅仅是个占位符，里面放什么都行 --&gt;
+    &lt;/delete&gt;
+
+    &lt;update id=&quot;updateStudent&quot;&gt;
+        update student set name=#{name}, age=#{age}, score=#{score} where id=#{id}
+    &lt;/update&gt;
+
+    &lt;select id=&quot;selectAllStudents&quot; resultType=&quot;Student&quot;&gt;
+        select id,name,age,score from student
+    &lt;/select&gt;
+
+    &lt;!-- 
+        resultType: 表示通过反映机制，调用set+属性名的方式，将结果封装为Student对象
+        如果属性名和字段名不一致，表中的字段为tid,tname,tage,score，属性名为id,name,age,score
+        解决方式一：字段别名 select tid id, tname name, tage age, score frome student
+        解决方式二：resultMap 
+            &lt;resultMap type=&quot;Student&quot; id=&quot;studentMapper&quot;&gt;
+                &lt;id column=&quot;tid&quot; property=&quot;id&quot; /&gt;
+                &lt;result column=&quot;tname&quot; property=&quot;name&quot; /&gt;
+                &lt;result column=&quot;tage&quot; property=&quot;age&quot; /&gt;
+            &lt;/resultMap&gt;
+            &lt;select id=&quot;selectAllStudents&quot; resultMap=&quot;studentMapper&quot;&gt;
+                select id,name,age,score from student
+            &lt;/select&gt;        
+     --&gt;    
+
+    &lt;select id=&quot;selectStudentById&quot; resultType=&quot;Student&quot;&gt;
+        select id,name,age,score from student where id=#{bbbbbb}
+    &lt;/select&gt;
+
+    &lt;select id=&quot;selectStudentsByName&quot; resultType=&quot;Student&quot;&gt;
+        &lt;!-- select id,name,age,score from student where name like concat(&apos;%&apos;,#{xxx},&apos;%&apos;) --&gt;
+        select id,name,age,score from student where name like &apos;%&apos; #{xxx} &apos;%&apos;
+    &lt;/select&gt;
+
+&lt;/mapper&gt;
+</code></pre><p>测试文件：Mytest.java</p>
+<pre><code>package com.bjpowernode.test;
+
+public class MyTest {
+
+    private IStudentDao dao;
+    private SqlSession sqlSession;
+
+    @Before
+    public void Before() {
+        sqlSession = MyBatisUtils.getSqlSession();
+        //dao:是一个动态代理
+        dao = sqlSession.getMapper(IStudentDao.class);
+    }
+
+    @After
+    public void after() {
+        if(sqlSession != null) {
+            sqlSession.close();
+        }
+    }
+
+    @Test
+    public void testInsertStudent() {
+        Student student = new Student(&quot;zhangsan2&quot;, 24, 1);
+        dao.insertStudent(student);
+        sqlSession.commit();
+    }
+
+    @Test
+    public void insertStudentCatchId() {
+        Student student = new Student(&quot;lisi&quot;, 24, 94);
+        System.out.println(&quot;插入前：student=&quot;+student);
+        dao.insertStudentCatchId(student);
+        System.out.println(&quot;插入后：student=&quot;+student);
+    }
+
+    @Test
+    public void testDeleteStudentById() {
+        dao.deleteStudentById(13);
+    }
+
+    @Test
+    public void testUpdateStudent() {
+        Student student = new Student(&quot;wangwu&quot;,25,95);
+        student.setId(14);
+        dao.updateStudent(student);
+    }
+
+    @Test
+    public void testSelectAllStudents() {
+        List&lt;Student&gt; students = dao.selectAllStudents();
+        for(Student student:students) {
+            System.out.println(student);
+        }
+    }
+
+    @Test
+    public void testSelectStudentById() {
+        Student student = dao.selectStudentById(14);
+        System.out.println(student);
+    }
+
+    @Test
+    public void testSelectStudentByName() {
+        List&lt;Student&gt; students = dao.selectStudentsByName(&quot;zhang&quot;);
+        for(Student student:students) {
+            System.out.println(student);
+        }
+    }
+}
+</code></pre><h4 id="1-5-多条件查询问题-根据Map查询"><a href="#1-5-多条件查询问题-根据Map查询" class="headerlink" title="1.5 多条件查询问题 - 根据Map查询"></a>1.5 多条件查询问题 - 根据Map查询</h4><p>接口：IStudentDao.java</p>
+<pre><code>package com.bjpowernode.dao;
+
+public interface IStudentDao {    
+    List&lt;Student&gt; selectStudentsByCondition(Map&lt;String, Object&gt; map);
+}
+</code></pre><p>映射文件：</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE mapper
+PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+
+&lt;mapper namespace=&quot;com.bjpowernode.dao.IStudentDao&quot;&gt;
+
+
+    &lt;select id=&quot;selectStudentsByCondition&quot; resultType=&quot;Student&quot;&gt;
+        &lt;!-- #{}里面可以放对象的属性名，也可以放map的key，也可以直接通过对象获取属性：如student.score --&gt;
+        select id,name,age,score from student where name like &apos;%&apos; #{nameCondition} &apos;%&apos; and age &gt; #{ageCondition}
+    &lt;/select&gt;
+
+&lt;/mapper&gt;
+</code></pre><p>测试类：MyTest.java</p>
+<pre><code>package com.bjpowernode.test;
+
+public class MyTest {
+
+    private IStudentDao dao;
+    private SqlSession sqlSession;
+
+    @Before
+    public void Before() {
+        sqlSession = MyBatisUtils.getSqlSession();
+        //dao:是一个动态代理
+        dao = sqlSession.getMapper(IStudentDao.class);
+    }
+
+    @After
+    public void after() {
+        if(sqlSession != null) {
+            sqlSession.close();
+        }
+    }
+
+    @Test
+    public void testSelectStudentsByCondition() {
+         Map&lt;String, Object&gt; map = new HashMap&lt;String, Object&gt;();
+         map.put(&quot;nameCondition&quot;, &quot;zhang&quot;);
+         map.put(&quot;ageCondition&quot;, 10);
+
+         List&lt;Student&gt; students = dao.selectStudentsByCondition(map);
+         for(Student student:students) {
+             System.out.println(student);
+         }
+    }
+}
+</code></pre><h4 id="1-6-多条件查询问题-使用索引号"><a href="#1-6-多条件查询问题-使用索引号" class="headerlink" title="1.6 多条件查询问题 - 使用索引号"></a>1.6 多条件查询问题 - 使用索引号</h4><p>接口类</p>
+<pre><code>package com.bjpowernode.dao;
+
+public interface IStudentDao {    
+    List&lt;Student&gt; selectStudentsByCondition(String name, int age);
+}
+</code></pre><p>映射文件：</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE mapper
+PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+
+&lt;mapper namespace=&quot;com.bjpowernode.dao.IStudentDao&quot;&gt;
+
+
+    &lt;select id=&quot;selectStudentsByCondition&quot; resultType=&quot;Student&quot;&gt;
+        &lt;!-- 
+            #{}里面可以放:
+            1、对象的属性名，
+            2、参数为map时，可以放map的key，
+            3、参数为map时，或key所对应的value为对象，则可以放入对象的属性如：Student.score 
+            4、也可以放索引
+            5、当#{}是个占位符时，可以放随意字符
+        --&gt;
+        select id,name,age,score 
+        from student 
+        where name like &apos;%&apos; #{0} &apos;%&apos; 
+        and age &gt; #{1}
+    &lt;/select&gt;
+
+&lt;/mapper&gt;
+</code></pre><p>测试类</p>
+<pre><code>package com.bjpowernode.test;
+
+public class MyTest {
+
+    private IStudentDao dao;
+    private SqlSession sqlSession;
+
+    @Before
+    public void Before() {
+        sqlSession = MyBatisUtils.getSqlSession();
+        //dao:是一个动态代理
+        dao = sqlSession.getMapper(IStudentDao.class);
+    }
+
+    @After
+    public void after() {
+        if(sqlSession != null) {
+            sqlSession.close();
+        }
+    }
+
+
+    @Test
+    public void testSelectStudentsByCondition() {
+
+         List&lt;Student&gt; students = dao.selectStudentsByCondition(&quot;zhang&quot;,23);
+         for(Student student:students) {
+             System.out.println(student);
+         }
+    }
+}
+</code></pre><h4 id="1-7-动态SQL"><a href="#1-7-动态SQL" class="headerlink" title="1.7 动态SQL"></a>1.7 动态SQL</h4><p>动态SQL，主要用于解决查询条件不确定的情况：在程序运行期间，根据用户提交的查询条件进行查询。提交的查询条件不同，执行的SQL语句不同。若将每种情况均逐一列出，对所有条件进行排列组合，将会出现大理的SQL语句。此时，可使用动态SQL来解决这样的问题。</p>
+<h5 id="动态SQL-if、where、choose、foreach、foreach-list、foreach-泛型自定义类型list"><a href="#动态SQL-if、where、choose、foreach、foreach-list、foreach-泛型自定义类型list" class="headerlink" title="动态SQL - if、where、choose、foreach、foreach-list、foreach-泛型自定义类型list"></a>动态SQL - if、where、choose、foreach、foreach-list、foreach-泛型自定义类型list</h5><p>测试类：</p>
+<pre><code>package com.bjpowernode.test;
+
+public class MyTest {
+
+    private IStudentDao dao;
+    private SqlSession sqlSession;
+
+    @Before
+    public void Before() {
+        sqlSession = MyBatisUtils.getSqlSession();
+        //dao:是一个动态代理
+        dao = sqlSession.getMapper(IStudentDao.class);
+    }
+
+    @After
+    public void after() {
+        if(sqlSession != null) {
+            sqlSession.close();
+        }
+    }
+
+    @Test
+    public void testSelectStudentsByIf() {
+        Student student = new Student(&quot;zhang&quot;,23,0);
+         List&lt;Student&gt; students = dao.selectStudentsByIf(student);
+         for(Student student1:students) {
+             System.out.println(student1);
+         }
+    }
+
+    @Test
+    public void testSelectStudentsByWhere() {
+        Student student = new Student(&quot;&quot;,0,0);
+         List&lt;Student&gt; students = dao.selectStudentsByWhere(student);
+         for(Student student1:students) {
+             System.out.println(student1);
+         }
+    }
+
+    @Test
+    public void testSelectStudentsByChoose() {
+        Student student = new Student(&quot;&quot;,0,0);
+         List&lt;Student&gt; students = dao.selectStudentsByChoose(student);
+         for(Student student1:students) {
+             System.out.println(student1);
+         }
+    }
+
+    @Test
+    public void testForeach() {
+        int[] ids = {14,16,18};
+        List&lt;Student&gt; students = dao.selectStudentsByForeach(ids);
+        for(Student student1:students) {
+            System.out.println(student1);
+        }
+    }
+
+    @Test
+    public void testForeachList() {
+        List&lt;Integer&gt; ids = new ArrayList&lt;&gt;();
+        ids.add(14);
+        ids.add(16);
+        ids.add(18);
+        List&lt;Student&gt; students = dao.selectStudentsByForeachList(ids);
+        for(Student student1:students) {
+            System.out.println(student1);
+        }
+    }
+
+    @Test
+    public void testForeachObject() {
+        Student stu1 = new Student();
+        stu1.setId(14);
+
+        Student stu2 = new Student();
+        stu2.setId(16);
+
+        List&lt;Student&gt; stus = new ArrayList&lt;&gt;();
+        stus.add(stu1);
+        stus.add(stu2);
+
+        List&lt;Student&gt; students = dao.selectStudentsByForeachObject(stus);
+        for(Student student1:students) {
+            System.out.println(student1);
+        }
+    }
+}
+</code></pre><p>接口</p>
+<pre><code>package com.bjpowernode.dao;
+
+public interface IStudentDao {
+    List&lt;Student&gt; selectStudentsByIf(Student student);
+
+    List&lt;Student&gt; selectStudentsByWhere(Student student);
+
+    List&lt;Student&gt; selectStudentsByChoose(Student student);
+
+    List&lt;Student&gt; selectStudentsByForeach(int[] ids);
+
+    List&lt;Student&gt; selectStudentsByForeachList(List&lt;Integer&gt; ids);
+
+    List&lt;Student&gt; selectStudentsByForeachObject(List&lt;Student&gt; students);
+
+}
+</code></pre><p>映射文件</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE mapper
+PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+
+&lt;mapper namespace=&quot;com.bjpowernode.dao.IStudentDao&quot;&gt;
+
+    &lt;select id=&quot;selectStudentsByIf&quot; resultType=&quot;Student&quot;&gt;
+        select id,name,age,score 
+        from student 
+        where 1 = 1 
+        &lt;if test=&quot;name != null and name !=&apos;&apos;&quot;&gt;
+            and name like &apos;%&apos; #{name} &apos;%&apos;
+        &lt;/if&gt;
+        &lt;if test=&quot;age &gt; 0&quot;&gt;
+            and age &gt; #{age}
+        &lt;/if&gt;
+    &lt;/select&gt;
+
+    &lt;select id=&quot;selectStudentsByWhere&quot; resultType=&quot;Student&quot;&gt;
+        select id,name,age,score 
+        from student 
+        &lt;where&gt;
+            &lt;if test=&quot;name != null and name !=&apos;&apos;&quot;&gt;
+                and name like &apos;%&apos; #{name} &apos;%&apos;
+            &lt;/if&gt;
+            &lt;if test=&quot;age &gt; 0&quot;&gt;
+                and age &gt; #{age}
+            &lt;/if&gt;
+        &lt;/where&gt;
+    &lt;/select&gt;
+
+    &lt;!-- 
+        若姓名不空，则按姓名查询；若年龄不空，则按年龄查询；都为空，不查询。
+     --&gt;
+    &lt;select id=&quot;selectStudentsByChoose&quot; resultType=&quot;Student&quot;&gt;
+        select id,name,age,score 
+        from student 
+        &lt;where&gt;
+            &lt;choose&gt;
+                &lt;when test=&quot;name != null and name != &apos;&apos;&quot;&gt;
+                    and name like &apos;%&apos; #{name} &apos;%&apos;
+                &lt;/when&gt;
+                &lt;when test=&quot;age &gt; 0&quot;&gt;
+                    and age &gt; #{age}
+                &lt;/when&gt;
+                &lt;otherwise&gt;
+                    1 &gt; 2
+                &lt;/otherwise&gt;
+            &lt;/choose&gt;
+        &lt;/where&gt;
+    &lt;/select&gt;
+
+    &lt;select id=&quot;selectStudentsByForeach&quot; resultType=&quot;Student&quot;&gt;
+        &lt;!-- select id,name,age,score from student where id in (1,3,5) --&gt;
+        select id,name,age,score 
+        from student 
+        &lt;if test=&quot;array.length &gt; 0&quot;&gt;
+            where id in 
+            &lt;foreach collection=&quot;array&quot; item=&quot;myid&quot; open=&quot;(&quot; close=&quot;)&quot; separator=&quot;,&quot;&gt;
+                #{myid}
+            &lt;/foreach&gt;
+        &lt;/if&gt;
+    &lt;/select&gt;
+
+    &lt;select id=&quot;selectStudentsByForeachList&quot; resultType=&quot;Student&quot;&gt;
+        &lt;!-- select id,name,age,score from student where id in (1,3,5) --&gt;
+        select id,name,age,score 
+        from student 
+        &lt;if test=&quot;list.size &gt; 0&quot;&gt;
+            where id in 
+            &lt;foreach collection=&quot;list&quot; item=&quot;myid&quot; open=&quot;(&quot; close=&quot;)&quot; separator=&quot;,&quot;&gt;
+                #{myid}
+            &lt;/foreach&gt;
+        &lt;/if&gt;
+    &lt;/select&gt;
+
+    &lt;select id=&quot;selectStudentsByForeachObject&quot; resultType=&quot;Student&quot;&gt;
+        select id,name,age,score 
+        from student 
+        &lt;if test=&quot;list.size &gt; 0&quot;&gt;
+            where id in 
+            &lt;foreach collection=&quot;list&quot; item=&quot;stu&quot; open=&quot;(&quot; close=&quot;)&quot; separator=&quot;,&quot;&gt;
+                #{stu.id}
+            &lt;/foreach&gt;
+        &lt;/if&gt;
+    &lt;/select&gt;
+
+    &lt;sql id=&quot;&quot;&gt;
+
+    &lt;/sql&gt;
+
+&lt;/mapper&gt;    
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/05/08/java/mybatis/mybatis-1/" data-id="cjh4911le004emtp3pryz22si" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mybatis/">mybatis</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
   
     <article id="post-java/spring/spring-10" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
@@ -442,7 +2098,7 @@ http://www.springframework.org/schema/tx/spring-tx.xsd&quot;&gt;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/08/java/spring/spring-10/" data-id="cjgxcg4bk004vr9p332isaka6" class="article-share-link">Delen</a>
+      <a data-url="http://yoursite.com/2018/05/08/java/spring/spring-10/" data-id="cjh4911md005jmtp3kcdaj7ph" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
@@ -857,7 +2513,7 @@ jdbc.password=haojie_123456
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/06/java/spring/spring-9/" data-id="cjgxcg4c1005jr9p3gvp86mx3" class="article-share-link">Delen</a>
+      <a data-url="http://yoursite.com/2018/05/06/java/spring/spring-9/" data-id="cjh4911mt0063mtp36uz4wd1z" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
@@ -992,958 +2648,7 @@ public class MyAspect {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/06/java/spring/spring-8/" data-id="cjgxcg4bz005fr9p3v6xfi55x" class="article-share-link">Delen</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/spring/spring-7" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/05/06/java/spring/spring-7/" class="article-date">
-  <time datetime="2018-05-06T03:01:39.000Z" itemprop="datePublished">2018-05-06</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/spring/">spring</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/05/06/java/spring/spring-7/">第七章 Spring与AOP AspectJ基于注解的AOP实现</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h4 id="7-1-AspectJ-基于注解的AOP实现-前置通知"><a href="#7-1-AspectJ-基于注解的AOP实现-前置通知" class="headerlink" title="7.1 AspectJ 基于注解的AOP实现 - 前置通知"></a>7.1 AspectJ 基于注解的AOP实现 - 前置通知</h4><p>指定ISomeService的doFirst()接入点为切入点，并执行前置方法</p>
-<p>主业务接口</p>
-<pre><code>public interface ISomeService {
-    void doFirst();
-    String doSecond(String str);
-    void doThird();
-}
-</code></pre><p>业务实现类</p>
-<pre><code>public class SomeServiceImpl implements ISomeService {
-    @Override
-    public void doFirst() {
-        System.out.println(&quot;执行doFirst()方法&quot;);
-    }
-    @Override
-    public String doSecond(String str) {
-        System.out.println(&quot;执行doSecond()方法&quot;);
-        return str;
-    }
-    @Override
-    public void doThird() {
-        System.out.println(&quot;执行doThird()方法&quot;);
-    }
-}
-</code></pre><p>切面</p>
-<pre><code>@Aspect //表示当前类为切面
-public class MyAspect {
-    //设置前置方法及切入点
-    @Before(&quot;execution(* *..ISomeService.doFirst(..))&quot;)
-    public void myBefore(JoinPoint jp) {
-        System.out.println(&quot;执行前置方法jp=&quot;+jp);
-    }
-}
-</code></pre><p>配置文件</p>
-<pre><code>&lt;!-- 注册切面 --&gt;
-&lt;bean id=&quot;myAspect&quot; class=&quot;com.siyantu.annotation.MyAspect&quot;&gt;&lt;/bean&gt;
-
- &lt;!-- 注册实现类 --&gt;
-&lt;bean id=&quot;someService&quot; class=&quot;com.siyantu.annotation.SomeServiceImpl&quot; /&gt;
-
-&lt;!-- aspectj自动代理 --&gt;
-&lt;aop:aspectj-autoproxy&gt;&lt;/aop:aspectj-autoproxy&gt;
-</code></pre><p>测试类</p>
-<pre><code>public class MyTest {
-    @Test
-    public void test() {
-        String resource = &quot;applicationContext.xml&quot;;
-        ApplicationContext ac = new ClassPathXmlApplicationContext(resource);
-        ISomeService service = (ISomeService) ac.getBean(&quot;someService&quot;);
-        service.doFirst();
-        System.out.println(&quot;=============&quot;);
-        service.doSecond(&quot;abcde&quot;);
-        System.out.println(&quot;=============&quot;);
-        service.doThird();
-        System.out.println(&quot;=============&quot;);
-
-    }
-
-}
-</code></pre><h4 id="7-2-AspectJ-基于注解的AOP实现-后置通知"><a href="#7-2-AspectJ-基于注解的AOP实现-后置通知" class="headerlink" title="7.2 AspectJ 基于注解的AOP实现 - 后置通知"></a>7.2 AspectJ 基于注解的AOP实现 - 后置通知</h4><pre><code>@Aspect //表示当前类为切面
-public class MyAspect {
-
-    ...
-
-    //设置后置方法及切入点，可以获取目标方法结果，但是因为没有返回值，所以没法修改
-    @AfterReturning(value=&quot;execution(* *..ISomeService.doSecond(..))&quot;,returning=&quot;result&quot;)
-    public void myAfterReturning(String result) {
-        System.out.println(&quot;执行后置方法 result=&quot;+result);
-    }
-
-}
-</code></pre><p>执行结果：</p>
-<pre><code>执行前置方法jp=execution(void com.siyantu.annotation.ISomeService.doFirst())
-执行doFirst()方法
-=============
-执行doSecond()方法
-执行后置方法 result=abcde
-=============
-执行doThird()方法
-=============
-</code></pre><h4 id="7-3-AspectJ-基于注解的AOP实现-环绕通知"><a href="#7-3-AspectJ-基于注解的AOP实现-环绕通知" class="headerlink" title="7.3 AspectJ 基于注解的AOP实现 - 环绕通知"></a>7.3 AspectJ 基于注解的AOP实现 - 环绕通知</h4><pre><code>@Aspect //表示当前类为切面
-public class MyAspect {
-
-    ...
-    //设置环绕通知及切入点
-    @Around(&quot;execution(* *..ISomeService.doSecond(..))&quot;)
-    public Object myAround(ProceedingJoinPoint pjp) throws Throwable {
-        System.out.println(&quot;执行环绕通知方法，目标方法执行之前&quot;);
-        //目标方法
-        Object result = pjp.proceed();
-        System.out.println(&quot;执行环绕通知方法，目标方法执行之后&quot;);
-        if(result != null) {
-            result = ((String)result).toUpperCase();
-        }
-        return result;
-    }
-
-}
-</code></pre><p>执行结果：</p>
-<pre><code>执行前置方法jp=execution(void com.siyantu.annotation.ISomeService.doFirst())
-执行doFirst()方法
-=============
-执行环绕通知方法，目标方法执行之前
-执行doSecond()方法
-执行环绕通知方法，目标方法执行之后
-执行后置方法 result=ABCDE
-=============
-执行doThird()方法
-=============
-</code></pre><h4 id="7-4-AspectJ-基于注解的AOP实现-异常通知"><a href="#7-4-AspectJ-基于注解的AOP实现-异常通知" class="headerlink" title="7.4 AspectJ 基于注解的AOP实现 - 异常通知"></a>7.4 AspectJ 基于注解的AOP实现 - 异常通知</h4><h5 id="异常分两类："><a href="#异常分两类：" class="headerlink" title="异常分两类："></a>异常分两类：</h5><p>1、运行时异常，不进行处理，也可以通过编译。</p>
-<p>若一个类继承自RunTimeException，则该异常就是运行时异常。</p>
-<p>2、编译时异常，受查异常，Checked Exception。不进行处理，将无法通过编译。</p>
-<p>若一个类继承自Exception，则该类就是受查异常。</p>
-<h5 id="自定义异常"><a href="#自定义异常" class="headerlink" title="自定义异常"></a>自定义异常</h5><p>主业务接口</p>
-<pre><code>public interface ISomeService {
-    void doThird(String username, String password) throws UserException;
-}
-</code></pre><p>业务实现类</p>
-<pre><code>public class SomeServiceImpl implements ISomeService {
-    @Override
-    public void doThird(String username, String password) throws UserException {
-        if(!&quot;beijing&quot;.equals(username)) {
-            throw new UsernameException(&quot;用户名有误&quot;);
-        }
-        if(!&quot;111&quot;.equals(password)) {
-            throw new PasswordException(&quot;密码有误&quot;);
-        }
-    }
-}
-</code></pre><p>切面</p>
-<pre><code>@Aspect //表示当前类为切面
-public class MyAspect {
-
-    //当目标方法抛出与指定类型的异常具有is-a关系的异常时，执行该异常通知方法    
-    @AfterThrowing(value=&quot;execution(* *..ISomeService.doThird(..))&quot;,throwing=&quot;ex&quot;)
-    public void myAfterThrowing(UsernameException ex) {
-        System.out.println(&quot;发生用户名异常:&quot;+ex.getMessage());
-    }
-
-    @AfterThrowing(value=&quot;execution(* *..ISomeService.doThird(..))&quot;,throwing=&quot;ex&quot;)
-    public void myAfterThrowing(PasswordException ex) {
-        System.out.println(&quot;发生密码异常:&quot;+ex.getMessage());
-    }
-
-    @AfterThrowing(value=&quot;execution(* *..ISomeService.doThird(..))&quot;,throwing=&quot;ex&quot;)
-    public void myAfterThrowing(Exception ex) {
-        System.out.println(&quot;发生其它异常:&quot;+ex.getMessage());
-    }
-
-}
-</code></pre><p>自定义UserException</p>
-<pre><code>public class UserException extends Exception {
-    public UserException() {
-        super();
-    }
-    public UserException(String message) {
-        super(message);
-    }
-}
-</code></pre><p>自定义UsernameException</p>
-<pre><code>public class UsernameException extends UserException {
-    public UsernameException() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
-    public UsernameException(String message) {
-        super(message);
-        // TODO Auto-generated constructor stub
-    }
-}
-</code></pre><p>测试类</p>
-<pre><code>异常处理方式一：将异常继续向上抛出，抛给虚拟机
-
-public class MyTest {
-    @Test
-    public void test() throws UserException {
-        String resource = &quot;applicationContext.xml&quot;;
-        ApplicationContext ac = new ClassPathXmlApplicationContext(resource);
-        ISomeService service = (ISomeService) ac.getBean(&quot;someService&quot;);
-
-        service.doThird(&quot;beijing&quot;,&quot;1112&quot;);
-
-    }
-
-}
-
-异常处理方式二：捕捉异常，自己处理
-
-public class MyTest {
-    @Test
-    public void test() {
-        String resource = &quot;applicationContext.xml&quot;;
-        ApplicationContext ac = new ClassPathXmlApplicationContext(resource);
-        ISomeService service = (ISomeService) ac.getBean(&quot;someService&quot;);
-
-        try {
-            service.doThird(&quot;beijing&quot;,&quot;1112&quot;);
-        } catch (UserException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-    }
-
-}
-</code></pre><h4 id="7-5-AspectJ-基于注解的AOP实现-最终通知"><a href="#7-5-AspectJ-基于注解的AOP实现-最终通知" class="headerlink" title="7.5 AspectJ 基于注解的AOP实现 - 最终通知"></a>7.5 AspectJ 基于注解的AOP实现 - 最终通知</h4><p>切面</p>
-<pre><code>@Aspect //表示当前类为切面
-public class MyAspect {
-
-    //最终通知
-    @After(&quot;execution(* *..ISomeService.doThird(..))&quot;)
-    public void myAfter() {
-        System.out.println(&quot;执行最终通知&quot;);
-    }
-
-}
-</code></pre><p>不管有没有异常，最终通知都会执行</p>
-<h4 id="7-6-AspectJ-基于注解的AOP实现-定义切入点"><a href="#7-6-AspectJ-基于注解的AOP实现-定义切入点" class="headerlink" title="7.6 AspectJ 基于注解的AOP实现 - 定义切入点"></a>7.6 AspectJ 基于注解的AOP实现 - 定义切入点</h4><pre><code>@Aspect //表示当前类为切面
-public class MyAspect {
-
-    //最终通知，使用定义的切入点替代表达式
-    @After(&quot;doThirdPointcut()&quot;)
-    public void myAfter() {
-        System.out.println(&quot;执行最终通知&quot;);
-    }
-
-    //定义切入点
-    @Pointcut(&quot;execution(* *..ISomeService.doThird(..))&quot;)
-    public void doThirdPointcut() {}
-
-}
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/06/java/spring/spring-7/" data-id="cjgxcg4bw005cr9p3214apq02" class="article-share-link">Delen</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/spring/spring-6" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/05/05/java/spring/spring-6/" class="article-date">
-  <time datetime="2018-05-05T06:34:38.000Z" itemprop="datePublished">2018-05-05</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/spring/">spring</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/05/05/java/spring/spring-6/">第六章 Spring与AOP AspectJ对AOP的实现</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Spring与AspectJ都对AOP这种编程思想进行了实现，但AspectJ实现方式更为简捷方便，而且还支持注解式开发。所以Spring又将AspectJ对于AOP的实现引入到了自己的框架中。</p>
-<h4 id="6-1-AspectJ的通知类型"><a href="#6-1-AspectJ的通知类型" class="headerlink" title="6.1 AspectJ的通知类型"></a>6.1 AspectJ的通知类型</h4><pre><code>（1）、前置通知
-
-（2）、后置通知
-
-（3）、环绕通知
-
-（4）、异常通知
-
-（5）、最终通知
-</code></pre><h4 id="6-2-AspectJ的切入点表达式"><a href="#6-2-AspectJ的切入点表达式" class="headerlink" title="6.2 AspectJ的切入点表达式"></a>6.2 AspectJ的切入点表达式</h4><p>表达式原型：</p>
-<p>execution(<br>    [modifiers-pattern] 访问权限类型<br>    ret-type-apttern 返回值类型<br>    [declaring-type-pattern] 全限定性类名<br>    name-pattern(param-pattern) 方法名（参数名）<br>    [throws-pattern] 抛出异常类型<br>)</p>
-<p>其中，返回值类型与方法名（参数名）不能省略。</p>
-<p>切入点表达式要匹配的对象就是目标方法的方法名。</p>
-<ul>
-<li><p><code>*</code> ：代表0到多个任意字符</p>
-</li>
-<li><p><code>..</code>：用在方法参数中，表示任意多个参数；用在包名中表示当前包及其子包路径</p>
-</li>
-<li><p><code>+</code>：用在类名中，表示当前类及其子类；用在接口中表示当前接口及其实现类</p>
-</li>
-</ul>
-<p><code>execution(* *..service.*.*(..))</code></p>
-<p>表示指定所有包下的service子包下所有类或接口中所有方法为切入点</p>
-<h4 id="6-3-测试环境的搭建"><a href="#6-3-测试环境的搭建" class="headerlink" title="6.3 测试环境的搭建"></a>6.3 测试环境的搭建</h4><p>#####（1）、导入jar包</p>
-<p>AOP的jar包，AOP联盟的jar包，AspectJ的jar包，spring与AspectJ的整合jar包。</p>
-<p>#####（2）、引入AOP的约束</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/05/java/spring/spring-6/" data-id="cjgxcha2s0000rap3ecp0598l" class="article-share-link">Delen</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/spring/spring-5" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/05/05/java/spring/spring-5/" class="article-date">
-  <time datetime="2018-05-05T06:21:51.000Z" itemprop="datePublished">2018-05-05</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/spring/">spring</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/05/05/java/spring/spring-5/">第五章 Spring与AOP 简介</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h4 id="5-1-AOP编程术语"><a href="#5-1-AOP编程术语" class="headerlink" title="5.1 AOP编程术语"></a>5.1 AOP编程术语</h4><h5 id="（1）、切面（Aspect）"><a href="#（1）、切面（Aspect）" class="headerlink" title="（1）、切面（Aspect）"></a>（1）、切面（Aspect）</h5><p>切面泛指交叉业务逻辑。常用的切面有通知与顾问。</p>
-<p>实际上就是对主业务逻辑的一种增强。</p>
-<h5 id="（2）、织入（Weaving）"><a href="#（2）、织入（Weaving）" class="headerlink" title="（2）、织入（Weaving）"></a>（2）、织入（Weaving）</h5><p>将切面代码插入到目标对象的过程。</p>
-<h5 id="（3）、连接点（JoinPoint）"><a href="#（3）、连接点（JoinPoint）" class="headerlink" title="（3）、连接点（JoinPoint）"></a>（3）、连接点（JoinPoint）</h5><p>通常业务中接口中的方法均为连接点。</p>
-<h5 id="（4）、切入点（Pointcut）"><a href="#（4）、切入点（Pointcut）" class="headerlink" title="（4）、切入点（Pointcut）"></a>（4）、切入点（Pointcut）</h5><p>指切面具体织入的那个连接点。</p>
-<p>被标记为final的方法是不能作为连接点和切入点的。</p>
-<h5 id="（5）、目标对象（Target）"><a href="#（5）、目标对象（Target）" class="headerlink" title="（5）、目标对象（Target）"></a>（5）、目标对象（Target）</h5><p>目标对象指将要被增强的对象。即包含主业务逻辑的类的对象。</p>
-<p>如StudentServiceImpl等。</p>
-<h5 id="（6）、通知（Advice）"><a href="#（6）、通知（Advice）" class="headerlink" title="（6）、通知（Advice）"></a>（6）、通知（Advice）</h5><p>通知是切入的一种实现。通知无法指定切入点，所有方法都会执行。</p>
-<p>切入点定义切入的位置，通知定义切入的时间。</p>
-<h5 id="7-、顾问（advisor）"><a href="#7-、顾问（advisor）" class="headerlink" title="(7)、顾问（advisor）"></a>(7)、顾问（advisor）</h5><p>顾问是切入的另一种实现。</p>
-<p>能够将通知以更为复杂的方式织入到目标对象中，是将通知包装为更复杂切面的装配器。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/05/java/spring/spring-5/" data-id="cjgxcg4bt0059r9p3hg407y1y" class="article-share-link">Delen</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/spring/spring-4" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/05/05/java/spring/spring-4/" class="article-date">
-  <time datetime="2018-05-05T03:00:10.000Z" itemprop="datePublished">2018-05-05</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/spring/">spring</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/05/05/java/spring/spring-4/">第四章 Spring与IOC 基于注解的DI</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>DI-annotation</p>
-<p>对于注解DI，不再需要在spring配置文件中声明Bean实例。</p>
-<h5 id="（1）、导入AOP的jar包。"><a href="#（1）、导入AOP的jar包。" class="headerlink" title="（1）、导入AOP的jar包。"></a>（1）、导入AOP的jar包。</h5><p>注解的后台实现用到了AOP编程。</p>
-<p>####（2）、添加约束头</p>
-<p>约束在spring-framework-reference\html\xsd-configuration.html文件中</p>
-<h4 id="3-、组件扫描器"><a href="#3-、组件扫描器" class="headerlink" title="(3)、组件扫描器"></a>(3)、组件扫描器</h4><p>配置文件中添加</p>
-<pre><code>&lt;context:component-scan base-package=&quot;com.bjpowernode.di03&quot;&gt;&lt;/context:component-scan&gt;
-</code></pre><p>Student.class</p>
-<pre><code>@Component(&quot;myStudent&quot;)//组件，表示该类被容器所管理
-public class Student {
-    @Value(&quot;zhangsan&quot;)
-    private String name;
-    @Value(&quot;23&quot;)
-    private int age;
-
-    private School school;
-
-    ...
-
-}
-</code></pre><h4 id="4-1-组件扫描器的base-package"><a href="#4-1-组件扫描器的base-package" class="headerlink" title="4.1 组件扫描器的base-package"></a>4.1 组件扫描器的base-package</h4><p>扫描com.bjpowernode这个包及其子包</p>
-<pre><code>&lt;context:component-scan base-package=&quot;com.bjpowernode&quot;&gt;&lt;/context:component-scan&gt;
-</code></pre><p>扫描com.bjpowernode这个包的子包</p>
-<pre><code>&lt;context:component-scan base-package=&quot;com.bjpowernode.*&quot;&gt;&lt;/context:component-scan&gt;
-</code></pre><h4 id="4-1-基于注解的DI-Component相关注解"><a href="#4-1-基于注解的DI-Component相关注解" class="headerlink" title="4.1 基于注解的DI - @Component相关注解"></a>4.1 基于注解的DI - @Component相关注解</h4><p>与@Component注解，功能相同但是意义不同的注解还有三个：</p>
-<ul>
-<li><p>@Repository: 注解在Dao实现类上</p>
-</li>
-<li><p>@Service: 注解在Service实现类上</p>
-</li>
-<li><p>@Controller: 注解在SpringMVC的处理器上</p>
-</li>
-</ul>
-<h4 id="4-2-基于注解的DI-Scope"><a href="#4-2-基于注解的DI-Scope" class="headerlink" title="4.2 基于注解的DI - @Scope"></a>4.2 基于注解的DI - @Scope</h4><p>不指定的话，默认也是singleton</p>
-<pre><code>@Scope(&quot;prototype&quot;)
-@Component(&quot;myStudent&quot;)
-public class Student {
-    @Value(&quot;zhangsan&quot;)
-    private String name;
-    @Value(&quot;23&quot;)
-    private int age;
-</code></pre><h4 id="4-3-基于注解的DI-域属性的注入"><a href="#4-3-基于注解的DI-域属性的注入" class="headerlink" title="4.3 基于注解的DI - 域属性的注入"></a>4.3 基于注解的DI - 域属性的注入</h4><p>byName方式的注入，要求@Autowired与@Qualifier联合使用</p>
-<pre><code>@Scope(&quot;prototype&quot;)
-@Component(&quot;myStudent&quot;)
-public class Student {
-    @Value(&quot;zhangsan&quot;)
-    private String name;
-    @Value(&quot;23&quot;)
-    private int age;
-    @Autowired
-    @Qualifier(&quot;mySchool&quot;)
-    private School school;//域属性的注解注入
-    ...
-}
-</code></pre><h4 id="4-3-基于注解的DI-域属性的注入-使用-Resource注解"><a href="#4-3-基于注解的DI-域属性的注入-使用-Resource注解" class="headerlink" title="4.3 基于注解的DI - 域属性的注入 - 使用@Resource注解"></a>4.3 基于注解的DI - 域属性的注入 - 使用@Resource注解</h4><p>@Resource //byType的方式注入</p>
-<p>@Resource(name=”mySchool”) //byName方式的注解注入</p>
-<pre><code>@Component(&quot;myStudent&quot;)    
-public class Student {
-    ...
-    //@Resource //byType的方式注入
-    @Resource(name=&quot;mySchool&quot;) //byName方式的注解注入
-    private School school;//域属性的注解注入
-    ...
-}
-</code></pre><h4 id="4-4-基于注解的DI-使用Spring的JUnit4测试"><a href="#4-4-基于注解的DI-使用Spring的JUnit4测试" class="headerlink" title="4.4 基于注解的DI - 使用Spring的JUnit4测试"></a>4.4 基于注解的DI - 使用Spring的JUnit4测试</h4><h5 id="（1）、导入jar包"><a href="#（1）、导入jar包" class="headerlink" title="（1）、导入jar包"></a>（1）、导入jar包</h5><p>spring与junit4的整合jar包：spring-test.4.1.RELEASE.jar</p>
-<p>测试类</p>
-<pre><code>@RunWith(SpringJUnit4ClassRunner.class)
-//指定配置文件
-@ContextConfiguration(locations=&quot;classpath:com/bjpowernode/di03/applicationContext.xml&quot;)
-public class MyTest {
-    //注解注入student
-    @Resource(name=&quot;myStudent&quot;)
-    private Student student;
-    @Test
-    public void test01() {
-        System.out.println(student.toString());
-    }
-}
-</code></pre><h4 id="4-5-Spring与IOC-DI-XML的优先级要基于注解的DI"><a href="#4-5-Spring与IOC-DI-XML的优先级要基于注解的DI" class="headerlink" title="4.5 Spring与IOC DI-XML的优先级要基于注解的DI"></a>4.5 Spring与IOC DI-XML的优先级要基于注解的DI</h4><p>同时存在基于XML的DI和基于注解的DI，XML的优先级要高。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/05/java/spring/spring-4/" data-id="cjgxcg4br0055r9p3llhl6jzu" class="article-share-link">Delen</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/spring/spring-3" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/05/05/java/spring/spring-3/" class="article-date">
-  <time datetime="2018-05-05T00:53:03.000Z" itemprop="datePublished">2018-05-05</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/spring/">spring</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/05/05/java/spring/spring-3/">第三章 Spring与IOC 基于XML的DI</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Bean实例在调用无参构造器创建了空值对象后，就要对Bean对象的属性进行初始化。初始化是由容器自动完成的，称为注入。常用方式分为设值注入和构造注入。</p>
-<h4 id="3-1-基于xml-设值注入"><a href="#3-1-基于xml-设值注入" class="headerlink" title="3.1 基于xml-设值注入"></a>3.1 基于xml-设值注入</h4><p>通过set方法注入，基本数据类型用value，引用数据类型用ref。</p>
-<p>applicationContext.xml</p>
-<pre><code>&lt;bean id=&quot;mySchool&quot; class=&quot;com.bjpowernode.di01.School&quot;&gt;
-    &lt;property name=&quot;name&quot; value=&quot;清华大学&quot; /&gt;
-&lt;/bean&gt;
-
-&lt;bean id=&quot;myStudent&quot; class=&quot;com.bjpowernode.di01.Student&quot;&gt;
-    &lt;property name=&quot;name&quot; value=&quot;张三&quot; /&gt;
-    &lt;property name=&quot;age&quot; value=&quot;23&quot;&gt;&lt;/property&gt;
-    &lt;property name=&quot;school&quot; ref=&quot;mySchool&quot;&gt;&lt;/property&gt;
-&lt;/bean&gt;
-</code></pre><p>School.class</p>
-<pre><code>public class School {
-    private String name;
-    public void setName(String name) {
-        this.name = name;
-    }
-
-}
-</code></pre><p>Student.class</p>
-<pre><code>public class Student {
-
-    private String name;
-    private int age;
-    private School school;
-
-    public Student() {
-        super();
-    }
-
-    public void setSchool(School school) {
-        this.school = school;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    @Override
-    public String toString() {
-        return &quot;Student [name=&quot; + name + &quot;, age=&quot; + age + &quot;, school=&quot; + school + &quot;]&quot;;
-    }
-
-}
-</code></pre><h4 id="3-2-基于xml-为集合属性赋值"><a href="#3-2-基于xml-为集合属性赋值" class="headerlink" title="3.2 基于xml-为集合属性赋值"></a>3.2 基于xml-为集合属性赋值</h4><p>Some.class</p>
-<pre><code>public class Some {
-    private School[] schools;
-    private String[] myStrs;
-    private List&lt;String&gt; myList;
-    private Set&lt;String&gt; mySet;
-    private Map&lt;String,Object&gt; myMap;
-    private Properties myPros;
-    ...
-    set 方法
-    ...
-    @Override
-    public String toString() {
-        return &quot;Some [schools=&quot; + Arrays.toString(schools) + &quot;, mystrs=&quot; + Arrays.toString(myStrs) + &quot;, myList=&quot;
-                + myList + &quot;, mySet=&quot; + mySet + &quot;, myMap=&quot; + myMap + &quot;, myPros=&quot; + myPros + &quot;]&quot;;
-    }
-}
-</code></pre><p>applicationContext.xml</p>
-<pre><code>&lt;bean id=&quot;mySchool1&quot; class=&quot;com.bjpowernode.di02.School&quot;&gt;
-    &lt;property name=&quot;name&quot; value=&quot;清华大学&quot; /&gt;
-&lt;/bean&gt;
-
-&lt;bean id=&quot;mySchool2&quot; class=&quot;com.bjpowernode.di02.School&quot;&gt;
-    &lt;property name=&quot;name&quot; value=&quot;北京大学&quot; /&gt;
-&lt;/bean&gt;
-
-&lt;bean id=&quot;mySome&quot; class=&quot;com.bjpowernode.di02.Some&quot;&gt;
-    &lt;property name=&quot;schools&quot;&gt;
-        &lt;array&gt;
-            &lt;ref bean=&quot;mySchool1&quot;/&gt;
-            &lt;ref bean=&quot;mySchool2&quot;/&gt;
-        &lt;/array&gt;
-    &lt;/property&gt;
-
-    &lt;property name=&quot;myStrs&quot;&gt;
-        &lt;array&gt;
-            &lt;value&gt;山东&lt;/value&gt;
-            &lt;value&gt;临沂&lt;/value&gt;
-        &lt;/array&gt;
-    &lt;/property&gt;
-
-    &lt;property name=&quot;myList&quot;&gt;
-        &lt;list&gt;
-            &lt;value&gt;平邑&lt;/value&gt;
-            &lt;value&gt;一村&lt;/value&gt;
-        &lt;/list&gt;
-    &lt;/property&gt;
-
-    &lt;property name=&quot;mySet&quot;&gt;
-        &lt;set&gt;
-            &lt;value&gt;一街道&lt;/value&gt;
-            &lt;value&gt;二街道&lt;/value&gt;
-        &lt;/set&gt;
-    &lt;/property&gt;
-
-    &lt;property name=&quot;myMap&quot;&gt;
-        &lt;map&gt;
-            &lt;entry key=&quot;mobile&quot; value=&quot;15011111111&quot;&gt;&lt;/entry&gt;
-            &lt;entry key=&quot;qq&quot; value=&quot;11111&quot;&gt;&lt;/entry&gt;
-        &lt;/map&gt;
-    &lt;/property&gt;
-
-    &lt;property name=&quot;myPros&quot;&gt;
-        &lt;props&gt;
-            &lt;prop key=&quot;age&quot;&gt;12&lt;/prop&gt;
-            &lt;prop key=&quot;sex&quot;&gt;femal&lt;/prop&gt;
-        &lt;/props&gt;
-    &lt;/property&gt;
-&lt;/bean&gt;
-</code></pre><h4 id="3-3-基于xml-域属性-自动注入"><a href="#3-3-基于xml-域属性-自动注入" class="headerlink" title="3.3 基于xml-域属性-自动注入"></a>3.3 基于xml-域属性-自动注入</h4><h5 id="3-3-1-基于xml-autowire-quot-byName-quot"><a href="#3-3-1-基于xml-autowire-quot-byName-quot" class="headerlink" title="3.3.1 基于xml-autowire=&quot;byName&quot;"></a>3.3.1 基于xml-<code>autowire=&quot;byName&quot;</code></h5><p>会从容器中查找与Student类中域属性名scholl相同的Bean的id，并将该Bean对象自动注入给该域属性</p>
-<pre><code>&lt;bean id=&quot;school&quot; class=&quot;com.bjpowernode.di01.School&quot;&gt;
-    &lt;property name=&quot;name&quot; value=&quot;清华大学&quot; /&gt;
-&lt;/bean&gt;
-
-&lt;bean id=&quot;myStudent&quot; class=&quot;com.bjpowernode.di01.Student&quot; autowire=&quot;byName&quot;&gt;
-    &lt;property name=&quot;name&quot; value=&quot;张三&quot; /&gt;
-    &lt;property name=&quot;age&quot; value=&quot;23&quot;&gt;&lt;/property&gt;
-&lt;/bean&gt;
-</code></pre><h5 id="3-3-2-基于xml-autowire-quot-byType-quot"><a href="#3-3-2-基于xml-autowire-quot-byType-quot" class="headerlink" title="3.3.2 基于xml-autowire=&quot;byType&quot;"></a>3.3.2 基于xml-<code>autowire=&quot;byType&quot;</code></h5><p>会从容器中查找与Student类中域属性类型School具有is-a关系的Bean，并将该Bean对象自动注入给该域属性</p>
-<pre><code>&lt;bean id=&quot;mySchool&quot; class=&quot;com.bjpowernode.di01.School&quot;&gt;
-    &lt;property name=&quot;name&quot; value=&quot;清华大学&quot; /&gt;
-&lt;/bean&gt;
-
-&lt;bean id=&quot;myStudent&quot; class=&quot;com.bjpowernode.di01.Student&quot; autowire=&quot;byType&quot;&gt;
-    &lt;property name=&quot;name&quot; value=&quot;张三&quot; /&gt;
-    &lt;property name=&quot;age&quot; value=&quot;23&quot;&gt;&lt;/property&gt;
-&lt;/bean&gt;
-</code></pre><h5 id="3-3-3-基于xml-DI-SPEL注入"><a href="#3-3-3-基于xml-DI-SPEL注入" class="headerlink" title="3.3.3 基于xml-DI-SPEL注入"></a>3.3.3 基于xml-DI-SPEL注入</h5><pre><code>&lt;bean id=&quot;myPerson&quot; class=&quot;com.bjpowernode.di01.Person&quot;&gt;
-    &lt;property name=&quot;pname&quot; value=&quot;lisi&quot;&gt;&lt;/property&gt;
-    &lt;!-- 通过spring el表达式调用静态方法 --&gt;
-    &lt;property name=&quot;page&quot; value=&quot;#{T(java.lang.Math).random() * 50}&quot;&gt;&lt;/property&gt;
-&lt;/bean&gt;
-
-&lt;bean id=&quot;myStudent&quot; class=&quot;com.bjpowernode.di01.Student&quot;&gt;
-    &lt;!-- 调用其它Bean的属性 --&gt;
-    &lt;property name=&quot;name&quot; value=&quot;#{myPerson.pname}&quot;&gt;&lt;/property&gt;
-    &lt;!-- 运算 --&gt;
-    &lt;property name=&quot;age&quot; value=&quot;#{myPerson.page &gt; 25 ? 25 : myPerson.page}&quot;&gt;&lt;/property&gt;
-    &lt;!-- 调用其它Bean的成员方法 --&gt;
-    &lt;property name=&quot;age&quot; value=&quot;#{myPerson.computeAge()}&quot;&gt;&lt;/property&gt;
-&lt;/bean&gt;
-</code></pre><h4 id="3-4-为应用指定多个Spring配置文件"><a href="#3-4-为应用指定多个Spring配置文件" class="headerlink" title="3.4 为应用指定多个Spring配置文件"></a>3.4 为应用指定多个Spring配置文件</h4><h5 id="1-、平等关系的配置文件"><a href="#1-、平等关系的配置文件" class="headerlink" title="(1)、平等关系的配置文件"></a>(1)、平等关系的配置文件</h5><p>两个配置文件：</p>
-<ul>
-<li><p>com/bjpowernode/di01/spring-base.xml</p>
-</li>
-<li><p>com/bjpowernode/di01/spring-beans.xml</p>
-</li>
-</ul>
-<p>创建容器：</p>
-<pre><code>String source01 = &quot;com/bjpowernode/di01/spring-base.xml&quot;;
-String source02 = &quot;com/bjpowernode/di01/spring-beans.xml&quot;;
-ApplicationContext ac = new ClassPathXmlApplicationContext(source01,source02);
-</code></pre><p>通配符</p>
-<pre><code>String source = &quot;com/bjpowernode/di01/spring-*.xml&quot;;
-ApplicationContext ac = new ClassPathXmlApplicationContext(source);
-</code></pre><h5 id="2-、包含关系的配置文件"><a href="#2-、包含关系的配置文件" class="headerlink" title="(2)、包含关系的配置文件"></a>(2)、包含关系的配置文件</h5><p>三个配置文件：</p>
-<ul>
-<li><p>com/bjpowernode/di01/applicationContext.xml</p>
-</li>
-<li><p>com/bjpowernode/di01/spring-base.xml</p>
-</li>
-<li><p>com/bjpowernode/di01/spring-beans.xml</p>
-</li>
-</ul>
-<p>applicationContext.xml</p>
-<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
-...
-&gt;
-   &lt;!--引入其它的配置文件--&gt;     
-    &lt;import resource=&quot;classpath:com/bjpowernode/di01/spring-base.xml&quot; /&gt;
-    &lt;import resource=&quot;classpath:com/bjpowernode/di01/spring-beans.xml&quot; /&gt;
-
-    &lt;!--通配符--&gt;
-    &lt;import resource=&quot;classpath:com/bjpowernode/di01/spring-*.xml&quot; /&gt;
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/05/java/spring/spring-3/" data-id="cjgxcg4bp0052r9p3x9ksbxew" class="article-share-link">Delen</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/spring/spring-2" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/05/04/java/spring/spring-2/" class="article-date">
-  <time datetime="2018-05-04T07:28:48.000Z" itemprop="datePublished">2018-05-04</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/spring/">spring</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/05/04/java/spring/spring-2/">第二章 spring与IOC</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>控制反转（IOC,Inversion of control），是一个概念，是一种思想。指将传上由程序代码直接操控的对象调用权交给容器，通过容器来实现对象的装配和管理。</p>
-<p>比较流行的两种实现方式有两种：</p>
-<ul>
-<li><p>依赖查找：Dependency Lookup, DL，容器提供回调接口与上下文环境给组件，程序代码则需要提供具体的查找方式。比较典型的是依赖于JNDI服务接口（java naming and directory interrface）的查找。</p>
-</li>
-<li><p>依赖注入：Dependency Injection， DI，程序代码不做定位查找，这些工作由容器自行完成。</p>
-</li>
-</ul>
-<p>依赖注入是目前最优秀的解耦方式。依赖注入让spring的Bean之间以配置文件的方式组织在一起，而不是以硬编码的方式耦合到一起。</p>
-<h4 id="2-1-创建spring容器"><a href="#2-1-创建spring容器" class="headerlink" title="2.1 创建spring容器"></a>2.1 创建spring容器</h4><pre><code>public class MyTest {
-    @Test
-    public void test01() {
-        SomeServiceImpl service = new SomeServiceImpl();
-        service.doSome();
-    }
-
-    @Test
-    public void test02() {
-        //从当前应用的类路径下查找
-        ApplicationContext ac = new ClassPathXmlApplicationContext(&quot;applicationContext.xml&quot;);
-        ISomeService service = (ISomeService) ac.getBean(&quot;myService&quot;);
-        service.doSome();
-    }
-
-    @Test
-    public void test03() {
-        //从当前应用的根路径下查找
-        ApplicationContext ac = new FileSystemXmlApplicationContext(&quot;src/applicationContext.xml&quot;);
-        ISomeService service = (ISomeService) ac.getBean(&quot;myService&quot;);
-        service.doSome();
-    }
-
-    @Test
-    public void test04() {
-        BeanFactory bf = new XmlBeanFactory(new ClassPathResource(&quot;applicationContext.xml&quot;));
-        ISomeService service = (ISomeService) bf.getBean(&quot;myService&quot;);
-        service.doSome();
-    }
-
-}
-</code></pre><p>applicationContext与BeanFactory两种容器的区别：对于其中的Bean的创建时机不同。</p>
-<ul>
-<li><p>applicationContext容器在进行初始化时，会将其中的所有Bean对象进行创建。</p>
-<p>缺点：占用系统资源（内存、cpu等）</p>
-<p>优点：响应速度快</p>
-</li>
-<li><p>BeanFactory容器中的对象，在容器初始化时并不会创建，而是在真正调用时才会被创建</p>
-<p>缺点： 响应速度慢</p>
-<p>优点： 不多占用系统资源</p>
-</li>
-</ul>
-<h4 id="2-2-Bean的装配"><a href="#2-2-Bean的装配" class="headerlink" title="2.2 Bean的装配"></a>2.2 Bean的装配</h4><p>Bean的装配，即Bean的创建。</p>
-<p>底层应用反射机制，通过调用无参构造器创建的Bean对象。</p>
-<h4 id="2-3-动态工厂Bean"><a href="#2-3-动态工厂Bean" class="headerlink" title="2.3 动态工厂Bean"></a>2.3 动态工厂Bean</h4><p>applicationContext.xml</p>
-<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
-    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
-    xsi:schemaLocation=&quot;
-        http://www.springframework.org/schema/beans 
-        http://www.springframework.org/schema/beans/spring-beans.xsd&quot;&gt;
-
-    &lt;!-- 注册动态工厂 --&gt;
-    &lt;bean id=&quot;factory&quot; class=&quot;com.bjpowernode.service.ServiceFactory&quot; /&gt;
-
-    &lt;!-- 注册Service:动态工厂Bean --&gt;
-    &lt;bean id=&quot;myService&quot; factory-bean=&quot;factory&quot; factory-method=&quot;getSomeService&quot; /&gt;
-
-&lt;/beans&gt;
-</code></pre><p>动态工厂</p>
-<pre><code>public class ServiceFactory {
-    public ISomeService getSomeService() {
-        return new SomeServiceImpl();
-    }
-}
-</code></pre><p>接口</p>
-<pre><code>public interface ISomeService {
-    void doSome();
-}
-</code></pre><p>实现类</p>
-<pre><code>public class SomeServiceImpl implements ISomeService {
-
-    @Override
-    public void doSome() {
-        System.out.println(&quot;execute dosome() method&quot;);
-    }
-
-}
-</code></pre><p>测试类</p>
-<p>public class MyTest {</p>
-<pre><code>@Test
-public void test05() {
-    ApplicationContext ac = new FileSystemXmlApplicationContext(&quot;src/applicationContext.xml&quot;);
-    ISomeService service = (ISomeService) ac.getBean(&quot;myService&quot;);
-    service.doSome();
-}
-</code></pre><p>}</p>
-<h4 id="2-4-静态工厂Bean"><a href="#2-4-静态工厂Bean" class="headerlink" title="2.4 静态工厂Bean"></a>2.4 静态工厂Bean</h4><p>applicationContext.xml</p>
-<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
-    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
-    xsi:schemaLocation=&quot;
-        http://www.springframework.org/schema/beans 
-        http://www.springframework.org/schema/beans/spring-beans.xsd&quot;&gt;
-
-    &lt;!-- 注册Service:静态工厂Bean --&gt;
-    &lt;bean id=&quot;myService&quot; class=&quot;com.bjpowernode.service.ServiceFactory&quot; factory-method=&quot;getSomeService&quot; /&gt;
-
-&lt;/beans&gt;
-</code></pre><p>静态工厂</p>
-<pre><code>public class ServiceFactory {
-    public static ISomeService getSomeService() {
-        return new SomeServiceImpl();
-    }
-}
-</code></pre><h4 id="2-5-Bean的作用域"><a href="#2-5-Bean的作用域" class="headerlink" title="2.5 Bean的作用域"></a>2.5 Bean的作用域</h4><pre><code>&lt;bean id=&quot;myService&quot; class=&quot;com.bjpowernode.service.SomeServiceImpl&quot; scope=&quot;singleton&quot; /&gt;
-</code></pre><p><code>scope=&quot;singleton&quot;</code> 单例模式：容器中对象的创建是在Spring容器初始化时就全部创建，是默认值</p>
-<p><code>scope=&quot;prototype&quot;</code> 原型模式：容器中对象的创建时机不是在Spring容器初始化时创建，而是在代码中真正访问时才创建</p>
-<pre><code>ISomeService service1 = (ISomeService) ac.getBean(&quot;myService&quot;);
-
-ISomeService service2 = (ISomeService) ac.getBean(&quot;myService&quot;);
-</code></pre><p>默认，即单例模式下，service1与service2从容器中获取的是同一个对象</p>
-<p>原型模式下，service1与service2分别创建新的对象</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/04/java/spring/spring-2/" data-id="cjgxcg4bm004zr9p3bpjln099" class="article-share-link">Delen</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/spring/spring-1" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/05/04/java/spring/spring-1/" class="article-date">
-  <time datetime="2018-05-04T06:33:18.000Z" itemprop="datePublished">2018-05-04</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/spring/">spring</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/05/04/java/spring/spring-1/">第一章 spring概述</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h4 id="1-1-概述"><a href="#1-1-概述" class="headerlink" title="1.1 概述"></a>1.1 概述</h4><p>spring的核心是控制反转（IOC）和面向切面编程（AOP）。</p>
-<p>spring的主要作用就是为代码“解耦”，降低代码间的耦合度。</p>
-<p>spring根据代码功能特点，将降低耦合度的方式分为了两类：IOC与AOP。<br>IOC使得主业务在相互调用过程中，不用再自己维护关系了，即不用再自己创建使用的对象了。而是由spring容器统一管理，自动“注入”。而AOP使得系统级服务得到了最大复用，且不用由程序员手工将系统级服务“混杂”到主业务逻辑中了，而是由spring容器统一完成“织入”。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/04/java/spring/spring-1/" data-id="cjgxcg4bh004sr9p3lxku0ub9" class="article-share-link">Delen</a>
+      <a data-url="http://yoursite.com/2018/05/06/java/spring/spring-8/" data-id="cjh4911mz0069mtp379fq62ge" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
@@ -1966,9 +2671,9 @@ ISomeService service2 = (ISomeService) ac.getBean(&quot;myService&quot;);
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Categorieën</h3>
+    <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/mybatis/">mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
     </div>
   </div>
 
@@ -1976,9 +2681,9 @@ ISomeService service2 = (ISomeService) ac.getBean(&quot;myService&quot;);
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Labels</h3>
+    <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
     </div>
   </div>
 
@@ -1988,14 +2693,14 @@ ISomeService service2 = (ISomeService) ac.getBean(&quot;myService&quot;);
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/mybatis/" style="font-size: 17.14px;">mybatis</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
     </div>
   </div>
 
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Archieven</h3>
+    <h3 class="widget-title">Archives</h3>
     <div class="widget">
       <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
     </div>
@@ -2005,28 +2710,28 @@ ISomeService service2 = (ISomeService) ac.getBean(&quot;myService&quot;);
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Recente berichten</h3>
+    <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
         
           <li>
-            <a href="/2018/05/08/java/spring/spring-10/">第十章 Spring事务管理</a>
+            <a href="/2018/05/13/java/mybatis/mybatis-7/">第七章 MyBatis - 查询缓存</a>
           </li>
         
           <li>
-            <a href="/2018/05/06/java/spring/spring-9/">第九章 spring与JDBC模板</a>
+            <a href="/2018/05/12/java/mybatis/mybatis-6/">第六章 MyBatis - 延迟加载</a>
           </li>
         
           <li>
-            <a href="/2018/05/06/java/spring/spring-8/">第八章 Spring与AOP AspectJ基于XML的AOP实现</a>
+            <a href="/2018/05/12/java/mybatis/mybatis-5/">第五章 MyBatis关联关系查询 - 多对多</a>
           </li>
         
           <li>
-            <a href="/2018/05/06/java/spring/spring-7/">第七章 Spring与AOP AspectJ基于注解的AOP实现</a>
+            <a href="/2018/05/12/java/mybatis/mybatis-4/">第四章 MyBatis关联关系查询 - 自关联</a>
           </li>
         
           <li>
-            <a href="/2018/05/05/java/spring/spring-6/">第六章 Spring与AOP AspectJ对AOP的实现</a>
+            <a href="/2018/05/12/java/mybatis/mybatis-3/">第三章 MyBatis关联关系查询 - 多对一</a>
           </li>
         
       </ul>

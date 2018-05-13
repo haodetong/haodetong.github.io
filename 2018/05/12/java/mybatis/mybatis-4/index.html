@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>第四章 MyBatis关联关系查询 - 自关联 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="4.1 自关联查询所谓自关联查询是指，自己既充当一方，又充当多方。例如，对于新闻栏目NewsLabel表，既有充当一方的父栏目，也有充当多方的子栏目。而反映到DB表中，只有一张表，这张表中具有一个外键pid，用于表示该栏目的父栏目。一级栏目没有父栏目，其外键值pid为0，而子栏目则具有外键值。 定义DB表 newslabel :   id，name，pid 1， 新闻娱乐，0 2，    体育新闻">
+<meta name="keywords" content="mybatis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第四章 MyBatis关联关系查询 - 自关联">
+<meta property="og:url" content="http://yoursite.com/2018/05/12/java/mybatis/mybatis-4/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="4.1 自关联查询所谓自关联查询是指，自己既充当一方，又充当多方。例如，对于新闻栏目NewsLabel表，既有充当一方的父栏目，也有充当多方的子栏目。而反映到DB表中，只有一张表，这张表中具有一个外键pid，用于表示该栏目的父栏目。一级栏目没有父栏目，其外键值pid为0，而子栏目则具有外键值。 定义DB表 newslabel :   id，name，pid 1， 新闻娱乐，0 2，    体育新闻">
+<meta property="og:updated_time" content="2018-05-12T11:06:02.715Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="第四章 MyBatis关联关系查询 - 自关联">
+<meta name="twitter:description" content="4.1 自关联查询所谓自关联查询是指，自己既充当一方，又充当多方。例如，对于新闻栏目NewsLabel表，既有充当一方的父栏目，也有充当多方的子栏目。而反映到DB表中，只有一张表，这张表中具有一个外键pid，用于表示该栏目的父栏目。一级栏目没有父栏目，其外键值pid为0，而子栏目则具有外键值。 定义DB表 newslabel :   id，name，pid 1， 新闻娱乐，0 2，    体育新闻">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-java/mybatis/mybatis-4" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/12/java/mybatis/mybatis-4/" class="article-date">
+  <time datetime="2018-05-12T10:37:09.000Z" itemprop="datePublished">2018-05-12</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mybatis/">mybatis</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      第四章 MyBatis关联关系查询 - 自关联
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="4-1-自关联查询"><a href="#4-1-自关联查询" class="headerlink" title="4.1 自关联查询"></a>4.1 自关联查询</h4><p>所谓自关联查询是指，自己既充当一方，又充当多方。例如，对于新闻栏目NewsLabel表，既有充当一方的父栏目，也有充当多方的子栏目。而反映到DB表中，只有一张表，这张表中具有一个外键pid，用于表示该栏目的父栏目。一级栏目没有父栏目，其外键值pid为0，而子栏目则具有外键值。</p>
+<p>定义DB表 newslabel : </p>
+<ul>
+<li>id，name，pid</li>
+<li>1， 新闻娱乐，0</li>
+<li>2，    体育新闻，0</li>
+<li>3，    NBA</li>
+<li>4，    CBA</li>
+<li>5，    火箭，    3</li>
+<li>6，    湖人，    3</li>
+<li>7，    北京金隅，    4</li>
+<li>8，    浙江广厦，    4</li>
+<li>9，    青岛双星，    4</li>
+<li>10，港台明星，    1</li>
+<li>11，内地影展，    1</li>
+</ul>
+<h4 id="4-2-自关联查询-以一对多的方式实现-查询指定栏目的所有子孙栏目"><a href="#4-2-自关联查询-以一对多的方式实现-查询指定栏目的所有子孙栏目" class="headerlink" title="4.2 自关联查询 - 以一对多的方式实现 - 查询指定栏目的所有子孙栏目"></a>4.2 自关联查询 - 以一对多的方式实现 - 查询指定栏目的所有子孙栏目</h4><p>定义实体类：NewsLabel.java</p>
+<pre><code>package com.bjpowernode.beans;
+
+import java.util.Set;
+
+//新闻栏目:当前的新闻栏目被看作是一方，即父栏目
+public class NewsLabel {
+    private Integer id;
+    private String name;
+    //定义关联属性子栏目
+    private Set&lt;NewsLabel&gt; children;
+    ...
+    getter and setter methods
+    ...
+}
+</code></pre><p>接口</p>
+<pre><code>package com.bjpowernode.dao;
+
+public interface INewsLabelDao {
+    List&lt;NewsLabel&gt; selectChildrenByParent(int pid);
+}
+</code></pre><p>映射文件</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE mapper
+PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+
+&lt;mapper namespace=&quot;com.bjpowernode.dao.INewsLabelDao&quot;&gt;
+
+    &lt;!-- &lt;select id=&quot;&quot;&gt;
+        select id,name from newslabel where pid=#{ooo}
+    &lt;/select&gt; --&gt;
+
+    &lt;resultMap type=&quot;NewsLabel&quot; id=&quot;newsLabelMapper&quot;&gt;
+        &lt;id column=&quot;id&quot; property=&quot;id&quot;/&gt;
+        &lt;result column=&quot;name&quot; property=&quot;name&quot;/&gt;
+        &lt;collection property=&quot;children&quot;
+                    ofType=&quot;NewsLabel&quot;
+                    select=&quot;selectChildrenByParent&quot;
+                    column=&quot;id&quot;
+        /&gt;
+    &lt;/resultMap&gt;
+
+    &lt;select id=&quot;selectChildrenByParent&quot; resultMap=&quot;newsLabelMapper&quot;&gt;
+        select id,name from newslabel where pid=#{xxx}
+    &lt;/select&gt;
+
+&lt;/mapper&gt;
+</code></pre><p>测试类</p>
+<pre><code>package com.bjpowernode.test;
+
+public class MyTest {
+
+    private INewsLabelDao dao;
+    private SqlSession sqlSession;
+
+    @Before
+    public void Before() {
+        sqlSession = MyBatisUtils.getSqlSession();
+        //dao:是一个动态代理
+        dao = sqlSession.getMapper(INewsLabelDao.class);
+    }
+
+    @After
+    public void after() {
+        if(sqlSession != null) {
+            sqlSession.close();
+        }
+    }
+
+    @Test
+    public void test01() {
+        List&lt;NewsLabel&gt; children = dao.selectChildrenByParent(2);
+        for(NewsLabel newsLabel:children) {
+            System.out.println(newsLabel);
+        }
+    }
+}
+</code></pre><h4 id="4-3-自关联查询-以一对多的方式实现-查询指定栏目及其所有子孙栏目"><a href="#4-3-自关联查询-以一对多的方式实现-查询指定栏目及其所有子孙栏目" class="headerlink" title="4.3 自关联查询 - 以一对多的方式实现 - 查询指定栏目及其所有子孙栏目"></a>4.3 自关联查询 - 以一对多的方式实现 - 查询指定栏目及其所有子孙栏目</h4><p>实体类不变</p>
+<p>接口</p>
+<pre><code>import com.bjpowernode.beans.NewsLabel;
+
+public interface INewsLabelDao {
+    NewsLabel selectNewsLabelById(int id);
+}
+</code></pre><p>映射文件</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE mapper
+PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+
+&lt;mapper namespace=&quot;com.bjpowernode.dao.INewsLabelDao&quot;&gt;
+
+    &lt;select id=&quot;selectNewsLabelByParent&quot; resultMap=&quot;newsLabelMapper&quot;&gt;
+        select id,name from newslabel where pid = #{ooo}
+    &lt;/select&gt;
+
+    &lt;resultMap type=&quot;NewsLabel&quot; id=&quot;newsLabelMapper&quot;&gt;
+        &lt;id column=&quot;id&quot; property=&quot;id&quot;/&gt;
+        &lt;result column=&quot;name&quot; property=&quot;name&quot;/&gt;
+        &lt;collection property=&quot;children&quot;
+                    ofType=&quot;NewsLabel&quot;
+                    select=&quot;selectNewsLabelByParent&quot;
+                    column=&quot;id&quot;
+        /&gt;
+    &lt;/resultMap&gt;
+
+    &lt;select id=&quot;selectNewsLabelById&quot; resultMap=&quot;newsLabelMapper&quot;&gt;
+        select id,name from newslabel where id=#{xxx}
+    &lt;/select&gt;
+
+&lt;/mapper&gt;
+</code></pre><h4 id="4-3-自关联查询-以多对一的方式实现-查询指定栏目及其父栏目"><a href="#4-3-自关联查询-以多对一的方式实现-查询指定栏目及其父栏目" class="headerlink" title="4.3 自关联查询 - 以多对一的方式实现 - 查询指定栏目及其父栏目"></a>4.3 自关联查询 - 以多对一的方式实现 - 查询指定栏目及其父栏目</h4><p>定义实体类</p>
+<pre><code>package com.bjpowernode.beans;
+
+import java.util.Set;
+
+//新闻栏目:当前的新闻栏目被看作是多方，即子栏目
+public class NewsLabel {
+    private Integer id;
+    private String name;
+    //定义关联属性父栏目
+    private NewsLabel parent;
+    ...
+    getter and setter methods
+    ...
+}
+</code></pre><p>定义接口</p>
+<pre><code>package com.bjpowernode.dao;
+
+public interface INewsLabelDao {
+    NewsLabel selectNewsLabelById(int id);
+}
+</code></pre><p>映射文件</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE mapper
+PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+
+&lt;mapper namespace=&quot;com.bjpowernode.dao.INewsLabelDao&quot;&gt;
+    &lt;!-- 
+    &lt;select id=&quot;&quot; resultMap=&quot;&quot;&gt;
+        select id,name,pid from newslabel where id = #{ooo}
+    &lt;/select&gt;
+    --&gt;
+    &lt;resultMap type=&quot;NewsLabel&quot; id=&quot;newsLabelMapper&quot;&gt;
+        &lt;id column=&quot;id&quot; property=&quot;id&quot;/&gt;
+        &lt;result column=&quot;name&quot; property=&quot;name&quot;/&gt;
+        &lt;association property=&quot;parent&quot; 
+                     javaType=&quot;NewsLabel&quot;
+                     select=&quot;selectNewsLabelById&quot;
+                     column=&quot;pid&quot;
+        /&gt;
+    &lt;/resultMap&gt;
+
+    &lt;select id=&quot;selectNewsLabelById&quot; resultMap=&quot;newsLabelMapper&quot;&gt;
+        select id,name,pid from newslabel where id=#{xxx}
+    &lt;/select&gt;
+
+&lt;/mapper&gt;
+</code></pre><p>测试类</p>
+<pre><code>package com.bjpowernode.test;
+
+public class MyTest {
+
+    private INewsLabelDao dao;
+    private SqlSession sqlSession;
+
+    @Before
+    public void Before() {
+        sqlSession = MyBatisUtils.getSqlSession();
+        //dao:是一个动态代理
+        dao = sqlSession.getMapper(INewsLabelDao.class);
+    }
+
+    @After
+    public void after() {
+        if(sqlSession != null) {
+            sqlSession.close();
+        }
+    }
+
+
+    @Test
+    public void test01() {
+        NewsLabel newsLabel = dao.selectNewsLabelById(7);
+        System.out.println(newsLabel);
+    }
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/05/12/java/mybatis/mybatis-4/" data-id="cjh4911lk004mmtp3m8rhqzlf" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mybatis/">mybatis</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/05/12/java/mybatis/mybatis-5/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          第五章 MyBatis关联关系查询 - 多对多
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/05/12/java/mybatis/mybatis-3/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">第三章 MyBatis关联关系查询 - 多对一</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/mybatis/">mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/mybatis/" style="font-size: 17.14px;">mybatis</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/05/13/java/mybatis/mybatis-7/">第七章 MyBatis - 查询缓存</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/12/java/mybatis/mybatis-6/">第六章 MyBatis - 延迟加载</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/12/java/mybatis/mybatis-5/">第五章 MyBatis关联关系查询 - 多对多</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/12/java/mybatis/mybatis-4/">第四章 MyBatis关联关系查询 - 自关联</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/12/java/mybatis/mybatis-3/">第三章 MyBatis关联关系查询 - 多对一</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

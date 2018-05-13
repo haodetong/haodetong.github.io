@@ -50,7 +50,7 @@
         
           <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Zoeken"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
@@ -60,6 +60,1773 @@
 </header>
       <div class="outer">
         <section id="main">
+  
+    <article id="post-java/java-io/IO-13-file-coperate" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/10/java/java-io/IO-13-file-coperate/" class="article-date">
+  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/10/java/java-io/IO-13-file-coperate/">IO流 - 十三、IO流 - 文件切割合并</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="1、文件切割"><a href="#1、文件切割" class="headerlink" title="1、文件切割"></a>1、文件切割</h4><pre><code>public class SplitFile {
+
+    private static final int SIZE = 1024*1024;
+
+    public static void main(String[] args) throws IOException {
+        //指定切割文件
+        File file = new File(&quot;IMG_0215.JPG&quot;);
+
+        //读取流
+        FileInputStream fis = new FileInputStream(file);
+
+        //写入流
+        FileOutputStream fos = null;
+
+        //缓冲区
+        byte[] buf = new byte[SIZE];
+
+        //存储目录
+        File dir = new File(&quot;//Users//haojie//eclipse-workspace//hello world//partfiles&quot;);
+        if(!dir.exists())
+            dir.mkdir();
+
+        //切割
+        int length = 0;
+        int count = 1;
+        while((length = fis.read(buf)) != -1) {
+            fos = new FileOutputStream(new File(dir,(count++)+&quot;.part&quot;));
+            fos.write(buf, 0, length);;
+        }
+
+        //关闭流
+        fos.close();
+        fis.close();
+    }
+
+}
+</code></pre><h4 id="2、文件合并"><a href="#2、文件合并" class="headerlink" title="2、文件合并"></a>2、文件合并</h4><pre><code>public class Merge {
+
+    public static void main(String[] args) throws IOException {
+
+        File dir = new File(&quot;//Users//haojie//eclipse-workspace//hello world//partfiles&quot;);
+        mergeFile(dir);
+    }
+
+    public static void mergeFile(File dir) throws IOException {
+        //读取流
+        ArrayList&lt;FileInputStream&gt; al = new ArrayList&lt;FileInputStream&gt;();
+        for(int x=1; x&lt;3; x++) {
+            al.add(new FileInputStream(new File(dir,x+&quot;.part&quot;)));
+        }
+        //合并流
+        Enumeration&lt;FileInputStream&gt; en = Collections.enumeration(al);
+        SequenceInputStream sis = new SequenceInputStream(en);
+        //输出流
+        FileOutputStream fos = new FileOutputStream(new File(dir,&quot;1.JPG&quot;));
+        //缓冲区
+        byte[] buf = new byte[1024];
+        int length = 0;
+        while((length = sis.read(buf)) != -1) {
+            fos.write(buf, 0, length);
+        }
+        //关闭流
+        fos.close();
+        sis.close();
+    }
+
+}
+</code></pre><h4 id="3、文件切割合并-配置文件"><a href="#3、文件切割合并-配置文件" class="headerlink" title="3、文件切割合并+配置文件"></a>3、文件切割合并+配置文件</h4><pre><code>public class FileSplitMergeUtil {
+
+    private static final int SIZE = 1024*1024;
+
+    public static void main(String[] args) throws IOException {
+
+        //切割
+        File file = new File(&quot;IMG_0215.JPG&quot;);
+        splitFile(file);
+
+        //合并
+        File dir = new File(&quot;//Users//haojie//eclipse-workspace//hello world//partfiles&quot;);
+        mergeFile(dir);
+    }
+
+    //切割传入的文件
+    public static void splitFile(File file) throws IOException {
+
+        //读取流
+        FileInputStream fis = new FileInputStream(file);
+
+        //写入流
+        FileOutputStream fos = null;
+
+        //缓冲区
+        byte[] buf = new byte[SIZE];
+
+        //存储目录
+        File dir = new File(&quot;//Users//haojie//eclipse-workspace//hello world//partfiles&quot;);
+        if(!dir.exists())
+            dir.mkdir();
+
+        //切割
+        int length = 0;
+        int count = 1;
+        while((length = fis.read(buf)) != -1) {
+            fos = new FileOutputStream(new File(dir,(count++)+&quot;.part&quot;));
+            fos.write(buf, 0, length);
+            fos.close();
+        }
+
+        /**
+         * 配置文件
+         * partcount 碎片数量
+         * filename 被切割文件名称
+         */
+        Properties prop = new Properties();
+
+        //配置文件设置
+        prop.setProperty(&quot;partcount&quot;, count+&quot;&quot;);
+        prop.setProperty(&quot;filename&quot;, file.getName());
+
+        //配置文件输出流
+        fos = new FileOutputStream(new File(dir,count+&quot;.properties&quot;));
+
+        //写入配置信息
+        prop.store(fos, &quot;fileinfo&quot;);
+
+        //关闭流
+        fos.close();
+        fis.close();
+    }
+
+    public static void mergeFile(File dir) throws IOException {
+        //过滤配置文件
+        File[] files = dir.listFiles(new SuffixFilter(&quot;.properties&quot;));
+        if(files.length != 1)
+            throw new RuntimeException(dir+&quot;获取配置文件失败&quot;);
+        File confile = files[0];
+
+        //读取配置文件
+        Properties prop = new Properties();
+        FileInputStream fis = new FileInputStream(confile);
+        prop.load(fis);
+        String filename = prop.getProperty(&quot;filename&quot;);
+        int count = Integer.parseInt(prop.getProperty(&quot;partcount&quot;));
+
+        //检查碎片文件个数
+        File[] partFiles = dir.listFiles(new SuffixFilter(&quot;.part&quot;));
+        if(partFiles.length != (count-1)) {
+            throw new RuntimeException(&quot;碎片文件与配置信息中的数量不符&quot;);            
+        }
+
+        //读取流
+        ArrayList&lt;FileInputStream&gt; al = new ArrayList&lt;FileInputStream&gt;();
+        for(int x=0; x&lt;partFiles.length; x++) {
+            al.add(new FileInputStream(partFiles[x]));
+        }
+
+        //合并流
+        Enumeration&lt;FileInputStream&gt; en = Collections.enumeration(al);
+        SequenceInputStream sis = new SequenceInputStream(en);
+
+        //输出流
+        FileOutputStream fos = new FileOutputStream(new File(dir,filename));
+
+        //缓冲区
+        byte[] buf = new byte[1024];
+        int length = 0;
+        while((length = sis.read(buf)) != -1) {
+            fos.write(buf, 0, length);
+        }
+
+        //关闭流
+        fos.close();
+        sis.close();
+    }
+}
+
+public class SuffixFilter implements FilenameFilter {
+
+    private String suffix;
+
+    public SuffixFilter(String suffix) {
+        super();
+        this.suffix = suffix;
+    }
+
+    public boolean accept(File dir, String name) {
+        return name.endsWith(suffix);
+    }
+
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-13-file-coperate/" data-id="cjh4911j7002dmtp32m62lj51" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/java-io/IO-11-printSream" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/10/java/java-io/IO-11-printSream/" class="article-date">
+  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/10/java/java-io/IO-11-printSream/">IO流 - 十一、打印流</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>打印流字符流与字节流</p>
+<p>PrintWriter与PrintStream</p>
+<p>可以直接操作输出流和文件</p>
+<h4 id="1、PrintStream-字节打印流"><a href="#1、PrintStream-字节打印流" class="headerlink" title="1、PrintStream 字节打印流"></a>1、PrintStream 字节打印流</h4><pre><code>/**
+    PrintStream:
+    1、提供了打印方法可以对多种数据类型值进行打印，并保持数据的表现形式。
+    2、它不抛IOException
+    构造函数，接收三种类型的值：
+    1、字符串路径
+    2、File对象
+    3、字节输出流
+*/
+610: 0000-0000 0000-0000 0000-0010 0110-0001
+PrintStream out = new PrintStream(&quot;print.txt&quot;);
+out.write(610);//b ,只写最低8位
+out.print(97);//97，将97先变成字符，保持原样形式打印到目的地。
+out.close;
+</code></pre><h4 id="2、PrintWriter-字符打印流"><a href="#2、PrintWriter-字符打印流" class="headerlink" title="2、PrintWriter 字符打印流"></a>2、PrintWriter 字符打印流</h4><pre><code>/**
+    构造函数参数：
+    1、字符串路径
+    2、File对象
+    3、字节输出流
+    4、字符输出流
+*/
+
+
+public class PrintWriterDemo1 {
+
+    public static void main(String[] args) throws IOException {
+        //键盘输入流
+        BufferedReader bufr = new BufferedReader(new InputStreamReader(System.in));
+
+        //打印流,自动刷新缓冲区
+        PrintWriter out = new PrintWriter(new FileWriter(&quot;out.txt&quot;),true);
+
+        String line = null;
+        while((line = bufr.readLine()) != null) {
+            if(&quot;over&quot;.equals(line))
+                break;
+            out.println(line.toUpperCase());
+        }
+        out.close();
+        bufr.close();
+    }
+
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-11-printSream/" data-id="cjh4911j3002amtp39xlerxu1" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/java-io/IO-12-sequenceInputStream" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/10/java/java-io/IO-12-sequenceInputStream/" class="article-date">
+  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/10/java/java-io/IO-12-sequenceInputStream/">IO流 - 十二、序列流 - SequenceInputStream</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>对多个流进行合并</p>
+<h4 id="1、构造方法"><a href="#1、构造方法" class="headerlink" title="1、构造方法"></a>1、构造方法</h4><p>SequenceInputStream(Enumeration&lt;? extends InputStream&gt; e)</p>
+<pre><code>public class demo1 {
+
+    public static void main(String[] args) throws IOException {
+        /**
+         * 将1.txt，2.txt，3.txt文件中的数据合并到一个文件4.txt中
+         */
+        Vector&lt;FileInputStream&gt; v = new Vector&lt;FileInputStream&gt;();
+        v.add(new FileInputStream(&quot;1.txt&quot;));
+        v.add(new FileInputStream(&quot;2.txt&quot;));
+        v.add(new FileInputStream(&quot;3.txt&quot;));
+
+        Enumeration&lt;FileInputStream&gt; en = v.elements();
+
+        SequenceInputStream sis = new SequenceInputStream(en);
+
+        FileOutputStream fos = new FileOutputStream(&quot;4.txt&quot;);
+
+        byte[] buf = new byte[1024];
+
+        int length = 0;
+
+        while((length = sis.read(buf)) != -1 ) {
+            fos.write(buf,0,length);
+        }
+
+        fos.close();
+        sis.close();
+    }
+
+}
+</code></pre><h4 id="2、枚举和迭代"><a href="#2、枚举和迭代" class="headerlink" title="2、枚举和迭代"></a>2、枚举和迭代</h4><pre><code>//Vctor集合效率低。
+
+Vector&lt;FileInputStream&gt; v = new Vector&lt;FileInputStream&gt;();
+v.add(new FileInputStream(&quot;1.txt&quot;));
+v.add(new FileInputStream(&quot;2.txt&quot;));
+v.add(new FileInputStream(&quot;3.txt&quot;));
+
+Enumeration&lt;FileInputStream&gt; en = v.elements();
+
+//ArrayList集合代替
+ArrayList&lt;FileInputStream&gt; al = new ArrayList&lt;FileInputStream&gt;();
+//用集合工具类中的方法，返回Enumeration类对象
+Enumeration&lt;FileInputStream&gt; en = Collections.enumeration(al);
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-12-sequenceInputStream/" data-id="cjh4911ja002gmtp3t5pvw5uj" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/java-io/IO-10-properties" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/10/java/java-io/IO-10-properties/" class="article-date">
+  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/10/java/java-io/IO-10-properties/">IO流 - 十、IO流 - Properties集合</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="1、基本功能"><a href="#1、基本功能" class="headerlink" title="1、基本功能"></a>1、基本功能</h4><p>Map</p>
+<p>|—–Hashtable</p>
+<p>|————-Properties         </p>
+<p>Properties集合特点：</p>
+<p>1、该集合中的键和值都是字符串类型。</p>
+<p>2、集合中的数据可以保存流中，或者从流中获取。</p>
+<p>通常该集合用于操作以键值对形式存在的配置文件。</p>
+<pre><code>public class Demo1 {
+
+    public static void main(String[] args) {
+
+        Properties prop = new Properties();
+        //存储
+        prop.setProperty(&quot;zhangsan&quot;, &quot;32&quot;);
+        prop.setProperty(&quot;lisi&quot;, &quot;32&quot;);
+        prop.setProperty(&quot;wangwu&quot;, &quot;32&quot;);
+        prop.setProperty(&quot;zhaoliu&quot;, &quot;32&quot;);
+        //取出
+        Set&lt;String&gt; names = prop.stringPropertyNames();
+
+        for(String name:names) {
+            String value = prop.getProperty(name);
+            System.out.println(name+&quot;:&quot;+value);
+        }
+
+    }
+
+}
+</code></pre><h4 id="2、list方法"><a href="#2、list方法" class="headerlink" title="2、list方法"></a>2、list方法</h4><p>public void list(PrintStream out)    </p>
+<p>将属性列表输出到指定的输出流。此方法用于调试。</p>
+<pre><code>Properties prop = new Properties();
+//存储
+prop.setProperty(&quot;zhangsan&quot;, &quot;32&quot;);
+prop.setProperty(&quot;lisi&quot;, &quot;32&quot;);
+prop.setProperty(&quot;wangwu&quot;, &quot;32&quot;);
+prop.setProperty(&quot;zhaoliu&quot;, &quot;32&quot;);
+/*
+//取出
+Set&lt;String&gt; names = prop.stringPropertyNames();
+
+for(String name:names) {
+    String value = prop.getProperty(name);
+    System.out.println(name+&quot;:&quot;+value);
+}
+*/
+//prop.list(System.out);
+
+Properties props = System.getProperties();
+props.list(System.out);    
+</code></pre><h4 id="3、store方法"><a href="#3、store方法" class="headerlink" title="3、store方法"></a>3、store方法</h4><p>store(OutputStream out,String comments)</p>
+<p>Store(Writer writer,String comments)</p>
+<p>将集合中的字符串，键值信息持久化存储到硬盘的文件中。</p>
+<pre><code>public class Dmo2 {
+
+    public static void main(String[] args) throws IOException {
+
+        Properties prop = new Properties();
+        //存储
+        prop.setProperty(&quot;zhangsan&quot;, &quot;32&quot;);
+        prop.setProperty(&quot;lisi&quot;, &quot;32&quot;);
+        prop.setProperty(&quot;wangwu&quot;, &quot;32&quot;);
+        prop.setProperty(&quot;zhaoliu&quot;, &quot;32&quot;);
+
+        //将这些集合中的键值对信息持久化存储到文件中，需要关联输出流。
+        FileOutputStream fos = new FileOutputStream(&quot;info.txt&quot;);
+        prop.store(fos, &quot;name+age&quot;);
+
+        fos.close();
+
+    }
+
+}
+
+info.txt
+
+#name+age
+#Sat Jan 13 10:32:19 CST 2018
+zhangsan=32
+lisi=32
+zhaoliu=32
+wangwu=32
+</code></pre><h4 id="4、修改配置信息"><a href="#4、修改配置信息" class="headerlink" title="4、修改配置信息"></a>4、修改配置信息</h4><p>load(InputStream inStream)</p>
+<p>load(Reader reader)</p>
+<p>读取配置信息</p>
+<pre><code>public class Demo3 {
+
+    public static void main(String[] args) throws IOException {
+
+        Properties prop = new Properties();
+
+        FileInputStream fis = new FileInputStream(&quot;info.txt&quot;);
+
+        prop.load(fis);
+        prop.list(System.out);
+
+    }
+}
+
+输出结果：
+-- listing properties --
+zhangsan=32
+lisi=32
+zhaoliu=32
+wangwu=32
+</code></pre><p>模拟load方法</p>
+<pre><code>public static void myLoad() throws IOException {
+    Properties prop = new Properties();
+
+    BufferedReader bufr = new BufferedReader(new FileReader(&quot;info.txt&quot;));
+
+    String line = null;
+    while((line = bufr.readLine()) != null) {
+        if(line.startsWith(&quot;#&quot;)) 
+            continue;
+        String[] arr = line.split(&quot;=&quot;);
+        System.out.println(arr[0]+&quot;::&quot;+arr[1]);
+    }
+
+}
+</code></pre><p>修改硬盘的文件中已有的配置信息</p>
+<pre><code>public class Demo4 {
+
+    /**
+     * 读取文件
+     * 键值对信息存储到集合中
+     * 通过集合方法修改数据
+     * 通过流将修改后的数据存储到文件
+     * @param args
+     * @throws IOException 
+     */
+
+    public static void main(String[] args) throws IOException {
+        //读取文件流，流可以直接操作File对象
+        File file = new File(&quot;info.txt&quot;);
+        if(!file.exists()) {
+            file.createNewFile();
+        }
+        FileReader fr = new FileReader(file);
+
+        //创建空集合
+        Properties prop = new Properties();
+
+        //集合加载流数据
+        prop.load(fr);
+        //prop.list(System.out);
+
+        //修改集合数据
+        prop.setProperty(&quot;zhangsan&quot;, &quot;20&quot;);
+
+        //写入文件流
+        FileWriter fw = new FileWriter(file);
+
+        //集合持久化存储文件流
+        prop.store(fw,&quot;&quot;);
+
+        //关闭流
+        fr.close();
+        fw.close();
+    }
+
+}
+</code></pre><h4 id="5、Properties集合-练习"><a href="#5、Properties集合-练习" class="headerlink" title="5、Properties集合 - 练习"></a>5、Properties集合 - 练习</h4><p>定义功能，获取应用程序的运行次数，超过5次，给出到期提示并退出程序。</p>
+<p>思路：使用计数器，并以文件形式保存在硬盘中。</p>
+<pre><code>public class Demo5 {
+    public static void main(String[] args) throws IOException {
+        //封装配置文件对象
+        File confile = new File(&quot;count.properties&quot;);
+        if(!confile.exists()) {
+            confile.createNewFile();
+        }
+
+        //输入流
+        FileInputStream fis = new FileInputStream(confile);
+
+        //创建空集合
+        Properties prop = new Properties();
+
+        //加载数据流
+        prop.load(fis);
+
+        //获取数据
+        String value = prop.getProperty(&quot;time&quot;);
+
+        //计数器
+        int count = 0;
+        if(value != null) {
+            count = Integer.parseInt(value);
+            if(count &gt;= 5) {
+                throw new RuntimeException(&quot;使用次数到期&quot;);
+            }
+        }
+        count++;
+
+        //计数
+        prop.setProperty(&quot;time&quot;, count+&quot;&quot;);
+
+        //输出流
+        FileOutputStream fos = new FileOutputStream(confile);
+
+        //存储
+        prop.store(fos, &quot;&quot;);
+
+        fis.close();
+        fos.close();
+
+    }
+}
+</code></pre><h4 id="6、Properties集合-练习-文件清单列表"><a href="#6、Properties集合-练习-文件清单列表" class="headerlink" title="6、Properties集合 - 练习 - 文件清单列表"></a>6、Properties集合 - 练习 - 文件清单列表</h4><p>获取指定目录下，指定扩展名的所有文件，把这些文件的绝对路径写入到一个文本中。</p>
+<pre><code>public class Demo6 {
+
+    public static void main(String[] args) {
+        //指定文件夹
+        File dir = new File(&quot;test&quot;);
+
+        //定义集合
+        List&lt;File&gt; list = new ArrayList&lt;File&gt;();
+
+        //定义过滤器
+        FilenameFilter filter = new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.endsWith(&quot;.md&quot;);
+            }
+        };
+
+        //深度遍历文件夹
+        getFiles(dir,filter,list);
+
+        //遍历list写入文件
+        File destfile = new File(&quot;markdownlist.txt&quot;);
+        writeToFile(list,destfile);
+
+
+    }
+    /**
+     * 深度遍历，找到所有的文件并过滤，把符合条件的文件存储到容器中
+     * @param dir
+     * @param filter
+     * @param list
+     */
+    public static void getFiles(File dir, FilenameFilter filter, List&lt;File&gt; list) {
+        File[] files = dir.listFiles();
+        for(File file:files) {
+            if(file.isDirectory()) {
+                //递归
+                getFiles(dir, filter, list);
+            } else {
+                //过滤并添加集合
+                if(filter.accept(dir, file.getName())) {
+                    list.add(file);
+                }
+            }
+        }
+    }
+
+    //写入到文件中
+    public static void writeToFile(List&lt;File&gt; list, File destFile) {
+        BufferedWriter bufw = null;
+        try {
+            bufw = new BufferedWriter(new FileWriter(destFile));
+            for(File file:list) {
+                bufw.write(file.getAbsolutePath());
+                bufw.flush();
+                bufw.newLine();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(&quot;写入失败&quot;);
+        } finally {
+            if(bufw != null)
+                try {
+                    bufw.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(&quot;关闭失败&quot;);
+                }
+        }
+
+    }
+
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-10-properties/" data-id="cjh4911iy0025mtp3p49fyhv6" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/java-api/java-api-otherObjects" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/09/java/java-api/java-api-otherObjects/" class="article-date">
+  <time datetime="2018-01-09T07:16:19.000Z" itemprop="datePublished">2018-01-09</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/09/java/java-api/java-api-otherObjects/">其它对象API</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="一、System类"><a href="#一、System类" class="headerlink" title="一、System类"></a>一、System类</h3><p>System类中的方法和属性都是静态的。</p>
+<p>常见方法：</p>
+<p>long currentTimeMillis():获取当前时间的毫秒值</p>
+<p>Properties getProperties():获取当前系统的属性信息    </p>
+<pre><code>public class SystemApi {
+    public static void main(String[] args) {
+
+        long millisTime = System.currentTimeMillis();
+        System.out.println(millisTime);
+
+        Properties prop = System.getProperties();
+
+        Set&lt;String&gt; nameSet = prop.stringPropertyNames();
+
+        for(String name:nameSet) {
+            String value = prop.getProperty(name);
+            System.out.println(name+&quot;::&quot;+value);
+        }
+
+
+    }
+}
+</code></pre><h3 id="二、Runtime类"><a href="#二、Runtime类" class="headerlink" title="二、Runtime类"></a>二、Runtime类</h3><p>Runtime:</p>
+<p>没有构造方法摘要，说明该类不可以创建对象。</p>
+<p>又发现该类有非静态方法，说明该类应该有提供的静态的返回该类对象的方法。</p>
+<p>而且只有一个这种方法，说明Runtime类使用了单例设计模式。</p>
+<pre><code>public class RuntimeApi {
+
+    public static void main(String[] args) throws IOException, InterruptedException {
+
+        Runtime r = Runtime.getRuntime();
+
+        Process p = r.exec(&quot;open -a Safari.app http://www.baidu.com&quot;);
+        Thread.sleep(2000);
+        p.destroy();
+    }
+
+}
+</code></pre><h3 id="三、Math类"><a href="#三、Math类" class="headerlink" title="三、Math类"></a>三、Math类</h3><p>常用方法：</p>
+<p>double ceil():返回大于参数的最小整数。</p>
+<p>double floor():返回小于参数的最大整数。</p>
+<p>double round():返回四舍五入的整数。</p>
+<p>max(a,b):返回最大值</p>
+<p>pow(a,b):a的b次方</p>
+<p>double random():返回大于等于0.0小于1.0的随机double值，与java.util中的Random类相似。</p>
+<h3 id="四、Date类"><a href="#四、Date类" class="headerlink" title="四、Date类"></a>四、Date类</h3><h4 id="（一）、日期对象和毫秒值之间的转换"><a href="#（一）、日期对象和毫秒值之间的转换" class="headerlink" title="（一）、日期对象和毫秒值之间的转换"></a>（一）、日期对象和毫秒值之间的转换</h4><h5 id="毫秒值–-gt-日期对象"><a href="#毫秒值–-gt-日期对象" class="headerlink" title="毫秒值–&gt;日期对象"></a>毫秒值–&gt;日期对象</h5><p>1、通过Date对象的构造方法 new Date(timeMills);</p>
+<p>2、通过setTime方法。</p>
+<p>目的是通过Date对象的方法，对该日期中的年月日等字段进行操作。</p>
+<h5 id="日期对象–-gt-毫秒值"><a href="#日期对象–-gt-毫秒值" class="headerlink" title="日期对象–&gt;毫秒值"></a>日期对象–&gt;毫秒值</h5><p>1、通过getTime方法。</p>
+<p>目的是通过具体的数值进行运算。</p>
+<pre><code>public static void thord1() {
+        //long time = System.currentTimeMillis();//1515489394135
+
+        Date date1 = new Date();//将当前日期和时间封装成Date对象
+        System.out.println(date1);//Tue Jan 09 17:16:34 CST 2018
+
+        Date date2 = new Date(1515489367117l);//将指定毫秒封装成Date对象
+        System.out.println(date2);//Tue Jan 09 17:16:07 CST 2018
+}
+</code></pre><h4 id="（二）、日期对象转成字符串"><a href="#（二）、日期对象转成字符串" class="headerlink" title="（二）、日期对象转成字符串"></a>（二）、日期对象转成字符串</h4><pre><code>public class DateDemo {
+
+    public static void main(String[] args) {
+
+        Date date = new Date();
+
+        //获取日期格式对象。具备着默认的风格
+        DateFormat dateFormat = DateFormat.getDateInstance();
+        String str_date = dateFormat.format(date);
+        System.out.println(str_date); //Jan 9, 2018
+
+        DateFormat dateFormat2 = DateFormat.getDateTimeInstance();
+        String str_date2 = dateFormat2.format(date);
+        System.out.println(str_date2);//Jan 9, 2018 5:48:43 PM
+
+        //其它风格 FULL LONG SHORT MEDIUM
+        //DateFormat dateFormat3 = DateFormat.getDateInstance(DateFormat.FULL);//Tuesday, January 9, 2018
+
+        //DateFormat dateFormat3 = DateFormat.getDateInstance(DateFormat.LONG);//January 9, 2018
+
+        //DateFormat dateFormat3 = DateFormat.getDateInstance(DateFormat.SHORT);//1/9/18
+
+        DateFormat dateFormat3 = DateFormat.getDateInstance(DateFormat.MEDIUM);//Jan 9, 2018
+
+        String str_date3 = dateFormat3.format(date);
+        System.out.println(str_date3);
+
+        //日期和时间
+        DateFormat dateFormat4 = DateFormat.getDateTimeInstance(DateFormat.LONG,DateFormat.LONG);//Jan 9, 2018
+
+        String str_date4 = dateFormat4.format(date);
+        System.out.println(str_date4);
+
+        //自定义风格
+        DateFormat dateFormats = DateFormat.getDateInstance();
+        dateFormats = new SimpleDateFormat(&quot;yyyy-MM-dd&quot;);
+        String str_date5 = dateFormats.format(date);
+        System.out.println(str_date5);//2018-01-09
+
+
+    }
+}
+</code></pre><h4 id="（三）、字符串转成日期对象"><a href="#（三）、字符串转成日期对象" class="headerlink" title="（三）、字符串转成日期对象"></a>（三）、字符串转成日期对象</h4><p>使用的是DateFormat类中的parse方法。</p>
+<pre><code>public class DateFormatDemo {
+
+    public static void main(String[] args) throws ParseException {
+
+        //默认的日期字符串格式转成日期对象
+        String str_date = &quot;Jan 9, 2018 5:48:43 PM&quot;;
+        DateFormat dateFormat = DateFormat.getDateInstance();
+        Date date = dateFormat.parse(str_date);
+        System.out.println(date);
+
+        //将自定义的日期字符串格式转成日期对象
+        String str_date2 = &quot;2018--1--10&quot;;
+        DateFormat dateFormat2 = DateFormat.getDateInstance(DateFormat.LONG);
+        dateFormat2 = new SimpleDateFormat(&quot;yyyy--MM--dd&quot;);
+        Date date2 = dateFormat2.parse(str_date2);
+        System.out.println(date2);
+
+    }
+
+}
+</code></pre><h4 id="（四）、Date类-练习"><a href="#（四）、Date类-练习" class="headerlink" title="（四）、Date类 - 练习"></a>（四）、Date类 - 练习</h4><pre><code>public class Demo1 {
+
+    public static void main(String[] args) throws ParseException {
+
+        /**
+         * 练习：
+         * &quot;2017.12.20&quot;到&quot;2018.1.10&quot;中间相隔多少天
+         * 
+         * 思路：
+         * 1、日期字符串转日期对象
+         * 2、日期对象方法获取毫秒数
+         * 3、毫秒数相减，再计算天数
+         */
+
+        String str_date1 = &quot;2017.12.20&quot;;
+        String str_date2 = &quot;2018.1.10&quot;;
+
+        //DateFormat dateFormat = DateFormat.getDateInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat(&quot;yyyy.MM.dd&quot;);
+        Date date1 = dateFormat.parse(str_date1);
+        Date date2 = dateFormat.parse(str_date2);
+
+        long date1Millis = date1.getTime();
+        long date2millis = date2.getTime();
+
+        int day = (int) Math.abs(date1Millis - date2millis)/1000/60/60/24;
+
+
+        System.out.println(day);
+    }
+
+}
+</code></pre><h3 id="四、Calendar类"><a href="#四、Calendar类" class="headerlink" title="四、Calendar类"></a>四、Calendar类</h3><p>常见方法：</p>
+<p>set()</p>
+<p>get()</p>
+<p>add():偏移</p>
+<h5 id="一、基本演示"><a href="#一、基本演示" class="headerlink" title="一、基本演示"></a>一、基本演示</h5><pre><code>public class CalendarDemo {
+
+    public static void main(String[] args) {
+
+        Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH)+1;
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        int week = c.get(Calendar.DAY_OF_WEEK);
+
+        System.out.println(year+&quot;年&quot;+month+&quot;月&quot;+day+&quot;日&quot;+getWeek(week));
+
+    }
+
+    private static String getWeek(int i) {
+        String[] weeks = {&quot;&quot;,&quot;星期日&quot;,&quot;星期一&quot;,&quot;星期二&quot;,&quot;星期三&quot;,&quot;星期四&quot;,&quot;星期五&quot;,&quot;星期六&quot;};
+        return weeks[i];
+    }
+}
+</code></pre><h5 id="二、练习"><a href="#二、练习" class="headerlink" title="二、练习"></a>二、练习</h5><pre><code>public class CalendarDemo {
+
+    public static void main(String[] args) {
+
+        Calendar c = Calendar.getInstance();
+        //指定日期
+        c.set(2018, 0, 20);
+        showDate(c);
+
+        //日期偏移
+        c.add(Calendar.YEAR, 2);
+        showDate(c);
+
+    }
+
+    public static void showDate(Calendar c) {
+        //Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH)+1;
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        int week = c.get(Calendar.DAY_OF_WEEK);
+
+        System.out.println(year+&quot;年&quot;+month+&quot;月&quot;+day+&quot;日&quot;+getWeek(week));
+    }
+
+    private static String getWeek(int i) {
+        String[] weeks = {&quot;&quot;,&quot;星期日&quot;,&quot;星期一&quot;,&quot;星期二&quot;,&quot;星期三&quot;,&quot;星期四&quot;,&quot;星期五&quot;,&quot;星期六&quot;};
+        return weeks[i];
+    }
+
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/09/java/java-api/java-api-otherObjects/" data-id="cjh4911ib001lmtp32cdide5j" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/api/">api</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/java-collections/java-collection-utilities" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/09/java/java-collections/java-collection-utilities/" class="article-date">
+  <time datetime="2018-01-09T06:45:51.000Z" itemprop="datePublished">2018-01-09</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/09/java/java-collections/java-collection-utilities/">集合框架五 - 工具类</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="五、集合框架-工具类"><a href="#五、集合框架-工具类" class="headerlink" title="五、集合框架 - 工具类"></a>五、集合框架 - 工具类</h3><p>Utilities</p>
+<p>|– Collections</p>
+<p>|– Arrays</p>
+<h4 id="1、Collections-排序"><a href="#1、Collections-排序" class="headerlink" title="1、Collections - 排序"></a>1、Collections - 排序</h4><p>需求：对有重复元素的集合排序。</p>
+<pre><code>public class Demo1 {
+
+    public static void main(String[] args) {
+
+        List&lt;String&gt; list = new ArrayList&lt;String&gt;();
+
+        list.add(&quot;afgds&quot;);
+        list.add(&quot;jlojaio&quot;);
+        list.add(&quot;haljasld&quot;);
+        list.add(&quot;xjvis&quot;);
+        list.add(&quot;afgds&quot;);
+
+        System.out.println(list);
+
+        //对list集合进行指定顺序的排序。
+        Collections.sort(list);
+        System.out.println(list);
+
+        //对list按长度排序，传入自定义比较器
+        Collections.sort(list,new ComparatorByLength());
+        System.out.println(list);
+
+    }
+
+}
+
+public class ComparatorByLength implements Comparator&lt;String&gt; {
+
+    @Override
+    public int compare(String o1, String o2) {
+        int temp = o1.length() - o2.length();
+        return temp == 0 ? o1.compareTo(o2) : temp;
+    }
+
+}
+
+输出结果：
+[afgds, jlojaio, haljasld, xjvis, afgds]
+[afgds, afgds, haljasld, jlojaio, xjvis]    
+</code></pre><p>自定义Collections工具类的static sort(List<t> list) </t></p>
+<pre><code>public static &lt;T extends Comparable&lt;? super T&gt;&gt; void mysort(List&lt;T&gt; list) {
+
+    for (int i = 0; i &lt; list.size()-1; i++) {
+        for (int j = i+1; j &lt; list.size(); j++) {
+            if(list.get(i).compareTo(list.get(j)) &gt; 0) {
+                /*
+                T temp = list.get(i);
+                list.set(i, list.get(j));
+                list.set(j, temp);
+                */
+                Collections.swap(list, i, j);
+            }
+        }
+    }
+
+
+}
+</code></pre><p>自定义Collections工具类的static  sort(List<t> list, Comparator&lt;? super T&gt; c) </t></p>
+<pre><code>public static &lt;T&gt; void mySort(List&lt;T&gt; list,Comparator&lt;? super T&gt; comp) {
+        for (int i = 0; i &lt; list.size()-1; i++) {
+            for (int j = i+1; j &lt; list.size(); j++) {
+                if(comp.compare(list.get(i), list.get(j)) &gt; 0) {
+                    Collections.swap(list, i, j);
+                }
+            }
+        }
+    }
+</code></pre><h4 id="2、Collections-折半-amp-最值"><a href="#2、Collections-折半-amp-最值" class="headerlink" title="2、Collections - 折半&amp;最值"></a>2、Collections - 折半&amp;最值</h4><p>折半查找，必须是对有序元素。</p>
+<pre><code>public class Demo2 {
+
+    public static void main(String[] args) {
+
+        List&lt;String&gt; list = new ArrayList&lt;String&gt;();
+
+        list.add(&quot;afgds&quot;);
+        list.add(&quot;jlojaio&quot;);
+        list.add(&quot;haljasld&quot;);
+        list.add(&quot;xjvis&quot;);
+        list.add(&quot;afgds&quot;);
+
+        System.out.println(list);
+
+        Collections.sort(list);
+
+        int index = Collections.binarySearch(list, &quot;afgds&quot;);
+
+        System.out.println(index);
+
+    }    
+}
+
+输出结果：
+[afgds, jlojaio, haljasld, xjvis, afgds]
+0
+</code></pre><p>最值：有没有序都可以。</p>
+<pre><code>public class Demo2 {
+
+    public static void main(String[] args) {
+
+        List&lt;String&gt; list = new ArrayList&lt;String&gt;();
+
+        list.add(&quot;afgds&quot;);
+        list.add(&quot;jlojaio&quot;);
+        list.add(&quot;haljasld&quot;);
+        list.add(&quot;xjvis&quot;);
+        list.add(&quot;afgds&quot;);
+
+        System.out.println(list);
+
+        //取最大值
+        String max = Collections.max(list);
+        System.out.println(&quot;max:&quot;+max);
+
+        //取最长值
+        String longest = Collections.max(list, new ComparatorByLength());
+        System.out.println(&quot;longest:&quot;+longest);
+
+    }
+
+}
+</code></pre><h4 id="3、Collections-逆序-amp-替换"><a href="#3、Collections-逆序-amp-替换" class="headerlink" title="3、Collections - 逆序&amp;替换"></a>3、Collections - 逆序&amp;替换</h4><p>逆序：reverseOrder方法，返回一个比较器，可以将具备自然排序的集合进行逆序。</p>
+<pre><code>public class Demo3 {
+
+    public static void main(String[] args) {
+        TreeSet&lt;String&gt; ts = new TreeSet&lt;String&gt;(Collections.reverseOrder());
+
+        ts.add(&quot;afgds&quot;);
+        ts.add(&quot;jlojaio&quot;);
+        ts.add(&quot;haljasld&quot;);
+        ts.add(&quot;xjvis&quot;);
+        ts.add(&quot;afgds&quot;);
+
+        System.out.println(ts);
+
+    }
+
+}    
+
+输出结果：倒序排列
+[xjvis, jlojaio, haljasld, afgds]
+</code></pre><p>也可对已有的比较器进行逆转</p>
+<pre><code>public class Demo3 {
+
+    public static void main(String[] args) {
+
+        TreeSet&lt;String&gt; ts = new TreeSet&lt;String&gt;(Collections.reverseOrder(new ComparatorByLength()));
+
+        ts.add(&quot;afgds&quot;);
+        ts.add(&quot;jlojaio&quot;);
+        ts.add(&quot;haljasld&quot;);
+        ts.add(&quot;xjvis&quot;);
+        ts.add(&quot;afgds&quot;);
+
+        System.out.println(ts);
+    }
+
+}
+
+输出结果：从长到短排列
+[haljasld, jlojaio, xjvis, afgds]
+</code></pre><p>static <t> boolean    replaceAll(List<t> list, T oldVal, T newVal) 使用另一个值替换列表中出现的所有某一指定值。</t></t></p>
+<pre><code>public class Demo4 {
+
+    public static void main(String[] args) {
+
+        List&lt;String&gt; list = new ArrayList&lt;String&gt;();
+
+        list.add(&quot;afgds&quot;);
+        list.add(&quot;jloj&quot;);
+        list.add(&quot;halj&quot;);
+
+        System.out.println(list);
+
+        Collections.replaceAll(list, &quot;halj&quot;, &quot;haojie&quot;);
+
+        System.out.println(list);
+    }
+
+}
+
+输出结果：
+[afgds, jloj, halj]
+[afgds, jloj, haojie]
+</code></pre><h4 id="4、Collections-其它方法-amp-将非同步集合转成同步集合的方法"><a href="#4、Collections-其它方法-amp-将非同步集合转成同步集合的方法" class="headerlink" title="4、Collections - 其它方法&amp;将非同步集合转成同步集合的方法"></a>4、Collections - 其它方法&amp;将非同步集合转成同步集合的方法</h4><p>使用指定元素替换指定列表中的所有元素。    </p>
+<pre><code>static &lt;T&gt; void    fill(List&lt;? super T&gt; list, T obj) 
+</code></pre><p>使用默认随机源对指定列表进行置换。随机排序，洗牌</p>
+<pre><code>static void    shuffle(List&lt;?&gt; list) 
+</code></pre><p>返回指定 collection 支持的同步（线程安全的）collection。</p>
+<pre><code>static &lt;T&gt; Collection&lt;T&gt; synchronizedCollection(Collection&lt;T&gt; c) 
+</code></pre><p>返回指定列表支持的同步（线程安全的）列表。<br>    static <t> List<t>    synchronizedList(List<t> list) </t></t></t></p>
+<p>返回由指定映射支持的同步（线程安全的）映射。</p>
+<pre><code>static &lt;K,V&gt; Map&lt;K,V&gt;    synchronizedMap(Map&lt;K,V&gt; m) 
+</code></pre><p>返回指定 set 支持的同步（线程安全的）set。</p>
+<pre><code>static &lt;T&gt; Set&lt;T&gt;    synchronizedSet(Set&lt;T&gt; s) 
+</code></pre><h4 id="5、Arrays-toString方法"><a href="#5、Arrays-toString方法" class="headerlink" title="5、Arrays - toString方法"></a>5、Arrays - toString方法</h4><p>Arrays.toString方法</p>
+<pre><code>public class Demo1 {
+
+    public static void main(String[] args) {
+
+        int[] arr = {3,2,1,4,5,6};
+        System.out.println(Arrays.toString(arr));
+    }
+
+}
+
+经典实现
+
+public static String toString(int[] a) {
+    if (a == null)
+        return &quot;null&quot;;
+    int iMax = a.length - 1;
+    if (iMax == -1)
+        return &quot;[]&quot;;
+
+    StringBuilder b = new StringBuilder();
+    b.append(&apos;[&apos;);
+    for (int i = 0; ; i++) {
+        b.append(a[i]);
+        if (i == iMax)
+            return b.append(&apos;]&apos;).toString();
+        b.append(&quot;, &quot;);
+    }
+}
+</code></pre><h4 id="6、Arrays-asList方法"><a href="#6、Arrays-asList方法" class="headerlink" title="6、Arrays - asList方法"></a>6、Arrays - asList方法</h4><p>将数组转成集合</p>
+<pre><code>static &lt;T&gt; List&lt;T&gt; asList(T... a) 
+</code></pre><p>好处：可以使用集合中的方法来操作数组中的元素，除了改变长度的方法。</p>
+<p>a、注意：数组的长度是固定的，所以对于集合的增删方法是不可以使用的。否则会发生UnsupportedOperationException</p>
+<pre><code>public class Demo2 {
+    public static void main(String[] args) {
+
+        String[] arr = {&quot;aaa&quot;,&quot;bbb&quot;,&quot;ccc&quot;};
+
+        List&lt;String&gt; list = Arrays.asList(arr);
+
+        boolean b = list.contains(&quot;aaa&quot;);
+
+        System.out.println(b);
+
+    }
+}
+</code></pre><p>b、如果数组中的元素是对象，那么转成集合时，直接将数组中的对象元素，作为集合中的元素进行存储。</p>
+<p>如果数组中的元素是基本类型数值，那么会将该数组作为集合中的元素进行存储，因为集合中只能存储对象，而不能存储基本类型数据。</p>
+<pre><code>public class Demo3 {
+    public static void main(String[] args) {
+
+        int[] arr = {31,22,44,12};
+
+        List&lt;int[]&gt; list = Arrays.asList(arr);
+
+        System.out.println(list.size());
+
+    }
+}
+
+输出结果：
+1
+</code></pre><h4 id="7、Collection-toArray方法"><a href="#7、Collection-toArray方法" class="headerlink" title="7、Collection-toArray方法"></a>7、Collection-toArray方法</h4><p>集合转数组：可以对集合中的元素操作的方法进行限定，不允许对其增删。</p>
+<p>使用的是Collecion接口中的toArray方法</p>
+<p>toArray方法需要传入一个指定类型的数组。</p>
+<p>如果长度小于集合的size，那么该方法会创建一个同类型并和集合相同size的数组。</p>
+<p>如果长度大于集合的size，那么该方法就会使用指定的数组，存储集合中的元素，其它位置默认为null。</p>
+<p>建议，最好长度就指定为集合的size。</p>
+<pre><code>public class Demo4 {
+
+    public static void main(String[] args) {
+
+        List&lt;String&gt; list = new ArrayList&lt;String&gt;();
+        list.add(&quot;ab3&quot;);
+        list.add(&quot;sds&quot;);
+        list.add(&quot;asfa&quot;);
+
+        String[] arr = list.toArray(new String[5]);
+
+        System.out.println(Arrays.toString(arr));
+
+    }
+
+}
+
+输出结果：
+[ab3, sds, asfa, null, null]
+</code></pre><h4 id="8、集合框架-jdk5-0特性-ForEach循环"><a href="#8、集合框架-jdk5-0特性-ForEach循环" class="headerlink" title="8、集合框架 - jdk5.0特性 - ForEach循环"></a>8、集合框架 - jdk5.0特性 - ForEach循环</h4><pre><code>public class Demo5 {
+
+    public static void main(String[] args) {
+
+        /**
+         * foreach语句：
+         * 格式：
+         * for(类型 变量: Collection集合|数组){
+         * 
+         * }
+         * 
+         * 传统for循环和高级for循环的区别：
+         * 传统for循环可以对语句执行很多次，因为可以控制循环的增量和条件。
+         * 高级for循环是一种简化形式，必须有遍历的目标，可以是数组，也可以是Collecion单列集合。
+         * 
+         * 对数组的遍历，如果仅仅是为了获取数组中的元素，可以使用高级for循环。
+         * 如果要对数组的角标进行操作建议使用传统for循环。
+         */
+
+        List&lt;String&gt; list = new ArrayList&lt;String&gt;();
+
+        list.add(&quot;abc&quot;);
+        list.add(&quot;def&quot;);
+        list.add(&quot;ghi&quot;);
+        list.add(&quot;jkl&quot;);
+
+        //迭代器
+        Iterator&lt;String&gt; it = list.iterator();
+
+        while(it.hasNext()) {
+            System.out.println(it.next());
+        }
+
+        //高级for循环，通常只用于遍历，简化书写
+        for(String s : list) {
+            System.out.println(s);
+        }
+
+        //遍历数组
+        int[] arr = {3,8,2,1,7};
+        for(int i : arr) {
+            System.out.println(i);
+        }
+
+        //高级for循环遍历map集合，要先把map集合转为单列集合。
+        Map&lt;Integer,String&gt; map = new HashMap&lt;Integer,String&gt;();
+
+        map.put(3, &quot;zhangsan&quot;);
+        map.put(4, &quot;lisi&quot;);
+        map.put(5, &quot;wangwu&quot;);
+        map.put(7, &quot;zhaoliu&quot;);
+
+        for(Integer key : map.keySet()) {
+            String value = map.get(key);
+            System.out.println(key+&quot;:&quot;+value);
+        }
+
+        for(Map.Entry&lt;Integer, String&gt; merryEntry : map.entrySet()) {
+            Integer key = merryEntry.getKey();
+            String value = merryEntry.getValue();
+            System.out.println(key+&quot;::&quot;+value);
+        }
+
+    }
+
+}
+</code></pre><h4 id="9、集合框架-jdk5-0特性-函数可变参数"><a href="#9、集合框架-jdk5-0特性-函数可变参数" class="headerlink" title="9、集合框架 - jdk5.0特性 - 函数可变参数"></a>9、集合框架 - jdk5.0特性 - 函数可变参数</h4><pre><code>public class Demo6 {
+
+    public static void main(String[] args) {
+
+        int sum = newAdd(5,1,4,7,3);
+        System.out.println(&quot;sum=&quot;+sum);
+
+        int sum1 = newAdd(3,5,2,5,3,2,2);
+        System.out.println(&quot;sum1=&quot;+sum1);
+
+    }
+
+    /**
+     * 函数是可变参数。
+     * 其实就是一个数组，但是接收的是数组元素。
+     * 自动将这些元素封装为数组。简化了调用者的书写。
+     * 注意：可变参数类型，必须定义参数列表的结尾。
+     */
+
+    private static int newAdd(int a,int... arr) {
+        int sum = 0;
+        for (int i = 0; i &lt; arr.length; i++) {
+            sum+=arr[i];
+        }
+        return sum;
+    }
+
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/09/java/java-collections/java-collection-utilities/" data-id="cjh4911iw0021mtp3avqhvgi1" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/java-collections/java-collection-map" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/09/java/java-collections/java-collection-map/" class="article-date">
+  <time datetime="2018-01-09T06:44:18.000Z" itemprop="datePublished">2018-01-09</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/09/java/java-collections/java-collection-map/">集合框架四 - Map集合</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="四、集合框架-Map集合"><a href="#四、集合框架-Map集合" class="headerlink" title="四、集合框架 - Map集合"></a>四、集合框架 - Map集合</h3><h4 id="1、集合特点-amp-常用方法"><a href="#1、集合特点-amp-常用方法" class="headerlink" title="1、集合特点&amp;常用方法"></a>1、集合特点&amp;常用方法</h4><p>Collection：一次添加一个元素，集合称为单列集合。</p>
+<p>Map：一次添加一对元素，存储的是键值对，集合中必须保证键的唯一性。</p>
+<p>常用方法：</p>
+<p>添加：</p>
+<pre><code>value put(key,value):返回前一个和key关联的值，如果没有返回null
+</code></pre><p>删除：</p>
+<pre><code>void clear():清空map集合
+value remove(key):根据指定的key删除这个键值对，返回被删除键值对的value。
+</code></pre><p>判断：</p>
+<pre><code>boolean containskey(key)
+boolean containsValue(value)
+boolean isEmpty()
+</code></pre><p>获取：</p>
+<pre><code>value get(key):通过键获取值，如果没有该键返回null。因此，可以通过返回null，来判断是否包含指定键。
+int size():获取键值对的个数。
+</code></pre><p>方法演示：</p>
+<pre><code>public class MapDemo1 {
+
+    public static void main(String[] args) {
+
+        Map&lt;Integer,String&gt; map = new HashMap&lt;Integer,String&gt;();
+
+        method(map);
+
+    }
+
+    private static void method(Map&lt;Integer, String&gt; map) {
+
+        //添加
+        System.out.println(map.put(8, &quot;wangcai&quot;));
+        System.out.println(map.put(8, &quot;xiaoqiang&quot;));
+        map.put(2, &quot;zhangsan&quot;);
+        map.put(4, &quot;lisi&quot;);
+        System.out.println(map);
+
+        //删除
+        System.out.println(&quot;remove:&quot;+map.remove(2));
+
+        //判断
+        System.out.println(&quot;containskey:&quot;+map.containsKey(7));
+
+        //获取
+        System.out.println(&quot;get:&quot;+map.get(6));
+
+
+    }
+
+}
+</code></pre><h4 id="2、重点方法keySet"><a href="#2、重点方法keySet" class="headerlink" title="2、重点方法keySet"></a>2、重点方法keySet</h4><p>取出map中的所有元素。</p>
+<p>原理：通过keySet方法取出map中的所有键所在的Set集合，再通过Set的迭代器获取每一个键，再通过map集合的get方法获取每个键所对应的值。</p>
+<pre><code>public class MapDemo2 {
+
+    public static void main(String[] args) {
+
+        Map&lt;Integer,String&gt; map = new HashMap&lt;Integer,String&gt;();
+
+        method(map);
+
+    }
+
+    private static void method(Map&lt;Integer, String&gt; map) {
+
+        map.put(2, &quot;zhangsan&quot;);
+        map.put(8, &quot;lisi&quot;);
+        map.put(7, &quot;wangwu&quot;);
+        map.put(6, &quot;zhaoliu&quot;);
+
+        Set&lt;Integer&gt; keySet = map.keySet();
+        Iterator&lt;Integer&gt; it = keySet.iterator();
+
+        while(it.hasNext()) {
+            Integer key = it.next();
+            String value = map.get(key);
+            System.out.println(key+&quot;:&quot;+value);
+        }
+
+    }
+
+}
+
+输出结果：
+2:zhangsan
+6:zhaoliu
+7:wangwu
+8:lisi
+</code></pre><h4 id="3、重点方法entrySet"><a href="#3、重点方法entrySet" class="headerlink" title="3、重点方法entrySet"></a>3、重点方法entrySet</h4><p>该方法将键和值的映射关系作为对象存储到了Set集合中，而这个映射关系的类型就是Map.Entry类型（结婚证）。</p>
+<pre><code>public class MapDemo3 {
+
+    public static void main(String[] args) {
+
+        Map&lt;Integer,String&gt; map = new HashMap&lt;Integer,String&gt;();
+
+        method(map);
+
+    }
+
+    private static void method(Map&lt;Integer, String&gt; map) {
+
+        map.put(2, &quot;zhangsan&quot;);
+        map.put(8, &quot;lisi&quot;);
+        map.put(7, &quot;wangwu&quot;);
+        map.put(6, &quot;zhaoliu&quot;);
+
+        Set&lt;Map.Entry&lt;Integer,String&gt;&gt; entrySet = map.entrySet();
+
+        Iterator&lt;Map.Entry&lt;Integer,String&gt;&gt; it = entrySet.iterator();
+
+        while(it.hasNext()) {
+            Map.Entry&lt;Integer, String&gt; merryEntry = it.next();
+            Integer key = merryEntry.getKey();
+            String value = merryEntry.getValue();
+            System.out.println(key+&quot;:&quot;+value);
+        }
+
+    }
+
+}
+</code></pre><h4 id="4、values方法"><a href="#4、values方法" class="headerlink" title="4、values方法"></a>4、values方法</h4><p>Collection<v> values()</v></p>
+<p>返回此映射中包含的值的Collection视图。</p>
+<pre><code>public class MapDemo4 {
+
+    public static void main(String[] args) {
+
+        Map&lt;Integer,String&gt; map = new HashMap&lt;Integer,String&gt;();
+
+        method(map);
+
+    }
+
+    public static void method(Map&lt;Integer, String&gt; map) {
+        map.put(2, &quot;zhangsan&quot;);
+        map.put(8, &quot;lisi&quot;);
+        map.put(7, &quot;wangwu&quot;);
+        map.put(6, &quot;zhaoliu&quot;);
+
+        Collection&lt;String&gt; values = map.values();
+
+        Iterator&lt;String&gt; it = values.iterator();
+
+        while(it.hasNext()) {
+            System.out.println(it.next());
+        }
+
+    }
+
+}
+</code></pre><h4 id="5、Map集合-常见子类对象"><a href="#5、Map集合-常见子类对象" class="headerlink" title="5、Map集合-常见子类对象"></a>5、Map集合-常见子类对象</h4><p>Map常见子类：</p>
+<p>|– Hashtable：</p>
+<p>内部结构是哈希表，是同步的。不允许null作为键和值。</p>
+<p>|—— Properties：</p>
+<p>可以用来存储键值对型的配置文件的信息，可以和IO技术相结合。</p>
+<p>|– HashMap：</p>
+<p>内部结构是哈希表，不是同步的。允许null作为键和值。</p>
+<p>|– TreeMap：</p>
+<p>内部结构是二叉树，不是同步的。可以对Map集合中的键排序。</p>
+<h4 id="6、HashMap存储自定义对象"><a href="#6、HashMap存储自定义对象" class="headerlink" title="6、HashMap存储自定义对象"></a>6、HashMap存储自定义对象</h4><pre><code>public class MapDemo5 {
+
+    public static void main(String[] args) {
+
+        /**
+         * 将学生对象和学生的归属地通过键与值存储到map集合中。
+         */
+
+        HashMap&lt;Student,String&gt; hm = new HashMap&lt;Student,String&gt;();
+
+        hm.put(new Student(&quot;zhangsan&quot;,20),&quot;上海&quot;);
+        hm.put(new Student(&quot;lisi&quot;,21),&quot;北京&quot;);
+        hm.put(new Student(&quot;wangwu&quot;,30),&quot;临沂&quot;);
+        hm.put(new Student(&quot;wangwu&quot;,30),&quot;临沂&quot;);
+
+        Set&lt;Student&gt; keySet = hm.keySet();
+
+        Iterator&lt;Student&gt; it = keySet.iterator();
+
+        while(it.hasNext()) {
+            Student key = it.next();
+            String value = hm.get(key);
+            System.out.println(key.getName()+&quot;:&quot;+key.getAge()+&quot;:&quot;+value);
+        }
+
+
+    }
+
+}
+
+输出结果：
+zhangsan:20:上海
+wangwu:30:临沂
+wangwu:30:临沂
+lisi:21:北京
+
+Student类继承自Person2类，通过在Person2类中覆盖重写hashCode和equals方法，去重，保证唯一性。
+</code></pre><h4 id="7、TreeMap存储自定义对象"><a href="#7、TreeMap存储自定义对象" class="headerlink" title="7、TreeMap存储自定义对象"></a>7、TreeMap存储自定义对象</h4><pre><code>public class MapDemo6 {
+
+    public static void main(String[] args) {
+
+        /**
+         * 将学生对象和学生的归属地通过键与值存储到map集合中。
+         * 按姓名排序
+         */
+
+        TreeMap&lt;Student,String&gt; tm = new TreeMap&lt;Student,String&gt;(new ComparatorByName());
+
+        tm.put(new Student(&quot;zhangsan&quot;,20),&quot;上海&quot;);
+        tm.put(new Student(&quot;lisi&quot;,21),&quot;北京&quot;);
+        tm.put(new Student(&quot;wangwu&quot;,30),&quot;临沂&quot;);
+        tm.put(new Student(&quot;wangwu&quot;,30),&quot;临沂&quot;);
+
+        Set&lt;Map.Entry&lt;Student,String&gt;&gt; entrySet = tm.entrySet();
+
+        Iterator&lt;Map.Entry&lt;Student, String&gt;&gt; it = entrySet.iterator();
+
+        while(it.hasNext()) {
+            Map.Entry&lt;Student, String&gt; merryEntry = it.next();
+            Student key = merryEntry.getKey();
+            String value = merryEntry.getValue();
+            System.out.println(key.getName()+&quot;:&quot;+key.getAge()+&quot;:&quot;+value);
+        }
+    }
+
+}
+
+public class ComparatorByName implements Comparator&lt;Person2&gt; {
+
+    @Override
+    public int compare(Person2 o1, Person2 o2) {
+        Person2 p1 = (Person2)o1;
+        Person2 p2 = (Person2)o2;
+        int temp = p1.getName().compareTo(p2.getName());
+        return temp==0?p1.getAge()-p2.getAge():temp;
+    }    
+
+}
+</code></pre><h4 id="8、LinkedHashMap"><a href="#8、LinkedHashMap" class="headerlink" title="8、LinkedHashMap"></a>8、LinkedHashMap</h4><pre><code>public class MapDemo7 {
+
+    public static void main(String[] args) {
+
+        HashMap&lt;Integer,String&gt; hm = new LinkedHashMap&lt;Integer,String&gt;();
+
+        hm.put(7, &quot;aaaa&quot;);
+        hm.put(2, &quot;bbbb&quot;);
+        hm.put(1, &quot;dddd&quot;);
+        hm.put(10, &quot;ccc&quot;);
+
+        Iterator&lt;Map.Entry&lt;Integer,String&gt;&gt; it = hm.entrySet().iterator();
+
+        while(it.hasNext()) {
+            Map.Entry&lt;Integer, String&gt; merryEntry = it.next();
+            Integer key = merryEntry.getKey();
+            String value = merryEntry.getValue();
+
+            System.out.println(key+&quot;:&quot;+value);
+        }
+
+    }
+
+}
+
+输出结果：
+7:aaaa
+2:bbbb
+1:dddd
+10:ccc
+
+由HashMap变为LinkedHashMap之后，存和取的顺序保持了一致。
+</code></pre><h4 id="9、Map集合练习-按自然顺序，记录字母出现次数"><a href="#9、Map集合练习-按自然顺序，记录字母出现次数" class="headerlink" title="9、Map集合练习 - 按自然顺序，记录字母出现次数"></a>9、Map集合练习 - 按自然顺序，记录字母出现次数</h4><pre><code>public class MapDemp8 {
+
+
+    public static void main(String[] args) {
+
+        String str = &quot;jslsjflAAsCCjl  ++js--lajaslasjfsala&quot;;
+
+        String s = getCarCount(str);
+
+        System.out.println(s);
+
+    }
+
+    private static String getCarCount(String str) {
+
+        //字符串变字符数组
+        char[] charArr = str.toCharArray();
+
+        //TreeSet集合
+        TreeMap&lt;Character,Integer&gt; tm = new TreeMap&lt;Character,Integer&gt;();
+
+        for (int i = 0; i &lt; charArr.length; i++) {
+
+            if(!(charArr[i] &gt;= &apos;a&apos; &amp;&amp; charArr[i] &lt;= &apos;z&apos; || charArr[i] &gt;= &apos;A&apos; &amp;&amp; charArr[i] &lt;= &apos;Z&apos;)) {
+                continue;
+            }
+
+            Character chara = charArr[i];
+            Integer val = tm.get(chara);
+            if(val == null) {
+                tm.put(chara, 1);
+            }else {
+                Integer count = tm.get(chara) + 1;
+                tm.put(chara,count);
+            }
+
+
+        }
+
+        return mapToString(tm);
+    }
+
+    private static String mapToString(TreeMap&lt;Character, Integer&gt; tm) {
+        StringBuilder sb = new StringBuilder();
+
+        Set&lt;Character&gt; keySet = tm.keySet();
+
+        Iterator&lt;Character&gt; it = keySet.iterator();
+
+        while(it.hasNext()) {
+            Character key = it.next();
+            Integer value = tm.get(key);
+            sb.append(key+&quot;(&quot;+value+&quot;)&quot;);
+        }
+
+        return sb.toString();
+    }
+
+}
+
+输出结果：
+A(2)C(2)a(5)f(2)j(6)l(6)s(7)
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/09/java/java-collections/java-collection-map/" data-id="cjh4911it001zmtp3l88vr4z0" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
   
     <article id="post-java/java-collections/java-collection-notes" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
@@ -115,7 +1882,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/09/java/java-collections/java-collection-notes/" data-id="cjgxcg48g001zr9p38hf4v83t" class="article-share-link">Delen</a>
+      <a data-url="http://yoursite.com/2018/01/09/java/java-collections/java-collection-notes/" data-id="cjh4911ip001umtp3pjj7rod9" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li></ul>
@@ -555,7 +2322,7 @@ class CompareByName2 implements Comparator&lt;Person2&gt;{
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/09/java/java-collections/java-collection-generic/" data-id="cjgxcg48c001ur9p39m5h3l96" class="article-share-link">Delen</a>
+      <a data-url="http://yoursite.com/2018/01/09/java/java-collections/java-collection-generic/" data-id="cjh4911ig001nmtp3fviw2m14" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li></ul>
@@ -1265,2278 +3032,10 @@ public class TreeSetPractice {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/27/java/java-collections/java-collection-framework/" data-id="cjgxcg483001nr9p3buzi3onj" class="article-share-link">Delen</a>
+      <a data-url="http://yoursite.com/2017/12/27/java/java-collections/java-collection-framework/" data-id="cjh4911il001rmtp3tpa7mudf" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/java-api/basic-data-class" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/23/java/java-api/basic-data-class/" class="article-date">
-  <time datetime="2017-12-23T03:28:25.000Z" itemprop="datePublished">2017-12-23</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/java/">java</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/23/java/java-api/basic-data-class/">基本数据类型包装类</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h4 id="1、为了方便操作基本数据类型值，将其封装成了对象，在对象中定义属性和行为，丰富了该数据的操作。"><a href="#1、为了方便操作基本数据类型值，将其封装成了对象，在对象中定义属性和行为，丰富了该数据的操作。" class="headerlink" title="1、为了方便操作基本数据类型值，将其封装成了对象，在对象中定义属性和行为，丰富了该数据的操作。"></a>1、为了方便操作基本数据类型值，将其封装成了对象，在对象中定义属性和行为，丰富了该数据的操作。</h4><table>
-<thead>
-<tr>
-<th>数据类型</th>
-<th>包装类</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>byte</td>
-<td>Byte</td>
-</tr>
-<tr>
-<td>short</td>
-<td>Short</td>
-</tr>
-<tr>
-<td>int</td>
-<td>Integer</td>
-</tr>
-<tr>
-<td>long</td>
-<td>Long</td>
-</tr>
-<tr>
-<td>flot</td>
-<td>Float</td>
-</tr>
-<tr>
-<td>double</td>
-<td>Double</td>
-</tr>
-<tr>
-<td>char</td>
-<td>Character</td>
-</tr>
-<tr>
-<td>boolean</td>
-<td>Boolean</td>
-</tr>
-</tbody>
-</table>
-<h4 id="2、基本数据类型和字符串之间的转换"><a href="#2、基本数据类型和字符串之间的转换" class="headerlink" title="2、基本数据类型和字符串之间的转换"></a>2、基本数据类型和字符串之间的转换</h4><p>基本类型–&gt;字符串</p>
-<p>(1)、基本类型数值+””</p>
-<p>(2)、用String类中的静态方法valueOf(基本类型数值)</p>
-<p>字符串–&gt;基本类型</p>
-<p>(1)、静态方法 parseInt, parseLong, parseBoolean。。。。</p>
-<p>8种基本数据类型中，只有Character没有parse的用法。</p>
-<p>(2)、如果字符串被Integer进行了对象的封装。可以使用别一个非静态方法intValue()将一个Integer对象转成基本数据类型值。</p>
-<pre><code>Integer i = new Integer(&quot;123&quot;);
-System.out.println(i.intValue());
-</code></pre><h4 id="3、进制转换"><a href="#3、进制转换" class="headerlink" title="3、进制转换"></a>3、进制转换</h4><p>十进制–&gt;其它进制</p>
-<pre><code>//转二进制
-System.out.println(Integer.toBinaryString(60));
-System.out.println(Integer.toString(60,2));
-
-//转八进制
-System.out.println(Integer.toOctalString(60));
-System.out.println(Integer.toString(60,8));
-
-//转十六进制
-System.out.println(Integer.toHexString(60));
-System.out.println(Integer.toString(60,16));
-</code></pre><p>其它进制–&gt;十进制 parseInt(“string”, radix)</p>
-<pre><code>//二进制转十进制
-System.out.println(Integer.parseInt(&quot;110&quot;,2));
-
-//八进制转十进制
-System.out.println(Integer.parseInt(&quot;74&quot;,8));
-
-//十六进制转十进制
-System.out.println(Integer.parseInt(&quot;3c&quot;,16));
-</code></pre><h4 id="4、自动装箱拆箱"><a href="#4、自动装箱拆箱" class="headerlink" title="4、自动装箱拆箱"></a>4、自动装箱拆箱</h4><pre><code>Integer i = new Integer(4);
-jdk1.4以后简写为Integer i = 4; //自动装箱
-
-i = i + 6;
-是i = new Integer(i.intValue()+6)的简写，自动拆箱。
-</code></pre><h4 id="5、小结"><a href="#5、小结" class="headerlink" title="5、小结"></a>5、小结</h4><p>Integer a = new Integer(127);<br>Integer b = new Integer(127);</p>
-<p>System.out.println(a==b);//fasle,对象比较地址<br>System.out.println(a.equals(b));//true，比较内容</p>
-<p>Integer x = 129;<br>Integer y = 129;</p>
-<p>System.out.println(x==y);//fasle<br>System.out.println(x.equals(y));//true</p>
-<p>Integer x = 127;<br>Integer y = 127;</p>
-<p>System.out.println(x==y);//true<br>System.out.println(x.equals(y));//true</p>
-<p>x,y都为127时，x==y为true，都为129时，x==y为false</p>
-<p>是因为jdk1.5以后，自动装箱时，如果装箱的在一个字节空间内（-128~127）,那么该数据会被共享，不会重新开辟空间，因此都为127时，比较x==y时，实际上是一个地址。</p>
-<h4 id="6、练习"><a href="#6、练习" class="headerlink" title="6、练习"></a>6、练习</h4><p>对字符串中的数值排序</p>
-<pre><code>import java.util.Arrays;
-
-public class WrapperTest {
-    private static final String SPACE_SEPARATOR = &quot; &quot;;
-
-    public static void main(String[] args) {
-        String numStr = &quot;20 83 32     11 -7 50&quot;;
-        System.out.println(numStr);
-        numStr = sortStringNumber(numStr);
-        System.out.println(numStr);
-    }
-
-    private static String sortStringNumber(String numStr) {
-        //字符串变成字符串数组
-        String[] str_arr = stringToArray(numStr);
-
-        //字符串数组变成int数组
-        int[] num_arr = toIntArray(str_arr);
-
-        //int数组排序
-        mySortArray(num_arr);
-
-        //排序后的int数组变成字符串
-        String temp = arrayToString(num_arr);
-
-        return temp;
-    }
-
-    private static String arrayToString(int[] num_arr) {
-        StringBuilder sb = new StringBuilder();
-        for(int i=0; i&lt;num_arr.length; i++) {
-            if(i!=num_arr.length-1)
-                sb.append(num_arr[i]+SPACE_SEPARATOR);
-            else
-                sb.append(num_arr[i]);
-        }
-        return sb.toString();
-    }
-
-    private static void mySortArray(int[] num_arr) {
-        Arrays.sort(num_arr);
-    }
-
-    private static int[] toIntArray(String[] str_arr) {
-        int[] arr = new int[str_arr.length];
-        for(int i=0; i&lt;arr.length; i++) {
-            arr[i] = Integer.parseInt(str_arr[i]);
-        }
-        return arr;
-    }
-
-    public static String[] stringToArray(String numStr) {
-        String[] str_arr = numStr.split(SPACE_SEPARATOR+&quot;+&quot;);
-        return str_arr;
-    }
-
-}
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/23/java/java-api/basic-data-class/" data-id="cjgxcg47w001ir9p3pjprhxxi" class="article-share-link">Delen</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/api/">api</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/java-api/java-stringBuffer" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/22/java/java-api/java-stringBuffer/" class="article-date">
-  <time datetime="2017-12-22T06:58:18.000Z" itemprop="datePublished">2017-12-22</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/java/">java</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/22/java/java-api/java-stringBuffer/">常用对象API-StringBuffer类</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>StringBuffer就是字符串缓冲区，用于存储数据的容器，初始被容量16个字符。</p>
-<h4 id="1、特点"><a href="#1、特点" class="headerlink" title="1、特点"></a>1、特点</h4><p>(1)、长度是可变的</p>
-<p>(2)、可以存储不同类型的数据</p>
-<p>(3)、最终转成字符串进行使用</p>
-<p>(4)、可以对字符串进行插入修改</p>
-<h4 id="2、方法"><a href="#2、方法" class="headerlink" title="2、方法"></a>2、方法</h4><p>(1)、添加 返回StringBuffer类型的对象</p>
-<pre><code>StringBuffer append(data)
-
-StringBuffer sb = new StringBuffer();
-sb.append(4);
-sb.append(true);
-sb.insert(1, false);
-System.out.println(sb); //4falsetrue输出字符串
-</code></pre><p>(2)、指定位置插入</p>
-<pre><code>insert(index, data) 
-</code></pre><p>(3)、删除 返回StringBuffer类型的对象</p>
-<pre><code>StringBuffer delete(start, end)，包含头，不包含尾
-
-StringBuffer deleteCharAt(int index)，删除指定位置元素
-
-StringBuffer sb = new StringBuffer(&quot;abce&quot;);
-sb.delete(1, 3);
-System.out.println(sb);//ae
-</code></pre><p>(4)、查找</p>
-<pre><code>char charAt(index);
-int indexOf(stirng);
-int lastIndexOf(string);
-</code></pre><p>(5)、修改</p>
-<pre><code>StringBuffer replace(int start, int end, string str)
-
-void setCharAt(index, char);    
-
-sb.replace(1,3,&quot;nba&quot;);//anbae
-
-sb.setCharAt(2, &apos;1&apos;);//abqe    
-</code></pre><h4 id="3、StringBuilder类"><a href="#3、StringBuilder类" class="headerlink" title="3、StringBuilder类"></a>3、StringBuilder类</h4><p>jdk1.5以后出现了功能和StringBuffer一样的对象。就是StringBuilder。</p>
-<p>不同的是：</p>
-<p>StringBuffer是线程同步的，通常用于多线程。</p>
-<p>StringBuilder是线程不同步的，通常用于单线程，提高效率。</p>
-<pre><code>public class StringBuilderTest {
-
-    public static void main(String[] args) {
-        int[] arr = {3,1,5,1,2};
-        String s = arrayToString(arr);
-        System.out.println(s);
-    }
-
-    public static String arrayToString(int[] arr) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(&quot;[&quot;);
-        for(int i= 0; i&lt;arr.length; i++) {
-            if(i!=arr.length - 1)
-                sb.append(arr[i]+&quot;, &quot;);
-            else
-                sb.append(&quot;]&quot;);
-        }
-        return sb.toString();
-    }
-
-    public static String arrayToString2(int[] arr)         {
-        String str = &quot;[&quot;;
-        for(int i=0; i&lt;arr.length; i++) {
-            if(i!=arr.length - 1)
-                str+=arr[i]+&quot;, &quot;;
-            else
-                str+=arr[i]+&quot;]&quot;;
-        }
-        return str;
-    }
-}
-</code></pre><p>字符串拼接的方式会在字符串常量池中生成多个字符串。因此，推荐用缓冲区容器的方式。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/22/java/java-api/java-stringBuffer/" data-id="cjgxcg481001mr9p308iyb47u" class="article-share-link">Delen</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/api/">api</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/java-api/api-string" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/21/java/java-api/api-string/" class="article-date">
-  <time datetime="2017-12-21T01:39:07.000Z" itemprop="datePublished">2017-12-21</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/java/">java</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/21/java/java-api/api-string/">api-string</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="String类"><a href="#String类" class="headerlink" title="String类"></a>String类</h3><h4 id="1、创建对象"><a href="#1、创建对象" class="headerlink" title="1、创建对象"></a>1、创建对象</h4><pre><code>String s = &quot;abc&quot;;//常量池中创建一个对象
-
-String s1 = new String(&quot;abc&quot;);//堆内存中创建两个对象，一个string类型的对象，一个“abc”对象
-
-System.out.println(s == s1);//false，比较地址
-
-System.out.println(s.equals(s1));//true,object中的equals方法比较的是地址，但object类中equals方法比较的是内容。
-</code></pre><h4 id="2、构造函数"><a href="#2、构造函数" class="headerlink" title="2、构造函数"></a>2、构造函数</h4><p>通过数组创建字符串</p>
-<pre><code>byte[] arr = {64, 66, 67, 68};
-String s = new String(arr);
-System.out.println(s);//ABCD
-</code></pre><p>截取数组中的一部分，创建字符串</p>
-<pre><code>char[] arr = {&apos;a&apos;, &apos;b&apos;, &apos;c&apos;, &apos;d&apos;}；
-String s = new String(arr, 1, 3);
-System.out.println(s);//bcd
-</code></pre><h4 id="3、获取"><a href="#3、获取" class="headerlink" title="3、获取"></a>3、获取</h4><p>1、length() 长度</p>
-<p>2、charAt(int index) 根据索引获取字符</p>
-<p>3、根据字符获取索引</p>
-<pre><code>indexOf(int ch) 
-
-indexOf(int ch, int fromIndex)
-
-indexOf(String str)
-
-indexOf(String str, fromIndex)
-
-lastIndexOf(int ch)
-
-lastIndexOf(int ch, int fromIndex)
-
-lastIndexOf(String str)
-
-lastIndexOf(String str, int fromIndex)
-</code></pre><h4 id="4、获取字符串中的一部分字符串"><a href="#4、获取字符串中的一部分字符串" class="headerlink" title="4、获取字符串中的一部分字符串"></a>4、获取字符串中的一部分字符串</h4><pre><code>subString(int beginIndex, int endIndex)//包括开始，不包括结束
-
-subString(int beginIndex)
-</code></pre><h4 id="5、转换"><a href="#5、转换" class="headerlink" title="5、转换"></a>5、转换</h4><p>(1)、String[] split 切割，将字符串转为字符串数组</p>
-<pre><code>split(String regex)//切割，正则，将字符串转为数组
-
-String str = &quot;张三.李四.王五&quot;;
-
-String[] arr = s.split(&quot;\\.&quot;);
-</code></pre><p>(2)、char[] toCharArray 切割，将字符串转为字符数组</p>
-<p>(3)、byte[] getBytes 将字符串变成字节数组</p>
-<p>(4)、字符串中的字母大小写转换</p>
-<pre><code>String toUpperCase(): 大写
-String toLowerCase(): 小写
-</code></pre><p>(5)、将字符串中的内容进行替换</p>
-<pre><code>String replace(char oldch, char newch)
-
-String replace(String s1, String s2)
-</code></pre><p>(6)、去掉字符串两端空格</p>
-<pre><code>String trim()
-</code></pre><p>(7)、将字符串进行连接</p>
-<pre><code>String concat(String);
-</code></pre><p>(8)、将基本数据类型转换为字符串</p>
-<pre><code>String valueOf(int short byte long double float)
-</code></pre><h4 id="6、判断"><a href="#6、判断" class="headerlink" title="6、判断"></a>6、判断</h4><p>(1)、两个字符串内容是否相同</p>
-<pre><code>boolean equals(Object obj)
-
-boolean equalsIgnoreCase(String str);//忽略大小写
-</code></pre><p>(2)、字符串中是否包含指定字符串</p>
-<pre><code>boolean contains(String str)
-</code></pre><p>(3)、字符串是否以指定字符串开头/结尾</p>
-<pre><code>boolean startsWith(String str);
-
-boolean endsWith(String str);
-</code></pre><h4 id="7、比较"><a href="#7、比较" class="headerlink" title="7、比较"></a>7、比较</h4><p>int compareTo(String anotherString)</p>
-<p>比较两个字符串中各个字符的Unicode值。</p>
-<p>此字符串按字典顺序小于字符串参数，返回小于0的值，大于的话，返回一个大于0的值，相等的话，返回0。</p>
-<h4 id="8、练习"><a href="#8、练习" class="headerlink" title="8、练习"></a>8、练习</h4><p>(1)、字符串数组排序</p>
-<pre><code>public static void main(String[] args){
-    String[] arr = {&quot;nba&quot;,&quot;abc&quot;,&quot;hjk&quot;,&quot;efs&quot;,&quot;wyn&quot;,};
-    printArray(arr);
-    sortString(arr);
-    printArray(arr);
-}
-
-public static void printArray(String[] arr){
-    System.out.print(&quot;[&quot;);
-    for(int i=0; i&lt;arr.length; i++){
-        System.out.print(arr[i]+&quot;, &quot;);
-    }
-    System.out.print(&quot;]&quot;);
-}
-
-public static void sortString(String[] arr){
-    for(int i=0; i&lt; arr.length-1; i++){
-        for(int j=i+1; j&lt; arr.length; j++){
-            if(arr[i].compareTo(arr[j])&gt;0)//字符串比较 用compareTo方法
-                swap(arr,i,j);
-        }
-    }
-}
-
-public static void swap(String[] arr, int i, int j){
-    String temp = arr[i];
-    arr[i] = arr[j];
-    arr[j] = temp;    
-}
-</code></pre><p>(2)、一个子串在整串中出现的次数</p>
-<p>方法一：</p>
-<p>通过indexOf获取第一次出现的位置。</p>
-<p>记录出现的位置，通过subString在剩余的字符串中继续查找子串。</p>
-<p>循环查找，直到indexOf返回-1。</p>
-<pre><code>public static int getKeyStringCount(String str, String key){
-    int count = 0;
-    int index = 0;
-    while((index = str.indexOf(key)) &gt; 0){
-        str = str.subString(index+key.length());
-        count++;
-    }
-    return count;
-}
-</code></pre><p>缺点：每次取子串，字符串常量池中都会增加字符串。</p>
-<p>方法二：</p>
-<p>记录每一次出现的位置，下一次查找，通过indexOf(String str, fromindex)方法，从该位置继续往下查找，直到返回-1。</p>
-<pre><code>public static int getKeyStringCount(String str, String key){
-    int count = 0;
-    int index = 0;
-    while((index = str.indexOf(key,index)) &gt; 0){
-        index = index + key.length();
-        count++;
-    }
-    return count;
-}
-</code></pre><p>(3)、两个字符串中最大相同的子串</p>
-<pre><code>public static void main(String[] args){
-    String s1 = &quot;jskkskabcdlslslsl&quot;;
-    String s2 = &quot;xjxabcdjas&quot;;
-    String s = getMaxSubstring(s1, s2);
-    System.out.println(&quot;s=&quot;+s);
-}
-
-public static String getMaxSubstring(String s1, String s2){
-    String max = null, min = null;
-    max = (s1.length()&gt;s2.length())?s1:s2;
-    min = max.equals(s1)?s2:s1;
-    for(int i=0; i&lt;min.length(); i++){
-        for(int a=0, b=s2.length()-i; b!=s2.length()+1, a++, b++){
-            String sub = s2.subString(a, b);
-            if(s1.contains(sub))
-                return sub;
-        }
-    }
-    return null;
-}
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/21/java/java-api/api-string/" data-id="cjgxcg47r001hr9p31vz6716e" class="article-share-link">Delen</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/api/">api</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/java-thread/thread-communication" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/18/java/java-thread/thread-communication/" class="article-date">
-  <time datetime="2017-12-18T08:42:27.000Z" itemprop="datePublished">2017-12-18</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/java/">java</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/18/java/java-thread/thread-communication/">thread-communication</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h4 id="一、多线程通信"><a href="#一、多线程通信" class="headerlink" title="一、多线程通信"></a>一、多线程通信</h4><p>多个线程在处理同一资源，但是任务不同。</p>
-<h4 id="1、示例"><a href="#1、示例" class="headerlink" title="1、示例"></a>1、示例</h4><p>input类：输入</p>
-<p>resource类： name、sex</p>
-<p>output类：输出</p>
-<p>input和output作为两个线程，处理同一个资源resource。</p>
-<pre><code>class Resource{
-    String name;
-    String sex;
-}
-
-class Input implements Runnable{
-    Resource r;
-    Input(Resource r){
-        this.r = r;
-    }
-    public void run(){
-        int x = 0;
-        while(true){
-            synchronized(r){//同步锁r与output保持一致
-                if(x == 0){
-                    r.name = &quot;张三&quot;;
-                    r.sex = &quot;男&quot;;
-                }else{
-                    r.name = &quot;李四&quot;;
-                    r.sex = &quot;女&quot;;
-                }
-            }
-            x = (x+1)%2;
-        }
-    }
-}
-
-class Output implements Runnable{
-    Resource r;
-    Input(Resource r){
-        this.r = r;
-    }
-    public void run(){
-        while(true){                    
-            synchronized(r){
-                System.out.println(r.name+&quot;....&quot;+r.sex);
-            }
-        }
-    }
-}
-
-class ResourceDemo{
-    public static void main(String[] args){
-        Resource r = new Resource();
-        Input in = new Input(r);
-        Output out = new Output(r);
-        Thread t1 = new Thread(in);
-        Thread t2 = new Thread(out);
-        t1.start();
-        t2.start();
-    }
-}
-</code></pre><p>线程分析：</p>
-<p>input拿到执行权后，输入张三男，output拿到执行权，输出张三、男，input再拿到执行输入李四女，还是input拿到执行权，输入张三男，覆盖了李四女，output拿到执行权还是输出张三男。因此，无法实现input输入一次，output就输出一次的需求。</p>
-<h4 id="2、多线程通信-等待唤醒机制"><a href="#2、多线程通信-等待唤醒机制" class="headerlink" title="2、多线程通信-等待唤醒机制"></a>2、多线程通信-等待唤醒机制</h4><p>实现input输入一次，output就紧接着输出一次。</p>
-<p>等待唤醒机制涉及的方法：</p>
-<p>1、wait()：让线程处于冻结状态，被wait的线程会被存储到线程池中。</p>
-<p>2、notify()：唤醒线程池中一个线程（任意）。</p>
-<p>3、notifyAll()：唤醒线程池中的所有线程。</p>
-<p>4、以上方法都必须定义在同步中。因为这些方法都是用于操作线程状态的方法。必须要明确到底操作的是哪个锁上的线程。</p>
-<p>5、r锁即为线程input和output的监视器。</p>
-<p>6、为什么操作线程的方法wait、notify、notifyAll定义在了Object类中，而没有定义在Thread类中。因为这些方法是监视器的方法。监视器就是锁。锁可以是任意对象，任意对象都继承自Object类。</p>
-<pre><code>class Resource{
-    String name;
-    String sex;
-    boolean flag = false;
-}
-
-class Input implements Runnable{
-    Resource r;
-    Input(Resource r){
-        this.r = r;
-    }
-    public void run(){
-        int x = 0;
-        while(true){
-            synchronized(r){//同步锁r与output保持一致
-                if(r.flag)
-                    try{
-                        r.wait()
-                    }catch(InterruptedException e){
-                        //...
-                    }
-                if(x == 0){
-                    r.name = &quot;张三&quot;;
-                    r.sex = &quot;男&quot;;
-                }else{
-                    r.name = &quot;李四&quot;;
-                    r.sex = &quot;女&quot;;
-                }
-                r.flag = true;
-                r.notify();
-            }
-            x = (x+1)%2;
-        }
-    }
-}
-
-class Output implements Runnable{
-    Resource r;
-    Input(Resource r){
-        this.r = r;
-    }
-    public void run(){
-        while(true){                    
-            synchronized(r){
-                if(!r.flag)
-                    try{
-                        r.wait()
-                    }catch(InterruptedException e){
-                        //...
-                    }
-                    System.out.println(r.name+&quot;....&quot;+r.sex);
-                    r.flag = false;
-                    r.notify();
-            }
-        }
-    }
-}
-
-class ResourceDemo{
-    public static void main(String[] args){
-        Resource r = new Resource();
-        Input in = new Input(r);
-        Output out = new Output(r);
-        Thread t1 = new Thread(in);
-        Thread t2 = new Thread(out);
-        t1.start();
-        t2.start();
-    }
-}
-</code></pre><p>线程分析：input和output分别取得执行权，并相互唤醒对方。</p>
-<p>代码优化：不要直接访问Resource中的变量，提高安全性。</p>
-<pre><code>class Resource{
-    private String name;
-    private String sex;
-    private boolean flag = false;
-    public synchronized void set(String name, String sex){
-        if(flag){
-            try{
-                    this.wait()
-                }catch(InterruptedException e){
-                    //...
-                }
-            this.name = name;
-            this.sex = sex;
-            flag = true;
-            this.notify();//同步函数的锁是this
-        }
-    }
-    public synchronized void out(){
-        if(!flag){
-            try{
-                    this.wait()
-                }catch(InterruptedException e){
-                    //...
-                }
-        }
-        System.out.println(name+&quot;....&quot;+sex);
-        flag = false;
-        this.notify();
-    }
-}
-
-class Input implements Runnable{
-    Resource r;
-    Input(Resource r){
-        this.r = r;
-    }
-    public void run(){
-        int x = 0;
-        while(true){
-            if(x == 0){
-                r.set(&quot;张三&quot;,&quot;男&quot;);
-            }else{
-                r.set(&quot;张三&quot;,&quot;女&quot;);
-            }
-            x = (x+1)%2;
-        }
-    }
-}
-
-class Output implements Runnable{
-    Resource r;
-    Input(Resource r){
-        this.r = r;
-    }
-    public void run(){
-        while(true){                    
-            r.out();
-        }
-    }
-}
-
-class ResourceDemo{
-    public static void main(String[] args){
-        Resource r = new Resource();
-        Input in = new Input(r);
-        Output out = new Output(r);
-        Thread t1 = new Thread(in);
-        Thread t2 = new Thread(out);
-        t1.start();
-        t2.start();
-    }
-}
-</code></pre><h4 id="3、多线程通信-多生产者多消费者问题"><a href="#3、多线程通信-多生产者多消费者问题" class="headerlink" title="3、多线程通信-多生产者多消费者问题"></a>3、多线程通信-多生产者多消费者问题</h4><pre><code>class Resource{
-    private String name;
-    private int count = 1;
-    private boolean flag = false;
-    public synchronized void set(String name){
-        if(flag)
-            try{
-                this.wait()
-            }catch(InterruptedException e){
-                //...
-            }
-        this.name = name + count;
-        count++;
-        System.out.println(Thread.currentThread().getName()+&quot;...生产者...&quot;+this.name);
-        flag = true;
-        this.notify();//同步函数的锁是this
-    }
-    public synchronized void out(){
-        if(!flag)
-            try{
-                this.wait()
-            }catch(InterruptedException e){
-                //...
-            }
-        System.out.println(Thread.currentThread().getName()+&quot;...消费者...&quot;+this.name);
-        flag = false;
-        this.notify();
-    }
-}
-
-class Producer implements Runnable{
-    private Resource r;
-    Producer(Resource r){
-        this.r = r;
-    }
-    public void run(){
-        while(true){
-            r.set(&quot;烤鸭&quot;);
-        }
-    }
-}
-
-class Consumer implements Runnable{
-    private Resource r;
-    Producer(Resource r){
-        this.r = r;
-    }
-    public void run(){
-        while(true){
-            r.out();
-        }
-    }
-}
-
-//只有一个生产者和一个消费者，安全
-class ProducerConsumerDemo{
-    public static void main(String[] args){
-        Resource r = new Resource();
-        Producer pro = new Producer();
-        Consumer con = new Consumer();
-        Thread t1 = new Thread(pro);
-        Thread t2 = new Thread(con);
-        t1.start();
-        t2.start();
-    }
-}
-
-//存在多个生产者和多个消费者，存在安全隐患
-class ProducerConsumerDemo{
-    public static void main(String[] args){
-        Resource r = new Resource();
-        Producer pro = new Producer();
-        Consumer con = new Consumer();
-        Thread t1 = new Thread(pro);
-        Thread t2 = new Thread(pro);
-        Thread t3 = new Thread(con);
-        Thread t4 = new Thread(con);
-        t1.start();
-        t2.start();
-        t3.start();
-        t4.start();
-    }
-}
-</code></pre><p>线程分析：只有一个生产者，一个消费者时，没有问题。但是当有多个生产者和多个消费者是会存在安全隐患，甚至死锁。</p>
-<h5 id="隐患分析："><a href="#隐患分析：" class="headerlink" title="隐患分析："></a>隐患分析：</h5><p>t0,t1,t2,t3都有执行资格。</p>
-<p>线程t0拿到执行权，生产烤鸭1，flag为true。</p>
-<p>t0再次拿到执行权被冻结。</p>
-<p>t1拿到执行权也被冻结。此时，t0和t1都进入线程池。</p>
-<p>t2拿到执行权，消费了烤鸭1，flag为false。唤醒线程池中被冻结的线程t0或t1。假设唤醒了t0。此时，t0,t2,t3有执行资格。</p>
-<p>t2继续拿到执行权被冻结，进入线程池（t1,t2）。</p>
-<p>t3拿到执行权也被冻结，进入线程池（t1,t2,t3）。</p>
-<p>被唤醒的t0拿到执行权，没有判断if(flag)，直接往下执行，生产烤鸭2，flag为true。唤醒线程池中的一个线程。</p>
-<p>如果t1被唤醒，此时t0和t1有执行资格，线程池中还有t2和t3。</p>
-<p>t0拿到执行权，被冻结进入线程池。</p>
-<p>被唤醒的t1拿到执行权，还是没有判断if(flag)，从被冻结的位置，直接往下执行，又生产了烤鸭3。</p>
-<p>问题出现，烤鸭2没有被消费的情况下，生产了烤鸭3。</p>
-<h5 id="隐患解决方法：t1拿到执行权后，要判断flag为true，不要再生产烤鸭3。"><a href="#隐患解决方法：t1拿到执行权后，要判断flag为true，不要再生产烤鸭3。" class="headerlink" title="隐患解决方法：t1拿到执行权后，要判断flag为true，不要再生产烤鸭3。"></a>隐患解决方法：t1拿到执行权后，要判断flag为true，不要再生产烤鸭3。</h5><p>因此要将if改为while</p>
-<pre><code>public synchronized void set(String name){
-    while(flag)
-        try{
-            this.wait()
-        }catch(InterruptedException e){
-            //...
-        }
-    ...
-}
-
-public synchronized void out(){
-    while(!flag)
-        try{
-            this.wait()
-        }catch(InterruptedException e){
-            //...
-        }
-    ...
-}
-</code></pre><h5 id="死锁分析："><a href="#死锁分析：" class="headerlink" title="死锁分析："></a>死锁分析：</h5><p>t0和t1被冻结进入线程池。</p>
-<p>t2拿到执行权，消费烤鸭1，flag为false，唤醒t0。</p>
-<p>t2和t3先后拿到执行权被冻结进入线程池。</p>
-<p>t0拿到执行权，生产烤鸭，flag变为true，唤醒线程池中的任意一个线程。此时，线程池中有t1,t2,t3。</p>
-<p>如果唤醒的是t1，此时有执行资格的为t0和t1。先后拿到执行权，由于flag为true，都被冻结进入线程池。此时，t0,t1,t2,t3都被冻结在线程池中。</p>
-<p>没有线程被唤醒，没有线程有执行资格，没有线程能拿到执行权，死锁。</p>
-<h5 id="死锁解决："><a href="#死锁解决：" class="headerlink" title="死锁解决："></a>死锁解决：</h5><p>t0拿到执行权，生产烤鸭，flag变为true，唤醒线程池中的线程时，全部唤醒。</p>
-<pre><code>public synchronized void set(String name){
-    ...
-    this.notifyAll();
-}
-
-public synchronized void out(String name){
-    ...
-    this.notifyAll();
-}
-</code></pre><h4 id="4、多线程通信-多生产者多消费者问题-JDK1-5新特性-Lock"><a href="#4、多线程通信-多生产者多消费者问题-JDK1-5新特性-Lock" class="headerlink" title="4、多线程通信-多生产者多消费者问题-JDK1.5新特性-Lock"></a>4、多线程通信-多生产者多消费者问题-JDK1.5新特性-Lock</h4><p>Lock接口是1.5版本对synchronized的替代。</p>
-<p>同步代码块和同步函数对于锁的操作是隐式的。</p>
-<p>jdk1.5以后将同步和锁封装成了对象，并将操作锁的隐式方式定义到了该对象中，将隐式动作变成了显式动作。</p>
-<pre><code>Object obj = new Object();
-void show(){
-    synchronized(obj){
-        //...
-    }
-}
-
-Lock lock = new ReentrantLock();
-void show(){
-    try{
-        lock.lock();//获取锁
-        //...
-    }catch(){
-        //...
-    }finally{
-        lock.unlock();
-    }
-}
-</code></pre><h4 id="5、多线程通信-多生产者多消费者问题-JDK1-5新特性-Condition"><a href="#5、多线程通信-多生产者多消费者问题-JDK1-5新特性-Condition" class="headerlink" title="5、多线程通信-多生产者多消费者问题-JDK1.5新特性-Condition"></a>5、多线程通信-多生产者多消费者问题-JDK1.5新特性-Condition</h4><pre><code>Object obj = new Object();
-void show(){
-    synchronized(obj){
-        //...
-    }
-}
-
-同步代码块中的锁对象，只有一组操作线程的方法，就是继承自object的wait(),notify(),notifyAll()。
-
-Lock lock = new ReentrantLock();
-void show(){
-    try{
-        lock.lock();//获取锁
-        //...
-    }catch(){
-        //...
-    }finally{
-        lock.unlock();
-    }
-}
-
-jdk1.5以后将操作线程的方法封装为了对象即为condition接口。
-
-Lock替代的是synchronized的方法和语句的使用，Condition替代了Object监视器（即锁）的方法（wait,notify,notifyAll）的使用。
-
-通过Lock接口的newCondition方法，就可以使一个实现了Lock接口的锁对象生成多组监视器方法。
-
-interface Condition{
-    await();
-    signal();
-    signalAll();
-}
-
-Lock lock = new ReentrantLock();
-Condition c1 = lock.newCondition();
-Condition c2 = lock.newCondition();
-</code></pre><h5 id="优化烤鸭示例代码"><a href="#优化烤鸭示例代码" class="headerlink" title="优化烤鸭示例代码"></a>优化烤鸭示例代码</h5><pre><code>import java.util.concurrent.locks.*
-
-class Resource{
-    private ...
-    ...
-    //创建一个锁对象
-    Lock lock = new ReentrantLock();
-    //通过已有的锁获取该锁上的监视器对象
-    Condition con = lock.newCondition();
-    public void set(String name){
-        lock.lock();
-        try{
-            while(flag)
-                //try{this.wait();}catch(...){}
-                try{con.await();}catch(...){}
-                ...
-                //notifyAll();
-                con.signalAll();
-        }finally{
-            lock.unlock();
-        }
-    }
-    public void out(){
-        lock.lock();
-        try{
-            while(!flag)
-                //try{this.wait();}catch(...){}
-                try{con.await();}catch(...){}
-                ...
-                //notifyAll();
-                con.signalAll();
-        }finally{
-            lock.unlock();
-        }
-    }
-}
-</code></pre><h5 id="notifyAll解决方法缺点"><a href="#notifyAll解决方法缺点" class="headerlink" title="notifyAll解决方法缺点"></a>notifyAll解决方法缺点</h5><p>唤醒了所有的线程，t1还有可能优于t2和t2拿到执行权，降低了效率。</p>
-<p>应该想办法做到：set的线程t0和t1只唤醒out的t2和t3，而out的线程t2和t3只唤醒t0和t1。</p>
-<p>lock和condition满足条件，四个线程共用一把锁lock，但是一把锁有两个监视器，一个监视器用来监视set，另一个监视器用来监视out。</p>
-<h5 id="优化烤鸭示例代码-1"><a href="#优化烤鸭示例代码-1" class="headerlink" title="优化烤鸭示例代码"></a>优化烤鸭示例代码</h5><pre><code>Lock lock = new ReentrantLock();
-Condition producer_con = lock.newCondition();
-Condition consumer_con = lock.newCondition();
-public void set(String name){
-    lock.lock();
-    try{
-        while(flag)
-            //try{this.wait();}catch(...){}
-            //try{con.await();}catch(...){}
-            try{producer_con();}catch(...){}
-            ...
-            //notifyAll();
-            //con.signalAll();
-            //唤醒消费者的线程的一个线程即可
-            consumer_con.signal();
-    }finally{
-        lock.unlock();
-    }
-}
-public void out(){
-    lock.lock();
-    try{
-        while(!flag)
-            //try{this.wait();}catch(...){}
-            //try{con.await();}catch(...){}
-            try{consumer_con.await();}catch(...){}
-            ...
-            //notifyAll();
-            //con.signalAll();
-            producer_con.signal();
-    }finally{
-        lock.unlock();
-    }
-}
-</code></pre><h5 id="lock-amp-condition"><a href="#lock-amp-condition" class="headerlink" title="lock &amp; condition"></a>lock &amp; condition</h5><p>Lock接口：替代了同步代码块或者同步函数。将同步的隐式锁操作变成显式操作。同时更为灵活。可以给一个锁加上多组监视器。</p>
-<pre><code>lock():获取锁
-
-unlock():释放锁
-</code></pre><p>Condition接口：替代了Object中的wait，notify，notifyAll方法。将这些监视器的方法进行了封装，变成Condition监视器对象。可以任意锁进行组合。</p>
-<pre><code>await():相当于wait()方法
-signal():相当于notify()方法
-signalAll():相当于notifyAll()方法
-</code></pre><h4 id="6、wait和sleep的区别"><a href="#6、wait和sleep的区别" class="headerlink" title="6、wait和sleep的区别"></a>6、wait和sleep的区别</h4><p>1、wait可以指定时间，也可以不指定时间。sleep必须指定时间。</p>
-<p>2、在同步中，对cpu的执行权和锁的处理不同。<br>    wait：释放执行权，也释放锁。<br>    sleep：释放执行权，不释放锁。</p>
-<h4 id="7、停止线程方式-定义标记"><a href="#7、停止线程方式-定义标记" class="headerlink" title="7、停止线程方式 - 定义标记"></a>7、停止线程方式 - 定义标记</h4><p>1、stop方法。已过时。</p>
-<p>2、run方法结束</p>
-<p>任务中都有循环结构，只要控制住循环就可以结束任务。</p>
-<p>控制循环通常就用定义标记来完成。</p>
-<pre><code>class StopThread implements Runnable{
-    private boolean flag = true;
-    public void run(){
-        while(flag){
-            System.out.println(Thread.currentThread().getName()+&quot;...&quot;);
-        }
-    }
-    public void setFlag(){
-        flag = false;
-    }
-}
-
-class StopThreadDemo{
-    public static void main(String[] args){
-        StopThread st = new StopThread();
-        Thread t1 = new Thread(st);
-        Thread t2 = new Thread(st);
-        t1.start();
-        t2.start();
-
-        int num = 1;
-        for(;;){
-            if(++num == 50){
-                st.setFlag(0;
-                break;
-            }
-            System.out.println(&quot;main...&quot;+num);
-        }
-        System.out.println(&quot;over&quot;);
-    }
-}
-</code></pre><p>如果线程处于冻结状态，无法读取标记，可以用Thread类中的interrupt方法将线程从冻结状态强制恢复到运行状态中来，让线程具备cpu的执行资格。</p>
-<p>强制动作会发生中断异常，需要处理。</p>
-<pre><code>class StopThread implements Runnable{
-    private boolean flag = true;
-    public void run(){
-        while(flag){
-            try{
-                wait();
-            }catch(InterruptedException e){
-                System.out.printlin(Thread.currentThread().getName()+&quot;...&quot;+e);
-            }
-            System.out.printlin(Thread.currentThread().getName()+&quot;...+++&quot;);
-        }
-    }
-    public void setFlag(){
-        flag = false;
-    }
-}
-
-class StopThreadDemo{
-    public static void main(String[] args){
-        StopThread st = new StopThread();
-        Thread t1 = new Thread(st);
-        Thread t2 = new Thread(st);
-        t1.start();
-        t2.start();
-
-        int num = 1;
-        for(;;){
-            if(++num == 50){
-                //st.setFlag(0;
-                t1.interrupt();
-                t2.interrupt();
-                break;
-            }
-            System.out.println(&quot;main...&quot;+num);
-        }
-        System.out.println(&quot;over&quot;);
-    }
-}
-</code></pre><h4 id="8、多线程-守护线程"><a href="#8、多线程-守护线程" class="headerlink" title="8、多线程 - 守护线程"></a>8、多线程 - 守护线程</h4><p>setDaemon：后台线程，守护线程，用户线程。</p>
-<p>运行时，跟前台线程一样，争夺cpu资源。</p>
-<p>前台线程需要手动结束，后台线程当前台线程全部结束后自动结束。</p>
-<p>setDaemon在线程开启之前调用。</p>
-<pre><code>t1.setDaemon(true);
-t1.start();
-t2.setDaemon(true);
-t2.start();
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/18/java/java-thread/thread-communication/" data-id="cjgxcg4be004pr9p3d1ixd7fw" class="article-share-link">Delen</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/thread/">thread</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/java-thread/java-thread" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/12/15/java/java-thread/java-thread/" class="article-date">
-  <time datetime="2017-12-15T02:47:02.000Z" itemprop="datePublished">2017-12-15</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/java/">java</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/12/15/java/java-thread/java-thread/">java多线程</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h4 id="创建线程"><a href="#创建线程" class="headerlink" title="创建线程"></a>创建线程</h4><h5 id="创建线程方式一：继承thread类。"><a href="#创建线程方式一：继承thread类。" class="headerlink" title="创建线程方式一：继承thread类。"></a>创建线程方式一：继承thread类。</h5><p>步骤：</p>
-<p>1、定义一个子类继承Thread类。</p>
-<p>2、覆盖Thread类中的run方法。</p>
-<p>3、直接创建Thread的子类对象创建线程。</p>
-<p>4、调用start方法开启线程并调用线程的任务run方法执行。</p>
-<pre><code>class Demo extends Thread{
-    private String name;
-    Demo(String name){
-        this.name = name;
-    }
-    public void run(){
-        for(int x=0; x&lt;10; x++){
-            System.out.println(name+&quot;...x=&quot;+x);
-        }
-    }
-}
-
-class ThreadDemo2{
-    public static void main(String[] args){
-        Demo d1 = new Demo(&quot;张三&quot;);
-        Demo d2 = new Demo(&quot;李四&quot;);
-        d1.start();
-        d2.start();
-    }
-}
-</code></pre><h5 id="创建线程方式二：实现Runnable接口。"><a href="#创建线程方式二：实现Runnable接口。" class="headerlink" title="创建线程方式二：实现Runnable接口。"></a>创建线程方式二：实现Runnable接口。</h5><p>步骤：</p>
-<p>1、定义类实现Runnable接口。</p>
-<p>2、覆盖接口中的run方法，将线程的任务代码封闭到run方法中。</p>
-<p>3、通过Thread类创建线程对象，并将实现Runnable接口的子类对象，作为Thread类的构造函数的参数进行传递。</p>
-<pre><code>为什么？因为线程的任务都封装在Runnable接口子类对象的run方法中。
-所以要
-</code></pre><p>4、调用线程对象的start方法开启线程。</p>
-<pre><code>class Demo implements Runnable{
-    public void run(){
-        show();
-    }
-    public void show(){
-        for(int x=0; x&lt;20; x++){
-            system.out.println(Thread.currentThread().getname()+&quot;........&quot;+x);
-        }
-    }
-}
-
-class TreadDemo{
-    public static void main(sting[] args){
-        Demo d = new Demo();
-        Thread t1 = new Thread(d);
-        Thread t2 = new Thread(d);
-        t1.start;
-        t2.start;
-    }
-}
-</code></pre><h5 id="线程安全隐患排查原则"><a href="#线程安全隐患排查原则" class="headerlink" title="线程安全隐患排查原则"></a>线程安全隐患排查原则</h5><p>1、查找共享数据</p>
-<p>2、共享数据代码的操作不止一条</p>
-<p>事例：两个储户到银行存钱，每次存100，共存三次。银行总数从100到600递增。</p>
-<pre><code>class Bank{
-    private int sum;
-    public void add(int num){
-        sum = sum + num;
-        try{
-            Thread.sleep();
-        }catch(InterruptedException e){
-            //...
-        }
-        System.out.println(&quot;sum=&quot;+sum);
-    }
-}
-
-class Cus implements Runnable{
-    private b = new Bank();
-    public void run(){
-        for(int x=0; x&lt;3; x++){
-            b.add(100);
-        }
-    }
-}
-
-class BankDemo{
-    public static void main(String[] args){
-        Cus c = new Cus();
-        Thread t1 = new Thread(c);
-        Thread t2 = new Thread(c);
-        t1.start();
-        t2.start();
-    }
-}
-</code></pre><h5 id="分析多线程安全隐患："><a href="#分析多线程安全隐患：" class="headerlink" title="分析多线程安全隐患："></a>分析多线程安全隐患：</h5><p>共享数据有：private b</p>
-<p>执行代码有一句：b.add(100);</p>
-<p>b.add里有一个共享数据：private int sum;</p>
-<p>执行语句有两句：sum = sum + num; system.out.printls…;</p>
-<p>此处会产生安全隐患：比如第一次当线程0进来时，sum = 100，但没有执行system.out.println语句，第二次线程1进来，此时sum = 100+100,再执行线程0和线程1的输出语句时，就都成了200。</p>
-<h5 id="解决方式一："><a href="#解决方式一：" class="headerlink" title="解决方式一："></a>解决方式一：</h5><p>用同步代码块把产生线程安全隐患的代码封装，注意要保持多线程用的是同一个锁。</p>
-<pre><code>class Bank{
-    private int sum;
-    private Object obj = new Object();
-    public void add(int num){
-        synchronized(obj){//三个线程共用一个对象锁obj
-            sum = sum + num;
-            try{
-                Thread.sleep();
-            }catch(InterruptedException e){
-                //...
-            }
-            System.out.println(&quot;sum=&quot;+sum);
-        }
-    }
-}
-</code></pre><h5 id="解决方式二："><a href="#解决方式二：" class="headerlink" title="解决方式二："></a>解决方式二：</h5><p>同步函数</p>
-<pre><code>class Bank{
-    private int sum;
-    public synchronized void add(int num){//同步函数
-        sum = sum + num;
-        try{
-            Thread.sleep();
-        }catch(InterruptedException e){
-            //...
-        }
-        System.out.println(&quot;sum=&quot;+sum);
-    }
-}
-</code></pre><h5 id="同步的好处和弊端"><a href="#同步的好处和弊端" class="headerlink" title="同步的好处和弊端"></a>同步的好处和弊端</h5><p>好处：解决了线程的安全问题</p>
-<p>弊端：降低了效率，因为同步外的线程都会判断同步锁。</p>
-<h5 id="同步函数和同步代码块的区别："><a href="#同步函数和同步代码块的区别：" class="headerlink" title="同步函数和同步代码块的区别："></a>同步函数和同步代码块的区别：</h5><p>1、同步函数使用的锁是this，同步代码块的锁是任意的对象。</p>
-<p>2、建议使用同步代码块。</p>
-<h5 id="静态同步函数的锁"><a href="#静态同步函数的锁" class="headerlink" title="静态同步函数的锁"></a>静态同步函数的锁</h5><p>静态同步函数的锁是该函数所属的字节码文件对象</p>
-<p>该对象可以用this.getClass()方法获取，也可以用当前类名.class获取。</p>
-<pre><code>class Bank{
-    private int sum;
-    public static synchronized void add(int num){
-        sum = sum + num;
-        try{
-            Thread.sleep();
-        }catch(InterruptedException e){
-            //...
-        }
-        System.out.println(&quot;sum=&quot;+sum);
-    }
-}
-</code></pre><p>该静态同步函数add的同步锁即为该函数所属的字节码文件对象，即为Bank.class。</p>
-<h5 id="单例模式涉及的多线程问题"><a href="#单例模式涉及的多线程问题" class="headerlink" title="单例模式涉及的多线程问题"></a>单例模式涉及的多线程问题</h5><pre><code>//饿汉式
-class Single{
-    private static final Singles = new Single();
-    private Single(){};
-    public static Single getInstance(){
-        return s;
-    }
-}
-
-//懒汉式
-class Single{
-    private static final Singles = null;
-    private Single(){};
-    public static Single getInstance(){
-        if(s == null)
-            s = new Single();
-            return s;
-    }
-}
-
-class SingleDemo{
-    public static void main(String[] args){
-
-    }
-}
-</code></pre><p>饿汉式多线程安全隐患分析：</p>
-<p>如果把getInstance函数封装为多线程的任务，1、多线程存在共享数据s；2、只有一条语句return s；因此，不会存在安全隐患。</p>
-<p>懒汉式多线程安全隐患分析：</p>
-<p>如果把getInstance函数封装为多线程的任务，1、多线程存在共享数据s；2、有多条语句；因此，存在安全隐患。比如：线程0进来时，s == null，挂住了，线程1双进来了，s == null，挂住了。线程0取得执行权，生成对象并返回。线程1又取得执行权，又生成了对象并返回。就不能保证单例设计模式对象的唯一性了。</p>
-<p>因此，懒汉式需要同步函数。</p>
-<pre><code>public static synchronized Single getInstance(){
-    if(s == null)
-        s = new Single();
-        return s;
-}
-</code></pre><p>解决了安全问题，但是每一次线程进来时都会判断同步锁是否一样，降低了效率。</p>
-<p>同步代码块解决安全问题以及效率问题。</p>
-<pre><code>public static Single getInstance(){
-    if(s == null){ //a处的if
-        synchronized(Single.class){
-            if(s == null) //b处的if
-                s = new Single();
-                return s;
-        }
-    }
-    return s;
-}
-</code></pre><p>分析：线程0进入getInstance，判断a处的s == null,进入if，挂起。线程1进入判断a处的s == null，进入if挂起。线程0取得执行权，判断b处的s == null，生成对象并返回。线程1取得执行权，判断b处的s已经不为null了，跳出if。线程2进入getInstance，判断a处的s已经不为null了，直接return s。</p>
-<h5 id="多线程死锁事例"><a href="#多线程死锁事例" class="headerlink" title="多线程死锁事例"></a>多线程死锁事例</h5><pre><code>class Test implements Runnable{
-    private boolean flag = true;
-    public void run(){
-        if(flag){
-            while(true)
-                synchronized(MyLock.locka){
-                    System.out.prinln(Thread.currentThread().getName()+&quot;if...locka...&quot;);
-                synchronized(MyLock.lockb){
-                        System.out.prinln(Thread.currentThread().getName()+&quot;if...lockb...&quot;);                    
-                    }
-                }
-        }else{
-            while(true)
-                synchronized(MyLock.lockb){
-                    System.out.prinln(Thread.currentThread().getName()+&quot;else...lockb...&quot;);    
-                synchronized(MyLock.locka){
-                        System.out.prinln(Thread.currentThread().getName()+&quot;else...locka...&quot;);    
-                    }
-                }
-        }
-    }
-}
-
-class MyLock{
-    public static final Object locka = new Object();
-    public static final Object lockb = new Object();
-}
-
-class DeadLockTest{
-    public static void main(String[] args){
-        Test a = new Test();
-        Thread t1 = new Thread(a);
-        Thread t2 = new Thread(a);
-        t1.start();
-        try{
-            Thread.sleep(10);//冻结main主线程10毫秒
-        }catch(){
-            //...
-        }
-        a.flag = false;
-        t2.start();
-    }
-}
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/15/java/java-thread/java-thread/" data-id="cjgxcg4ba004lr9p3t0ul5lr6" class="article-share-link">Delen</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/thread/">thread</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-css/css-grid" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/09/14/css/css-grid/" class="article-date">
-  <time datetime="2017-09-14T02:43:24.000Z" itemprop="datePublished">2017-09-14</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/转载/">转载</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/09/14/css/css-grid/">网格布局</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>原文地址：<a href="http://www.w3cplus.com/css3/a-complete-guide-css-grid-layout.html" target="_blank" rel="external">CSS Grid布局指南</a></p>
-<p>英文出处：<a href="http://chris.house/blog/a-complete-guide-css-grid-layout/" target="_blank" rel="external">A Complete Guide to CSS Grid Layout</a></p>
-<h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><p>CSS Grid布局 （又名”网格”），是一个基于二维网格布局的系统，主要目的是改变我们基于网格设计的用户接口方式。如我们所知，CSS 总是用于网页的样式设置，但它并没有起到很好的作用。刚开始的时候我们使用表格(table)，然后使用浮动(float)、 定位(position)和内联块(inline-block)，但所有这些方法本质上来讲都是hacks，存留了很多需要实现的重要功能问题(例如，<a href="http://www.w3cplus.com/blog/tags/357.html" target="_blank" rel="external">垂直居中</a>)。虽然<a href="http://www.w3cplus.com/blog/tags/157.html" target="_blank" rel="external">Flexbox</a>可以起到一定的补救作用，但是它只可以实现简单的一维布局，并不适用于复杂的二维布局(实际上 Flexbox 和 Grid 可以一起结合使用起到最佳效果)。网格是 CSS 第一次专门创建的模块，用来解决我们之前在制作网站时使用hacks处理布局问题。</p>
-<p>这里有两件事情启发我创建本指南。第一个是 Rachel Andrew 的令人敬畏的书–<a href="http://abookapart.com/products/get-ready-for-css-grid-layout" target="_blank" rel="external">为 CSS Grid 布局做好准备</a>。这本书很详尽明确的的介绍了Grid，如果你想很好的掌握Grid的基础知识，我强烈建议你去购买。另外一个很大的灵感来自于 Chris Coyier 的– <a href="http://www.w3cplus.com/css3/a-guide-to-flexbox-new.html" target="_blank" rel="external">Flexbox完整指南</a>，这本书是我了解Flebox的一个很优秀的资源。这里，我还想补充一句，当你使用谷歌搜索”flexbox”时，会出现很多类似的资源，但是为什么不直接利用最好的资源呢？</p>
-<p>我书写此指南的目的是基于目前最新版本，规范其网格概念。所以我不会再次提及过时的 IE 语法，并且随着规范的成熟，我会尽力定期更新此指南。</p>
-<h4 id="基础知识与浏览器支持"><a href="#基础知识与浏览器支持" class="headerlink" title="基础知识与浏览器支持"></a>基础知识与浏览器支持</h4><p>Grid 的入门是很容易的。你只需要定义一个容器元素并设置display：grid，使用grid-template-columns 和 grid-template-rows属性设置网格的列与 行的大小，然后使用grid-column 和 grid-row属性将其子元素放入网格之中。与flexbox类似，网格项的源顺序无关紧要。为了更好地使你的网格与媒体查询相结合使用，你可以在 CSS 中任意放置。想象一下你定义的整个页面布局，然后如果想要完全重新布局以适应不同的屏幕宽度，这时仅仅使用几行 CSS 代码就可以实现。Grid是曾经介绍过的最强大 CSS 模块之一。</p>
-<p>关于 Grid 一件很重要的事情就是它现在还不适用于项目使用。目前还处于 <a href="https://www.w3.org/TR/css-grid-1/" target="_blank" rel="external">W3C 的工作草案</a>之中，并且默认情况下，还不被所有的浏览器所支持。Internet Explorer 10 和 11 已经可以实现支持，但也是利用一种过时的语法实现的。现在出于示例演示，我建议你使用启用了特殊标志的 Chrome, Opera 或者 Firefox 。在 Chrome，导航到chrome://flags 并启用” web 实验平台功能”。该方法同样适用于 Opera (opera://flags)。在Firefox中，启用 layout.css.grid.enabled 标志。</p>
-<iframe src="http://caniuse.com/css-grid/embed" frameborder="0" width="100%" height="413px"></iframe>
-
-<p>除了Microsoft，浏览器厂商似乎想要等到Grid规范成熟后再加以推广。这是一件好事，因为这意味着我们就不需要担心学习多个语法。</p>
-<p>等待 Grid 的使用，只是时间的问题。但是现在你需要开始学习它了。</p>
-<h4 id="重要术语"><a href="#重要术语" class="headerlink" title="重要术语"></a>重要术语</h4><p>在深入研究Grid之前，我们需要理解其相关术语概念。因为这里涉及到的术语在概念上都有点类似，如果你没有首先记住Grid规范中的相关定义，你就会很容易将其与另一个概念相混淆。但是不需要担心，这里的属性并不是很多。</p>
-<p>网格容器(Grid Container)</p>
-<p>当一个元素设置display: grid属性时，它就会成为所有网格项(Grid Items)的父元素。在下面的示例中，container就是网格容器。</p>
-<pre><code>&lt;div class=&quot;container&quot;&gt;
-    &lt;div class=&quot;item item-1&quot;&gt;&lt;/div&gt;
-    &lt;div class=&quot;item item-2&quot;&gt;&lt;/div&gt;
-    &lt;div class=&quot;item item-3&quot;&gt;&lt;/div&gt;
-&lt;/div&gt;
-</code></pre><h4 id="网格项-Grid-Item"><a href="#网格项-Grid-Item" class="headerlink" title="网格项(Grid Item)"></a>网格项(Grid Item)</h4><p>网格容器的孩子(e.g. 子元素)。这里item元素都是网格项，但是sub-item不包含其中。</p>
-<pre><code>&lt;div class=&quot;container&quot;&gt;
-    &lt;div class=&quot;item&quot;&gt;&lt;/div&gt; 
-    &lt;div class=&quot;item&quot;&gt;
-        &lt;p class=&quot;sub-item&quot;&gt;&lt;/p&gt;
-    &lt;/div&gt;
-    &lt;div class=&quot;item&quot;&gt;&lt;/div&gt;
-&lt;/div&gt;
-</code></pre><h4 id="网格线-Grid-Line"><a href="#网格线-Grid-Line" class="headerlink" title="网格线(Grid Line)"></a>网格线(Grid Line)</h4><p>分界线构成了网格的结构。他们可以是垂直的(“列网格线”)也可以是水平的(“行网格线”)，并且存在于一行或一列的任一侧。下面图片中的黄线就是列网格线的一个例子。</p>
-<p><img src="http://cdn.w3cplus.com/cdn/farfuture/gKpvc25w95A-Rw4rzvxuvooFq21vgQLTMvLHI9d9I9k/mtime:1460132248/sites/default/files/blogs/2016/1604/grid-line.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<h4 id="网格轨道-Grid-Track"><a href="#网格轨道-Grid-Track" class="headerlink" title="网格轨道(Grid Track)"></a>网格轨道(Grid Track)</h4><p>两个相邻网格线之间的空间。你可以把它们想像成网格的行或列。下图所示的是第二行和第三行网格线之间的网格轨道。</p>
-<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/gOiQ2Q-w5thxu5hsyw5c9UiGQq7RmnTs-qNKEfnSQxI/mtime:1460132250/sites/default/files/blogs/2016/1604/grid-track.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<h4 id="网格单元格-Grid-Cell"><a href="#网格单元格-Grid-Cell" class="headerlink" title="网格单元格(Grid Cell)"></a>网格单元格(Grid Cell)</h4><p>两个相邻的行和两个相邻的列之间的网格线空间。它是网格的一个”单位”。下面图片所示的是行网格线 1 和 2 与列网格线 2 和 3 之间的网格单元格。</p>
-<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/seD6LEaaFyvVwPATSrWehDkUrCdsHApObOg12OlXNm4/mtime:1460132245/sites/default/files/blogs/2016/1604/grid-cell.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<h4 id="网格区域-Grid-Area"><a href="#网格区域-Grid-Area" class="headerlink" title="网格区域(Grid Area)"></a>网格区域(Grid Area)</h4><p>四条网格线所包围的所有空间。网格区域可由任意数量的网格单元格组成。下面图片所示的是行网格线 1 和 3 和列网格线 1 和 3 之间的网格区域。</p>
-<p><img src="http://cdn.w3cplus.com/cdn/farfuture/t4WyvkNvPqgPU-Jly_aF7ZGgDaM6AxgAedTXkfx4L74/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-area.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<h4 id="网格容器属性-Grid-Container"><a href="#网格容器属性-Grid-Container" class="headerlink" title="网格容器属性(Grid Container)"></a>网格容器属性(Grid Container)</h4><h5 id="display"><a href="#display" class="headerlink" title="display"></a>display</h5><p>定义一个元素成为网格容器，并对其内容建立一个网格格式的上下文。</p>
-<h5 id="属性值"><a href="#属性值" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><p>grid: 产生一个块级的网格</p>
-</li>
-<li><p>inline-grid: 产生内联级网格</p>
-<pre><code>.container{
-    display: grid | inline-grid   
-}
-</code></pre></li>
-</ul>
-<p>注: column, float, clear, 和 vertical-align 元素对网格容器不起作用。</p>
-<h4 id="grid-template-rows"><a href="#grid-template-rows" class="headerlink" title="grid-template-rows"></a>grid-template-rows</h4><p>利用以空格分隔的值定义网格的列和行。值的大小代表轨道的大小，并且它们之间的空格表示网格线。</p>
-<h5 id="属性值-1"><a href="#属性值-1" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><p><track-size>: 可以是一个长度、百分比或者是网格中自由空间的一小部分(使用fr单位)</track-size></p>
-</li>
-<li><p><line-name>: 你选择的任意名称</line-name></p>
-</li>
-<li><p>subgrid - 如果你的网格容器本身就是一个网格项(即嵌套网格)，你可以使用此属性指定行和列的大小继承于父元素而不是自身指定。</p>
-<pre><code>.container{
-    grid-template-columns: &lt;track-size&gt; ... | &lt;line-name&gt; &lt;track-size&gt; ... | subgrid;
-    grid-template-rows: &lt;track-size&gt; ... | &lt;line-name&gt; &lt;track-size&gt; ... | subgrid;
-}
-</code></pre></li>
-</ul>
-<h4 id="示例"><a href="#示例" class="headerlink" title="示例:"></a>示例:</h4><p>当你在值之间留有空格时，网络线就会自动分配数值名称:</p>
-<pre><code>.container{
-    grid-template-columns: 40px 50px auto 50px 40px;
-    grid-template-rows: 25% 100px auto;
-}
-</code></pre><p><img src="http://cdn2.w3cplus.com/cdn/farfuture/X_DM7Y2QqrzK1H9w41DkpyGLmZeMkaq5pbyVZevlgBg/mtime:1460132249/sites/default/files/blogs/2016/1604/grid-numbers.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<p>但是你也可以显示命名，请参考下面括号语法中的名称命名方式:</p>
-<pre><code>.container{
-    grid-template-columns: [first] 40px [line2] 50px [line3] auto [col4-start] 50px [five] 40px [end];
-    grid-template-rows: [row1-start] 25% [row1-end] 100% [third-line] auto [last-line];
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/TeK_YrqYf9wK7TYBGo00d8vzqb0ErZkCLNVZrRWSRdM/mtime:1460132249/sites/default/files/blogs/2016/1604/grid-names.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<p>请注意，一条网格线可以具有有多个名称。例如，这里的第二行将有两个名字: row1-end 和 row2-start:</p>
-<pre><code>.container{
-    grid-template-rows: [row1-start] 25% [row1-end row2-start] 25% [row2-end];
-}
-</code></pre><p>如果你的定义中包含重复的部分，你可以使用 repeat() 表示法进行精简:</p>
-<pre><code>.container{
-    grid-template-columns: repeat(3, 20px [col-start]) 5%;
-}
-</code></pre><p>等效于:</p>
-<pre><code>.container{
-    grid-template-columns: 20px [col-start] 20px [col-start] 20px [col-start] 5%;
-}
-</code></pre><p>fr 单位允许你将一个轨道大小设置为网格容器内自由空间的一小部分。如下所示，每个网格项就会占据网格容器宽度的三分之一:</p>
-<pre><code>.container{
-    grid-template-columns: 1fr 1fr 1fr;
-}
-</code></pre><p>这里自由空间表示除去非弹性项以后剩余的空间。在此示例中的 fr 单位的可用空间表示减去50px以后的空间大小:</p>
-<pre><code>.container{
-    grid-template-columns: 1fr 50px 1fr 1fr;
-}
-</code></pre><h4 id="grid-template-areas"><a href="#grid-template-areas" class="headerlink" title="grid-template-areas"></a>grid-template-areas</h4><p>使用grid-area属性定义网格区域名称，从而定义网格模板。网格区域重复的名称就会导致内容跨越这些单元格。句点表示一个空单元格。语法本身提供了一种可视化的网格结构。</p>
-<h5 id="属性值-2"><a href="#属性值-2" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><p><grid-area-name>: 使用grid-area属性定义网格区域名称</grid-area-name></p>
-</li>
-<li><p>.: 句点表示一个空单元格</p>
-</li>
-<li><p>none: 无网格区域被定义</p>
-<pre><code>.container{
-    grid-template-areas: &quot;&lt;grid-area-name&gt; | . | none | ...&quot;
-                      &quot;...&quot;
-}
-</code></pre></li>
-</ul>
-<h5 id="示例-1"><a href="#示例-1" class="headerlink" title="示例:"></a>示例:</h5><pre><code>.item-a{
-    grid-area: header;
-}
-.item-b{
-    grid-area: main;
-}
-.item-c{
-    grid-area: sidebar;
-}
-.item-d{
-    grid-area: footer;
-}
-.container{
-    grid-template-columns: 50px 50px 50px 50px;
-    grid-template-rows: auto;
-    grid-template-areas: &quot;header header header header&quot;
-                         &quot;main main . sidebar&quot;
-                         &quot;footer footer footer footer&quot;
-}
-</code></pre><p>这将创建一个四列三行的网格。最上面的一行为header区域。中间一行由两个main区域，一个空单元格和一个sidebar区域。最后一行是footer区域。</p>
-<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/p5O591xAPbyGPVI0pepIgQIQyo25GEzXJc4FqPnkCgI/mtime:1460132550/sites/default/files/blogs/2016/1604/grid-template-areas.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<p>你所声明的每一行都需要具有相同数目的单元格。</p>
-<p>你可以使用任意数量的句点(.)声明单个空单元格。只要句点之间没有空格就表示一个空单元格。</p>
-<p>注意，你只是使用此语法进行网格区域命名，而不是网格线命名。当你使用此语法时，区域两边的线就会得到自动命名。如果网格区域名称为foo,则其行线和列线的名称就将为foo-start，最后一行线及其最后一列线的名字就会为foo-end。这意味着一些线就可能具有多个名称，如上面示例中所示，拥有三个名称: header-start, main-start, 以及footer-start。</p>
-<h4 id="grid-column-gap和grid-row-gap"><a href="#grid-column-gap和grid-row-gap" class="headerlink" title="grid-column-gap和grid-row-gap"></a>grid-column-gap和grid-row-gap</h4><p>指定网格线的大小。你可以把它想像成在行/列之间设置间距宽度。</p>
-<h5 id="属性值-3"><a href="#属性值-3" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><code>&lt;line-size&gt;</code>: 一个长度值</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    grid-column-gap: &lt;line-size&gt;;</div><div class="line">    grid-row-gap: &lt;line-size&gt;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h5 id="示例-2"><a href="#示例-2" class="headerlink" title="示例:"></a>示例:</h5><pre><code>.container{
-    grid-template-columns: 100px 50px 100px;
-    grid-template-rows: 80px auto 80px; 
-    grid-column-gap: 10px;
-    grid-row-gap: 15px;
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/NkH6E9Mt_yBnhLMcuOO2bvijzL-d1dr4PcHROe1jQTw/mtime:1460132245/sites/default/files/blogs/2016/1604/grid-column-row-gap.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<p>间距仅仅在列/行之间产生，而不会在边缘区。</p>
-<h4 id="grid-gap"><a href="#grid-gap" class="headerlink" title="grid-gap"></a>grid-gap</h4><p>grid-column-gap 和 grid-row-gap的简写值。</p>
-<h5 id="属性值-4"><a href="#属性值-4" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><grid-column-gap> <grid-row-gap>: 长度值</grid-row-gap></grid-column-gap></li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    grid-gap: &lt;grid-column-gap&gt; &lt;grid-row-gap&gt;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h5 id="示例-3"><a href="#示例-3" class="headerlink" title="示例:"></a>示例:</h5><pre><code>.container{
-    grid-template-columns: 100px 50px 100px;
-    grid-template-rows: 80px auto 80px; 
-    grid-gap: 10px 15px;
-}
-</code></pre><p>如果没有指定grid-row-gap属性的值，默认与grid-column-gap属性值相同</p>
-<h4 id="justify-items"><a href="#justify-items" class="headerlink" title="justify-items"></a>justify-items</h4><p>沿列轴对齐网格项中的内容(相反于align-item属性定义的沿行轴对齐)。此值适用于容器内所有的网格项。</p>
-<h5 id="属性值-5"><a href="#属性值-5" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><p>start: 内容与网格区域的左端对齐</p>
-</li>
-<li><p>end: 内容与网格区域的右端对齐</p>
-</li>
-<li><p>center: 内容处于网格区域的中间位置</p>
-</li>
-<li><p>stretch: 内容宽度占据整个网格区域空间(默认值)</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    justify-items: start | end | center | stretch;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h5 id="示例-4"><a href="#示例-4" class="headerlink" title="示例:"></a>示例:</h5><pre><code>.container{
-    justify-items: start;
-}
-</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/DeEsJc9aJ197-ygaKH5umTPYax9LHpKqb6UNjOz87AE/mtime:1460132247/sites/default/files/blogs/2016/1604/grid-justify-items-start.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    justify-items: end;
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/Z3ZWMZKBOshRlLnyD_ezkqsI_MswMPWela1e_HJzAH8/mtime:1460132247/sites/default/files/blogs/2016/1604/grid-justify-items-end.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    justify-items: center;
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/VxU0G7HhPCZ9mXhfkuCGrXXjGsvV-JKGdNQ-OzSe6b8/mtime:1460132247/sites/default/files/blogs/2016/1604/grid-justify-items-center.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    justify-items: stretch;
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/k4EK27vIfTqh5nmhucLhomEhun0LTJqUckrTctj41Ag/mtime:1460132248/sites/default/files/blogs/2016/1604/grid-justify-items-stretch.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<p>这也可以使用justify-self属性对各个网格项进行设置。</p>
-<h4 id="align-items"><a href="#align-items" class="headerlink" title="align-items"></a>align-items</h4><p>沿行轴对齐网格项中的内容(相反于justify-item属性定义的沿列轴对齐)。此值适用于容器内所有的网格项。</p>
-<h5 id="属性值-6"><a href="#属性值-6" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><p>start: 内容与网格区域的顶端对齐</p>
-</li>
-<li><p>end: 内容与网格区域的底部对齐</p>
-</li>
-<li><p>center: 内容处于网格区域的中间位置</p>
-</li>
-<li><p>stretch: 内容高度占据整个网格区域空间(默认值)</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    align-items: start | end | center | stretch;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h5 id="示例-5"><a href="#示例-5" class="headerlink" title="示例:"></a>示例:</h5><pre><code>.container{
-    align-items: start;
-}
-</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/SBt28c71z4UWwWCA6VMBJUPVUk5XLccB8-c2gB5RWlQ/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-align-items-start.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    align-items: end;
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/aVcTwfxWM3eKLHtrVECcY0PH-YrinUfDm4m3_eN5lXs/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-align-items-end.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    align-items: center;
-}
-</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/DYCXxtNsb_VN7Yz5qL8qDro-cRnENpRSl7irBEd3vTE/mtime:1460132243/sites/default/files/blogs/2016/1604/grid-align-items-center.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    align-items: stretch;
-}
-</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/fGHKY7-aeOfgpniLoTxQmsgCbLDRt1GiPaVXAl-4LOM/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-align-items-stretch.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<p>这也可以使用align-self属性对各个网格项进行设置。</p>
-<h4 id="justify-content"><a href="#justify-content" class="headerlink" title="justify-content"></a>justify-content</h4><p>当你使用px这种非响应式的单位对你的网格项进行大小设置时，就有可能出现一种情况–你的网格大小可能小于其网格容器的大小。在这种情况下，你就可以设置网格容器内网格的对齐方式。此属性会将网格沿列轴进行对齐(相反于align-content属性定义的沿行轴对齐)。</p>
-<h5 id="属性值-7"><a href="#属性值-7" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><p>start: 网格与网格容器的左端对齐</p>
-</li>
-<li><p>end: 网格与网格容器的右端对齐</p>
-</li>
-<li><p>center: 网格处于网格容器的中间</p>
-</li>
-<li><p>stretch: 调整网格项的大小，使其宽度填充整个网格容器</p>
-</li>
-<li><p>space-around: 在网格项之间设置偶数个空格间隙，其最边缘间隙大小为中间空格间隙大小的一半</p>
-</li>
-<li><p>space-between: 在网格项之间设置偶数个空格间隙，其最边缘不存在空格间隙</p>
-</li>
-<li><p>space-evenly: 在网格项之间设置偶数个空格间隙，同样适用于最边缘区域</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    justify-content: start | end | center | stretch | space-around | space-between | space-evenly;    </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>示例:</p>
-<pre><code>.container{
-    justify-content: start;
-}
-</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/V86BK0l5PPe8ypiC_ewHQnFOJGsHzAJFq81nEvaIzh0/mtime:1460132246/sites/default/files/blogs/2016/1604/grid-justify-content-start.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    justify-content: end; 
-}
-</code></pre><p><img src="http://cdn2.w3cplus.com/cdn/farfuture/OT3tWVLBz8oPeolOD2q01eBHPgyRPay198nZsNyplOw/mtime:1460132245/sites/default/files/blogs/2016/1604/grid-justify-content-end.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    justify-content: center;  
-}
-</code></pre><p><img src="http://cdn2.w3cplus.com/cdn/farfuture/x02TnVK7AWfQrBFo3BmtUW5-9ZdOLp2eBQKShftkYnM/mtime:1460132245/sites/default/files/blogs/2016/1604/grid-justify-content-center.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    justify-content: stretch; 
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/KhGlUpKr2znYjX26PmOrTvEXgf5SfBjuysXm0UwzxYk/mtime:1460132247/sites/default/files/blogs/2016/1604/grid-justify-content-stretch.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    justify-content: space-around;    
-}
-</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/0hwm5rYzTdMYuZV4dTK6ROAEgdxZsoKG0w9Z1utQoIQ/mtime:1460132246/sites/default/files/blogs/2016/1604/grid-justify-content-space-around.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    justify-content: space-between;   
-}
-</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/-Z5SERN8i6b_AFz-KvfhRxP-cHoaIeIYn9G4V5i31F0/mtime:1460132246/sites/default/files/blogs/2016/1604/grid-justify-content-space-between.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-  justify-content: space-evenly;    
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/akDy0eshtzxnti20ICE8V3JyJmotAXjkgLGyMa2HMic/mtime:1460132246/sites/default/files/blogs/2016/1604/grid-justify-content-space-evenly.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<h4 id="align-content"><a href="#align-content" class="headerlink" title="align-content"></a>align-content</h4><p>当你使用px这种非响应式的单位对你的网格项进行大小设置时，就有可能出现一种情况–你的网格大小可能小于其网格容器的大小。在这种情况下，你就可以设置网格容器内网格的对齐方式。此属性会将网格沿行轴进行对齐(相反于justify-content属性定义的沿列轴对齐)。</p>
-<h5 id="属性值-8"><a href="#属性值-8" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><p>start: 网格与网格容器的顶端对齐</p>
-</li>
-<li><p>end: 网格与网格容器的底部对齐</p>
-</li>
-<li><p>center: 网格处于网格容器的中间</p>
-</li>
-<li><p>stretch: 调整网格项的大小，使其高度填充整个网格容器</p>
-</li>
-<li><p>space-around: 在网格项之间设置偶数个空格间隙，其最边缘间隙大小为中间空格空隙大小的一半</p>
-</li>
-<li><p>space-between: 在网格项之间设置偶数个空格间隙，其最边缘不存在空格间隙</p>
-</li>
-<li><p>space-evenly: 在网格项之间设置偶数个空格间隙，同样适用于最边缘区域</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    align-content: start | end | center | stretch | space-around | space-between | space-evenly;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>#####示例:</p>
-<pre><code>.container{
-    align-content: start; 
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/hojdd_caTcpZcB5rA6bf9yu1nd-VzBCviKhKWdNlzmU/mtime:1460132243/sites/default/files/blogs/2016/1604/grid-align-content-start.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    align-content: end;   
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/Z4qpR9QCYog6YQuroNQV1MllyNGMaXdIJkwBmO9-FgE/mtime:1460132243/sites/default/files/blogs/2016/1604/grid-align-content-end.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    align-content: center;    
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/wgXMAOUrFkvw1g5JcA9hlb_d9gb3b_WWAAUxmnIUwMY/mtime:1460132242/sites/default/files/blogs/2016/1604/grid-align-content-center.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    align-content: stretch;   
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/vg-a2_oeUlNgPGVXTeKL-4N5UJlTH2x77cR3fmAgaqI/mtime:1460132243/sites/default/files/blogs/2016/1604/grid-align-content-stretch.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    align-content: space-around;  
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/O4UjhRmD81HKp0JycpbCreC1n59MuMZbLqq-U5ZGT10/mtime:1460132242/sites/default/files/blogs/2016/1604/grid-align-content-space-around.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    align-content: space-between; 
-}
-</code></pre><p><img src="http://cdn2.w3cplus.com/cdn/farfuture/ebLV62oCnLHL9gL8q0h3j44aXZGd-6jJnTGk3Zx9Fe0/mtime:1460132242/sites/default/files/blogs/2016/1604/grid-align-content-space-between.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.container{
-    align-content: space-evenly;  
-}
-</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/14tRJmA8NGCIZ7UUAksJfSU2cot8Eyiwjw9Sgx7R0r4/mtime:1460132242/sites/default/files/blogs/2016/1604/grid-align-content-space-evenly.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<h4 id="grid-auto-columns和grid-auto-rows"><a href="#grid-auto-columns和grid-auto-rows" class="headerlink" title="grid-auto-columns和grid-auto-rows"></a>grid-auto-columns和grid-auto-rows</h4><p>指定任何自动生成的网格轨道(隐式网格跟踪)的大小。当你显式定位行或列(使用 grid-template-rows/grid-template-columns属性)时,就会产生超出定义范围内的隐式网格轨道。</p>
-<h5 id="属性值-9"><a href="#属性值-9" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><code>&lt;track-siz&gt;</code>: 可以是长度、 百分比或网格自由空间的一小部分(使用fr单位)</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    grid-auto-columns: &lt;track-size&gt; ...;</div><div class="line">    grid-auto-rows: &lt;track-size&gt; ...;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>为了说明隐式网格轨道是如何被创造出来的，请思考如下代码:</p>
-<pre><code>.container{
-    grid-template-columns: 60px 60px;
-    grid-template-rows: 90px 90px
-}
-</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/Dqn09IqXrYUqk3YP5ALD5KsauBp-8VFeVe0nO0U-Nqk/mtime:1460132245/sites/default/files/blogs/2016/1604/grid-auto.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<p>这里创建了一个2 x 2 的网格。</p>
-<p>但是现在你想象你使用grid-column 和 grid-row 来定位网格项，如下所示:</p>
-<pre><code>.item-a{
-    grid-column: 1 / 2;
-    grid-row: 2 / 3;
-}
-.item-b{
-    grid-column: 5 / 6;
-    grid-row: 2 / 3;
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/5cMq7ShQn3RVBpbPAIz_5V7m05azOp_8HNZAE3QmB_I/mtime:1460132250/sites/default/files/blogs/2016/1604/implicit-tracks.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<p>这里我们定义.item b开始于列线 5 并结束于在列线 6，但是我们从来没有定义列线 5 或 6。因为我们引用不存在的线，宽度为0的隐式轨道的就会被创建用来填补空白。我们可以使用grid-auto-columns 和 grid-auto-rows属性来设置这些隐式轨道的宽度:</p>
-<pre><code>.container{
-    grid-auto-columns: 60px;
-}
-</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/IS-UCPIfqtPIuj_V24vZqOXgiJbsSusPwIzbzg56yIM/mtime:1460132250/sites/default/files/blogs/2016/1604/implicit-tracks-with-widths.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<h4 id="grid-auto-flow"><a href="#grid-auto-flow" class="headerlink" title="grid-auto-flow"></a>grid-auto-flow</h4><p>如果你不显式的在网格中放置网格项，自动布局算法就会自动踢出此网格项。此属性用来控制自动布局算法的工作原理。</p>
-<h5 id="属性值-10"><a href="#属性值-10" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><p>row: 告诉自动布局算法填充每一行，必要时添加新行</p>
-</li>
-<li><p>column: 告诉自动布局算法填充每一列，必要时添加新列</p>
-</li>
-<li><p>dense: 告诉自动布局算法试图填补网格中之前较小的网格项留有的空白</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    grid-auto-flow: row | column | row dense | column dense</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>注意:dense值可能会导致更改网格项的顺序。</p>
-<h5 id="示例-6"><a href="#示例-6" class="headerlink" title="示例:"></a>示例:</h5><p>考虑如下HTMl代码:</p>
-<pre><code>&lt;section class=&quot;container&quot;&gt;
-    &lt;div class=&quot;item-a&quot;&gt;item-a&lt;/div&gt;
-    &lt;div class=&quot;item-b&quot;&gt;item-b&lt;/div&gt;
-    &lt;div class=&quot;item-c&quot;&gt;item-c&lt;/div&gt;
-    &lt;div class=&quot;item-d&quot;&gt;item-d&lt;/div&gt;
-    &lt;div class=&quot;item-e&quot;&gt;item-e&lt;/div&gt;
-&lt;/section&gt;
-</code></pre><p>这里定义了一个两列五行的网格，并将 grid-auto-flow属性设置为row(即默认值):</p>
-<pre><code>.container{
-    display: grid;
-    grid-template-columns: 60px 60px 60px 60px 60px;
-    grid-template-rows: 30px 30px;
-    grid-auto-flow: row;
-}
-</code></pre><p>将网格项放置在网格中时只需要其中的两个网格项:</p>
-<pre><code>.item-a{
-    grid-column: 1;
-    grid-row: 1 / 3;
-}
-.item-e{
-    grid-column: 5;
-    grid-row: 1 / 3;
-}
-</code></pre><p>因为我们将grid-auto-flow属性设置为了row，所以我们的网格看起来会像这个样子。注意我们我们没有对其进行设置的三个网格项(item-b, item-c and item-d),会沿行轴进行布局。</p>
-<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/DBQZgbw82BJwGw7Q61UdcDRlRANo-_2iJW2wQlUcDrw/mtime:1460132245/sites/default/files/blogs/2016/1604/grid-auto-flow-row.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<p>如果我们将grid-auto-flow属性设置为 column,item-b, item-c 和 item-d 就会沿列轴进行布局。</p>
-<pre><code>.container{
-    display: grid;
-    grid-template-columns: 60px 60px 60px 60px 60px;
-    grid-template-rows: 30px 30px;
-    grid-auto-flow: column;
-}
-</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/TPY1m3jC4Lir0oDl8aASuAUOwn5lJmAyiQdkzHJwg54/mtime:1460132245/sites/default/files/blogs/2016/1604/grid-auto-flow-column.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<h4 id="grid"><a href="#grid" class="headerlink" title="grid"></a>grid</h4><p>在一行声明中设置一下所有属性的简写形式:grid-template-rows, grid-template-columns, grid-template-areas, grid-auto-rows, grid-auto-columns, 以及 grid-auto-flow。它将 grid-column-gap 和 grid-row-gap属性设置为初始值，即使它们不能显示的设置此属性。</p>
-<h5 id="属性值-11"><a href="#属性值-11" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><p>none: 将所有的子属性设置为初始值</p>
-</li>
-<li><p>subgrid: 将grid-template-rows 和 grid-template-columns属性值设置为subgrid,其余子属性设置为初始值</p>
-</li>
-<li><p><code>&lt;grid-template-rows&gt;</code> / <code>&lt;grid-template-columns&gt;</code>: 将grid-template-rows 和 grid-template-columns属性值设置为指定值，其余子属性设置为初始值</p>
-</li>
-<li><p><code>&lt;grid-auto-flow&gt;</code>[<code>&lt;grid-auto-rows&gt;</code> [ / <code>&lt;grid-auto-columns&gt;</code>] ] : grid-auto-flow, grid-auto-rows 和 grid-auto-columns属性分别接受相同的值,如果省略了grid-auto-columns属性，它将设置为grid-auto-rows属性的值。如果两者均被忽略，那么都将被设置为初始值。</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    grid: none | subgrid | &lt;grid-template-rows&gt; / &lt;grid-template-columns&gt; | &lt;grid-auto-flow&gt; [&lt;grid-auto-rows&gt; [/ &lt;grid-auto-columns&gt;]];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h5 id="示例-7"><a href="#示例-7" class="headerlink" title="示例:"></a>示例:</h5><p>下面两个代码块是等效的:</p>
-<pre><code>.container{
-    grid: 200px auto / 1fr auto 1fr;
-}
-
-.container{
-    grid-template-rows: 200px auto;
-    grid-template-columns: 1fr auto 1fr;
-    grid-template-areas: none;
-}
-</code></pre><p>同样，下面的两个代码块也是等效的:</p>
-<pre><code>.container{
-    grid: column 1fr / auto;
-}
-
-.container{
-    grid-auto-flow: column;
-    grid-auto-rows: 1fr;
-    grid-auto-columns: auto;
-}
-</code></pre><p>它还接受一次性设置所有属性，更复杂但非常方便的语法。指定grid-template-areas, grid-auto-rows 和 grid-auto-columns属性，其他所有子属性都将设置为其初始值。你现在所做的是在其网格区域内，指定网格线名称和内联轨道大小。下面是最简单的描述:</p>
-<pre><code>.container{
-    grid: [row1-start] &quot;header header header&quot; 1fr [row1-end]
-          [row2-start] &quot;footer footer footer&quot; 25px [row2-end]
-          / auto 50px auto;
-}
-</code></pre><p>等效于:</p>
-<pre><code>.container{
-    grid-template-areas: &quot;header header header&quot;
-                         &quot;footer footer footer&quot;;
-    grid-template-rows: [row1-start] 1fr [row1-end row2-start] 25px [row2-end];
-    grid-template-columns: auto 50px auto;    
-}
-</code></pre><h4 id="网格项属性-Grid-Items"><a href="#网格项属性-Grid-Items" class="headerlink" title="网格项属性(Grid Items)"></a>网格项属性(Grid Items)</h4><h5 id="grid-column-start-grid-column-end-grid-row-start-grid-row-end"><a href="#grid-column-start-grid-column-end-grid-row-start-grid-row-end" class="headerlink" title="grid-column-start/grid-column-end/grid-row-start/grid-row-end"></a>grid-column-start/grid-column-end/grid-row-start/grid-row-end</h5><p>使用特定的网格线确定网格项在网格内的位置。grid-column-start/grid-row-start 属性表示网格项的网格线的起始位置，grid-column-end/grid-row-end属性表示网格项的网格线的终止位置。</p>
-<h5 id="属性值-12"><a href="#属性值-12" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><p><code>&lt;line&gt;</code>: 可以是一个数字来引用相应编号的网格线，或者使用名称引用相应命名的网格线</p>
-</li>
-<li><p>span <code>&lt;number&gt;</code>: 网格项包含指定数量的网格轨道</p>
-</li>
-<li><p>span <code>&lt;name&gt;</code>: 网格项包含指定名称网格项的网格线之前的网格轨道</p>
-</li>
-<li><p>auto: 表明自动定位，自动跨度或者默认跨度之一</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">.item&#123;</div><div class="line">    grid-column-start: &lt;number&gt; | &lt;name&gt; | span &lt;number&gt; | span &lt;name&gt; | auto</div><div class="line">    grid-column-end: &lt;number&gt; | &lt;name&gt; | span &lt;number&gt; | span &lt;name&gt; | auto</div><div class="line">    grid-row-start: &lt;number&gt; | &lt;name&gt; | span &lt;number&gt; | span &lt;name&gt; | auto</div><div class="line">    grid-row-end: &lt;number&gt; | &lt;name&gt; | span &lt;number&gt; | span &lt;name&gt; | auto</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>示例:</p>
-<pre><code>.item-a{
-    grid-column-start: 2;
-    grid-column-end: five;
-    grid-row-start: row1-start
-    grid-row-end: 3
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/_qe1h2tf7kOnbma7mv0npHmPxuqdtgBhz-ue5plGF7s/mtime:1460132249/sites/default/files/blogs/2016/1604/grid-start-end-a.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.item-b{
-    grid-column-start: 1;
-    grid-column-end: span col4-start;
-    grid-row-start: 2
-    grid-row-end: span 2
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/alQ0HIXYmT5gbNObM3SG329ddcjN0R53iwUYRx7mxu4/mtime:1460132249/sites/default/files/blogs/2016/1604/grid-start-end-b.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<p>如果没有声明grid-column-end/grid-row-end属性，默认情况下网格项的跨度为1。</p>
-<p>网格项可以互相重叠。可以使用z-index属性控制堆叠顺序。</p>
-<h4 id="grid-column-grid-row"><a href="#grid-column-grid-row" class="headerlink" title="grid-column/grid-row"></a>grid-column/grid-row</h4><h5 id="grid-column-start-grid-column-end-和-grid-row-start-grid-row-end属性分别的简写形式。"><a href="#grid-column-start-grid-column-end-和-grid-row-start-grid-row-end属性分别的简写形式。" class="headerlink" title="grid-column-start + grid-column-end, 和 grid-row-start + grid-row-end属性分别的简写形式。"></a>grid-column-start + grid-column-end, 和 grid-row-start + grid-row-end属性分别的简写形式。</h5><h5 id="属性值-13"><a href="#属性值-13" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><code>&lt;start-line&gt;</code> / <code>&lt;end-line&gt;</code>： 每一个属性均接收一个相同值，包括跨度。</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">.item&#123;</div><div class="line">    grid-column: &lt;start-line&gt; / &lt;end-line&gt; | &lt;start-line&gt; / span &lt;value&gt;;</div><div class="line">    grid-row: &lt;start-line&gt; / &lt;end-line&gt; | &lt;start-line&gt; / span &lt;value&gt;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h5 id="示例-8"><a href="#示例-8" class="headerlink" title="示例:"></a>示例:</h5><pre><code>.item-c{
-    grid-column: 3 / span 2;
-    grid-row: third-line / 4;
-}
-</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/9cHMaarlw9Q6EUB4uXNHygG6E2jez75tLEKURdJ6byc/mtime:1460132250/sites/default/files/blogs/2016/1604/grid-start-end-c.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<p>如果没有声明结束网格线值，默认网格轨道跨度为1.</p>
-<h4 id="grid-area"><a href="#grid-area" class="headerlink" title="grid-area"></a>grid-area</h4><p>给网格项进行命名以便于模板使用grid-template-areas属性创建时可以加以引用。另外也可以被grid-row-start + grid-column-start + grid-row-end + grid-column-end属性更为简洁的加以引用。</p>
-<h5 id="属性值-14"><a href="#属性值-14" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><p><code>&lt;name&gt;</code>: 你所定义的名称</p>
-</li>
-<li><p><code>&lt;row-start&gt;</code> / <code>&lt;column-start&gt;</code> / <code>&lt;row-end&gt;</code> / <code>&lt;column-end&gt;</code>: 可以为数字或者名称</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item&#123;</div><div class="line">    grid-area: &lt;name&gt; | &lt;row-start&gt; / &lt;column-start&gt; / &lt;row-end&gt; / &lt;column-end&gt;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h5 id="示例-9"><a href="#示例-9" class="headerlink" title="示例:"></a>示例:</h5><p>对网格项进行命名的一种方式:</p>
-<pre><code>.item-d{
-    grid-area: header
-}
-</code></pre><p>grid-row-start + grid-column-start + grid-row-end + grid-column-end属性的一种简写方式:</p>
-<pre><code>.item-d{
-    grid-area: 1 / col4-start / last-line / 6
-}
-</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/KPiJbq66MU7EYvSn5VTCzBseoZJIX5DKxJ1EiTYcEQM/mtime:1460132250/sites/default/files/blogs/2016/1604/grid-start-end-d.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<h4 id="justify-self"><a href="#justify-self" class="headerlink" title="justify-self"></a>justify-self</h4><p>沿列轴对齐网格项中的内容(相反于align-item属性定义的沿行轴对齐)。此值适用于单一网格项中的内容。</p>
-<h5 id="属性值-15"><a href="#属性值-15" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><p>start: 内容与网格区域的左端对齐</p>
-</li>
-<li><p>end: 内容与网格区域的右端对齐</p>
-</li>
-<li><p>center: 内容处于网格区域的中间位置</p>
-</li>
-<li><p>stretch: 内容宽度占据整个网格区域空间(默认值)</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item&#123;</div><div class="line">    justify-self: start | end | center | stretch;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h5 id="示例-10"><a href="#示例-10" class="headerlink" title="示例"></a>示例</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item-a&#123;</div><div class="line">    justify-self: start;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/FAa3UWcKAWEOIkPH8lXG5jfZE8OuistoRRDCRctpTbQ/mtime:1460132248/sites/default/files/blogs/2016/1604/grid-justify-self-start.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.item-a{
-    justify-self: end;
-}
-</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/wGYKmY8P1ZXvDQ-7hZD5PpaQNqx7DRcXJX8sJWoHqOQ/mtime:1460132248/sites/default/files/blogs/2016/1604/grid-justify-self-end.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.item-a{
-    justify-self: center;
-}
-</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/ucq6X4Lajn6Nc9er0fx6XvcvZTFlD9fFfo_Otls8rP4/mtime:1460132248/sites/default/files/blogs/2016/1604/grid-justify-self-center.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<pre><code>.item-a{
-    justify-self: stretch;
-}
-</code></pre><p><img src="http://cdn2.w3cplus.com/cdn/farfuture/fIfcjkknWhPK0DrPTKv-0Klh8Lb1_JiiaY--htE70Vc/mtime:1460132249/sites/default/files/blogs/2016/1604/grid-justify-self-stretch.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<p>设置网格中所有网格项的对齐方式，可以使用网格容器上的justify-items属性。</p>
-<h4 id="align-self"><a href="#align-self" class="headerlink" title="align-self"></a>align-self</h4><p>沿行轴对齐网格项中的内容(相反于justify-item属性定义的沿列轴对齐)。此值适用于单一网格项中的内容。</p>
-<h5 id="属性值-16"><a href="#属性值-16" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
-<li><p>start: 内容与网格区域的顶端对齐</p>
-</li>
-<li><p>end: 内容与网格区域的底部对齐</p>
-</li>
-<li><p>center: 内容处于网格区域的中间位置</p>
-</li>
-<li><p>stretch: 内容高度占据整个网格区域空间(默认值)</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item&#123;</div><div class="line">    align-self: start | end | center | stretch;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>示例:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item-a&#123;</div><div class="line">    align-self: start;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><img src="http://cdn.w3cplus.com/cdn/farfuture/jQeKs_UnuosaBK6-eJDD9pMd9FBBr7PCs67KCOCz3iE/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-align-self-start.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item-a&#123;</div><div class="line">    align-self: end;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/abkBl5xW-qmCOAc1lSdD6GnsmO8Ngi2wjBcnbFp1_Nk/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-align-self-end.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item-a&#123;</div><div class="line">    align-self: center;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/A8Or3mJI9h3CLZ6JZ0iMk3SHp3vWsnlAHGSlVic3uO4/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-align-self-center.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item-a&#123;</div><div class="line">    align-self: stretch;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/pl7ZPQIMBPLDqNIjZQXxIfmBEqIjhPhh8GQcG9Ec0aA/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-align-self-stretch.png" alt="Grid布局指南"></p>
-<center>Grid布局指南</center>
-
-<p>使网格中所有的网格项对齐，可以使用网格容器上的align-items属性。</p>
-<p>特别声明：本文来自于<a href="http://chris.house/blog/a-complete-guide-css-grid-layout/" target="_blank" rel="external">Chris House写的指南</a>，此份指南由Chris himself所写，并且会不断的保持更新。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/css/css-grid/" data-id="cjgxcg46m000rr9p3cytv4jcf" class="article-share-link">Delen</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/css-grid/">css-grid</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-bootstrap/bootstrap-notes" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/09/14/bootstrap/bootstrap-notes/" class="article-date">
-  <time datetime="2017-09-14T02:21:19.000Z" itemprop="datePublished">2017-09-14</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/bootstrap/">bootstrap</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/09/14/bootstrap/bootstrap-notes/">bootstrap笔记</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><a href="http://v3.bootcss.com/" target="_blank" rel="external">Bootstrap</a>：最受欢迎的HTML、CSS和JS框架，用于开发响应式布局、移动设备优先的WEB项目。</p>
-<h4 id="启步"><a href="#启步" class="headerlink" title="启步"></a>启步</h4><p>1、响应式布局标签：</p>
-<pre><code>&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
-</code></pre><p>2、为了让最新浏览器运行在最新的渲染模式下，建议将此 <meta> 标签加入到页面中：</p>
-<pre><code>&lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
-</code></pre><p>3、让部分国产浏览器如360采用高速模式渲染页面：</p>
-<pre><code>&lt;meta name=&quot;renderer&quot; content=&quot;webkit&quot;&gt;
-</code></pre><h4 id="全局CSS样式"><a href="#全局CSS样式" class="headerlink" title="全局CSS样式"></a>全局CSS样式</h4><h5 id="一、概览"><a href="#一、概览" class="headerlink" title="一、概览"></a>一、概览</h5><p>1、移动设备优先</p>
-<p>在移动设备浏览器上，通过为视口（viewport）设置 meta 属性为 user-scalable=no 可以禁用其缩放（zooming）功能。</p>
-<pre><code>&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no&quot;&gt;
-</code></pre><p>2、布局容器</p>
-<p>.container 类用于固定宽度并支持响应式布局的容器。</p>
-<pre><code>&lt;div class=&quot;container&quot;&gt;
-  ...
-&lt;/div&gt;
-</code></pre><p>.container-fluid 类用于 100% 宽度，占据全部视口（viewport）的容器。</p>
-<pre><code>&lt;div class=&quot;container-fluid&quot;&gt;
-  ...
-&lt;/div&gt;
-</code></pre><h5 id="二、栅格系统"><a href="#二、栅格系统" class="headerlink" title="二、栅格系统"></a>二、栅格系统</h5><p>1、媒体查询</p>
-<p>Less文件中使用以下媒体查询（media query）来创建关键的分界点阈值。</p>
-<pre><code>/* 超小屏幕（手机，小于 768px） */
-/* 没有任何媒体查询相关的代码，因为这在 Bootstrap 中是默认的（还记得 Bootstrap 是移动设备优先的吗？） */
-
-/* 小屏幕（平板，大于等于 768px） */
-@media (min-width: @screen-sm-min) { ... }
-
-/* 中等屏幕（桌面显示器，大于等于 992px） */
-@media (min-width: @screen-md-min) { ... }
-
-/* 大屏幕（大桌面显示器，大于等于 1200px） */
-@media (min-width: @screen-lg-min) { ... }
-</code></pre><p>2、栅格参数</p>
-<pre><code>| 超小屏幕 手机（&lt;768px） 
-| 小屏幕 平板（&gt;=768px） 
-| 中等屏幕 显示器（&gt;=992px） 
-| 大屏幕 大显示器（&gt;=1200px）
-</code></pre><table>
-<thead>
-<tr>
-<th>.container 最大宽度</th>
-<th>自动</th>
-<th>750px</th>
-<th>970px</th>
-<th>1170px</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>类前缀</td>
-<td>.col-xs-</td>
-<td>.col-sm-</td>
-<td>.col-md-</td>
-<td>.col-lg-</td>
-</tr>
-<tr>
-<td>槽宽</td>
-<td>30px（每列左右各15px）</td>
-<td>30px</td>
-<td>30px</td>
-<td>30px</td>
-</tr>
-</tbody>
-</table>
-<p>实例：使用单一的一组 .col-md-* 栅格类，就可以创建一个基本的栅格系统，在手机和平板设备上一开始是堆叠在一起的（超小屏幕到小屏幕这一范围），在桌面（中等）屏幕设备上变为水平排列。所有“列（column）必须放在 ” .row 内。</p>
-<p><img src="../../public/css/images/column.png" alt=".col-md"></p>
-<center>grid demo</center>
-
-<pre><code>&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-md-8&quot;&gt;.col-md-8&lt;/div&gt;
-  &lt;div class=&quot;col-md-4&quot;&gt;.col-md-4&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-md-4&quot;&gt;.col-md-4&lt;/div&gt;
-  &lt;div class=&quot;col-md-4&quot;&gt;.col-md-4&lt;/div&gt;
-  &lt;div class=&quot;col-md-4&quot;&gt;.col-md-4&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-md-6&quot;&gt;.col-md-6&lt;/div&gt;
-  &lt;div class=&quot;col-md-6&quot;&gt;.col-md-6&lt;/div&gt;
-&lt;/div&gt;
-</code></pre><p>3、实例：移动设备和桌面屏幕</p>
-<p>是否不希望在小屏幕设备上所有列都堆叠在一起？那就使用针对超小屏幕和中等屏幕设备所定义的类吧，即 .col-xs- 和 .col-md-。请看下面的实例，研究一下这些是如何工作的。</p>
-<pre><code>&lt;!-- Stack the columns on mobile by making one full-width and the other half-width --&gt;
-&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-xs-12 col-md-8&quot;&gt;.col-xs-12 .col-md-8&lt;/div&gt;
-  &lt;div class=&quot;col-xs-6 col-md-4&quot;&gt;.col-xs-6 .col-md-4&lt;/div&gt;
-&lt;/div&gt;
-
-&lt;!-- Columns start at 50% wide on mobile and bump up to 33.3% wide on desktop --&gt;
-&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-xs-6 col-md-4&quot;&gt;.col-xs-6 .col-md-4&lt;/div&gt;
-  &lt;div class=&quot;col-xs-6 col-md-4&quot;&gt;.col-xs-6 .col-md-4&lt;/div&gt;
-  &lt;div class=&quot;col-xs-6 col-md-4&quot;&gt;.col-xs-6 .col-md-4&lt;/div&gt;
-&lt;/div&gt;
-
-&lt;!-- Columns are always 50% wide, on mobile and desktop --&gt;
-&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-xs-6&quot;&gt;.col-xs-6&lt;/div&gt;
-  &lt;div class=&quot;col-xs-6&quot;&gt;.col-xs-6&lt;/div&gt;
-&lt;/div&gt;
-</code></pre><p>4、列偏移</p>
-<p>使用 .col-md-offset- 类可以将列向右侧偏移。这些类实际是通过使用 选择器为当前元素增加了左侧的边距（margin）。例如，.col-md-offset-4 类将 .col-md-4 元素向右侧偏移了4个列（column）的宽度。</p>
-<pre><code>&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-md-4&quot;&gt;.col-md-4&lt;/div&gt;
-  &lt;div class=&quot;col-md-4 col-md-offset-4&quot;&gt;.col-md-4 .col-md-offset-4&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-md-3 col-md-offset-3&quot;&gt;.col-md-3 .col-md-offset-3&lt;/div&gt;
-  &lt;div class=&quot;col-md-3 col-md-offset-3&quot;&gt;.col-md-3 .col-md-offset-3&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-md-6 col-md-offset-3&quot;&gt;.col-md-6 .col-md-offset-3&lt;/div&gt;
-&lt;/div&gt;
-</code></pre><p>5、列排序</p>
-<p>通过使用 .col-md-push- 和 .col-md-pull- 类就可以很容易的改变列（column）的顺序。</p>
-<pre><code>&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-md-9 col-md-push-3&quot;&gt;.col-md-9 .col-md-push-3&lt;/div&gt;
-  &lt;div class=&quot;col-md-3 col-md-pull-9&quot;&gt;.col-md-3 .col-md-pull-9&lt;/div&gt;
-&lt;/div&gt;
-</code></pre><h5 id="三、排版"><a href="#三、排版" class="headerlink" title="三、排版"></a>三、排版</h5><p>1、标题</p>
-<p>h1到h6做为主标题 samll做为副标题</p>
-<pre><code>&lt;h1&gt;h1. Bootstrap heading &lt;small&gt;Secondary text&lt;/small&gt;&lt;/h1&gt;
-</code></pre><p>2、对齐</p>
-<pre><code>&lt;p class=&quot;text-left&quot;&gt;Left aligned text.&lt;/p&gt;
-&lt;p class=&quot;text-center&quot;&gt;Center aligned text.&lt;/p&gt;
-&lt;p class=&quot;text-right&quot;&gt;Right aligned text.&lt;/p&gt;
-&lt;p class=&quot;text-justify&quot;&gt;Justified text.&lt;/p&gt;
-&lt;p class=&quot;text-nowrap&quot;&gt;No wrap text.&lt;/p&gt;
-</code></pre><p>3、地址</p>
-<pre><code>&lt;address&gt;
-  &lt;strong&gt;Twitter, Inc.&lt;/strong&gt;&lt;br&gt;
-  795 Folsom Ave, Suite 600&lt;br&gt;
-  San Francisco, CA 94107&lt;br&gt;
-  &lt;abbr title=&quot;Phone&quot;&gt;P:&lt;/abbr&gt; (123) 456-7890
-&lt;/address&gt;
-
-&lt;address&gt;
-  &lt;strong&gt;Full Name&lt;/strong&gt;&lt;br&gt;
-  &lt;a href=&quot;mailto:#&quot;&gt;first.last@example.com&lt;/a&gt;
-&lt;/address&gt;
-</code></pre><p>4、内联列表</p>
-<pre><code>&lt;ul class=&quot;list-inline&quot;&gt;
-  &lt;li&gt;...&lt;/li&gt;
-&lt;/ul&gt;
-</code></pre><p>5、水平排列的描述</p>
-<pre><code>&lt;dl class=&quot;dl-horizontal&quot;&gt;
-  &lt;dt&gt;...&lt;/dt&gt;
-  &lt;dd&gt;...&lt;/dd&gt;
-&lt;/dl&gt;
-</code></pre><p>四、表格</p>
-<p>1、响应式表格</p>
-<p>将任何 .table 元素包裹在 .table-responsive 元素内，即可创建响应式表格，其会在小屏幕设备上（小于768px）水平滚动。当屏幕大于 768px 宽度时，水平滚动条消失。</p>
-<pre><code>&lt;div class=&quot;table-responsive&quot;&gt;
-  &lt;table class=&quot;table&quot;&gt;
-    ...
-  &lt;/table&gt;
-&lt;/div&gt;
-</code></pre><p>五、表单</p>
-<p>1、基本实例</p>
-<p>单独的表单控件会被自动赋予一些全局样式。所有设置了 .form-control 类的 <code>&lt;input&gt;</code>、<code>&lt;textarea&gt;</code> 和 <code>&lt;select&gt;</code> 元素都将被默认设置宽度属性为 width: 100%;。 将 label 元素和前面提到的控件包裹在 .form-group 中可以获得最好的排列。</p>
-<pre><code>&lt;form&gt;
-  &lt;div class=&quot;form-group&quot;&gt;
-    &lt;label for=&quot;exampleInputEmail1&quot;&gt;Email address&lt;/label&gt;
-    &lt;input type=&quot;email&quot; class=&quot;form-control&quot; id=&quot;exampleInputEmail1&quot; placeholder=&quot;Email&quot;&gt;
-  &lt;/div&gt;
-  &lt;div class=&quot;form-group&quot;&gt;
-    &lt;label for=&quot;exampleInputPassword1&quot;&gt;Password&lt;/label&gt;
-    &lt;input type=&quot;password&quot; class=&quot;form-control&quot; id=&quot;exampleInputPassword1&quot; placeholder=&quot;Password&quot;&gt;
-  &lt;/div&gt;
-  &lt;div class=&quot;form-group&quot;&gt;
-    &lt;label for=&quot;exampleInputFile&quot;&gt;File input&lt;/label&gt;
-    &lt;input type=&quot;file&quot; id=&quot;exampleInputFile&quot;&gt;
-    &lt;p class=&quot;help-block&quot;&gt;Example block-level help text here.&lt;/p&gt;
-  &lt;/div&gt;
-  &lt;div class=&quot;checkbox&quot;&gt;
-    &lt;label&gt;
-      &lt;input type=&quot;checkbox&quot;&gt; Check me out
-    &lt;/label&gt;
-  &lt;/div&gt;
-  &lt;button type=&quot;submit&quot; class=&quot;btn btn-default&quot;&gt;Submit&lt;/button&gt;
-&lt;/form&gt;
-</code></pre><p>2、…</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/bootstrap/bootstrap-notes/" data-id="cjgxcg46i000mr9p3q8vcfh03" class="article-share-link">Delen</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/bootstrap/">bootstrap</a></li></ul>
 
     </footer>
   </div>
@@ -3556,9 +3055,9 @@ class DeadLockTest{
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Categorieën</h3>
+    <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/mybatis/">mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
     </div>
   </div>
 
@@ -3566,9 +3065,9 @@ class DeadLockTest{
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Labels</h3>
+    <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
     </div>
   </div>
 
@@ -3578,14 +3077,14 @@ class DeadLockTest{
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/mybatis/" style="font-size: 17.14px;">mybatis</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
     </div>
   </div>
 
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Archieven</h3>
+    <h3 class="widget-title">Archives</h3>
     <div class="widget">
       <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
     </div>
@@ -3595,28 +3094,28 @@ class DeadLockTest{
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Recente berichten</h3>
+    <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
         
           <li>
-            <a href="/2018/05/08/java/spring/spring-10/">第十章 Spring事务管理</a>
+            <a href="/2018/05/13/java/mybatis/mybatis-7/">第七章 MyBatis - 查询缓存</a>
           </li>
         
           <li>
-            <a href="/2018/05/06/java/spring/spring-9/">第九章 spring与JDBC模板</a>
+            <a href="/2018/05/12/java/mybatis/mybatis-6/">第六章 MyBatis - 延迟加载</a>
           </li>
         
           <li>
-            <a href="/2018/05/06/java/spring/spring-8/">第八章 Spring与AOP AspectJ基于XML的AOP实现</a>
+            <a href="/2018/05/12/java/mybatis/mybatis-5/">第五章 MyBatis关联关系查询 - 多对多</a>
           </li>
         
           <li>
-            <a href="/2018/05/06/java/spring/spring-7/">第七章 Spring与AOP AspectJ基于注解的AOP实现</a>
+            <a href="/2018/05/12/java/mybatis/mybatis-4/">第四章 MyBatis关联关系查询 - 自关联</a>
           </li>
         
           <li>
-            <a href="/2018/05/05/java/spring/spring-6/">第六章 Spring与AOP AspectJ对AOP的实现</a>
+            <a href="/2018/05/12/java/mybatis/mybatis-3/">第三章 MyBatis关联关系查询 - 多对一</a>
           </li>
         
       </ul>

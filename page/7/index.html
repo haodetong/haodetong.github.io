@@ -50,7 +50,7 @@
         
           <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Zoeken"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
@@ -60,6 +60,1341 @@
 </header>
       <div class="outer">
         <section id="main">
+  
+    <article id="post-react/react-native-es5-es6" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/08/17/react/react-native-es5-es6/" class="article-date">
+  <time datetime="2017-08-17T06:54:33.000Z" itemprop="datePublished">2017-08-17</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/react/">react</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/08/17/react/react-native-es5-es6/">React/React Native的ES5 ES6写法对照表</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>摘抄：<a href="http://bbs.reactnative.cn/topic/15/react-react-native-%E7%9A%84es5-es6%E5%86%99%E6%B3%95%E5%AF%B9%E7%85%A7%E8%A1%A8" target="_blank" rel="external">React/React Native 的ES5 ES6写法对照表</a></p>
+<p>###一、模块</p>
+<p>#####1、引用</p>
+<p>在ES5里，如果使用CommonJS标准，引入React包基本通过require进行，代码类似这样：</p>
+<pre><code>//ES5
+var React = require(&quot;react-native&quot;);
+var {
+    Image,
+    Text,
+    PropTypes
+} = React;  //引用不同的React Native组件
+</code></pre><p>在ES6里，import写法更为标准</p>
+<pre><code>//ES6
+import React, {
+    Image, 
+    Text,
+    PropTypes
+} from &apos;react-native&apos;;
+</code></pre><p>#####2、导出单个类</p>
+<p>在ES5里，要导出一个类给别的模块用，一般通过module.exports来导出</p>
+<pre><code>//ES5
+var MyComponent = React.createClass({
+    ...
+});
+module.exports = MyComponent;
+</code></pre><p>在ES6里，通常用export default来实现相同的功能：</p>
+<pre><code>//ES6
+export default class MyComponent extends React.Component{
+    ...
+}
+</code></pre><p>引用的时候也类似：</p>
+<pre><code>//ES5
+var MyComponent = require(&apos;./MyComponent.js&apos;);
+
+//ES6
+import MyComponent from &apos;./MyComponent.js&apos;;
+</code></pre><p>###二、组件</p>
+<p>#####1、定义组件</p>
+<p>在ES5里，通常通过React.createClass来定义一个组件类，像这样：</p>
+<pre><code>//ES5
+var Photo = React.createClass({
+    render: function() {
+        return (
+            &lt;Image source={this.props.source} /&gt;
+        );
+    },
+});
+</code></pre><p>在ES6里，我们通过定义一个继承自React.Component的class来定义一个组件类，像这样：</p>
+<pre><code>//ES6
+class Photo extends React.Component {
+    render() {
+        return (
+            &lt;Image source={this.props.source} /&gt;
+        );
+    }
+}    
+</code></pre><p>#####2、给组件定义方法</p>
+<p>从上面的例子里可以看到，给组件定义方法不再用 名字: function()的写法，而是直接用名字()，在方法的最后也不能有逗号了。</p>
+<p>//ES5</p>
+<pre><code>var Photo = React.createClass({
+    componentWillMount: function(){
+
+    },
+    render: function() {
+        return (
+            &lt;Image source={this.props.source} /&gt;
+        );
+    },
+});
+</code></pre><p>//ES6</p>
+<p>class Photo extends React.Component {<br>    componentWillMount() {</p>
+<pre><code>}
+render() {
+    return (
+        &lt;Image source={this.props.source} /&gt;
+    );
+}
+</code></pre><p>}</p>
+<p>#####3、定义组件的属性类型和默认属性</p>
+<p>在ES5里，属性类型和默认属性分别通过propTypes成员和getDefaultProps方法来实现</p>
+<pre><code>//ES5 
+var Video = React.createClass({
+    getDefaultProps: function() {
+        return {
+            autoPlay: false,
+            maxLoops: 10,
+        };
+    },
+    propTypes: {
+        autoPlay: React.PropTypes.bool.isRequired,
+        maxLoops: React.PropTypes.number.isRequired,
+        posterFrameSrc: React.PropTypes.string.isRequired,
+        videoSrc: React.PropTypes.string.isRequired,
+    },
+    render: function() {
+        return (
+            &lt;View /&gt;
+        );
+    },
+});
+</code></pre><p>在ES6里，可以统一使用static成员来实现</p>
+<pre><code>//ES6
+class Video extends React.Component {
+    static defaultProps = {
+        autoPlay: false,
+        maxLoops: 10,
+    };  // 注意这里有分号
+    static propTypes = {
+        autoPlay: React.PropTypes.bool.isRequired,
+        maxLoops: React.PropTypes.number.isRequired,
+        posterFrameSrc: React.PropTypes.string.isRequired,
+        videoSrc: React.PropTypes.string.isRequired,
+    };  // 注意这里有分号
+    render() {
+        return (
+            &lt;View /&gt;
+        );
+    } // 注意这里既没有分号也没有逗号
+}
+</code></pre><p>也有人这么写，虽然不推荐，但读到代码的时候你应当能明白它的意思：</p>
+<pre><code>//ES6
+class Video extends React.Component {
+    render() {
+        return (
+            &lt;View /&gt;
+        );
+    }
+}
+Video.defaultProps = {
+    autoPlay: false,
+    maxLoops: 10,
+};
+Video.propTypes = {
+    autoPlay: React.PropTypes.bool.isRequired,
+    maxLoops: React.PropTypes.number.isRequired,
+    posterFrameSrc: React.PropTypes.string.isRequired,
+    videoSrc: React.PropTypes.string.isRequired,
+};
+</code></pre><p>注意: 对React开发者而言，static成员在IE10及之前版本不能被继承，而在IE11和其它浏览器上可以，这有时候会带来一些问题。React Native开发者可以不用担心这个问题。</p>
+<p>#####4、初始化state</p>
+<p>ES5下情况类似，</p>
+<pre><code>//ES5 
+var Video = React.createClass({
+    getInitialState: function() {
+        return {
+            loopsRemaining: this.props.maxLoops,
+        };
+    },
+})
+</code></pre><p>ES6下，有两种写法：</p>
+<pre><code>//ES6
+class Video extends React.Component {
+    state = {
+        loopsRemaining: this.props.maxLoops,
+    }
+}
+</code></pre><p>不过我们推荐更易理解的在构造函数中初始化（这样你还可以根据需要做一些计算）：</p>
+<pre><code>//ES6
+class Video extends React.Component {
+    constructor(props){
+        super(props);
+        this.state = {
+            loopsRemaining: this.props.maxLoops,
+        };
+    }
+}
+</code></pre><p>###三、把方法作为回调提供</p>
+<p>#####1、写法</p>
+<p>在ES5下，React.createClass会把所有的方法都bind一遍，这样可以提交到任意的地方作为回调函数，而this不会变化。但官方现在逐步认为这反而是不标准、不易理解的。</p>
+<pre><code>//ES5
+var PostInfo = React.createClass({
+    handleOptionsButtonClick: function(e) {
+        // Here, &apos;this&apos; refers to the component instance.
+        this.setState({showOptionsModal: true});
+    },
+    render: function(){
+        return (
+            &lt;TouchableHighlight onPress={this.handleOptionsButtonClick}&gt;
+                &lt;Text&gt;{this.props.label}&lt;/Text&gt;
+            &lt;/TouchableHighlight&gt;
+        )
+    },
+});
+</code></pre><p>在ES6下，你需要通过bind来绑定this引用，或者使用箭头函数（它会绑定当前scope的this引用）来调用。</p>
+<pre><code>//ES6
+class PostInfo extends React.Component
+{
+    handleOptionsButtonClick(e){
+        this.setState({showOptionsModal: true});
+    }
+    render(){
+        return (
+            &lt;TouchableHighlight 
+                onPress={this.handleOptionsButtonClick.bind(this)}
+                onPress={e=&gt;this.handleOptionsButtonClick(e)}
+                &gt;
+                &lt;Text&gt;{this.props.label}&lt;/Text&gt;
+            &lt;/TouchableHighlight&gt;
+        )
+    },
+}
+</code></pre><p>#####2、箭头函数</p>
+<p>箭头函数实际上是在这里定义了一个临时的函数，箭头函数的箭头=&gt;之前是一个空括号、单个的参数名、或用括号括起的多个参数名，而箭头之后可以是一个表达式（作为函数的返回值），或者是用花括号括起的函数体（需要自行通过return来返回值，否则返回的是undefined）。</p>
+<pre><code>// 箭头函数的例子
+()=&gt;1
+v=&gt;v+1
+(a,b)=&gt;a+b
+()=&gt;{
+    alert(&quot;foo&quot;);
+}
+e=&gt;{
+    if (e == 0){
+        return 0;
+    }
+    return 1000/e;
+}
+</code></pre><p>需要注意的是，不论是bind还是箭头函数，每次被执行都返回的是一个新的函数引用，因此如果你还需要函数的引用去做一些别的事情（譬如卸载监听器），那么你必须自己保存这个引用。</p>
+<p>//错误的做法</p>
+<pre><code>class PauseMenu extends React.Component{
+    componentWillMount(){
+        AppStateIOS.addEventListener(&apos;change&apos;, this.onAppPaused.bind(this));
+    }
+    componentDidUnmount(){
+        AppStateIOS.removeEventListener(&apos;change&apos;, this.onAppPaused.bind(this));
+    }
+    onAppPaused(event){
+    }
+}
+</code></pre><p>//正确的做法</p>
+<pre><code>class PauseMenu extends React.Component{
+    constructor(props){
+        super(props);
+        this._onAppPaused = this.onAppPaused.bind(this);
+    }
+    componentWillMount(){
+        AppStateIOS.addEventListener(&apos;change&apos;, this._onAppPaused);
+    }
+    componentDidUnmount(){
+        AppStateIOS.removeEventListener(&apos;change&apos;, this._onAppPaused);
+    }
+    onAppPaused(event){
+    }
+}
+</code></pre><p>从这个帖子中我们还学习到一种新的做法：</p>
+<p>// 正确的做法</p>
+<pre><code>class PauseMenu extends React.Component{
+    componentWillMount(){
+        AppStateIOS.addEventListener(&apos;change&apos;, this.onAppPaused);
+    }
+    componentDidUnmount(){
+        AppStateIOS.removeEventListener(&apos;change&apos;, this.onAppPaused);
+    }
+    onAppPaused = (event) =&gt; {
+        //把方法直接作为一个arrow function的属性来定义，初始化的时候就绑定好了this指针
+    }
+}
+</code></pre><p>###四、在es6中Mixins不再推荐使用</p>
+<p>在ES5下，我们经常使用mixin来为我们的类添加一些新的方法，譬如PureRenderMixin</p>
+<pre><code>var PureRenderMixin = require(&apos;react-addons-pure-render-mixin&apos;);
+React.createClass({
+  mixins: [PureRenderMixin],
+
+  render: function() {
+    return &lt;div className={this.props.className}&gt;foo&lt;/div&gt;;
+  }
+});
+</code></pre><p>然而现在官方已经不再打算在ES6里继续推行Mixin。</p>
+<p>对于库编写者而言，应当尽快放弃Mixin的编写方式，推荐一种新的编码方式。</p>
+<pre><code>//Enhance.js
+import { Component } from &quot;React&quot;;
+
+export var Enhance = ComposedComponent =&gt; class extends Component {
+    constructor() {
+        this.state = { data: null };
+    }
+    componentDidMount() {
+        this.setState({ data: &apos;Hello&apos; });
+    }
+    render() {
+        return &lt;ComposedComponent {...this.props} data={this.state.data} /&gt;;
+    }
+};
+
+//HigherOrderComponent.js
+import { Enhance } from &quot;./Enhance&quot;;
+
+class MyComponent {
+    render() {
+        if (!this.data) return &lt;div&gt;Waiting...&lt;/div&gt;;
+        return &lt;div&gt;{this.data}&lt;/div&gt;;
+    }
+}
+
+export default Enhance(MyComponent); // Enhanced component
+</code></pre><p>用一个“增强函数”，来为某个类增加一些方法，并且返回一个新类，这无疑能实现mixin所实现的大部分需求。</p>
+<p>###五、es6+带来的其它好处</p>
+<p>解构&amp;属性延展</p>
+<p>结合使用ES6+的解构和属性延展，我们给孩子传递一批属性更为方便。</p>
+<p>这个例子把className以外的所有属性传递给了div标签：</p>
+<pre><code>class AutoloadingPostsGrid extends React.Component {
+    render() {
+        var {
+            className,
+            ...others,  // contains all properties of this.props except for className
+        } = this.props;
+        return (
+            &lt;div className={className}&gt;
+                &lt;PostsGrid {...others} /&gt;
+                &lt;button onClick={this.handleLoadMoreClick}&gt;Load more&lt;/button&gt;
+            &lt;/div&gt;
+        );
+    }
+}
+</code></pre><p>下面这种写法，则是传递所有属性的同时，用override来覆盖属性中的className值：</p>
+<pre><code>&lt;div {...this.props} className=&quot;override&quot;&gt;
+    …
+&lt;/div&gt;
+</code></pre><p>这个例子则相反，如果属性中没有包含className，则提供默认的值，而如果属性中已经包含了，则使用属性中的值</p>
+<pre><code>&lt;div className=&quot;base&quot; {...this.props}&gt;
+    …
+&lt;/div&gt;    
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/08/17/react/react-native-es5-es6/" data-id="cjh4911h3000vmtp3j11injkh" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/react/">react</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-github/github-hexo-blog" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/08/14/github/github-hexo-blog/" class="article-date">
+  <time datetime="2017-08-14T02:34:20.000Z" itemprop="datePublished">2017-08-14</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/github/">github</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/08/14/github/github-hexo-blog/">github+hexo博客并备份</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="一、hexo"><a href="#一、hexo" class="headerlink" title="一、hexo"></a>一、hexo</h3><p>1、官方网址：<a href="https://hexo.io/" target="_blank" rel="external">https://hexo.io/</a></p>
+<p>2、常用命令</p>
+<pre><code>npm install hexo -g #安装  
+npm update hexo -g #升级  
+hexo init #初始化
+</code></pre><p>3、简写</p>
+<pre><code>hexo n &quot;我的博客&quot; == hexo new &quot;我的博客&quot; #新建文章
+hexo p == hexo publish #草稿
+hexo g == hexo generate #生成
+hexo s == hexo server #启动服务预览
+hexo d == hexo deploy #部署
+</code></pre><p>4、布署</p>
+<p>修改_config.yml</p>
+<pre><code># Deployment
+## Docs: http://hexo.io/docs/deployment.html
+deploy:
+      type: git
+      repository: git@***.github.com:***/***.github.io.git
+      branch: master
+</code></pre><h3 id="二、Github"><a href="#二、Github" class="headerlink" title="二、Github"></a>二、Github</h3><p>1、摘抄</p>
+<p><a href="http://www.ruanyifeng.com/blog/2015/12/git-cheat-sheet.html" target="_blank" rel="external">常用 Git 命令清单</a></p>
+<p><a href="http://www.ruanyifeng.com/blog/2014/06/git_remote.html" target="_blank" rel="external">Git远程操作详解</a></p>
+<p><img src="http://image.beekka.com/blog/2014/bg2014061202.jpg" alt="MacDown Screenshot"></p>
+<ul>
+<li>Workspace：工作区</li>
+<li>Index / Stage：暂存区</li>
+<li>Repository：仓库区（或本地仓库）</li>
+<li>Remote：远程仓库</li>
+</ul>
+<p>2、常用命令</p>
+<p>a、新建本地仓库</p>
+<pre><code># 在当前目录新建一个Git代码库
+$ git init
+
+# 新建一个目录，将其初始化为Git代码库
+$ git init [project-name]
+
+# 下载一个项目和它的整个代码历史
+$ git clone [url]    
+</code></pre><p>b、增加/删除文件</p>
+<pre><code># 添加指定文件到暂存区
+$ git add [file1] [file2] ...
+
+# 添加指定目录到暂存区，包括子目录
+$ git add [dir]
+
+# 添加当前目录的所有文件到暂存区
+$ git add .
+
+# 删除工作区文件，并且将这次删除放入暂存区
+$ git rm [file1] [file2] ...
+
+# 改名文件，并且将这个改名放入暂存区
+$ git mv [file-original] [file-renamed]
+</code></pre><p>c、代码提交</p>
+<pre><code># 提交暂存区到仓库区
+$ git commit -m [message]
+
+# 提交暂存区的指定文件到仓库区
+$ git commit [file1] [file2] ... -m [message]
+
+# 提交时显示所有diff信息
+$ git commit -v
+</code></pre><p>d、分支</p>
+<pre><code># 列出所有本地分支
+$ git branch
+
+# 列出所有远程分支
+$ git branch -r
+
+# 列出所有本地分支和远程分支
+$ git branch -a
+
+# 新建一个分支，但依然停留在当前分支
+$ git branch [branch-name]
+
+# 新建一个分支，并切换到该分支
+$ git checkout -b [branch]
+
+# 新建一个分支，与指定的远程分支建立追踪关系
+$ git branch --track [branch] [remote-branch]
+
+# 切换到指定分支，并更新工作区
+$ git checkout [branch-name]
+
+# 切换到上一个分支
+$ git checkout -
+
+# 建立追踪关系，在现有分支与指定的远程分支之间
+$ git branch --set-upstream [branch] [remote-branch]
+
+# 合并指定分支到当前分支
+$ git merge [branch]
+
+# 删除分支
+$ git branch -d [branch-name]
+
+# 删除远程分支
+$ git push origin --delete [branch-name]
+$ git branch -dr [remote/branch]    
+</code></pre><p>e、查看信息</p>
+<pre><code># 显示有变更的文件
+$ git status
+
+# 显示当前分支的版本历史
+$ git log
+
+# 显示暂存区和工作区的差异
+$ git diff
+</code></pre><p>f、远程同步</p>
+<pre><code># 下载远程仓库的所有变动
+$ git fetch [remote]
+
+# 显示所有远程仓库
+$ git remote -v
+
+# 显示某个远程仓库的信息
+$ git remote show [remote]
+
+# 上传本地指定分支到远程仓库
+$ git push [remote] [branch]
+
+# 强行推送当前分支到远程仓库，即使有冲突
+$ git push [remote] --force
+
+# 推送所有分支到远程仓库
+$ git push [remote] --all
+</code></pre><p>g、撤销</p>
+<pre><code># 恢复暂存区的指定文件到工作区
+$ git checkout [file]
+
+# 恢复某个commit的指定文件到暂存区和工作区
+$ git checkout [commit] [file]
+
+# 恢复暂存区的所有文件到工作区
+$ git checkout .
+
+# 重置暂存区的指定文件，与上一次commit保持一致，但工作区不变
+$ git reset [file]
+
+# 重置暂存区与工作区，与上一次commit保持一致
+$ git reset --hard
+</code></pre><p>3、Git远程操作详解</p>
+<p>a、git clone</p>
+<pre><code>#从远程主机克隆一个版本库
+$ git clone &lt;版本库的网址&gt;    
+</code></pre><p>b、git remote</p>
+<pre><code>#列出所有的主机
+$ git remote
+origin
+
+#查看远程主机的网址
+$ git remote -v
+origin  git@github.com:jquery/jquery.git (fetch)
+origin  git@github.com:jquery/jquery.git (push)
+
+#克隆版本库的时候，所使用的远程主机自动被Git命名为origin
+$ git remote show &lt;主机名&gt;
+
+#git remote add命令用于添加远程主机。
+$ git remote add &lt;主机名&gt; &lt;网址&gt;
+
+#git remote rm命令用于删除远程主机
+$ git remote rm &lt;主机名&gt;
+
+#git remote rename命令用于远程主机的改名。
+$ git remote rename &lt;原主机名&gt; &lt;新主机名&gt;
+</code></pre><p>c、git fetch</p>
+<p>git fetch 取回到本地的是远程主机版本库的更新</p>
+<p>git fetch命令通常用来查看其他人的进程，因为它取回的代码对你本地的开发代码没有影响。</p>
+<p>默认情况下，git fetch取回所有分支（branch）的更新。如果只想取回特定分支的更新，可以指定分支名。</p>
+<pre><code>$ git fetch &lt;远程主机名&gt; &lt;分支名&gt;
+</code></pre><p>比如，取回origin主机的master分支。</p>
+<pre><code>$ git fetch origin master
+</code></pre><p>d、git pull</p>
+<p>git pull命令的作用是，取回远程主机某个分支的更新，再与本地的指定分支合并。它的完整格式稍稍有点复杂。</p>
+<pre><code>$ git pull &lt;远程主机名&gt; &lt;远程分支名&gt;:&lt;本地分支名&gt;
+</code></pre><p>比如，取回origin主机的next分支，与本地的master分支合并，需要写成下面这样</p>
+<pre><code>$ git pull origin next:master
+</code></pre><p>如果远程分支是与当前分支合并，则冒号后面的部分可以省略。</p>
+<pre><code>$ git pull origin next
+</code></pre><p>上面命令表示，取回origin/next分支，再与当前分支合并。实质上，这等同于先做git fetch，再做git merge。</p>
+<p>$ git fetch origin<br>$ git merge origin/next</p>
+<p>在某些场合，Git会自动在本地分支与远程分支之间，建立一种追踪关系（tracking）。比如，在git clone的时候，所有本地分支默认与远程主机的同名分支，建立追踪关系，也就是说，本地的master分支自动”追踪”origin/master分支。</p>
+<p>Git也允许手动建立追踪关系。</p>
+<pre><code>git branch --set-upstream master origin/next
+</code></pre><p>上面命令指定master分支追踪origin/next分支。</p>
+<p>e、git push</p>
+<p>git push命令用于将本地分支的更新，推送到远程主机。它的格式与git pull命令相仿。</p>
+<pre><code>$ git push &lt;远程主机名&gt; &lt;本地分支名&gt;:&lt;远程分支名&gt;
+</code></pre><p>如果省略远程分支名，则表示将本地分支推送与之存在”追踪关系”的远程分支（通常两者同名），如果该远程分支不存在，则会被新建。</p>
+<pre><code>$ git push origin master
+</code></pre><p>上面命令表示，将本地的master分支推送到origin主机的master分支。如果后者不存在，则会被新建。</p>
+<p>如果省略本地分支名，则表示删除指定的远程分支，因为这等同于推送一个空的本地分支到远程分支。</p>
+<pre><code>$ git push origin :master
+# 等同于
+$ git push origin --delete master
+</code></pre><p>上面命令表示删除origin主机的master分支。</p>
+<p>三、hexo多个终端同步</p>
+<p>1、在其中一个终端操作，push本地文件夹Hexo中的必要文件到yourname.github.io的hexo分支上</p>
+<pre><code>//初始化本地仓库
+git init  
+
+//将本地与Github项目对接
+git remote add origin git@github.com:yourname/yourname.github.io.git
+
+//将必要的文件依次添加，有些文件夹如npm install产生的node_modules由于路径过长不好处理，所以这里没有用`git add .`命令了，而是依次添加必要文件，如下图所示
+git add source scaffolds themes .npmignore _config.yml package.json
+git commit -m &quot;Blog Source Hexo&quot;
+
+//新建hexo分支
+git branch hexo 
+
+//切换到hexo分支上
+git checkout hexo   
+
+//push到Github项目的hexo分支上
+git push origin hexo   
+</code></pre><p>2、在另一终端完成clone和push更新</p>
+<pre><code>//将Github中hexo分支clone到本地
+git clone -b hexo git@github.com:yourname/yourname.github.io.git  
+
+//切换到刚刚clone的文件夹内
+cd  yourname.github.io
+
+//注意，这里一定要切换到刚刚clone的文件夹内执行，安装必要的所需组件，不用再init  
+npm install    
+
+//新建一个.md文件，并编辑完成自己的博客内容
+hexo new post &quot;new blog name&quot;   
+
+//经测试每次只要更新source中的文件到Github中即可，因为只是新建了一篇新博客
+git add source 
+
+git commit -m &quot;XX&quot;
+
+//更新分支
+git push origin hexo  
+
+//push更新完分支之后将自己写的博客对接到自己搭的博客网站上，同时同步了Github中的master
+hexo d -g
+</code></pre><p>3、不同终端更新博客</p>
+<pre><code>//先pull完成本地与远端的融合
+git pull origin hexo  
+
+hexo new post &quot; new blog name&quot;
+
+git add source
+
+git commit -m &quot;XX&quot;
+
+git push origin hexo
+
+hexo d -g
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/08/14/github/github-hexo-blog/" data-id="cjh4911g60007mtp3oycpbdzb" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/github/">github</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/08/14/hello-world/" class="article-date">
+  <time datetime="2017-08-14T02:32:17.000Z" itemprop="datePublished">2017-08-14</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/08/14/hello-world/">Hello World</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/08/14/hello-world/" data-id="cjh4911di0000mtp3ersvnbt3" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-angularjs/angular-requirejs" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/05/17/angularjs/angular-requirejs/" class="article-date">
+  <time datetime="2017-05-17T07:52:11.000Z" itemprop="datePublished">2017-05-17</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/angularjs/">angularjs</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/05/17/angularjs/angular-requirejs/">angularjs + requirjs前端架构</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在决定使用angularJS开发项目时，考虑到多人协作，模块化，扩展等等因素，决定引入requirJS实现js文件的异步加载，解决模块之间的依赖关系。</p>
+<p>参考了一些关于angularJS项目的前端架构，都觉得不甚理想，幸运的是最终看到一篇关于angularJS如何集成requireJS的文章：</p>
+<p>原文地址：<a href="http://www.cnblogs.com/cunjieliu/p/4021121.html" target="_blank" rel="external">如何将angularJS项目与requireJS集成</a></p>
+<p>一、项目组织目录：</p>
+<ul>
+<li><p>css 文件夹</p>
+</li>
+<li><p>img 文件夹</p>
+</li>
+<li><p>js 文件夹</p>
+</li>
+</ul>
+<p> – appIndex 文件夹</p>
+<p>  — api文件夹</p>
+<p>  — controller 文件夹</p>
+<p>     —- ctlModule.js</p>
+<p>     —- mainController.js</p>
+<p>     —- homeController.js</p>
+<p>  — directives 文件夹</p>
+<p>  — services 文件夹</p>
+<p>  — app.js</p>
+<p>  — index_main.js</p>
+<p>  — router.js</p>
+<p> – appLogin 文件夹</p>
+<p>  — …</p>
+<p>  — 与appIndex类似</p>
+<p>  — …</p>
+<ul>
+<li>lib 文件夹</li>
+</ul>
+<p> – angular 文件夹</p>
+<p>  — angular.js</p>
+<p>  — angular-ui-router.js</p>
+<p>  — …</p>
+<p> – bootstrap 文件夹</p>
+<p> – jquery 文件夹</p>
+<p> – require 文件夹</p>
+<p> – php 文件夹</p>
+<p> – template 文件夹</p>
+<p>  — common 文件夹</p>
+<p>  — tplIndex 文件夹</p>
+<p>  — tplLogin文件夹</p>
+<ul>
+<li><p>404.html</p>
+</li>
+<li><p>favicon.ico</p>
+</li>
+<li><p>humans.txt</p>
+</li>
+<li><p>index.html</p>
+</li>
+<li><p>LICENSE.txt</p>
+</li>
+<li><p>login.html</p>
+</li>
+<li><p>server.js</p>
+</li>
+</ul>
+<p>二、组织目录说明</p>
+<p>两个大的模块，一个appIndex，代表前台展示模块；一个appLogin，代表登录模块。appLogin与appIndex类似，以appIndex为例：</p>
+<p>appIndex下的文件夹：</p>
+<p>api: 与后端交互</p>
+<p>controllers： 控制器</p>
+<p>directives: 指令</p>
+<p>services: 服务</p>
+<p>appIndex下的文件：</p>
+<p>app.js 定义整个项目的module</p>
+<p>index_main.js 配置脚本文件，启动angular</p>
+<p>router.js 定义路由</p>
+<p>api下的文件：</p>
+<p>apiModule.js 定义api的module</p>
+<p>mainApi.js 加载所有的api文件</p>
+<p>homeApi.js 一个普通的api文件</p>
+<p>controllers下的文件：</p>
+<p>ctlModule.js 定义控制器的module</p>
+<p>mainController.js 加载所有的控制器文件</p>
+<p>homeController.js 一个普通的控制器文件</p>
+<p>directives下的文件：</p>
+<p>dirModule.js 定义指令的module</p>
+<p>mainDirective.js 加载所有的指令文件</p>
+<p>headerDirective.js 一个普通的指令文件</p>
+<p>services下的文件：</p>
+<p>serModule.js 定义服务的module</p>
+<p>mainService.js 加载所有的服务文件</p>
+<p>homeService.js 一个普通的服务文件</p>
+<p>三、命名约定</p>
+<p>$stateProvider.state(‘home’,{<br>    url: ‘/home’,<br>   templateUrl:’../../template/tplIndex/home.html’,<br>   controller:’homeCtl’<br>})<br>以homeController为例：</p>
+<p>对应的模板为home.html</p>
+<p>控制器名字：homeCtl</p>
+<p>return ctl.controller(‘homeCtl’,function($scope,person,serGetTitle,testData){</p>
+<p> …<br>});<br>})</p>
+<p>homeCtl里使用的服务，看到ser开头的，如serGetTitle，对应到homeService.js里查找，看到Data结尾的，如testData，对应到homeApi.js里查找<br>四、代码分析</p>
+<p>1、index.html 主要代码如下：</p>
+<p>&lt;!doctype html&gt;</p>
+<p><html class="no-js" lang=""><br>    <head><br>        <script data-main="js/appIndex/index_main" src="lib/require/require.js"></script><br>    </head><br>    <body><br>        <rabbit-header></rabbit-header></body></html></p>
+<pre><code>    &lt;div&gt;
+        &lt;ul&gt;
+            &lt;li&gt;&lt;a href=&quot;#/home&quot;&gt;home&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/div&gt;
+
+    &lt;div ui-view&gt;&lt;/div&gt;
+
+    &lt;rabbit-footer&gt;&lt;/rabbit-footer&gt;
+
+&lt;/body&gt;
+</code></pre><p><br>在首页index.html只需要引入requireJs库文件，并且指明入口函数main.js，采用手动启动angularjs应用，所以这里不用为首页添加ng-app=’rabbit’。</p>
+<p>2、index_main.js 主要代码如下：</p>
+<p>require.config({<br>    baseUrl:’js’,<br>    paths:{<br>        jquery:’../lib/jquery/jquery-1.9.1’,<br>        angular:’../lib/angular/angular’,<br>        angularUiRouter:’../lib/angular/angular-ui-router’,<br>        Restangular:’../lib/angular/restangular-1.5.2’,<br>        lodash:’../lib/angular/lodash-1.8.3’,<br>        app:’appIndex/app’,<br>        router:’appIndex/router’,<br>        mainController:’appIndex/controllers/mainController’,<br>        ctlModule:’appIndex/controllers/ctlModule’,<br>        homeController:’appIndex/controllers/homeController’,<br>        …<br>    },<br>    shim:{<br>        ‘angular’:{<br>            exports:’angular’<br>        },<br>        ‘angularUiRouter’:{<br>            deps: [‘angular’],<br>            exports:’angularUiRouter’<br>        },<br>        …<br>    },<br>    urlArgs:”bust=” + (new Date()).getTime()  //防止读取缓存，调试用<br>});</p>
+<p>require([<br>    ‘jquery’,<br>    ‘angular’,<br>    ‘angularUiRouter’,<br>    ‘app’,<br>    ‘router’<br>], function ($,angular,angularUiRouter,app,router) {<br>   $(document).ready(function(){<br>        //采用手动启动angularjs应用，所以这里不用为首页添加ng-app=’rabbit’<br>        angular.bootstrap(document, [‘rabbit’]);<br>    });<br>});<br>3、两个重要的文件app.js和router.js</p>
+<p>app.js 主要代码如下：</p>
+<p>define([“angular”,’mainController’,’mainDirective’,’mainService’,’mainApi’],function(angular){<br>        return angular.module(“rabbit”,[‘ui.router’,’app.ctlModule’,’app.dirModule’,’app.serModule’,’app.apiModule’]);<br>    })<br>定义匿名模块:依赖的mainController和mainDirective主要是用来加载angular的控制器和指令</p>
+<p>ui.router:一个基于ngRoute开发的第三方路由，作为框架额外的附加功能，它们都将以模块依赖的形式被引入</p>
+<p>rabbit为自定义的模块名，依赖第三方路由模块ui.router,以及自定义的控制器模块，自定义的指令模块</p>
+<p>这样做的目的是：在程序启动(bootstrap)的时候，加载依赖模块(如：ui.router)，将所有挂载在该模块的服务(provider)，指令(directive)，过滤器(filter)等都进行注册，那么在后面的程序中便可以调用了。</p>
+<p>router.js 主要代码如下：</p>
+<p>define([‘app’],function(app){<br>        return app.run([‘$rootScope’, ‘$log’, function($rootScope, $log){<br>                        $rootScope.$on(‘$stateChangeSuccess’, function(event, toState, toParams, fromState, fromParams){<br>                            $log.debug(‘successfully changed states’) ;<br>                        });<br>                    }])<br>                  .config(function($stateProvider, $urlRouterProvider, $locationProvider, $uiViewScrollProvider){<br>                        // 默认进入重定向<br>                        //$urlRouterProvider.otherwise(‘/index’);<br>                        $stateProvider.state(‘home’,{<br>                            url: ‘/home’,<br>                            templateUrl:’../../template/tplIndex/home.html’,<br>                            controller:’homeCtl’<br>                        })<br>                })<br>});<br>配置了一个指定 /home 的路由。</p>
+<p>4、控制器</p>
+<p>mainController.js 主要代码如下：</p>
+<p>define([‘homeController’,’indexController’], function() {});<br>主要用来加载各个控制器（所有的控制器都将在这个文件中被加载），我们可以有很多个控制器文件，按照具体需要进行添加。</p>
+<p>homeController.js 主要代码如下：</p>
+<p>define([‘ctlModule’,’jquery’],function(ctl,$){<br>    return ctl.controller(‘homeCtl’,function($scope,serGetTitle,testData){<br>        $scope.title = serGetTitle.title;<br>        $scope.projects = testData.getMessages();<br>    })<br>})<br>控制器homeCtl依赖于ctlModule模块，其实可以理解为app.ctlModule模块下的一个“方法”。</p>
+<p>ctlModule.js 主要代码如下：</p>
+<p>define([‘angular’], function (angular) {<br>    ‘use strict’;<br>    return angular.module(‘app.ctlModule’, []);<br> });<br>声明一个叫作app.ctlModule的模块，app.js里的模块rabbit，依赖于这个模块，并调用这个模块下的所有“方法”</p>
+<p>5、指令，服务，接口</p>
+<p>同控制器的定义方法完全类似。</p>
+<p>五、说明</p>
+<p>php文件夹放了一些php文件，可以用apache建一个站点，模拟与服务器端的数据交互。</p>
+<p>server.js是一个静态文件服务器，mac下进入目录，执行node server，即可创建一个简单的nodejs服务器。</p>
+<p>个人感觉这样设计一个前端架构，虽然会让开发变得繁琐，但功能划分比较明确，提供了一个开发标准，适合于多人协同作业，总体上来说利大于弊。</p>
+<p>源码下载地址：angularJS集成requireJS</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/05/17/angularjs/angular-requirejs/" data-id="cjh4911gm000gmtp3uw18m60z" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-personal-notes/Soccer-Superstars" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/05/18/personal-notes/Soccer-Superstars/" class="article-date">
+  <time datetime="2016-05-18T03:17:56.000Z" itemprop="datePublished">2016-05-18</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/随笔/">随笔</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/05/18/personal-notes/Soccer-Superstars/">时光飞逝 传奇谢幕</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>&emsp;&emsp;上赛季，老将纷纷谢幕。皮尔洛远走大联盟，不知道当尤文赛季初打不开局面时，斑马球迷是否会怀念皮波后场远程制导般的长传…杰拉德泪洒安菲尔德，习惯了看到杰拉德带队进场的又岂止红军球迷….看到斯坦福桥的神灯穿上天蓝色球衣，蓝军球迷会否五味杂陈难以言说…</p>
+<p>&emsp;&emsp;本赛季结束，相似的一幕再次上演。罗西基和阿尔特塔与枪手告别，队长的泪水让枪迷动容。克洛泽告别蓝鹰，球迷久久不愿离场。美国老门将霍华德告别英超，阿比亚蒂告别米兰，迪纳塔莱告别乌迪内斯，托尼告别意甲，甚至连效忠了一世的狼王托蒂和蓝军特里都前途未卜…</p>
+<p>&emsp;&emsp;记忆里，还有曾经以为会永远飘扬在伯纳乌上空的皇马旗帜-指环王劳尔，还有大步流星阳光帅气的米兰卡卡，还有威震英伦霸气绝伦的魔兽德罗巴…</p>
+<p>&emsp;&emsp;记忆里，还有那支橙色的鲁能泰山，尤其是看到这赛季鲁能的举步维艰，更是让人想起当年那些驰骋沙场战功赫赫无敌猛将。中锋韩鹏头球无敌，小胖王永珀脚法细腻，摩托车吕征跑起来后面带土，还有李徽，队长刘金东，铁血后腰崔鹏，时不时来脚远射的周海滨，开球时习惯一看二退三磕脚的李雷雷，穿针引线的日科夫….</p>
+<p>&emsp;&emsp;不可否认，职业足球里，或许球员与俱乐部的合同是冰冷的，球员新陈代谢也是自然规律，但球员与球迷的感情却也是深厚的，球员对俱乐部的感情也是真挚的。伟大的俱乐部不正是靠这些伟大的球星传承积淀的精神与文化吗。总觉得还是那个红黑剑条衫22号的卡卡最快乐，还是那个白衣7号的劳尔最为潇洒…希望足坛多一些吉格斯和萨内蒂的轶事，少出现一些卡西泪别伯纳乌，神灯反戈蓝军的残酷。</p>
+<p>&emsp;&emsp;老将谢幕，新秀扬名。内马尔赛场如穿花蝴蝶过人如麻，阿扎尔左闪右晃似凌波微步，贝尔威风凛凛似追风逐电，J罗凌空抽射犹如石破天惊…看到后梅罗时代，身价动辄亿元的博格巴们精彩纷呈的表演固然赏心悦目，但感觉里总少了一份难以言表的激动，是因为少了当年宿舍里一起欢呼的伙伴？少了年少时的激情与冲动？蓦然回首，才知道了杰拉德们告别的不光是他们的职业生涯，还有留给我们的无数个美好瞬间，还有时光飞逝永远回不去的青春。</p>
+<p>&emsp;&emsp;老兵不死，传奇不朽。你们带给我们球迷的不只是美好瞬间，还有你们的精神，兢兢业业的精神，永不放弃的精神，追求荣誉的精神，忠心感恩的精神。我们会以你们为榜样，也会将这种精神传递给我们的下一代。祝老将们未来一切都好。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2016/05/18/personal-notes/Soccer-Superstars/" data-id="cjh4911gx000qmtp3m1e69ux3" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/足球/">足球</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-angularjs/angular-jsonp" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/05/16/angularjs/angular-jsonp/" class="article-date">
+  <time datetime="2016-05-16T07:39:59.000Z" itemprop="datePublished">2016-05-16</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/angularjs/">angularjs</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/05/16/angularjs/angular-jsonp/">angularJS使用.jsonp方法</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>angularJS与服务器通信中的$http中有一个$http.jsonp方法，在网上偶然间看到一篇文章，对此解释得非常清楚。</p>
+<p>原文地址：<a href="JSONP跨域访问数据传输">【AngularJs】 – JSONP跨域访问数据传输</a></p>
+<p>json:数据存储格式.</p>
+<p>jsonp:一种非官方的跨域数据交互协议.</p>
+<p>AngularJS在http服务中的jsonp函数如下所示：</p>
+<pre><code>$http.jsonp(&quot;https://api.github.com?callback=JSON_CALLBACK&quot;).success(function(data) {
+    //执行回调
+})
+</code></pre><p>1、当请求被发送时，AngularJS会在DOM中生成一个如下所示的<code>&lt;script&gt;</code>标签：</p>
+<pre><code>&lt;script src=&quot;https://api.github.com?callback=angular.callbacks._0&quot; type=&quot;text/javascript&quot;&gt;
+</code></pre><p>2、当支持JSONP的服务器返回数据时，数据会被包装在由AngularJS生成的具名函数angular.callbacks._0中。</p>
+<p>3、在这个例子中，Github服务器响应如下：</p>
+<pre><code>angular.callbacks._0({ 
+    &apos;meta&apos;: {
+        &apos;X-RateLimit-Limit&apos;: &apos;60&apos;, 
+        &apos;status&apos;: 200 
+    },
+    &apos;data&apos;: {
+        &apos;current_user_url&apos;: &apos;https://api.github.com/user&apos; 
+    } 
+}) 
+</code></pre><p>4、angularJS中jsonp的使用</p>
+<pre><code>myUrl = &quot;http://localhost:8090/api/test?callback=JSON_CALLBACK&quot;;
+
+$http.jsonp(myUrl).success(
+　　function(data){
+　　　　alert(data);
+　　}
+);
+</code></pre><p>1.angularJS中使用$http.jsonp函数</p>
+<p>2.指定callback和回调函数名，函数名为JSON_CALLBACK时，会调用success回调函数，JSON_CALLBACK必须全为大写。</p>
+<p>3.也可以指定其它回调函数，但必须是定义在window下的全局函数。</p>
+<p>4.url中必须加上callback</p>
+<p>5.当callback为JSON_CALLBACK时，只会调用success，即使window中有JSON_CALLBACK函数，也不会调用该函数。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2016/05/16/angularjs/angular-jsonp/" data-id="cjh4911gt000nmtp3ahlw1jhi" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-angularjs/angular-http" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/05/15/angularjs/angular-http/" class="article-date">
+  <time datetime="2016-05-15T08:27:40.000Z" itemprop="datePublished">2016-05-15</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/angularjs/">angularjs</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/05/15/angularjs/angular-http/">angularJS服务器通信之http</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>搜索angularJS通信时，看到一篇对$http通信解释得很是详细的文章，更难得的是文章的最后有一个对$http的封装，正好用在自己的angularJS项目的架构中。</p>
+<p>原来地址：<a href="http://www.cnblogs.com/wujie520303/p/4869600.html" target="_blank" rel="external">Angular服务器通信</a></p>
+<p>参考文献：<a href="http://www.linuxidc.com/Linux/2015-01/111429.htm" target="_blank" rel="external">AngularJS权威教程</a></p>
+<p>####一、快速上手</p>
+<p>$http服务只接收一个配置对象作为参数，并且返回一个promise对象，两个回调方法success和error.</p>
+<p>1、使用success()和error()</p>
+<pre><code>$http({
+  method: &apos;GET&apos;,
+  url: &apos;/api/user/1&apos;
+}).success(function(rep) {
+  // ...
+}).error(function(err) {
+  // ...
+});
+</code></pre><p>2、使用then()方法</p>
+<pre><code>$http({
+  method: &apos;GET&apos;,
+  url: &apos;/api/user/1&apos;
+}).then(function(rep) {
+  // 成功
+}, function(err) {
+  // 失败
+});
+</code></pre><p>3、服务器向客户端返回一个json数据，并带有一个状态码。</p>
+<p>状态码约定为：</p>
+<pre><code>var rep_status = [
+  {key: &apos;SUCCESS&apos;, value: 1, desc: &apos;交互成功&apos;},
+  {key: &apos;NOT_LOGIN&apos;, value: 2, desc: &apos;未登录&apos;},
+  {key: &apos;INVALID_REQUEST&apos;, value: 3, desc: &apos;非法请求&apos;},
+  {key: &apos;INVALID_PARAM&apos;, value: 4, desc: &apos;参数错误&apos;},
+  {key: &apos;INNER_ERROR&apos;, value: 5, desc: &apos;服务器内部错误&apos;},
+  {key: &apos;UNKNOWN&apos;, value: 6, desc: &apos;未知错误&apos;}
+]
+</code></pre><p>返回API约定为：</p>
+<pre><code>// 响应成功返回
+{
+  status: 1,
+  message: &apos;ok&apos;,
+  data: {
+    total: 200,
+    object_list: [
+      {
+        // ....
+      }
+    ]
+  }
+}
+
+// 出现错误后端返回
+{
+  status: 4,
+  message: &apos;参数错误&apos;
+}
+</code></pre><p>4、通过success()和error()得到的响应数据只包含服务器响应数据的主体，如果想得到一个完整的对象，需要使用then()方法。一个完整的响应对象或者叫promise对象包含如下字段：</p>
+<p>data - {string | Object} 响应主体 status - {number} 响应状态</p>
+<p>headers - {function([headerName])} 获取响应头部的函数 </p>
+<p>config - {Object} 请求触发时提供的配置对象，后面会详细介绍</p>
+<p>statusText - {string} 响应状态描述*</p>
+<pre><code> var promise = $http({method: &apos;GET&apos;, url: &apos;/api/user/5&apos;});
+promise.then(function(rep) {
+  console.log(rep.data.data.name); // jenemy
+  console.log(rep.status); // 200
+  console.log(rep.statusText); // OK
+  console.log(rep.config.url); // /api/user/5
+  console.log(rep.headers()[&apos;x-powered-by&apos;]); // Express
+});
+</code></pre><p>5、$http配置属性</p>
+<p>// params参数会转化为?name=jenemy&amp;age=25</p>
+<pre><code>$http({
+  method: &apos;GET&apos;,
+  url: &apos;/api/user/5&apos;,
+  params: {
+    name: &apos;jenemy&apos;,
+    age: 25
+  }
+});
+</code></pre><p>// data - {string | object} 在发送POST或PUT时使用</p>
+<pre><code>$http({
+    method: &apos;POST&apos;,
+    url: &apos;/api/user/2&apos;,
+    data: {name: &quot;jenemy&quot;},
+    headers: {
+        &apos;Authorization&apos;: &apos;Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==&apos;,
+        &apos;Content-Type&apos;: &apos;application/x-www-form-urlencoded;charset=utf-8&apos;
+    }
+});
+</code></pre><p>6、cache - {boolean | cache}</p>
+<p>默认情况下，$http服务不会对请求进行本地缓存。启用缓存，需要向$http请求传入一个布尔值或者一个缓存实例。</p>
+<pre><code>$http.get(&apos;/api/user&apos;, { cache: true})
+.success(function(data) {})
+.error(function(data){});
+</code></pre><p>当第一次请求成功后，$http会缓存请求的url，下一次请求时会直接加载缓存中的数据，不会再产生一次$http请求发出。</p>
+<p>由于设置了启用缓存，AngularJS默认会使用$cacheFactory，这个服务是AngularJS在启动时自动创建的。</p>
+<p>如果想要对AngularJS使用的缓存进行更多的自定义控制，可以请求传入一个自定义的缓存实例代替true。</p>
+<p>例如，如果要使用LRU（Least Recently Used，最近最少使用）缓存，可以像这样传入缓存实例对象：</p>
+<pre><code>var lru = $cacheFactory(&apos;lru&apos;,{
+    capacity: 20 //容纳
+});
+// $http请求
+$http.get(&apos;/api/users.json&apos;, { cache: lru }) 
+.success(function(data){}) 
+.error(function(data){});    
+</code></pre><p>现在，最新的20个请求会被缓存。第21个请求会导致lru从缓存中将时间比较老的请求移除。</p>
+<p>通过.config()函数给所有$http请求设置一个默认的缓存：</p>
+<pre><code>angular.module(&apos;myApp&apos;, [])
+    .config(function($httpProvider, $cacheFactory) {
+        $httpProvider.defaults.cache = $cacheFactory(&apos;lru&apos;, {
+             capacity: 20
+        }); 
+    });
+</code></pre><p>7、拦截器</p>
+<p>什么是拦截器？我们将httpProvider对象输出到控制台</p>
+<pre><code>{
+  &quot;defaults&quot;: {
+    &quot;transformResponse&quot;: [null],
+    &quot;transformRequest&quot;: [null],
+    &quot;headers&quot;: {
+      &quot;common&quot;: {
+          &quot;Accept&quot;: &quot;application/json, text/plain, */*&quot;
+      },
+      &quot;post&quot;: {
+          &quot;Content-Type&quot;: &quot;application/json;charset=utf-8&quot;
+      },
+      &quot;put&quot;: {
+          &quot;Content-Type&quot;: &quot;application/json;charset=utf-8&quot;
+      },
+      &quot;patch&quot;: {
+          &quot;Content-Type&quot;: &quot;application/json;charset=utf-8&quot;
+      }
+    },
+    &quot;xsrfCookieName&quot;: &quot;XSRF-TOKEN&quot;,
+    &quot;xsrfHeaderName&quot;: &quot;X-XSRF-TOKEN&quot;,
+    &quot;paramSerializer&quot;: &quot;$httpParamSerializer&quot;
+  },
+  &quot;interceptors&quot;: [],
+  &quot;$get&quot;: [&quot;$httpBackend&quot;, &quot;$$cookieReader&quot;, &quot;$cacheFactory&quot;, &quot;$rootScope&quot;, &quot;$q&quot;, &quot;$injector&quot;, null]
+}
+</code></pre><p>可以看到$httpProvider中有一个interceptors数组，而所谓拦截器也就是一个注入到了该数组中的服务。</p>
+<pre><code>var app = angular.module(&apos;app&apos;, []);
+
+app.factory(&apos;myInterceptor&apos;, function($log) {
+    $log.debug(&apos;$log输出啦。。。&apos;);
+
+    var myInterceptor = {
+      response: function(rep) {
+        console.log(rep);
+        return rep;
+      }
+    }
+  });
+
+app.config(function($httpProvider) {
+  $httpProvider.interceptors.push(&apos;myInterceptor&apos;);
+});
+</code></pre><p>当我们在页面中向后端发起http请求时就可以看控制台中输出了我们的调试信息和服务器返回的数据。</p>
+<p>关于拦截器的知识，见过的大都是理论上的解释。这里有一个关于angularJS拦截器应用实例的文章：angularjs中的interceptor和挺好的例子</p>
+<p>####二、封装$http服务，统一管理请求url</p>
+<p>将项目中所有的数据请求统一管理，无疑是一个非常好的开发体验，在以后开发中会借鉴这个思路，加入到自己的项目中。</p>
+<p>在实际项目中，我们可以对$http服务作一层封装，比如封装成HttpService，将服务器返回的错误信息进行一次拦截处理，提供统一的错误提示。示例如下：</p>
+<pre><code>angular.module(&apos;httpService&apos;, [])
+  .service(&apos;HttpService&apos;, function($http, $q) {
+
+    var service = {
+      get: function(url, config) {
+        return handleRepData(&apos;get&apos;, url, null, config);
+      },
+      post: function(url, data, config) {
+        return handleRepData(&apos;post&apos;, url, data, config);
+      },
+      put: function(url, data, config) {
+        return handleRepData(&apos;post&apos;, url, data, config);
+      },
+      delete: function(url, config) {
+        return handleRepData(&apos;delete&apos;, url, null, config);
+      }
+    }
+
+    function handleRepData(method, url, data, config) {
+      var promise;
+      var defer = $q.defer();
+      switch (method) {
+        case &apos;get&apos;:
+          promise = $http.get(url, config);
+          break;
+        case &apos;post&apos;:
+          promise = $http.post(url, data, config);
+          break;
+        case &apos;put&apos;:
+          promise = $http.put(url, data, config);
+          break;
+        case &apos;delete&apos;:
+          promise = $http.delete(url, config)
+      }
+
+      promise.then(function(rep) {
+        if (rep.data.success || rep.data.status === 1) {
+          defer.resolve(rep.data);
+        } else {
+          var errorMsg = rep.data.message || &apos;哦，出错啦！但是后端没有给任何信息。&apos;;
+          // 弹出错误信息，或者重定向到404页面
+          alert(errorMsg);
+        }
+      }, function() {
+        defer.reject(&apos;出错了&apos;);
+      })
+
+      return defer.promise;
+    }
+
+    return service;
+  });
+</code></pre><p>将所有的请求url模块划分，统一放置在一个服务下面：</p>
+<pre><code>angular.module(&apos;urlService&apos;, [])
+  .factory(&apos;UrlService&apos;, function(HttpService) {
+    var service = {
+      // 数据源
+      cms: {
+        dataSource: {
+          // 新建
+          new: function(params_) {
+            return HttpService.post(&apos;/api/datasource/&apos;, params_).then(function(data_) {
+              return data_;
+            });
+          },
+          // 更新
+          update: function(params_, name_) {
+            return HttpService.put(&apos;/api/datasource/&apos; + name_ +&apos;/&apos;, params_).then(function(data_) {
+              return data_;
+            });
+          },
+          // 详情
+          detail: function(params_, name_) {
+            return HttpService.get(&apos;/api/datasource/&apos;+ name_ +&apos;/&apos;, {params: params_}).then(function(data_) {
+              return data_;
+            });
+          },
+          // 删除
+          delete: function(params_, name_) {
+            return HttpService.delete(&apos;/api/datasource/&apos;+ name_ +&apos;/&apos;, params_).then(function(data_) {
+              return data_;
+            });
+          },
+          {
+            // ...
+          }
+        }
+      },
+      // 店铺管理
+      store: {
+        shop: {
+          // 新建
+          create: function(params_) {
+            return HttpService.post(&apos;/api/shop/create/&apos;, params_).then(function(data_) {
+              return data_;
+            });
+          },
+          // 查重
+          checkDuplicate: function(params_) {
+            return HttpService.post(&apos;/api/shop/search_duplicate/&apos;, params_).then(function(data_) {
+              return data_;
+            });
+          },
+          // 搜索
+          search: function(params_) {
+            return HttpService.get(&apos;/api/shop/search/&apos;, params_).then(function(data_) {
+              return data_;
+            });
+          },
+          {
+            // ...
+          }
+        }
+      },
+      {
+        // ...
+      }
+    };
+
+    return service;
+  });
+</code></pre><p>最后在控制器中引入urlService服务：</p>
+<pre><code>angular.module(&apos;cmsDataSourceController&apos;, [])
+  .controller(&apos;cmsDataSourcePageCtrl&apos;, [&apos;$scope&apos;, &apos;UrlService&apos;, function($scope, UrlService) {
+
+    var params = {name: name, alias: alias, cate: cate, conds: conds, tags: tags};
+
+    UrlService.cms.dataSource.new(params).then(function(rep) {
+      tips(&apos;数据源创建成功!&apos;);
+      $(&apos;.btn-update&apos;).text(&apos;修改数据源&apos;);
+    });
+  }]);
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2016/05/15/angularjs/angular-http/" data-id="cjh4911gh000dmtp37k4hp9jw" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
   
     <article id="post-angularjs/restangular" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
@@ -239,7 +1574,7 @@ var books = author.getList(&apos;books&apos;);
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/05/13/angularjs/restangular/" data-id="cjgxcg46a000er9p365vka56p" class="article-share-link">Delen</a>
+      <a data-url="http://yoursite.com/2016/05/13/angularjs/restangular/" data-id="cjh4911go000imtp37lw7b77m" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
@@ -262,9 +1597,9 @@ var books = author.getList(&apos;books&apos;);
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Categorieën</h3>
+    <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/mybatis/">mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
     </div>
   </div>
 
@@ -272,9 +1607,9 @@ var books = author.getList(&apos;books&apos;);
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Labels</h3>
+    <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
     </div>
   </div>
 
@@ -284,14 +1619,14 @@ var books = author.getList(&apos;books&apos;);
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/mybatis/" style="font-size: 17.14px;">mybatis</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
     </div>
   </div>
 
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Archieven</h3>
+    <h3 class="widget-title">Archives</h3>
     <div class="widget">
       <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
     </div>
@@ -301,28 +1636,28 @@ var books = author.getList(&apos;books&apos;);
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Recente berichten</h3>
+    <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
         
           <li>
-            <a href="/2018/05/08/java/spring/spring-10/">第十章 Spring事务管理</a>
+            <a href="/2018/05/13/java/mybatis/mybatis-7/">第七章 MyBatis - 查询缓存</a>
           </li>
         
           <li>
-            <a href="/2018/05/06/java/spring/spring-9/">第九章 spring与JDBC模板</a>
+            <a href="/2018/05/12/java/mybatis/mybatis-6/">第六章 MyBatis - 延迟加载</a>
           </li>
         
           <li>
-            <a href="/2018/05/06/java/spring/spring-8/">第八章 Spring与AOP AspectJ基于XML的AOP实现</a>
+            <a href="/2018/05/12/java/mybatis/mybatis-5/">第五章 MyBatis关联关系查询 - 多对多</a>
           </li>
         
           <li>
-            <a href="/2018/05/06/java/spring/spring-7/">第七章 Spring与AOP AspectJ基于注解的AOP实现</a>
+            <a href="/2018/05/12/java/mybatis/mybatis-4/">第四章 MyBatis关联关系查询 - 自关联</a>
           </li>
         
           <li>
-            <a href="/2018/05/05/java/spring/spring-6/">第六章 Spring与AOP AspectJ对AOP的实现</a>
+            <a href="/2018/05/12/java/mybatis/mybatis-3/">第三章 MyBatis关联关系查询 - 多对一</a>
           </li>
         
       </ul>
