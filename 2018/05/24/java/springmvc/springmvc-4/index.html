@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>第四章 springmvc核心技术 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="4.1 请求转发与重定向当处理器对请求处理完毕后，向其它资源进行跳转时，有两种跳转方式：请求转发与重定向。而根据所要跳转的资源类型，又可分为两类：跳转到其它页面与跳转到其它处理器。 注意，对于请求转发的页面，可以是WEB-INF中的页面；而重定向的页面，不能是WEB-INF中的页面。因为重定向相当于用户再次发出一次请求，而用户是不能直接访问WEB-INF中的资源的。 4.1.1 返回ModelAn">
+<meta name="keywords" content="springmvc">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第四章 springmvc核心技术">
+<meta property="og:url" content="http://yoursite.com/2018/05/24/java/springmvc/springmvc-4/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="4.1 请求转发与重定向当处理器对请求处理完毕后，向其它资源进行跳转时，有两种跳转方式：请求转发与重定向。而根据所要跳转的资源类型，又可分为两类：跳转到其它页面与跳转到其它处理器。 注意，对于请求转发的页面，可以是WEB-INF中的页面；而重定向的页面，不能是WEB-INF中的页面。因为重定向相当于用户再次发出一次请求，而用户是不能直接访问WEB-INF中的资源的。 4.1.1 返回ModelAn">
+<meta property="og:updated_time" content="2018-05-25T09:01:32.239Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="第四章 springmvc核心技术">
+<meta name="twitter:description" content="4.1 请求转发与重定向当处理器对请求处理完毕后，向其它资源进行跳转时，有两种跳转方式：请求转发与重定向。而根据所要跳转的资源类型，又可分为两类：跳转到其它页面与跳转到其它处理器。 注意，对于请求转发的页面，可以是WEB-INF中的页面；而重定向的页面，不能是WEB-INF中的页面。因为重定向相当于用户再次发出一次请求，而用户是不能直接访问WEB-INF中的资源的。 4.1.1 返回ModelAn">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-java/springmvc/springmvc-4" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/24/java/springmvc/springmvc-4/" class="article-date">
+  <time datetime="2018-05-24T07:59:14.000Z" itemprop="datePublished">2018-05-24</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/springmvc/">springmvc</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      第四章 springmvc核心技术
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="4-1-请求转发与重定向"><a href="#4-1-请求转发与重定向" class="headerlink" title="4.1 请求转发与重定向"></a>4.1 请求转发与重定向</h4><p>当处理器对请求处理完毕后，向其它资源进行跳转时，有两种跳转方式：请求转发与重定向。而根据所要跳转的资源类型，又可分为两类：跳转到其它页面与跳转到其它处理器。</p>
+<p>注意，对于请求转发的页面，可以是WEB-INF中的页面；而重定向的页面，不能是WEB-INF中的页面。因为重定向相当于用户再次发出一次请求，而用户是不能直接访问WEB-INF中的资源的。</p>
+<h5 id="4-1-1-返回ModelAndView时的请求转发"><a href="#4-1-1-返回ModelAndView时的请求转发" class="headerlink" title="4.1.1 返回ModelAndView时的请求转发"></a>4.1.1 返回ModelAndView时的请求转发</h5><p>（1）、请求转发到页面</p>
+<p>（2）、请求转发到Controller</p>
+<h5 id="4-1-2-返回ModelAndView时的重定向"><a href="#4-1-2-返回ModelAndView时的重定向" class="headerlink" title="4.1.2 返回ModelAndView时的重定向"></a>4.1.2 返回ModelAndView时的重定向</h5><p>（1）、重定向到页面</p>
+<p>A、通过ModelAndView的Model携带参数</p>
+<p>index.jsp</p>
+<pre><code>&lt;form action=&quot;${pageContext.request.contextPath }/test/register.do&quot; method=&quot;POST&quot;&gt;
+    姓名：&lt;input type=&quot;text&quot; name=&quot;name&quot; /&gt;&lt;br /&gt;
+    年龄：&lt;input type=&quot;text&quot; name=&quot;age&quot; /&gt;&lt;br /&gt;
+    &lt;input type=&quot;submit&quot; value=&quot;注册&quot; /&gt;
+&lt;/form&gt;
+</code></pre><p>处理器</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+
+    @RequestMapping(&quot;/register.do&quot;)
+    public ModelAndView doSecond(String name, int age) {
+        ModelAndView mv = new ModelAndView();
+        mv.addObject(&quot;name&quot;, name);
+        mv.addObject(&quot;age&quot;, age);
+        mv.setViewName(&quot;redirect:/welcome.jsp&quot;);
+        return mv;
+    }
+}
+</code></pre><p>跳转到welcome.jsp页面获取接收参数</p>
+<pre><code>&lt;!-- 
+param.name底层执行的是request.getParameter(&quot;name&quot;) 
+requestScope.name底层执行的是request.getAttribute(&quot;name&quot;)
+--&gt;
+name = ${param.name}
+&lt;br/&gt;
+age = ${param.age}
+</code></pre><p>B、通过HttpSession携带参数</p>
+<p>（2）、重定向到Controller</p>
+<p>A、通过ModelAndView的Model携带参数</p>
+<p>B、通过HttpSession携带参数</p>
+<h5 id="4-1-3-返回String时的请求转发"><a href="#4-1-3-返回String时的请求转发" class="headerlink" title="4.1.3 返回String时的请求转发"></a>4.1.3 返回String时的请求转发</h5><p>（1）、请求转发到页面</p>
+<p>（2）、请求转发到Controller</p>
+<h5 id="4-1-4-返回String时的重定向"><a href="#4-1-4-返回String时的重定向" class="headerlink" title="4.1.4 返回String时的重定向"></a>4.1.4 返回String时的重定向</h5><p>（1）、重定向到页面</p>
+<p>（2）、重定向到Controller</p>
+<p>index.jsp</p>
+<pre><code>&lt;form action=&quot;${pageContext.request.contextPath }/test/register.do&quot; method=&quot;POST&quot;&gt;
+    姓名：&lt;input type=&quot;text&quot; name=&quot;name&quot; /&gt;&lt;br /&gt;
+    年龄：&lt;input type=&quot;text&quot; name=&quot;age&quot; /&gt;&lt;br /&gt;
+    &lt;input type=&quot;submit&quot; value=&quot;注册&quot; /&gt;
+&lt;/form&gt;
+</code></pre><p>处理器    </p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+
+    @RequestMapping(&quot;/register.do&quot;)
+    public String doRegister(String name, int age, Model model) {
+        model.addAttribute(&quot;name&quot;,name);
+        model.addAttribute(&quot;age&quot;,age);
+
+        return &quot;redirect:other.do&quot;;
+    }
+
+    @RequestMapping(&quot;/other.do&quot;)
+    public String doOther(String name,int age) {
+        System.out.println(&quot;name = &quot; + name);
+        System.out.println(&quot;age = &quot; + age);
+        return &quot;/welcome.jsp&quot;;
+    }
+}
+</code></pre><p>跳转到welcome.jsp页面获取接收参数</p>
+<pre><code>&lt;!-- 
+param.name底层执行的是request.getParameter(&quot;name&quot;) 
+requestScope.name底层执行的是request.getAttribute(&quot;name&quot;)
+--&gt;
+name = ${param.name}
+&lt;br/&gt;
+age = ${param.age}
+</code></pre><h5 id="4-1-5-返回void时的请求转发"><a href="#4-1-5-返回void时的请求转发" class="headerlink" title="4.1.5 返回void时的请求转发"></a>4.1.5 返回void时的请求转发</h5><p>（1）、请求转发到页面</p>
+<p>（2）、请求转发到Controller</p>
+<h5 id="4-1-6-返回void时的重定向"><a href="#4-1-6-返回void时的重定向" class="headerlink" title="4.1.6 返回void时的重定向"></a>4.1.6 返回void时的重定向</h5><p>（1）、重定向到页面</p>
+<p>（2）、重定向到Controller</p>
+<h4 id="4-2-异常处理"><a href="#4-2-异常处理" class="headerlink" title="4.2 异常处理"></a>4.2 异常处理</h4><p> 常用的springmvc异常处理方式主要有三种：</p>
+<ul>
+<li><p>使用系统定义好的异常处理器SimpleMappingExceptionResolver</p>
+</li>
+<li><p>使用自定义异常处理器</p>
+</li>
+<li><p>使用异常处理注解</p>
+</li>
+</ul>
+<h5 id="4-2-1-SimpleMappingExceptionResolver异常处理器"><a href="#4-2-1-SimpleMappingExceptionResolver异常处理器" class="headerlink" title="4.2.1 SimpleMappingExceptionResolver异常处理器"></a>4.2.1 SimpleMappingExceptionResolver异常处理器</h5><p>springmvc.xml</p>
+<pre><code>&lt;context:component-scan base-package=&quot;com.bjpowernode.handlers&quot;&gt;&lt;/context:component-scan&gt;
+
+&lt;bean class=&quot;org.springframework.web.servlet.handler.SimpleMappingExceptionResolver&quot;&gt;
+    &lt;property name=&quot;defaultErrorView&quot; value=&quot;/errors/error.jsp&quot;&gt;&lt;/property&gt;
+    &lt;property name=&quot;exceptionAttribute&quot; value=&quot;ex&quot;&gt;&lt;/property&gt;
+    &lt;property name=&quot;exceptionMappings&quot;&gt;
+        &lt;props&gt;
+            &lt;prop key=&quot;com.bjpowernode.exceptions.NameException&quot;&gt;/errors/nameError.jsp&lt;/prop&gt;
+            &lt;prop key=&quot;com.bjpowernode.exceptions.AgeException&quot;&gt;/errors/ageError.jsp&lt;/prop&gt;
+        &lt;/props&gt;
+    &lt;/property&gt;
+&lt;/bean&gt;
+</code></pre><p>StudentException.class</p>
+<pre><code>public class StudentException extends Exception {
+
+    public StudentException() {
+        super();
+    }
+
+    public StudentException(String message) {
+        super(message);
+    }
+
+}
+</code></pre><p>NameException.class</p>
+<pre><code>public class NameException extends StudentException {
+
+    public NameException() {
+        super();
+    }
+
+    public NameException(String message) {
+        super(message);
+    }
+
+}
+</code></pre><p>AgeException.class</p>
+<pre><code>public class AgeException extends StudentException {
+
+    public AgeException() {
+        super();
+    }
+
+    public AgeException(String message) {
+        super(message);
+    }
+
+}
+</code></pre><p>处理器</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+
+    @RequestMapping(&quot;/register.do&quot;)
+    public ModelAndView doRegister(String name, int age) {
+
+        int i = 3/0;
+
+        ModelAndView mv = new ModelAndView();
+        mv.addObject(&quot;name&quot;, name);
+        mv.addObject(&quot;age&quot;, age);
+        mv.setViewName(&quot;welcom.jsp&quot;);
+        return mv;
+    }
+
+}
+</code></pre><p>error.jsp</p>
+<pre><code>&lt;body&gt;
+    error page.&lt;br /&gt;
+    ${ex.message}
+&lt;/body&gt;
+</code></pre><p>nameError.jsp</p>
+<pre><code>name error page.
+&lt;br&gt;
+${ex.message}
+</code></pre><p>ageError.jsp</p>
+<pre><code>age error page.
+&lt;br&gt;
+${ex.message}
+</code></pre><h5 id="4-2-2-自定义异常处理器"><a href="#4-2-2-自定义异常处理器" class="headerlink" title="4.2.2 自定义异常处理器"></a>4.2.2 自定义异常处理器</h5><p>使用springmvc定义好的SimpleMappingExceptionResolver异常处理器，可以实现生指定异常后的跳转。但若要想实现在捕捉到异常时，进行一些操作，它是完成不了的。此时，就需要使用自定义异常。</p>
+<p>自定义异常处理器，需要实现HandlerExceptionResolver接口，并且该类需要在springmvc配置文件中进行注册。</p>
+<p>自定义异常处理器</p>
+<pre><code>public class MyHandlerExceptionResolver implements HandlerExceptionResolver {
+
+    @Override
+    public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler,
+            Exception ex) {
+        ModelAndView mv = new ModelAndView();
+        mv.addObject(&quot;ex&quot;, ex);
+
+        mv.setViewName(&quot;/errors/error.jsp&quot;);
+
+        if(ex instanceof NameException) {
+            mv.setViewName(&quot;/errors/nameError.jsp&quot;);
+        }
+
+        if(ex instanceof AgeException) {
+            mv.setViewName(&quot;/errors/ageError.jsp&quot;);
+        }
+
+        return mv;
+    }
+
+}
+</code></pre><p>springmvc.xml 注册</p>
+<pre><code>&lt;!-- 注册自定义异常处理器 --&gt;
+&lt;bean class=&quot;com.bjpowernode.resolvers.MyHandlerExceptionResolver&quot;&gt;&lt;/bean&gt;
+</code></pre><h5 id="4-2-3-异常处理器注解-ExceptionHandler"><a href="#4-2-3-异常处理器注解-ExceptionHandler" class="headerlink" title="4.2.3 异常处理器注解@ExceptionHandler"></a>4.2.3 异常处理器注解@ExceptionHandler</h5><p>定义异常处理器</p>
+<pre><code>@org.springframework.stereotype.Controller
+public class BaseController {
+
+    @ExceptionHandler(NameException.class)
+    public ModelAndView handlerNameException(Exception ex) {
+        ModelAndView mv = new ModelAndView();
+        mv.addObject(&quot;ex&quot;, ex);
+        mv.setViewName(&quot;/errors/nameError.jsp&quot;);
+        return mv;
+    }
+
+    @ExceptionHandler(AgeException.class)
+    public ModelAndView handlerAgeException(Exception ex) {
+        ModelAndView mv = new ModelAndView();
+        mv.addObject(&quot;ex&quot;, ex);
+        mv.setViewName(&quot;/errors/ageError.jsp&quot;);
+        return mv;
+    }
+
+    @ExceptionHandler
+    public ModelAndView handlerException(Exception ex) {
+        ModelAndView mv = new ModelAndView();
+        mv.addObject(&quot;ex&quot;, ex);
+        mv.setViewName(&quot;/errors/error.jsp&quot;);
+        return mv;
+    }
+
+}
+</code></pre><p>处理器继承异常处理器</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController extends BaseController {
+
+    @RequestMapping(&quot;/register.do&quot;)
+    public ModelAndView doRegister(String name, int age) throws StudentException {
+
+        if(!&quot;beijing&quot;.equals(name)) {
+            throw new NameException(&quot;用户名不正确&quot;);
+        }
+
+        if(age &gt; 60) {
+            throw new AgeException(&quot;年龄太大了&quot;);
+        }
+
+        ModelAndView mv = new ModelAndView();
+        mv.addObject(&quot;name&quot;, name);
+        mv.addObject(&quot;age&quot;, age);
+        mv.setViewName(&quot;/welcome.jsp&quot;);
+        return mv;
+    }
+
+}
+</code></pre><h4 id="4-3-类型转换器和初始化参数绑定"><a href="#4-3-类型转换器和初始化参数绑定" class="headerlink" title="4.3 类型转换器和初始化参数绑定"></a>4.3 类型转换器和初始化参数绑定</h4><p>可以解决提交的参数类型转换问题</p>
+<h4 id="4-4-数据验证"><a href="#4-4-数据验证" class="headerlink" title="4.4 数据验证"></a>4.4 数据验证</h4><p>springmvc支持JSR（Java Specification Requests）303-bean validation数据验证规范。而该规范的实现者很多，其中较常用的是Hibernate Valicator。</p>
+<p>需要注意的是，Hebernate Valicator是与Hibernate ORM并列的Hibernate的产品之一。</p>
+<p>第一步：导入jar包</p>
+<p>Hibernate Valicator的jar包：</p>
+<ul>
+<li><p>hibernate-validator</p>
+</li>
+<li><p>jboss-logging</p>
+</li>
+<li><p>validation-api</p>
+</li>
+</ul>
+<p>第二步：注册验证器和驱动</p>
+<p>springmvc.xml</p>
+<pre><code>&lt;!-- 注册验证器 --&gt;
+&lt;bean id=&quot;myValidator&quot; class=&quot;org.springframework.validation.beanvalidation.LocalValidatorFactoryBean&quot;&gt;
+    &lt;property name=&quot;providerClass&quot; value=&quot;org.hibernate.validator.HibernateValidator&quot;&gt;&lt;/property&gt;
+&lt;/bean&gt;
+
+&lt;!-- 注册mvc注解驱动 --&gt;
+&lt;mvc:annotation-driven validator=&quot;myValidator&quot;&gt;&lt;/mvc:annotation-driven&gt;
+</code></pre><p>第三步：实体类-验证规则</p>
+<pre><code>public class Student {
+    @NotNull(message=&quot;姓名不以为空&quot;)
+    @Size(min=3, max=6, message=&quot;姓名长度在{min}-{max}个字符之间&quot;)
+    private String name;
+
+    @Min(value=0, message=&quot;成绩不能小于{value}&quot;)
+    @Max(value=100, message=&quot;成绩不能大于{value}&quot;)
+    private double score;
+
+    @NotNull(message=&quot;电话不能为空&quot;)
+    @Pattern(regexp=&quot;^1[34578]\\d{9}$&quot;,message=&quot;手机号格式不正确&quot;)
+    private String mobile;
+
+    ....
+    getter and setter
+    ...
+
+}
+</code></pre><p>第四步：处理器</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+    @RequestMapping(value={&quot;/register.do&quot;}, method= RequestMethod.POST)
+    public ModelAndView doRegister(@Validated Student student, BindingResult br) {
+
+        ModelAndView mv = new ModelAndView();
+        mv.addObject(&quot;name&quot;, student);
+        mv.setViewName(&quot;/WEB-INF/jsp/welcome.jsp&quot;);
+
+        int errorCount = br.getErrorCount();
+        if(errorCount &gt; 0) {
+            FieldError nameError = br.getFieldError(&quot;name&quot;);
+            FieldError scoreError = br.getFieldError(&quot;score&quot;);
+            FieldError mobieError = br.getFieldError(&quot;mobile&quot;);
+
+            if(nameError != null) {
+                String nameErrorMSG = nameError.getDefaultMessage();
+                mv.addObject(&quot;nameErrorMSG&quot;, nameErrorMSG);
+            }
+
+            if(scoreError != null) {
+                String scoreErrorMSG = scoreError.getDefaultMessage();
+                mv.addObject(&quot;scoreErrorMSG&quot;, scoreErrorMSG);
+            }
+
+            if(mobieError != null) {
+                String mobileErrorMSG = mobieError.getDefaultMessage();
+                mv.addObject(&quot;mobileErrorMSG&quot;, mobileErrorMSG);
+            }
+            mv.setViewName(&quot;/index.jsp&quot;);
+        }
+
+
+        return mv;
+    }
+}
+</code></pre><p>index.jsp</p>
+<pre><code>&lt;form action=&quot;${pageContext.request.contextPath }/test/register.do&quot; method=&quot;POST&quot;&gt;
+    姓名：&lt;input type=&quot;text&quot; name=&quot;name&quot; /&gt;${nameErrorMSG }&lt;br /&gt;
+    成绩：&lt;input type=&quot;text&quot; name=&quot;score&quot; /&gt;${scoreErrorMSG }&lt;br /&gt;
+    电话：&lt;input type=&quot;text&quot; name=&quot;mobile&quot; /&gt;${mobileErrorMSG }&lt;br /&gt;
+
+    &lt;input type=&quot;submit&quot; value=&quot;注册&quot; /&gt;
+&lt;/form&gt;
+</code></pre><h4 id="4-5-文件上传"><a href="#4-5-文件上传" class="headerlink" title="4.5 文件上传"></a>4.5 文件上传</h4><h5 id="4-5-1-上传单个文件"><a href="#4-5-1-上传单个文件" class="headerlink" title="4.5.1 上传单个文件"></a>4.5.1 上传单个文件</h5><p>第一步：导入jar包</p>
+<ul>
+<li><p>commons-fileupload</p>
+</li>
+<li><p>commons-io</p>
+</li>
+</ul>
+<p>第二步：注册</p>
+<pre><code>&lt;bean id=&quot;multipartResolver&quot; class=&quot;org.springframework.web.multipart.commons.CommonsMultipartResolver&quot;&gt;
+    &lt;property name=&quot;defaultEncoding&quot; value=&quot;utf-8&quot;&gt;&lt;/property&gt;
+    &lt;property name=&quot;maxUploadSize&quot; value=&quot;1048576&quot;&gt;&lt;/property&gt;
+&lt;/bean&gt;
+
+&lt;mvc:annotation-driven&gt;&lt;/mvc:annotation-driven&gt;
+</code></pre><p>第三步：页面</p>
+<pre><code>&lt;form action=&quot;${pageContext.request.contextPath }/test/upload.do&quot; method=&quot;POST&quot; enctype=&quot;multipart/form-data&quot;&gt;
+    文件：&lt;input type=&quot;file&quot; name=&quot;img&quot; /&gt;&lt;br /&gt;
+    &lt;input type=&quot;submit&quot; value=&quot;提交&quot; /&gt;
+&lt;/form&gt;
+</code></pre><p>第四步：处理器</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+    @RequestMapping(value={&quot;/upload.do&quot;}, method= RequestMethod.POST)
+    public String doFileUpload(MultipartFile img, HttpSession session) throws Exception {
+        String path = session.getServletContext().getRealPath(&quot;/images&quot;);
+
+        if(img.getSize() &gt; 0) {            
+            String fileName = img.getOriginalFilename();
+            if(fileName.endsWith(&quot;jpg&quot;) || fileName.endsWith(&quot;png&quot;)) {                
+                File file = new File(path, fileName);
+                img.transferTo(file);
+                return &quot;/success.jsp&quot;;
+            }
+        }
+        return &quot;/fail.jsp&quot;;        
+    }
+
+}
+</code></pre><h5 id="4-5-2-上传多个文件"><a href="#4-5-2-上传多个文件" class="headerlink" title="4.5.2 上传多个文件"></a>4.5.2 上传多个文件</h5><p>处理器</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+    @RequestMapping(value={&quot;/upload.do&quot;}, method= RequestMethod.POST)
+    public String doFileUpload(@RequestParam MultipartFile[] imgs, HttpSession session) throws Exception {
+        String path = session.getServletContext().getRealPath(&quot;/images&quot;);
+
+        for(MultipartFile img:imgs) {        
+            if(img.getSize() &gt; 0) {            
+                String fileName = img.getOriginalFilename();
+                if(fileName.endsWith(&quot;jpg&quot;) || fileName.endsWith(&quot;png&quot;)) {                
+                    File file = new File(path, fileName);
+                    img.transferTo(file);
+                }
+            }
+        }
+
+        return &quot;/success.jsp&quot;;        
+    }
+
+}
+</code></pre><p>index.jsp</p>
+<pre><code>&lt;form action=&quot;${pageContext.request.contextPath }/test/upload.do&quot; method=&quot;POST&quot; enctype=&quot;multipart/form-data&quot;&gt;
+    文件1：&lt;input type=&quot;file&quot; name=&quot;imgs&quot; /&gt;&lt;br /&gt;
+    文件2：&lt;input type=&quot;file&quot; name=&quot;imgs&quot; /&gt;&lt;br /&gt;
+    文件3：&lt;input type=&quot;file&quot; name=&quot;imgs&quot; /&gt;&lt;br /&gt;
+    &lt;input type=&quot;submit&quot; value=&quot;提交&quot; /&gt;
+&lt;/form&gt;
+</code></pre><h4 id="4-6-拦截器"><a href="#4-6-拦截器" class="headerlink" title="4.6 拦截器"></a>4.6 拦截器</h4><p>springmvc中的拦截器是非常重要和相当有用的，它的主要作用是拦截指定的用户请求，并进行相应的预处理与后处理。其拦截的时间点在“处理器映射器根据用户提交的请求映射出了所要执行的处理器类，并且也找到了要执行该处理器类的处理器适配器，在处理器适配器执行处理器之前”。当然，在处理器映射器映射出所要执行的处理器类时，已经将拦截器与处理器组合为了一个处理器执行链，并返回给了中央调度器。</p>
+<h5 id="4-6-1-拦截器的实现"><a href="#4-6-1-拦截器的实现" class="headerlink" title="4.6.1 拦截器的实现"></a>4.6.1 拦截器的实现</h5><p>第一步：注册拦截器</p>
+<pre><code>&lt;!-- 注册拦截器 --&gt;
+&lt;mvc:interceptors&gt;
+    &lt;mvc:interceptor&gt;
+        &lt;mvc:mapping path=&quot;/**&quot;/&gt;
+        &lt;bean class=&quot;com.bjpowernode.interceptors.OneInterceptor&quot;&gt;&lt;/bean&gt;
+    &lt;/mvc:interceptor&gt;
+&lt;/mvc:interceptors&gt;
+</code></pre><p>第二步：拦截器</p>
+<pre><code>public class OneInterceptor implements HandlerInterceptor {    
+    @Override
+    public boolean preHandle(HttpServletRequest arg0, HttpServletResponse arg1, Object arg2) throws Exception {
+        System.out.println(&quot;execute prehandler&quot;);
+        return true;
+    }    
+
+    @Override
+    public void postHandle(HttpServletRequest arg0, HttpServletResponse arg1, Object arg2, ModelAndView arg3)
+            throws Exception {
+
+        System.out.println(&quot;execute posthandler&quot;);
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest arg0, HttpServletResponse arg1, Object arg2, Exception arg3)
+            throws Exception {
+        System.out.println(&quot;execute aftercomplete&quot;);
+    }
+}
+</code></pre><p>处理器</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+    @RequestMapping(&quot;/some.do&quot;)
+    public String doSome() {
+        System.out.println(&quot;execute dosome&quot;);
+        return &quot;/WEB-INF/jsp/welcome.jsp&quot;;
+    }
+
+}
+</code></pre><h5 id="4-6-2-权限拦截器"><a href="#4-6-2-权限拦截器" class="headerlink" title="4.6.2 权限拦截器"></a>4.6.2 权限拦截器</h5><p>处理器</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+    @RequestMapping(&quot;/some.do&quot;)
+    public String doSome() {
+        System.out.println(&quot;execute dosome&quot;);
+        return &quot;/WEB-INF/jsp/welcome.jsp&quot;;
+    }
+
+}
+</code></pre><p>拦截器</p>
+<pre><code>public class PermissionInterceptor implements HandlerInterceptor {
+
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+            throws Exception {
+
+        String user = (String) request.getSession().getAttribute(&quot;user&quot;);
+        if(&quot;beijing&quot;.equals(user)) {
+            return true;
+        }
+        request.getRequestDispatcher(&quot;/fail.jsp&quot;).forward(request, response);
+        return false;
+    }
+
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
+            ModelAndView modelAndView) throws Exception {
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
+            throws Exception {
+    }
+
+}
+</code></pre><p>注册</p>
+<pre><code>&lt;!-- 注册拦截器 --&gt;
+&lt;mvc:interceptors&gt;
+    &lt;mvc:interceptor&gt;
+        &lt;mvc:mapping path=&quot;/**&quot;/&gt;
+        &lt;bean class=&quot;com.bjpowernode.interceptors.PermissionInterceptor&quot;&gt;&lt;/bean&gt;
+    &lt;/mvc:interceptor&gt;
+&lt;/mvc:interceptors&gt;
+</code></pre><p>login.jsp</p>
+<pre><code>&lt;%
+    session.setAttribute(&quot;user&quot;, &quot;beijing&quot;);
+%&gt;&gt;
+login success.
+</code></pre><p>logout.jsp</p>
+<pre><code>&lt;%
+    session.removeAttribute(&quot;user&quot;);    
+%&gt;
+logout success.
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/05/24/java/springmvc/springmvc-4/" data-id="cjhlqourr006f47fyrezs2fsq" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/springmvc/">springmvc</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2018/05/23/java/springmvc/springmvc-3/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">第三章 springmvc注解式开发</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/mybatis/">mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/springmvc/">springmvc</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springmvc/">springmvc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/mybatis/" style="font-size: 17.14px;">mybatis</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/springmvc/" style="font-size: 14.29px;">springmvc</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/05/24/java/springmvc/springmvc-4/">第四章 springmvc核心技术</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/23/java/springmvc/springmvc-3/">第三章 springmvc注解式开发</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/22/java/springmvc/springmvc-2/">第二章 springmvc配置式开发</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/22/java/springmvc/springmvc-1/">第一章 springmvc概述</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/13/java/mybatis/mybatis-7/">第七章 MyBatis - 查询缓存</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

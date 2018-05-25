@@ -61,6 +61,1591 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-java/java-collections/java-collection-map" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/09/java/java-collections/java-collection-map/" class="article-date">
+  <time datetime="2018-01-09T06:44:18.000Z" itemprop="datePublished">2018-01-09</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/09/java/java-collections/java-collection-map/">集合框架四 - Map集合</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="四、集合框架-Map集合"><a href="#四、集合框架-Map集合" class="headerlink" title="四、集合框架 - Map集合"></a>四、集合框架 - Map集合</h3><h4 id="1、集合特点-amp-常用方法"><a href="#1、集合特点-amp-常用方法" class="headerlink" title="1、集合特点&amp;常用方法"></a>1、集合特点&amp;常用方法</h4><p>Collection：一次添加一个元素，集合称为单列集合。</p>
+<p>Map：一次添加一对元素，存储的是键值对，集合中必须保证键的唯一性。</p>
+<p>常用方法：</p>
+<p>添加：</p>
+<pre><code>value put(key,value):返回前一个和key关联的值，如果没有返回null
+</code></pre><p>删除：</p>
+<pre><code>void clear():清空map集合
+value remove(key):根据指定的key删除这个键值对，返回被删除键值对的value。
+</code></pre><p>判断：</p>
+<pre><code>boolean containskey(key)
+boolean containsValue(value)
+boolean isEmpty()
+</code></pre><p>获取：</p>
+<pre><code>value get(key):通过键获取值，如果没有该键返回null。因此，可以通过返回null，来判断是否包含指定键。
+int size():获取键值对的个数。
+</code></pre><p>方法演示：</p>
+<pre><code>public class MapDemo1 {
+
+    public static void main(String[] args) {
+
+        Map&lt;Integer,String&gt; map = new HashMap&lt;Integer,String&gt;();
+
+        method(map);
+
+    }
+
+    private static void method(Map&lt;Integer, String&gt; map) {
+
+        //添加
+        System.out.println(map.put(8, &quot;wangcai&quot;));
+        System.out.println(map.put(8, &quot;xiaoqiang&quot;));
+        map.put(2, &quot;zhangsan&quot;);
+        map.put(4, &quot;lisi&quot;);
+        System.out.println(map);
+
+        //删除
+        System.out.println(&quot;remove:&quot;+map.remove(2));
+
+        //判断
+        System.out.println(&quot;containskey:&quot;+map.containsKey(7));
+
+        //获取
+        System.out.println(&quot;get:&quot;+map.get(6));
+
+
+    }
+
+}
+</code></pre><h4 id="2、重点方法keySet"><a href="#2、重点方法keySet" class="headerlink" title="2、重点方法keySet"></a>2、重点方法keySet</h4><p>取出map中的所有元素。</p>
+<p>原理：通过keySet方法取出map中的所有键所在的Set集合，再通过Set的迭代器获取每一个键，再通过map集合的get方法获取每个键所对应的值。</p>
+<pre><code>public class MapDemo2 {
+
+    public static void main(String[] args) {
+
+        Map&lt;Integer,String&gt; map = new HashMap&lt;Integer,String&gt;();
+
+        method(map);
+
+    }
+
+    private static void method(Map&lt;Integer, String&gt; map) {
+
+        map.put(2, &quot;zhangsan&quot;);
+        map.put(8, &quot;lisi&quot;);
+        map.put(7, &quot;wangwu&quot;);
+        map.put(6, &quot;zhaoliu&quot;);
+
+        Set&lt;Integer&gt; keySet = map.keySet();
+        Iterator&lt;Integer&gt; it = keySet.iterator();
+
+        while(it.hasNext()) {
+            Integer key = it.next();
+            String value = map.get(key);
+            System.out.println(key+&quot;:&quot;+value);
+        }
+
+    }
+
+}
+
+输出结果：
+2:zhangsan
+6:zhaoliu
+7:wangwu
+8:lisi
+</code></pre><h4 id="3、重点方法entrySet"><a href="#3、重点方法entrySet" class="headerlink" title="3、重点方法entrySet"></a>3、重点方法entrySet</h4><p>该方法将键和值的映射关系作为对象存储到了Set集合中，而这个映射关系的类型就是Map.Entry类型（结婚证）。</p>
+<pre><code>public class MapDemo3 {
+
+    public static void main(String[] args) {
+
+        Map&lt;Integer,String&gt; map = new HashMap&lt;Integer,String&gt;();
+
+        method(map);
+
+    }
+
+    private static void method(Map&lt;Integer, String&gt; map) {
+
+        map.put(2, &quot;zhangsan&quot;);
+        map.put(8, &quot;lisi&quot;);
+        map.put(7, &quot;wangwu&quot;);
+        map.put(6, &quot;zhaoliu&quot;);
+
+        Set&lt;Map.Entry&lt;Integer,String&gt;&gt; entrySet = map.entrySet();
+
+        Iterator&lt;Map.Entry&lt;Integer,String&gt;&gt; it = entrySet.iterator();
+
+        while(it.hasNext()) {
+            Map.Entry&lt;Integer, String&gt; merryEntry = it.next();
+            Integer key = merryEntry.getKey();
+            String value = merryEntry.getValue();
+            System.out.println(key+&quot;:&quot;+value);
+        }
+
+    }
+
+}
+</code></pre><h4 id="4、values方法"><a href="#4、values方法" class="headerlink" title="4、values方法"></a>4、values方法</h4><p>Collection<v> values()</v></p>
+<p>返回此映射中包含的值的Collection视图。</p>
+<pre><code>public class MapDemo4 {
+
+    public static void main(String[] args) {
+
+        Map&lt;Integer,String&gt; map = new HashMap&lt;Integer,String&gt;();
+
+        method(map);
+
+    }
+
+    public static void method(Map&lt;Integer, String&gt; map) {
+        map.put(2, &quot;zhangsan&quot;);
+        map.put(8, &quot;lisi&quot;);
+        map.put(7, &quot;wangwu&quot;);
+        map.put(6, &quot;zhaoliu&quot;);
+
+        Collection&lt;String&gt; values = map.values();
+
+        Iterator&lt;String&gt; it = values.iterator();
+
+        while(it.hasNext()) {
+            System.out.println(it.next());
+        }
+
+    }
+
+}
+</code></pre><h4 id="5、Map集合-常见子类对象"><a href="#5、Map集合-常见子类对象" class="headerlink" title="5、Map集合-常见子类对象"></a>5、Map集合-常见子类对象</h4><p>Map常见子类：</p>
+<p>|– Hashtable：</p>
+<p>内部结构是哈希表，是同步的。不允许null作为键和值。</p>
+<p>|—— Properties：</p>
+<p>可以用来存储键值对型的配置文件的信息，可以和IO技术相结合。</p>
+<p>|– HashMap：</p>
+<p>内部结构是哈希表，不是同步的。允许null作为键和值。</p>
+<p>|– TreeMap：</p>
+<p>内部结构是二叉树，不是同步的。可以对Map集合中的键排序。</p>
+<h4 id="6、HashMap存储自定义对象"><a href="#6、HashMap存储自定义对象" class="headerlink" title="6、HashMap存储自定义对象"></a>6、HashMap存储自定义对象</h4><pre><code>public class MapDemo5 {
+
+    public static void main(String[] args) {
+
+        /**
+         * 将学生对象和学生的归属地通过键与值存储到map集合中。
+         */
+
+        HashMap&lt;Student,String&gt; hm = new HashMap&lt;Student,String&gt;();
+
+        hm.put(new Student(&quot;zhangsan&quot;,20),&quot;上海&quot;);
+        hm.put(new Student(&quot;lisi&quot;,21),&quot;北京&quot;);
+        hm.put(new Student(&quot;wangwu&quot;,30),&quot;临沂&quot;);
+        hm.put(new Student(&quot;wangwu&quot;,30),&quot;临沂&quot;);
+
+        Set&lt;Student&gt; keySet = hm.keySet();
+
+        Iterator&lt;Student&gt; it = keySet.iterator();
+
+        while(it.hasNext()) {
+            Student key = it.next();
+            String value = hm.get(key);
+            System.out.println(key.getName()+&quot;:&quot;+key.getAge()+&quot;:&quot;+value);
+        }
+
+
+    }
+
+}
+
+输出结果：
+zhangsan:20:上海
+wangwu:30:临沂
+wangwu:30:临沂
+lisi:21:北京
+
+Student类继承自Person2类，通过在Person2类中覆盖重写hashCode和equals方法，去重，保证唯一性。
+</code></pre><h4 id="7、TreeMap存储自定义对象"><a href="#7、TreeMap存储自定义对象" class="headerlink" title="7、TreeMap存储自定义对象"></a>7、TreeMap存储自定义对象</h4><pre><code>public class MapDemo6 {
+
+    public static void main(String[] args) {
+
+        /**
+         * 将学生对象和学生的归属地通过键与值存储到map集合中。
+         * 按姓名排序
+         */
+
+        TreeMap&lt;Student,String&gt; tm = new TreeMap&lt;Student,String&gt;(new ComparatorByName());
+
+        tm.put(new Student(&quot;zhangsan&quot;,20),&quot;上海&quot;);
+        tm.put(new Student(&quot;lisi&quot;,21),&quot;北京&quot;);
+        tm.put(new Student(&quot;wangwu&quot;,30),&quot;临沂&quot;);
+        tm.put(new Student(&quot;wangwu&quot;,30),&quot;临沂&quot;);
+
+        Set&lt;Map.Entry&lt;Student,String&gt;&gt; entrySet = tm.entrySet();
+
+        Iterator&lt;Map.Entry&lt;Student, String&gt;&gt; it = entrySet.iterator();
+
+        while(it.hasNext()) {
+            Map.Entry&lt;Student, String&gt; merryEntry = it.next();
+            Student key = merryEntry.getKey();
+            String value = merryEntry.getValue();
+            System.out.println(key.getName()+&quot;:&quot;+key.getAge()+&quot;:&quot;+value);
+        }
+    }
+
+}
+
+public class ComparatorByName implements Comparator&lt;Person2&gt; {
+
+    @Override
+    public int compare(Person2 o1, Person2 o2) {
+        Person2 p1 = (Person2)o1;
+        Person2 p2 = (Person2)o2;
+        int temp = p1.getName().compareTo(p2.getName());
+        return temp==0?p1.getAge()-p2.getAge():temp;
+    }    
+
+}
+</code></pre><h4 id="8、LinkedHashMap"><a href="#8、LinkedHashMap" class="headerlink" title="8、LinkedHashMap"></a>8、LinkedHashMap</h4><pre><code>public class MapDemo7 {
+
+    public static void main(String[] args) {
+
+        HashMap&lt;Integer,String&gt; hm = new LinkedHashMap&lt;Integer,String&gt;();
+
+        hm.put(7, &quot;aaaa&quot;);
+        hm.put(2, &quot;bbbb&quot;);
+        hm.put(1, &quot;dddd&quot;);
+        hm.put(10, &quot;ccc&quot;);
+
+        Iterator&lt;Map.Entry&lt;Integer,String&gt;&gt; it = hm.entrySet().iterator();
+
+        while(it.hasNext()) {
+            Map.Entry&lt;Integer, String&gt; merryEntry = it.next();
+            Integer key = merryEntry.getKey();
+            String value = merryEntry.getValue();
+
+            System.out.println(key+&quot;:&quot;+value);
+        }
+
+    }
+
+}
+
+输出结果：
+7:aaaa
+2:bbbb
+1:dddd
+10:ccc
+
+由HashMap变为LinkedHashMap之后，存和取的顺序保持了一致。
+</code></pre><h4 id="9、Map集合练习-按自然顺序，记录字母出现次数"><a href="#9、Map集合练习-按自然顺序，记录字母出现次数" class="headerlink" title="9、Map集合练习 - 按自然顺序，记录字母出现次数"></a>9、Map集合练习 - 按自然顺序，记录字母出现次数</h4><pre><code>public class MapDemp8 {
+
+
+    public static void main(String[] args) {
+
+        String str = &quot;jslsjflAAsCCjl  ++js--lajaslasjfsala&quot;;
+
+        String s = getCarCount(str);
+
+        System.out.println(s);
+
+    }
+
+    private static String getCarCount(String str) {
+
+        //字符串变字符数组
+        char[] charArr = str.toCharArray();
+
+        //TreeSet集合
+        TreeMap&lt;Character,Integer&gt; tm = new TreeMap&lt;Character,Integer&gt;();
+
+        for (int i = 0; i &lt; charArr.length; i++) {
+
+            if(!(charArr[i] &gt;= &apos;a&apos; &amp;&amp; charArr[i] &lt;= &apos;z&apos; || charArr[i] &gt;= &apos;A&apos; &amp;&amp; charArr[i] &lt;= &apos;Z&apos;)) {
+                continue;
+            }
+
+            Character chara = charArr[i];
+            Integer val = tm.get(chara);
+            if(val == null) {
+                tm.put(chara, 1);
+            }else {
+                Integer count = tm.get(chara) + 1;
+                tm.put(chara,count);
+            }
+
+
+        }
+
+        return mapToString(tm);
+    }
+
+    private static String mapToString(TreeMap&lt;Character, Integer&gt; tm) {
+        StringBuilder sb = new StringBuilder();
+
+        Set&lt;Character&gt; keySet = tm.keySet();
+
+        Iterator&lt;Character&gt; it = keySet.iterator();
+
+        while(it.hasNext()) {
+            Character key = it.next();
+            Integer value = tm.get(key);
+            sb.append(key+&quot;(&quot;+value+&quot;)&quot;);
+        }
+
+        return sb.toString();
+    }
+
+}
+
+输出结果：
+A(2)C(2)a(5)f(2)j(6)l(6)s(7)
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/09/java/java-collections/java-collection-map/" data-id="cjhlqounw002147fy6d3mpeuq" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/java-collections/java-collection-notes" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/09/java/java-collections/java-collection-notes/" class="article-date">
+  <time datetime="2018-01-09T06:42:46.000Z" itemprop="datePublished">2018-01-09</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/09/java/java-collections/java-collection-notes/">集合框架三 - 查阅技巧</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="三、集合框架-集合查阅的技巧"><a href="#三、集合框架-集合查阅的技巧" class="headerlink" title="三、集合框架-集合查阅的技巧"></a>三、集合框架-集合查阅的技巧</h3><p>唯一性？</p>
+<p>– 需要唯一：Set</p>
+<p>—- 需要顺序？</p>
+<p>—— 需要： TreeSet</p>
+<p>—— 不需要： HashSet</p>
+<p>—— 和存储一致的顺序：LinkedHashSet</p>
+<p>– 不需要唯一：List</p>
+<p>—- 频繁增删？</p>
+<p>—– 需要：LinkedList</p>
+<p>—— 不需要：ArrayList</p>
+<p>结构体系：</p>
+<p>List</p>
+<p>|– ArrayList</p>
+<p>|– LinkedList</p>
+<p>Set </p>
+<p>|– HashSet</p>
+<p>|– TreeSet</p>
+<p>后缀名就是该集合所属的体系。</p>
+<p>前缀名就是该集合的数据结构。</p>
+<p>看到array：就要想到数组，查询快，有角标。</p>
+<p>看到Link：就要想到增删快，想到add get remove+first last的方法。</p>
+<p>看到hash：就要想到hash表，唯一性，元素需要覆盖hashCode方法和equals方法。</p>
+<p>看到tree：就要想到二叉树，排序，两个接口Compareble和Comparator。</p>
+<p>而且这些常用的集合容器都是不同步的。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/09/java/java-collections/java-collection-notes/" data-id="cjhlqounr001u47fyh9ouoagh" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/java-collections/java-collection-generic" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/09/java/java-collections/java-collection-generic/" class="article-date">
+  <time datetime="2018-01-09T06:36:44.000Z" itemprop="datePublished">2018-01-09</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/09/java/java-collections/java-collection-generic/">集合框架二 - 泛型</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="二、集合框架-泛型"><a href="#二、集合框架-泛型" class="headerlink" title="二、集合框架-泛型"></a>二、集合框架-泛型</h3><pre><code>public class GenericDemo {
+
+    public static void main(String[] args) {
+        ArrayList&lt;String&gt; al = new ArrayList&lt;String&gt;();
+
+        al.add(&quot;abc&quot;);
+        al.add(&quot;abc2&quot;);
+        al.add(&quot;abc3&quot;);
+
+        Iterator&lt;String&gt; it = al.iterator();
+        while(it.hasNext()) {
+            String str = it.next();
+            System.out.println(str);
+        }
+
+    }
+
+}
+</code></pre><h4 id="1、概述："><a href="#1、概述：" class="headerlink" title="1、概述："></a>1、概述：</h4><p>jdk1.5出现的安全机制。</p>
+<p>好处：</p>
+<p>1、将运行时期的问题ClassCastException转到了编译时期。</p>
+<p>2、避免了强制转换的麻烦。</p>
+<p>&lt;&gt;：什么时候用？当操作的引用类型不确定的时候，就使用&lt;&gt;。将要操作的引用数据类型传入即可。</p>
+<p>其实&lt;&gt;就是一个用于接收具体引用数据类型的参数范围。</p>
+<h4 id="2、泛型-擦除-amp-补偿"><a href="#2、泛型-擦除-amp-补偿" class="headerlink" title="2、泛型-擦除&amp;补偿"></a>2、泛型-擦除&amp;补偿</h4><p>泛型技术是给编译器使用的技术，用于编译时期。确保了类型的安全。</p>
+<p>运行时，会将泛型去掉，生成的class文件中是不带泛型的，这个称之为泛型的擦除。</p>
+<p>为什么擦除？是为了兼容运行的类加载器。</p>
+<p>泛型的补偿：在运行时，通过获取元素的类型进行转换。不用使用者再强制转换了。</p>
+<h4 id="3、泛型在集合中的应用"><a href="#3、泛型在集合中的应用" class="headerlink" title="3、泛型在集合中的应用"></a>3、泛型在集合中的应用</h4><pre><code>public class GenericDemo2 {
+
+    public static void main(String[] args) {
+        TreeSet&lt;Person2&gt; ts = new TreeSet&lt;Person2&gt;();
+        ts.add(new Person2(&quot;lisi8&quot;,21));
+        ts.add(new Person2(&quot;lisi2&quot;,23));
+        ts.add(new Person2(&quot;lisi&quot;,21));
+        ts.add(new Person2(&quot;lis0&quot;,20));
+
+        Iterator&lt;Person2&gt; it = ts.iterator();
+        while(it.hasNext()) {
+            Person2 p = it.next();
+            System.out.println(p.getName()+&quot;:&quot;+p.getAge());
+        }
+
+    }
+
+}
+
+public class Person2 implements Comparable&lt;Person2&gt; {
+    private String name;
+    private int age;
+
+    public Person2() {
+        super();
+    }
+
+    public Person2(String name, int age) {
+        super();
+        this.name = name;
+        this.age = age;
+    }
+
+    public int compareTo(Person2 p){
+        int temp = this.age - p.getAge();
+        return temp==0?this.name.compareTo(p.getName()):temp;    
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }    
+
+}
+
+class CompareByname implements Comparator&lt;Person2&gt;{
+    public int compare(Person2 o1, Person2 o2) {
+        int temp = o1.getName().compareTo(o2.getName());
+        return temp == 0?o1.getAge() - o2.getAge():temp;    
+    }
+}
+
+//按年龄排序，输出结果：
+lis0:20
+lisi:21
+lisi8:21
+lisi2:23
+
+//按姓名排序，输出结果：
+lis0:20
+lisi:21
+lisi2:23
+lisi8:21
+</code></pre><h4 id="4、泛型类"><a href="#4、泛型类" class="headerlink" title="4、泛型类"></a>4、泛型类</h4><p>在jdk1.5后，使用泛型来接收类中要操作的引用数据类型</p>
+<p>什么时候用？当类中的操作的引用数据类型不确定的时候，就使用泛型来表示。<br>    public class Student {</p>
+<pre><code>}
+
+public class Worker {
+
+}
+
+public class Tool01&lt;XX&gt; {
+    private XX q;
+
+    public XX getObject() {
+        return q;
+    }
+    public void setObject(XX object) {
+        this.q = object;
+    }
+}
+
+public class GenericDemo3 {
+    public static void main(String[] args) {
+
+        Tool01&lt;Student&gt; tool = new Tool01&lt;Student&gt;();
+        tool.setObject(new Student());
+        Student stu = tool.getObject();
+        System.out.println(stu);
+
+    }
+}
+
+当tool.setObject(new Student());传递Worker对象时tool.setObject(new Worker());编译就会报错。
+</code></pre><h4 id="5、泛型方法"><a href="#5、泛型方法" class="headerlink" title="5、泛型方法"></a>5、泛型方法</h4><pre><code>class Tool02&lt;XX&gt; {//泛型定义在类上
+
+    public void print(XX str) {
+        System.out.println(&quot;print:&quot;+str);
+    }
+
+    /**
+     * 将泛型定义到方法上
+     */
+    public &lt;W&gt; void show(W str) {
+        System.out.println(&quot;show:&quot;+str);
+    }
+
+    /**
+     * 当定义静态方法时，不能访问类上定义的泛型。静态方法只能将泛型定义到方法上才能使用泛型。
+     */
+    public static &lt;Y&gt; void output(Y str) {
+        System.out.println(&quot;output:&quot;+str);
+    }
+}
+
+public class GenericDemo4 {
+
+    public static void main(String[] args) {
+
+        Tool02&lt;String&gt; tool = new Tool02&lt;String&gt;();
+
+        //print方法只能使用生成对象时指定的String类型
+        tool.print(&quot;abc&quot;);
+
+        //泛型定义到了tool方法上，可以传递任意类型对象，编译都不会报错
+        tool.show(new Integer(4));
+        tool.show(&quot;abc&quot;);
+
+        //静态方法的泛型只能定义到静态方法上可以传递任意类型对象
+        Tool02.output(&quot;abc&quot;);
+        Tool02.output(8);
+
+    }
+
+}    
+</code></pre><h4 id="6、泛型的接口"><a href="#6、泛型的接口" class="headerlink" title="6、泛型的接口"></a>6、泛型的接口</h4><pre><code>public class GenericDemo5 {
+
+    public static void main(String[] args) {
+
+        InterImpl in = new InterImpl();
+        in.show(&quot;abc&quot;);
+
+        InterImpl2&lt;Integer&gt; in2 = new InterImpl2&lt;Integer&gt;();
+        in2.show(5);
+
+
+    }
+
+}
+
+interface Inter&lt;T&gt;{
+    public void show(T t);
+}
+
+class InterImpl implements Inter&lt;String&gt;{
+    public void show(String str) {
+        System.out.println(&quot;show:&quot;+str);
+    }
+}
+
+class InterImpl2&lt;X&gt; implements Inter&lt;X&gt;{
+    public void show(X x) {
+        System.out.println(&quot;show:&quot;+x);
+    }
+}
+</code></pre><h4 id="7、泛型限定（上限）"><a href="#7、泛型限定（上限）" class="headerlink" title="7、泛型限定（上限）"></a>7、泛型限定（上限）</h4><p>泛型的通配符：?</p>
+<p>代表未知类型</p>
+<pre><code>public class GenericDemp6 {
+
+    public static void main(String[] args) {
+
+        ArrayList&lt;String&gt; al = new ArrayList&lt;String&gt;();
+        al.add(&quot;abc&quot;);
+        al.add(&quot;ddd&quot;);
+
+        ArrayList&lt;String&gt; al2 = new ArrayList&lt;String&gt;();
+        al.add(&quot;abc2&quot;);
+        al.add(&quot;ddd2&quot;);
+
+        printCollection(al);
+        printCollection(al2);
+
+    }
+
+    public static void printCollection(Collection&lt;?&gt; al) {
+        Iterator&lt;?&gt; it = al.iterator();
+        while(it.hasNext()) {
+            System.out.println(it.next());
+        }
+    }
+
+    public static &lt;X&gt; void printCollection2(Collection&lt;X&gt; al) {
+        Iterator&lt;X&gt; it = al.iterator();
+        while(it.hasNext()) {
+            X str = it.next();
+            System.out.println(str);
+        }
+    }
+
+}
+</code></pre><p>? extends E 限定只能传E或者E的子类</p>
+<pre><code>public class Student extends Person2{
+
+    public Student() {
+        super();
+    }
+
+    public Student(String name, int age) {
+        super(name, age);
+    }
+
+    public String toString() {
+        return &quot;student:&quot;+getName()+&quot;:&quot;+getAge();
+    }
+
+}
+
+public class Worker extends Person2 {
+
+    public Worker() {
+        super();
+    }
+
+    public Worker(String name, int age) {
+        super(name, age);
+    }
+
+    public String toString() {
+        return &quot;worker:&quot;+getName()+&quot;:&quot;+getAge();
+    }
+}
+
+public class GenericDemo7 {
+
+    public static void main(String[] args) {
+
+        ArrayList&lt;Worker&gt; al = new ArrayList&lt;Worker&gt;();
+        al.add(new Worker(&quot;worker01&quot;,30));
+        al.add(new Worker(&quot;worker02&quot;,32));
+
+        ArrayList&lt;Student&gt; al2 = new ArrayList&lt;Student&gt;();
+        al2.add(new Student(&quot;worker01&quot;,10));
+        al2.add(new Student(&quot;worker02&quot;,11));
+
+        printCollection(al);
+        printCollection(al2);
+
+    }
+
+    //限定只能传Person2的对象或者Person2的子类对象
+    private static void printCollection(ArrayList&lt;? extends Person2&gt; al) {
+
+        Iterator&lt;? extends Person2&gt; it = al.iterator();
+
+        while(it.hasNext()) {
+            System.out.println(it.next().toString());
+        }
+
+    }
+
+}
+</code></pre><h4 id="8、泛型限定（下限）"><a href="#8、泛型限定（下限）" class="headerlink" title="8、泛型限定（下限）"></a>8、泛型限定（下限）</h4><p>? super E 限定只能传E或者E的父类</p>
+<pre><code>public class GenericDemo7 {
+
+    public static void main(String[] args) {
+
+        ArrayList&lt;Person2&gt; al = new ArrayList&lt;Person2&gt;();
+        al.add(new Person2(&quot;Person&quot;,30));
+        al.add(new Person2(&quot;Person&quot;,32));
+
+        ArrayList&lt;Student&gt; al2 = new ArrayList&lt;Student&gt;();
+        al2.add(new Student(&quot;worker01&quot;,10));
+        al2.add(new Student(&quot;worker02&quot;,11));
+
+        printCollection(al);
+        printCollection(al2);
+
+    }
+
+    //限定只能传Student的对象或者父类Person2的对象，而不能传Worker对象
+    private static void printCollection(ArrayList&lt;? super Student&gt; al) {
+
+        Iterator&lt;? super Student&gt; it = al.iterator();
+
+        while(it.hasNext()) {
+            System.out.println(it.next());
+        }
+
+    }
+
+}
+</code></pre><h4 id="9、泛型限定-上限的体现"><a href="#9、泛型限定-上限的体现" class="headerlink" title="9、泛型限定-上限的体现"></a>9、泛型限定-上限的体现</h4><p>一般在存储元素时候都是用上限，因为这样取出的时都是按照上限类型来运算的。不会出现类型的安全隐患。</p>
+<pre><code>public class GenericDemo8 {
+
+    public static void main(String[] args) {
+
+        ArrayList&lt;Person2&gt; al = new ArrayList&lt;Person2&gt;();
+        al.add(new Person2(&quot;Person&quot;,30));
+        al.add(new Person2(&quot;Person&quot;,32));
+
+        ArrayList&lt;Student&gt; al2 = new ArrayList&lt;Student&gt;();
+        al2.add(new Student(&quot;studnet01&quot;,10));
+        al2.add(new Student(&quot;studnet02&quot;,11));
+
+        ArrayList&lt;Worker&gt; al3 = new ArrayList&lt;Worker&gt;();
+        al3.add(new Worker(&quot;worker01&quot;,20));
+        al3.add(new Worker(&quot;worker02&quot;,21));
+
+        al.addAll(al2);
+        al.addAll(al3);
+
+    }
+
+}
+
+class MyCollection&lt;E&gt;{
+    public void add(E e) {
+
+    }
+    public void addAll(MyCollection&lt;? extends E&gt; e){
+
+    }
+}
+</code></pre><h4 id="10、泛型限定-下限的体现"><a href="#10、泛型限定-下限的体现" class="headerlink" title="10、泛型限定-下限的体现"></a>10、泛型限定-下限的体现</h4><p>通常对集合中的元素进行取出操作时，可以用下限。</p>
+<pre><code>public class GenericDemo9 {
+
+    public static void main(String[] args) {
+
+        TreeSet&lt;Person2&gt; al = new TreeSet&lt;Person2&gt;(new CompareByName2());
+        al.add(new Person2(&quot;aaa&quot;,30));
+        al.add(new Person2(&quot;bbb&quot;,32));
+        al.add(new Person2(&quot;ccc&quot;,32));
+        al.add(new Person2(&quot;ddd&quot;,34));
+
+        TreeSet&lt;Student&gt; al2 = new TreeSet&lt;Student&gt;();
+        al2.add(new Student(&quot;studnet01&quot;,10));
+        al2.add(new Student(&quot;studnet02&quot;,11));
+
+        al.addAll(al2);
+
+        Iterator&lt;Person2&gt; it = al.iterator();
+
+        while(it.hasNext()) {
+            System.out.println(it.next());
+        }
+
+    }
+
+}
+
+class CompareByName2 implements Comparator&lt;Person2&gt;{
+
+    @Override
+    public int compare(Person2 o1, Person2 o2) {
+        int temp = o1.getName().compareTo(o2.getName());
+        return temp == 0? o1.getAge() - o2.getAge():temp;
+    }
+
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/09/java/java-collections/java-collection-generic/" data-id="cjhlqounn001r47fya1h0pxbj" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/java-collections/java-collection-framework" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/12/27/java/java-collections/java-collection-framework/" class="article-date">
+  <time datetime="2017-12-27T03:35:39.000Z" itemprop="datePublished">2017-12-27</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/12/27/java/java-collections/java-collection-framework/">集合框架一 - Collecion集合</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="集合框架的构成和分类"><a href="#集合框架的构成和分类" class="headerlink" title="集合框架的构成和分类"></a>集合框架的构成和分类</h3><p>java中集合类的关系图</p>
+<p><a href="http://blog.csdn.net/real_neu/article/details/52821491" target="_blank" rel="external">http://blog.csdn.net/real_neu/article/details/52821491</a></p>
+<h3 id="一、集合框架-概述"><a href="#一、集合框架-概述" class="headerlink" title="一、集合框架 - 概述"></a>一、集合框架 - 概述</h3><h4 id="1、特点-："><a href="#1、特点-：" class="headerlink" title="1、特点 ："></a>1、特点 ：</h4><ul>
+<li><p>用于存储对象的容器。</p>
+</li>
+<li><p>集合的长度可变。</p>
+</li>
+<li><p>集合中不能存储基本数据类型值。</p>
+</li>
+</ul>
+<h4 id="2、体系-amp-共性功能"><a href="#2、体系-amp-共性功能" class="headerlink" title="2、体系&amp;共性功能"></a>2、体系&amp;共性功能</h4><p>框架的顶层Collection接口：</p>
+<p>1、添加 </p>
+<pre><code>boolean add(Object obj)
+
+boolean addAll(Collection coll);
+</code></pre><p>2、删除</p>
+<pre><code>boolean remove(Object)
+boolean removeAll(Collection coll)
+void clear()
+</code></pre><p>3、判断</p>
+<pre><code>boolean contains(Object obj)
+boolean containsAll(Collection coll)
+boolean isEmpty();
+</code></pre><p>4、获取</p>
+<pre><code>int size();
+Iterator iterator(): 取出元素的方式：迭代器
+</code></pre><p>5、其它</p>
+<pre><code>boolean retainAll(Collection coll): 取交集
+Object toArray(): 将集合转为数组
+</code></pre><h4 id="3、方法演示"><a href="#3、方法演示" class="headerlink" title="3、方法演示"></a>3、方法演示</h4><pre><code>import java.util.ArrayList;
+import java.util.Collection;
+
+public class CollectionDemo {
+
+    public static void main(String[] args) {
+        Collection coll = new ArrayList();
+        //show(coll);
+
+        Collection c1 = new ArrayList();
+        Collection c2 = new ArrayList();
+        show(c1,c2);
+    }
+
+    public static void show(Collection c1, Collection c2) {
+        //给c1添加元素
+        c1.add(&quot;abc1&quot;);
+        c1.add(&quot;abc2&quot;);
+        c1.add(&quot;abc3&quot;);
+        c1.add(&quot;abc4&quot;);
+
+        //给c2添加元素
+        c2.add(&quot;abc2&quot;);
+        c2.add(&quot;abc6&quot;);
+        c2.add(&quot;abc7&quot;);
+
+        System.out.println(&quot;c1:&quot;+c1);
+        System.out.println(&quot;c2:&quot;+c2);
+
+        //演示addAll
+        c1.addAll(c2);
+        System.out.println(&quot;c1:&quot;+c1);
+
+        //演示removeAll，将两个集合中的相同元素从调用removeAll的集合中删除
+        //boolean b = c1.removeAll(c2);
+        //System.out.println(&quot;removeAll:&quot;+b);
+        //System.out.println(&quot;c1:&quot;+c1);
+
+        //演示containsAll
+        boolean c = c1.contains(c2);
+        System.out.println(&quot;containsAll:&quot;+c);
+
+        //演示retainAll
+        System.out.println(&quot;c1:&quot;+c1);
+        System.out.println(&quot;c2:&quot;+c2);
+        boolean d = c1.retainAll(c2);
+        System.out.println(d);
+        System.out.println(&quot;c1:&quot;+c1);
+    }
+
+    public static void show(Collection coll) {
+        //添加
+        coll.add(&quot;abc1&quot;);
+        coll.add(&quot;abc2&quot;);
+        coll.add(&quot;abc3&quot;);
+        System.out.println(coll);
+
+        //删除，会改变集合的长度
+        coll.remove(&quot;abc2&quot;);
+        System.out.println(coll);
+
+        //清空
+        coll.clear();
+        System.out.println(coll);
+
+        //判断
+        System.out.println(coll.contains(&quot;abc3&quot;));
+    }
+
+}
+</code></pre><h4 id="4、迭代器"><a href="#4、迭代器" class="headerlink" title="4、迭代器"></a>4、迭代器</h4><p>使用方法</p>
+<pre><code>import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+
+public class IteratorDemo {
+
+    public static void main(String[] args) {
+        Collection coll = new ArrayList();
+        coll.add(&quot;abc1&quot;);
+        coll.add(&quot;abc2&quot;);
+        coll.add(&quot;abc3&quot;);
+        coll.add(&quot;abc4&quot;);
+        System.out.println(coll);
+        //调用集合中的迭代器方法，是为了获取集合中的迭代器对象
+//        Iterator it = coll.iterator();
+//        while(it.hasNext()) {
+//            System.out.println(it.next());
+//        }
+
+        for(Iterator it = coll.iterator(); it.hasNext(); ) {
+            System.out.println(it.next());
+        }
+
+    }
+
+}
+</code></pre><p>原理</p>
+<pre><code>Iterator iterator(): 取出元素的方式：迭代器
+
+该对象必须依赖于具体容器，因为每一个容器的数据结构都不同。
+
+所以该迭代器对象是在容器内部实现的。
+
+对于使用容器者而言，具体的实现方式不重要，只要通过容器获取到实现的迭代器的对象即可，也就是iterator方法。
+
+Iterator接口就是对所有的Collection容器进行元素取出的公共接口。
+</code></pre><h4 id="5、List和Set的特点"><a href="#5、List和Set的特点" class="headerlink" title="5、List和Set的特点"></a>5、List和Set的特点</h4><pre><code>Collection
+
+|--    List：有序（存入和取出的顺序一致），元素都有索引，元素可以重复。
+
+|-- Set：元素不能重复。
+</code></pre><p>List：特有的常见方法</p>
+<p>1、添加</p>
+<pre><code>void add(index,element)
+void add(index,collection)
+</code></pre><p>2、删除</p>
+<pre><code>Object remove(index)
+</code></pre><p>3、修改</p>
+<pre><code>Object set(index,element)
+</code></pre><p>4、获取</p>
+<pre><code>Object get(index)
+int indexOf(Object)
+int lastIndexOf(object)
+List subList(fromIndex,toIndex)
+</code></pre><p>list集合是可以完成对元素的增删改查的。</p>
+<p>方法演示</p>
+<pre><code>public class listDemo2 {
+
+    public static void main(String[] args) {
+        List list = new ArrayList();
+        show(list);
+    }
+
+    private static void show(List list) {
+        list.add(&quot;abc1&quot;);
+        list.add(&quot;abc2&quot;);
+        list.add(&quot;abc3&quot;);
+        list.add(&quot;abc4&quot;);
+
+        Iterator it = list.iterator();
+        while(it.hasNext()) {
+            System.out.println(&quot;next:&quot;+it.next());
+        }
+
+        //list特有的取出元素的方式，set只能通过迭代器方式取出元素
+        for(int x=0; x&lt;list.size(); x++) {
+            System.out.println(&quot;get:&quot;+list.get(x));
+        }
+    }
+
+}
+</code></pre><p>演示2</p>
+<pre><code>public class listDemo3 {
+
+    public static void main(String[] args) {
+        List list = new ArrayList();
+        list.add(&quot;abc1&quot;);
+        list.add(&quot;abc2&quot;);
+        list.add(&quot;abc3&quot;);
+
+        Iterator it = list.iterator();
+        while(it.hasNext()) {
+            Object obj = it.next();
+            if(obj.equals(&quot;abc2&quot;)) {
+                list.add(&quot;abc9&quot;);
+            }else {                
+                System.out.println(&quot;next:&quot;+obj);
+            }            
+        }
+
+        System.out.println(it.next());
+    }
+
+}
+
+执行时，抛出并发修改的异常。
+Exception in thread &quot;main&quot;         
+java.util.ConcurrentModificationException
+
+原因：
+Iterator it = list.iterator();迭代器检查list集合长度为3。
+当list.add(&quot;abc9&quot;)，修改了集合长度时，迭代器不知道。
+
+解决方案：使用Iterator接口的子接口listIterator来完成在迭代中对元素进修改。
+
+public class listDemo3 {
+
+    public static void main(String[] args) {
+        List list = new ArrayList();
+        list.add(&quot;abc1&quot;);
+        list.add(&quot;abc2&quot;);
+        list.add(&quot;abc3&quot;);
+
+        //获取列表迭代器对象，它可以实现在迭代过程中对元素的增删改查，注意只有list集合具备该迭代功能
+        ListIterator it = list.listIterator();
+
+        while(it.hasNext()) {
+            Object obj = it.next();
+            if(obj.equals(&quot;abc2&quot;)) {
+                //it.add(&quot;abc9&quot;);
+                it.set(&quot;abc9&quot;);
+            }
+        }
+
+        System.out.println(list);
+
+        while(it.hasPrevious()) {
+            System.out.println(&quot;previous:&quot;+it.previous());
+        }
+
+    }
+
+}
+</code></pre><h4 id="6、List常用子类的特点"><a href="#6、List常用子类的特点" class="headerlink" title="6、List常用子类的特点"></a>6、List常用子类的特点</h4><p>List:</p>
+<p>|– Vector：内部是数组数据结构，是同步的。增删，查询都很慢。</p>
+<p>|– ArrayList：内部是数组数据结构，是不同步的。替代了Vector。查询的速度快。</p>
+<p>|– LinkedList：内部是链表数据结构，是不同步的。增删元素的速度很快。</p>
+<p>– addFirst()</p>
+<p>– addLast()</p>
+<p>– getFirst() 获取但不移除，如果链表为空，抛出NoSuchElement异常</p>
+<p>– getLast()</p>
+<p>– removeFirst() 获取并移除，如果链表为空，抛出NoSuchElement异常</p>
+<p>– removeLast()</p>
+<p>jdk1.6</p>
+<p>– offerFirst()</p>
+<p>– offerLast()</p>
+<p>– peekFirst() 获取但不移除，如果链表为空，返回null</p>
+<p>– peekLast()</p>
+<p>– pollFirst() 获取并移除，如果链接为空，返回null</p>
+<p>– pollLast()</p>
+<pre><code>/**
+ * 请使用LinkedList来模拟一个堆栈或者队列数据结构
+ * 堆栈：先进后出
+ * 队列：先进先出
+ */
+public class linkedListDemo {
+    public static void main(String[] args) {
+
+        DuiLie dl = new DuiLie();
+        dl.myAdd(&quot;abc1&quot;);
+        dl.myAdd(&quot;abc2&quot;);
+        dl.myAdd(&quot;abc3&quot;);
+        dl.myAdd(&quot;abc4&quot;);
+
+        while(!dl.isNull()) {
+            System.out.println(dl.myGet());
+        }
+    }
+}
+
+class DuiLie{
+    private LinkedList link;
+
+    public DuiLie() {
+        link = new LinkedList();
+    }
+
+    public void myAdd(Object obj) {
+        link.addLast(obj);
+    }
+
+    public Object myGet() {
+        return link.removeFirst();
+    }
+
+    public boolean isNull() {
+        return link.isEmpty();
+    }
+}
+</code></pre><h4 id="7、ArrayList集合存储自定义对象"><a href="#7、ArrayList集合存储自定义对象" class="headerlink" title="7、ArrayList集合存储自定义对象"></a>7、ArrayList集合存储自定义对象</h4><pre><code>public class arrayListTest {
+
+    public static void main(String[] args) {
+
+        ArrayList al = new ArrayList();
+        al.add(new Person(&quot;lisi1&quot;,21));
+        al.add(new Person(&quot;lisi2&quot;,22));
+        al.add(new Person(&quot;lisi3&quot;,23));
+        al.add(new Person(&quot;lisi4&quot;,24));
+
+        Iterator it = al.iterator();
+        while(it.hasNext()) {
+            //System.out.println(((Person) it.next()).getName());
+            Person p = (Person) it.next();
+            System.out.println(p.getName()+&quot;--&quot;+p.getAge());
+        }
+
+    }
+
+}
+
+class Person{
+    private String name;
+    private int age;
+
+    public Person() {
+        super();
+    }
+
+    public Person(String name, int age) {
+        super();
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+}    
+</code></pre><h3 id="集合框架-HashSet集合"><a href="#集合框架-HashSet集合" class="headerlink" title="集合框架-HashSet集合"></a>集合框架-HashSet集合</h3><p>Set：元素不可以重复，是无序的。</p>
+<p>Set接口中的方法和Collection一致。</p>
+<p>|– HashSet：内部数据结构是Hash表，是不同步的。</p>
+<p>|– TreeSet：</p>
+<pre><code>public static void main(String[] args) {
+        HashSet hs = new HashSet();
+
+        hs.add(&quot;aaa&quot;);
+        hs.add(&quot;bbb&quot;);
+        hs.add(&quot;ccc&quot;);
+        hs.add(&quot;ddd&quot;);
+
+        Iterator it = hs.iterator();
+
+        while(it.hasNext()) {
+            System.out.println(it.next());
+        }
+
+    }
+</code></pre><p>集合框架 - 哈希表</p>
+<p>HashSet集合数据结构是哈希表，所以存储元素的时候，首先使用元素的hashCode方法来确定位置，如果位置相同，在通过元素的equals方法来确定内容是否相同。    </p>
+<pre><code>class Person{
+
+    ...
+
+    public int hashCode() {
+        //System.out.println(this);
+        return name.hashCode()+age*27;
+    }
+
+    public boolean equals(Object obj) {
+    if(this == obj)
+            return true;
+
+    if(!(obj instanceof Person))
+        throw new ClassCastException(&quot;类型不对&quot;);
+
+    Person p = (Person)obj;
+
+    System.out.println(this.name+&quot;...&quot;+this.age+&quot;...equals...&quot;+p.name+&quot;...&quot;+p.age);
+
+    return this.name.equals(p.name) &amp;&amp; this.age == p.age;
+}
+
+    ...
+
+}    
+
+public class hashSetDemo2 {
+
+    public static void main(String[] args) {
+
+        HashSet hs = new HashSet();
+
+        hs.add(new Person(&quot;lisi1&quot;,21));
+        hs.add(new Person(&quot;lisi2&quot;,22));
+        hs.add(new Person(&quot;lisi3&quot;,23));
+        hs.add(new Person(&quot;lisi4&quot;,24));
+        hs.add(new Person(&quot;lisi4&quot;,24));
+
+        Iterator it = hs.iterator();
+
+        while(it.hasNext()) {
+            Person p = (Person)it.next();
+            System.out.println(p.getName()+&quot;...&quot;+p.getAge());
+        }
+
+    }
+
+}
+</code></pre><h4 id="8、删除ArrayList集合中的重复元素"><a href="#8、删除ArrayList集合中的重复元素" class="headerlink" title="8、删除ArrayList集合中的重复元素"></a>8、删除ArrayList集合中的重复元素</h4><pre><code>public class arrayListPractice {
+
+    public static void main(String[] args) {
+        ArrayList al = new ArrayList();
+        al.add(&quot;abc1&quot;);
+        al.add(&quot;abc2&quot;);
+        al.add(&quot;abc3&quot;);
+        al.add(&quot;abc4&quot;);
+        al.add(&quot;abc1&quot;);
+        al.add(&quot;abc3&quot;);
+
+        System.out.println(al);
+
+        al = getSingleElement(al);
+
+        System.out.println(al);
+    }
+
+    private static ArrayList getSingleElement(ArrayList al) {
+        //1、定义临时容器
+        ArrayList temp = new ArrayList();
+        //2、迭代al集合
+        Iterator it = al.iterator();
+        while(it.hasNext()) {
+            Object obj = it.next();
+            //3、判断是否重复
+            if(!(temp.contains(obj))) {
+                temp.add(obj);
+            }
+        }
+        return temp;
+    }
+
+}
+
+输出结果：
+[abc1, abc2, abc3, abc4, abc1, abc3]
+[abc1, abc2, abc3, abc4]
+
+换成自定义对象测试：
+
+    public static void main(String[] args) {
+        ArrayList al = new ArrayList();
+        al.add();
+        al.add(&quot;abc2&quot;);
+        al.add(&quot;abc3&quot;);
+        al.add(&quot;abc4&quot;);
+        al.add(&quot;abc1&quot;);
+        al.add(&quot;abc3&quot;);
+
+        System.out.println(al);
+
+        al = getSingleElement(al);
+
+        System.out.println(al);
+    }
+
+输出结果：
+[lisi1:21, lisi2:22, lisi3:23, lisi4:24, lisi2:22, lisi3:23]
+[lisi1:21, lisi2:22, lisi3:23, lisi4:24, lisi2:22, lisi3:23]
+
+原因分析：
+contains方法是用的equals方法来比较两个元素是否相同。
+equals方法是自定义类继承的object中的方法，所以比较的是对象的内存地址。
+
+所以，要到Person类中对equals方法进行重写覆盖，就像String类对equals方法进行了重写一样，只要内容相同，即视为元素相同。
+
+public boolean equals(Object obj) {
+    if(this == obj)
+            return true;
+
+    if(!(obj instanceof Person))
+        throw new ClassCastException(&quot;类型不对&quot;);
+
+    Person p = (Person)obj;
+
+    //System.out.println(this.name+&quot;...&quot;+this.age+&quot;...equals...&quot;+p.name+&quot;...&quot;+p.age);
+
+    return this.name.equals(p.name) &amp;&amp; this.age == p.age;
+}
+</code></pre><h4 id="9、集合框架-LinkedHashSet集合"><a href="#9、集合框架-LinkedHashSet集合" class="headerlink" title="9、集合框架-LinkedHashSet集合"></a>9、集合框架-LinkedHashSet集合</h4><p>HashSet保证了唯一，但是无序。</p>
+<p>LinkedHashSet用链表进行了扩展。</p>
+<pre><code>public static void main(String[] args) {
+    HashSet hs = new LinkedHashSet();
+
+    hs.add(&quot;abc2&quot;);
+    hs.add(&quot;abc1&quot;);
+    hs.add(&quot;abc3&quot;);
+    hs.add(&quot;abc4&quot;);
+
+    Iterator it = hs.iterator();
+    while(it.hasNext()) {
+        System.out.println(it.next());
+    }
+}
+
+输出结果：
+abc2
+abc1
+abc3
+abc4
+
+保证了集合既有序且唯一。
+</code></pre><h4 id="10、集合框架-TreeSet集合"><a href="#10、集合框架-TreeSet集合" class="headerlink" title="10、集合框架 - TreeSet集合"></a>10、集合框架 - TreeSet集合</h4><p>TreeSet：可以对Set集合中的元素进行排序。是不同步的。</p>
+<p>判断元素唯一性的方式：就是根据比较方法的返回结果是否为0，是0，就是相同元素，不存。</p>
+<h5 id="TreeSet对元素进行排序的方式一："><a href="#TreeSet对元素进行排序的方式一：" class="headerlink" title="TreeSet对元素进行排序的方式一："></a>TreeSet对元素进行排序的方式一：</h5><p>让元素自身具备比较功能，元素就需要实现Comparable接口，重写覆盖compareTo方法。</p>
+<pre><code>public static void main(String[] args) {
+    TreeSet ts = new TreeSet();
+
+    ts.add(&quot;abc&quot;);
+    ts.add(&quot;aaa&quot;);
+    ts.add(&quot;abbc&quot;);
+    ts.add(&quot;acsw&quot;);
+
+    Iterator it = ts.iterator();
+
+    while(it.hasNext()) {
+        System.out.println(it.next());
+    }
+
+}
+
+输出结果：    
+aaa
+abbc
+abc
+acsw
+</code></pre><p>String类已经实现了Comparable接口，重写了compareTo方法，所以添加时对元素进行了排序。自定义的类，需要按需求自定义排序方式。</p>
+<pre><code>class Person implements Comparable{
+    ...
+    //按年龄排序，年龄相同的按姓名排序
+    public int compareTo(Object o) {
+        Person p = (Person)o;
+        int temp = this.age - p.age;
+        return temp == 0?this.name.compareTo(p.name):temp;
+    }
+    ...
+}
+
+public class TreeSetDemo {
+    public static void main(String[] args) {
+        TreeSet ts = new TreeSet();
+
+        ts.add(new Person(&quot;zhangsan&quot;,28));
+        ts.add(new Person(&quot;wangwu&quot;,21));
+        ts.add(new Person(&quot;lisi&quot;,26));
+        ts.add(new Person(&quot;zhaoliu&quot;,28));        
+
+        Iterator it = ts.iterator();
+
+        while(it.hasNext()) {
+            System.out.println(it.next());
+        }
+
+    }
+}
+
+输出结果：
+wangwu:21
+lisi:26
+zhangsan:28
+zhaoliu:28
+</code></pre><h5 id="TreeSet对元素进行排序的方式二："><a href="#TreeSet对元素进行排序的方式二：" class="headerlink" title="TreeSet对元素进行排序的方式二："></a>TreeSet对元素进行排序的方式二：</h5><p>让集合自身具备比较功能，自定义一个比较器类，实现Comparator接口，重写覆盖compare方法。将该类对象作为参数传递给TreeSet集合的构造函数。</p>
+<pre><code>//创建比较器
+public class ComparableDemo implements Comparator {
+
+    public int compare(Object o1, Object o2) {
+        Person p1 = (Person)o1;
+        Person p2 = (Person)o2;
+        //按名字排序，名字相同者按年龄排序
+        int temp = p1.getName().compareTo(p2.getName());
+        return temp==0?p1.getAge()-p2.getAge():temp;
+    }
+
+}
+
+public class TreeSetDemo {
+
+    public static void main(String[] args) {
+        //创建集合时传入比较器
+        TreeSet ts = new TreeSet(new ComparableDemo());
+
+        ts.add(new Person(&quot;zhangsan&quot;,28));
+        ts.add(new Person(&quot;wangwu&quot;,21));
+        ts.add(new Person(&quot;lisi&quot;,26));
+        ts.add(new Person(&quot;zhaoliu&quot;,28));        
+
+        Iterator it = ts.iterator();
+
+        while(it.hasNext()) {
+            System.out.println(it.next());
+        }
+
+    }
+
+}
+
+输出结果：
+lisi:26
+wangwu:21
+zhangsan:28
+zhaoliu:28
+
+集合比较器优先于元素比较器，且更为常用。
+</code></pre><h4 id="TreeSet集合练习-字符串长度排序"><a href="#TreeSet集合练习-字符串长度排序" class="headerlink" title="TreeSet集合练习-字符串长度排序"></a>TreeSet集合练习-字符串长度排序</h4><pre><code>public class TreeSetPractice {
+
+    public static void main(String[] args) {
+        TreeSet ts = new TreeSet();
+
+        ts.add(&quot;aaa&quot;);
+        ts.add(&quot;zzzz&quot;);
+        ts.add(&quot;bhjan&quot;);
+        ts.add(&quot;lsdds&quot;);
+        ts.add(&quot;hahaj&quot;);
+
+        Iterator it = ts.iterator();
+
+        while(it.hasNext()) {
+            System.out.println(it.next());
+        }
+    }
+
+}
+输出结果：
+aaa
+bhjan
+hahaj
+lsdds
+zzzz
+</code></pre><p>String类元素默认的是自然排序，想要按字条串长度排序，只能通过修改集合<br>的比较器来实现。</p>
+<pre><code>class ComparatorByLength implements Comparator{
+    public int compare(Object o1, Object o2) {
+        String s1 = (String)o1;
+        String s2 = (String)o2;
+        int temp = s1.length() - s2.length();
+        return temp==0?s1.compareTo(s2):temp;
+    }
+}
+
+public class TreeSetPractice {
+
+    public static void main(String[] args) {
+        TreeSet ts = new TreeSet(new ComparatorByLength());
+
+        ...        
+    }
+
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/12/27/java/java-collections/java-collection-framework/" data-id="cjhlqounh001n47fyxt45qij6" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-java/java-api/basic-data-class" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2017/12/23/java/java-api/basic-data-class/" class="article-date">
@@ -234,7 +1819,7 @@ public class WrapperTest {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/23/java/java-api/basic-data-class/" data-id="cjh4911id001mmtp3kisfa7vf" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/12/23/java/java-api/basic-data-class/" data-id="cjhlqounb001i47fy9io73w4w" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/api/">api</a></li></ul>
@@ -347,7 +1932,7 @@ sb.setCharAt(2, &apos;1&apos;);//abqe
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/22/java/java-api/java-stringBuffer/" data-id="cjh4911i6001hmtp319l21evz" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/12/22/java/java-api/java-stringBuffer/" data-id="cjhlqounf001m47fy33jj3hbw" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/api/">api</a></li></ul>
@@ -536,7 +2121,7 @@ public static String getMaxSubstring(String s1, String s2){
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/21/java/java-api/api-string/" data-id="cjh4911i9001imtp35cb67yh2" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/12/21/java/java-api/api-string/" data-id="cjhlqoun7001h47fy7b77jl1l" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/api/">api</a></li></ul>
@@ -1143,7 +2728,7 @@ t2.start();
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/18/java/java-thread/thread-communication/" data-id="cjh4911m00054mtp3icquit1q" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/12/18/java/java-thread/thread-communication/" data-id="cjhlqouqf004p47fygwyvqdpg" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/thread/">thread</a></li></ul>
@@ -1415,7 +3000,7 @@ class DeadLockTest{
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/12/15/java/java-thread/java-thread/" data-id="cjh4911l70047mtp34e6f3m5n" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/12/15/java/java-thread/java-thread/" data-id="cjhlqouqc004l47fycxwe3e09" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/thread/">thread</a></li></ul>
@@ -2078,7 +3663,7 @@ class DeadLockTest{
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/css/css-grid/" data-id="cjh4911ge000bmtp3i0ogqwk6" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/09/14/css/css-grid/" data-id="cjhlqoulx000r47fyc13qryha" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/css-grid/">css-grid</a></li></ul>
@@ -2090,1028 +3675,10 @@ class DeadLockTest{
 
 
   
-    <article id="post-bootstrap/bootstrap-notes" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/09/14/bootstrap/bootstrap-notes/" class="article-date">
-  <time datetime="2017-09-14T02:21:19.000Z" itemprop="datePublished">2017-09-14</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/bootstrap/">bootstrap</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/09/14/bootstrap/bootstrap-notes/">bootstrap笔记</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><a href="http://v3.bootcss.com/" target="_blank" rel="external">Bootstrap</a>：最受欢迎的HTML、CSS和JS框架，用于开发响应式布局、移动设备优先的WEB项目。</p>
-<h4 id="启步"><a href="#启步" class="headerlink" title="启步"></a>启步</h4><p>1、响应式布局标签：</p>
-<pre><code>&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
-</code></pre><p>2、为了让最新浏览器运行在最新的渲染模式下，建议将此 <meta> 标签加入到页面中：</p>
-<pre><code>&lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
-</code></pre><p>3、让部分国产浏览器如360采用高速模式渲染页面：</p>
-<pre><code>&lt;meta name=&quot;renderer&quot; content=&quot;webkit&quot;&gt;
-</code></pre><h4 id="全局CSS样式"><a href="#全局CSS样式" class="headerlink" title="全局CSS样式"></a>全局CSS样式</h4><h5 id="一、概览"><a href="#一、概览" class="headerlink" title="一、概览"></a>一、概览</h5><p>1、移动设备优先</p>
-<p>在移动设备浏览器上，通过为视口（viewport）设置 meta 属性为 user-scalable=no 可以禁用其缩放（zooming）功能。</p>
-<pre><code>&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no&quot;&gt;
-</code></pre><p>2、布局容器</p>
-<p>.container 类用于固定宽度并支持响应式布局的容器。</p>
-<pre><code>&lt;div class=&quot;container&quot;&gt;
-  ...
-&lt;/div&gt;
-</code></pre><p>.container-fluid 类用于 100% 宽度，占据全部视口（viewport）的容器。</p>
-<pre><code>&lt;div class=&quot;container-fluid&quot;&gt;
-  ...
-&lt;/div&gt;
-</code></pre><h5 id="二、栅格系统"><a href="#二、栅格系统" class="headerlink" title="二、栅格系统"></a>二、栅格系统</h5><p>1、媒体查询</p>
-<p>Less文件中使用以下媒体查询（media query）来创建关键的分界点阈值。</p>
-<pre><code>/* 超小屏幕（手机，小于 768px） */
-/* 没有任何媒体查询相关的代码，因为这在 Bootstrap 中是默认的（还记得 Bootstrap 是移动设备优先的吗？） */
-
-/* 小屏幕（平板，大于等于 768px） */
-@media (min-width: @screen-sm-min) { ... }
-
-/* 中等屏幕（桌面显示器，大于等于 992px） */
-@media (min-width: @screen-md-min) { ... }
-
-/* 大屏幕（大桌面显示器，大于等于 1200px） */
-@media (min-width: @screen-lg-min) { ... }
-</code></pre><p>2、栅格参数</p>
-<pre><code>| 超小屏幕 手机（&lt;768px） 
-| 小屏幕 平板（&gt;=768px） 
-| 中等屏幕 显示器（&gt;=992px） 
-| 大屏幕 大显示器（&gt;=1200px）
-</code></pre><table>
-<thead>
-<tr>
-<th>.container 最大宽度</th>
-<th>自动</th>
-<th>750px</th>
-<th>970px</th>
-<th>1170px</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>类前缀</td>
-<td>.col-xs-</td>
-<td>.col-sm-</td>
-<td>.col-md-</td>
-<td>.col-lg-</td>
-</tr>
-<tr>
-<td>槽宽</td>
-<td>30px（每列左右各15px）</td>
-<td>30px</td>
-<td>30px</td>
-<td>30px</td>
-</tr>
-</tbody>
-</table>
-<p>实例：使用单一的一组 .col-md-* 栅格类，就可以创建一个基本的栅格系统，在手机和平板设备上一开始是堆叠在一起的（超小屏幕到小屏幕这一范围），在桌面（中等）屏幕设备上变为水平排列。所有“列（column）必须放在 ” .row 内。</p>
-<p><img src="../../public/css/images/column.png" alt=".col-md"></p>
-<center>grid demo</center>
-
-<pre><code>&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-  &lt;div class=&quot;col-md-1&quot;&gt;.col-md-1&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-md-8&quot;&gt;.col-md-8&lt;/div&gt;
-  &lt;div class=&quot;col-md-4&quot;&gt;.col-md-4&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-md-4&quot;&gt;.col-md-4&lt;/div&gt;
-  &lt;div class=&quot;col-md-4&quot;&gt;.col-md-4&lt;/div&gt;
-  &lt;div class=&quot;col-md-4&quot;&gt;.col-md-4&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-md-6&quot;&gt;.col-md-6&lt;/div&gt;
-  &lt;div class=&quot;col-md-6&quot;&gt;.col-md-6&lt;/div&gt;
-&lt;/div&gt;
-</code></pre><p>3、实例：移动设备和桌面屏幕</p>
-<p>是否不希望在小屏幕设备上所有列都堆叠在一起？那就使用针对超小屏幕和中等屏幕设备所定义的类吧，即 .col-xs- 和 .col-md-。请看下面的实例，研究一下这些是如何工作的。</p>
-<pre><code>&lt;!-- Stack the columns on mobile by making one full-width and the other half-width --&gt;
-&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-xs-12 col-md-8&quot;&gt;.col-xs-12 .col-md-8&lt;/div&gt;
-  &lt;div class=&quot;col-xs-6 col-md-4&quot;&gt;.col-xs-6 .col-md-4&lt;/div&gt;
-&lt;/div&gt;
-
-&lt;!-- Columns start at 50% wide on mobile and bump up to 33.3% wide on desktop --&gt;
-&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-xs-6 col-md-4&quot;&gt;.col-xs-6 .col-md-4&lt;/div&gt;
-  &lt;div class=&quot;col-xs-6 col-md-4&quot;&gt;.col-xs-6 .col-md-4&lt;/div&gt;
-  &lt;div class=&quot;col-xs-6 col-md-4&quot;&gt;.col-xs-6 .col-md-4&lt;/div&gt;
-&lt;/div&gt;
-
-&lt;!-- Columns are always 50% wide, on mobile and desktop --&gt;
-&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-xs-6&quot;&gt;.col-xs-6&lt;/div&gt;
-  &lt;div class=&quot;col-xs-6&quot;&gt;.col-xs-6&lt;/div&gt;
-&lt;/div&gt;
-</code></pre><p>4、列偏移</p>
-<p>使用 .col-md-offset- 类可以将列向右侧偏移。这些类实际是通过使用 选择器为当前元素增加了左侧的边距（margin）。例如，.col-md-offset-4 类将 .col-md-4 元素向右侧偏移了4个列（column）的宽度。</p>
-<pre><code>&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-md-4&quot;&gt;.col-md-4&lt;/div&gt;
-  &lt;div class=&quot;col-md-4 col-md-offset-4&quot;&gt;.col-md-4 .col-md-offset-4&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-md-3 col-md-offset-3&quot;&gt;.col-md-3 .col-md-offset-3&lt;/div&gt;
-  &lt;div class=&quot;col-md-3 col-md-offset-3&quot;&gt;.col-md-3 .col-md-offset-3&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-md-6 col-md-offset-3&quot;&gt;.col-md-6 .col-md-offset-3&lt;/div&gt;
-&lt;/div&gt;
-</code></pre><p>5、列排序</p>
-<p>通过使用 .col-md-push- 和 .col-md-pull- 类就可以很容易的改变列（column）的顺序。</p>
-<pre><code>&lt;div class=&quot;row&quot;&gt;
-  &lt;div class=&quot;col-md-9 col-md-push-3&quot;&gt;.col-md-9 .col-md-push-3&lt;/div&gt;
-  &lt;div class=&quot;col-md-3 col-md-pull-9&quot;&gt;.col-md-3 .col-md-pull-9&lt;/div&gt;
-&lt;/div&gt;
-</code></pre><h5 id="三、排版"><a href="#三、排版" class="headerlink" title="三、排版"></a>三、排版</h5><p>1、标题</p>
-<p>h1到h6做为主标题 samll做为副标题</p>
-<pre><code>&lt;h1&gt;h1. Bootstrap heading &lt;small&gt;Secondary text&lt;/small&gt;&lt;/h1&gt;
-</code></pre><p>2、对齐</p>
-<pre><code>&lt;p class=&quot;text-left&quot;&gt;Left aligned text.&lt;/p&gt;
-&lt;p class=&quot;text-center&quot;&gt;Center aligned text.&lt;/p&gt;
-&lt;p class=&quot;text-right&quot;&gt;Right aligned text.&lt;/p&gt;
-&lt;p class=&quot;text-justify&quot;&gt;Justified text.&lt;/p&gt;
-&lt;p class=&quot;text-nowrap&quot;&gt;No wrap text.&lt;/p&gt;
-</code></pre><p>3、地址</p>
-<pre><code>&lt;address&gt;
-  &lt;strong&gt;Twitter, Inc.&lt;/strong&gt;&lt;br&gt;
-  795 Folsom Ave, Suite 600&lt;br&gt;
-  San Francisco, CA 94107&lt;br&gt;
-  &lt;abbr title=&quot;Phone&quot;&gt;P:&lt;/abbr&gt; (123) 456-7890
-&lt;/address&gt;
-
-&lt;address&gt;
-  &lt;strong&gt;Full Name&lt;/strong&gt;&lt;br&gt;
-  &lt;a href=&quot;mailto:#&quot;&gt;first.last@example.com&lt;/a&gt;
-&lt;/address&gt;
-</code></pre><p>4、内联列表</p>
-<pre><code>&lt;ul class=&quot;list-inline&quot;&gt;
-  &lt;li&gt;...&lt;/li&gt;
-&lt;/ul&gt;
-</code></pre><p>5、水平排列的描述</p>
-<pre><code>&lt;dl class=&quot;dl-horizontal&quot;&gt;
-  &lt;dt&gt;...&lt;/dt&gt;
-  &lt;dd&gt;...&lt;/dd&gt;
-&lt;/dl&gt;
-</code></pre><p>四、表格</p>
-<p>1、响应式表格</p>
-<p>将任何 .table 元素包裹在 .table-responsive 元素内，即可创建响应式表格，其会在小屏幕设备上（小于768px）水平滚动。当屏幕大于 768px 宽度时，水平滚动条消失。</p>
-<pre><code>&lt;div class=&quot;table-responsive&quot;&gt;
-  &lt;table class=&quot;table&quot;&gt;
-    ...
-  &lt;/table&gt;
-&lt;/div&gt;
-</code></pre><p>五、表单</p>
-<p>1、基本实例</p>
-<p>单独的表单控件会被自动赋予一些全局样式。所有设置了 .form-control 类的 <code>&lt;input&gt;</code>、<code>&lt;textarea&gt;</code> 和 <code>&lt;select&gt;</code> 元素都将被默认设置宽度属性为 width: 100%;。 将 label 元素和前面提到的控件包裹在 .form-group 中可以获得最好的排列。</p>
-<pre><code>&lt;form&gt;
-  &lt;div class=&quot;form-group&quot;&gt;
-    &lt;label for=&quot;exampleInputEmail1&quot;&gt;Email address&lt;/label&gt;
-    &lt;input type=&quot;email&quot; class=&quot;form-control&quot; id=&quot;exampleInputEmail1&quot; placeholder=&quot;Email&quot;&gt;
-  &lt;/div&gt;
-  &lt;div class=&quot;form-group&quot;&gt;
-    &lt;label for=&quot;exampleInputPassword1&quot;&gt;Password&lt;/label&gt;
-    &lt;input type=&quot;password&quot; class=&quot;form-control&quot; id=&quot;exampleInputPassword1&quot; placeholder=&quot;Password&quot;&gt;
-  &lt;/div&gt;
-  &lt;div class=&quot;form-group&quot;&gt;
-    &lt;label for=&quot;exampleInputFile&quot;&gt;File input&lt;/label&gt;
-    &lt;input type=&quot;file&quot; id=&quot;exampleInputFile&quot;&gt;
-    &lt;p class=&quot;help-block&quot;&gt;Example block-level help text here.&lt;/p&gt;
-  &lt;/div&gt;
-  &lt;div class=&quot;checkbox&quot;&gt;
-    &lt;label&gt;
-      &lt;input type=&quot;checkbox&quot;&gt; Check me out
-    &lt;/label&gt;
-  &lt;/div&gt;
-  &lt;button type=&quot;submit&quot; class=&quot;btn btn-default&quot;&gt;Submit&lt;/button&gt;
-&lt;/form&gt;
-</code></pre><p>2、…</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/bootstrap/bootstrap-notes/" data-id="cjh4911fm0001mtp3pcffpvnd" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/bootstrap/">bootstrap</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-angularjs/angular-apply" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/09/14/angularjs/angular-apply/" class="article-date">
-  <time datetime="2017-09-14T01:54:51.000Z" itemprop="datePublished">2017-09-14</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/angularjs/">angularjs</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/09/14/angularjs/angular-apply/">理解数据绑定过程 - `$watch`, `$apply`和`$digest`</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>项目开发过程中，在自定义指令里，用jquery捕捉到事件后改变scope里的变量，模板里的变量没有发生变化。幸运的是，从中文社区找到一篇关于数据绑定过程的文章，不仅解决了这个问题，对angular的理解也更加深了一层。</p>
-<p>博文地址：<a href="http://www.angularjs.cn/A0a6" target="_blank" rel="external">理解$watch ，$apply 和 $digest — 理解数据绑定过程</a></p>
-<p>英文地址：<a href="http://angular-tips.com/blog/2013/08/watch-how-the-apply-runs-a-digest/" target="_blank" rel="external">$watch How the $apply Runs a $digest</a></p>
-<h4 id="一、浏览器循环事件和Angular-js扩展"><a href="#一、浏览器循环事件和Angular-js扩展" class="headerlink" title="一、浏览器循环事件和Angular.js扩展"></a>一、浏览器循环事件和Angular.js扩展</h4><p>我们的浏览器一直在等待事件，比如用户交互。假如你点击一个按钮或者在输入框里输入东西，事件的回调函数就会在javascript解释器里执行，然后你就可以做任何DOM操作，等回调函数执行完毕时，浏览器就会相应地对DOM做出变化。 Angular拓展了这个事件循环，生成一个<font color="#d44950">angular context</font>的执行环境（记住，这是个重要的概念），为了解释什么是<font color="#d44950">context</font>以及它如何工作，我们还需要解释更多的概念。</p>
-<h4 id="二、-watch队列（-watch-list）"><a href="#二、-watch队列（-watch-list）" class="headerlink" title="二、$watch队列（$watch list）"></a>二、$watch队列（$watch list）</h4><p>页面上绑定一个model就会向$watch队列里插入一条 $watch 。$watch 检测它监视的model是否发生了变化。</p>
-<h5 id="1、demo"><a href="#1、demo" class="headerlink" title="1、demo"></a>1、demo</h5><font color="#d44950">index.html</font>
-
-<pre><code>User: &lt;input type=&quot;text&quot; ng-model=&quot;user&quot; /&gt;
-Password: &lt;input type=&quot;password&quot; ng-model=&quot;pass&quot; /&gt;
-</code></pre><p>页面绑定了两个scope的变量，所以$watch list里面加入了两个$watch。</p>
-<h5 id="2、demo"><a href="#2、demo" class="headerlink" title="2、demo"></a>2、demo</h5><font color="#d44950">controllers.js</font>
-
-<pre><code>app.controller(&apos;MainCtrl&apos;, function($scope) {
-  $scope.foo = &quot;Foo&quot;;
-  $scope.world = &quot;World&quot;;
-});
-</code></pre><font color="#d44950">index.html</font>
-
-<pre><code>Hello, {{ World }}
-</code></pre><p>这里，即便我们在$scope上添加了两个东西，但是只有一个绑定在了UI上，因此在这里只生成了一个$watch.</p>
-<h5 id="3、demo"><a href="#3、demo" class="headerlink" title="3、demo"></a>3、demo</h5><font color="#d44950">controllers.js</font>
-
-<pre><code>app.controller(&apos;MainCtrl&apos;, function($scope) {
-  $scope.people = [...];
-});
-</code></pre><font color="#d44950">index.html</font>
-
-<pre><code>&lt;ul&gt;
-  &lt;li ng-repeat=&quot;person in people&quot;&gt;
-      {{person.name}} - {{person.age}}
-  &lt;/li&gt;
-&lt;/ul&gt;
-</code></pre><p>这里又生成了多少个$watch呢？每个person有两个（一个name，一个age），然后ng-repeat又有一个，因此10个person一共是(2 * 10) +1,也就是说有21个$watch。</p>
-<h5 id="4、总结"><a href="#4、总结" class="headerlink" title="4、总结"></a>4、总结</h5><p>因此，每一个绑定到了UI上的数据都会生成一个$watch。</p>
-<p>那这些$watch是什么时候生成的呢？</p>
-<p>当我们的模版加载完毕时，也就是在linking阶段（Angular分为compile阶段和linking阶段—译者注），Angular解释器会寻找每个directive，然后生成每个需要的$watch。</p>
-<h4 id="三、-digest循环"><a href="#三、-digest循环" class="headerlink" title="三、$digest循环"></a>三、$digest循环</h4><p>还记得我前面提到的扩展的事件循环吗？当浏览器接收到可以被angular context处理的事件时，$digest循环就会触发</p>
-<p>这个循环是由两个更小的循环组合起来的：</p>
-<p>一个处理evalAsync队列。</p>
-<p>另一个处理$watch队列，这个也是本篇博文的主题。 这个是处理什么的呢？$digest将会遍历我们的$watch</p>
-<ul>
-<li><p>嘿，$watch，你的值是什么？</p>
-<ul>
-<li>是9。</li>
-</ul>
-</li>
-<li><p>好的，它改变过吗？</p>
-<ul>
-<li>没有，先生。</li>
-</ul>
-</li>
-</ul>
-<p>*（这个变量没变过，那下一个）</p>
-<ul>
-<li><p>你呢，你的值是多少？</p>
-<ul>
-<li>报告，是Foo。</li>
-</ul>
-</li>
-<li><p>刚才改变过没？</p>
-<ul>
-<li>改变过，刚才是Bar。</li>
-</ul>
-</li>
-<li><p>（很好，我们有DOM需要更新了）</p>
-</li>
-<li><p>继续询问直到$watch队列都检查过。</p>
-</li>
-</ul>
-<p>这就是所谓的dirty-checking。</p>
-<p>既然所有的$watch都检查完了，那就要问了：有没有$watch更新过？如果有至少一个更新过，这个循环就会再次触发，直到所有的$watch都没有变化。这样就能够保证每个model都已经不会再变化。</p>
-<p>记住如果循环超过10次的话，它将会抛出一个异常，防止无限循环。</p>
-<p>当$digest循环结束时，DOM相应地变化。</p>
-<h5 id="1、demo-1"><a href="#1、demo-1" class="headerlink" title="1、demo"></a>1、demo</h5><font color="#d44950">controllers.js</font>
-
-<pre><code>app.controller(&apos;MainCtrl&apos;, function() {
-  $scope.name = &quot;Foo&quot;;
-
-  $scope.changeFoo = function() {
-      $scope.name = &quot;Bar&quot;;
-  }
-});
-</code></pre><font color="#d44950">index.html</font>
-
-<pre><code>{{ name }}
-&lt;button ng-click=&quot;changeFoo()&quot;&gt;Change the name&lt;/button&gt;
-</code></pre><p>这里我们只有一个$watch，因为ng-click不生成$watch（函数是不会变的）。</p>
-<ul>
-<li><p>按下按钮</p>
-</li>
-<li><p>浏览器接收到一个事件，进入angular context（后面会解释为什么）。</p>
-</li>
-<li><p>$digest循环开始执行，查询每个$watch是否变化。</p>
-</li>
-<li><p>由于监视$scope.name的$watch报告了变化，它会强制再执行一次$digest循环。</p>
-</li>
-<li><p>新的$digest循环没有检测到变化。</p>
-</li>
-<li><p>浏览器拿回控制权，更新与$scope.name新值相应部分的DOM。</p>
-</li>
-</ul>
-<h4 id="四、通过-apply进入angular-context"><a href="#四、通过-apply进入angular-context" class="headerlink" title="四、通过$apply进入angular context"></a>四、通过$apply进入angular context</h4><p>谁来决定什么事件可以进入angular context，而哪些又不能进入呢？$apply！</p>
-<ul>
-<li><p>如果当事件触发时，你调用$apply，它会进入angular context，如果没有调用就不会进入。</p>
-</li>
-<li><p>现在你可能会问：刚才的例子里我也没有调用$apply啊，为什么？Angular为了做了！</p>
-</li>
-<li><p>当你点击带有ng-click的元素时，事件就会被封装到一个$apply调用。</p>
-</li>
-<li><p>例如你有一个ng-model=”foo”的输入框，然后你敲一个f，事件就会这样调用$apply(“foo = ‘f’;”)。</p>
-</li>
-</ul>
-<h4 id="五、Angular什么时候不会自动为我们-apply呢？"><a href="#五、Angular什么时候不会自动为我们-apply呢？" class="headerlink" title="五、Angular什么时候不会自动为我们$apply呢？"></a>五、Angular什么时候不会自动为我们$apply呢？</h4><p>这是Angular新手共同的痛处。为什么我的jQuery不会更新我绑定的东西呢？因为jQuery没有调用$apply，事件没有进入angular context，$digest循环永远没有执行。</p>
-<h5 id="1、demo-2"><a href="#1、demo-2" class="headerlink" title="1、demo"></a>1、demo</h5><font color="#d44950">app.js</font>
-
-<pre><code>app.directive(‘clickable’, function() {
-
-return {
-  restrict: &quot;E&quot;,
-  scope: {
-    foo: &apos;=&apos;,//通过 &apos;=&apos; 双向绑定，隔离的scope得以与controller里的父scope通信
-    bar: &apos;=&apos;//双向绑定
-  },
-  template: &apos;&lt;ul style=&quot;background-color: lightblue&quot;&gt;&lt;li&gt;{{foo}}&lt;/li&gt;&lt;li&gt;{{bar}}&lt;/li&gt;&lt;/ul&gt;&apos;,
-  link: function(scope, element, attrs) {
-    element.bind(&apos;click&apos;, function() {
-      scope.foo++;
-      scope.bar++;
-    });
-  }
-}
-
-});
-
-app.controller(&apos;MainCtrl&apos;, function($scope) {
-  $scope.foo = 0;
-  $scope.bar = 0;
-});
-</code></pre><p>代码意图：将foo和bar从controller里绑定到一个list里面，每次点击这个元素的时候，foo和bar都会自增1。</p>
-<p>但是当我们点击元素ul时，发现元素没有变化还是0。</p>
-<p>这是因为点击事件是一个没有封装到$apply里的事件。虽然如此，但是scope里的变量（foo和bar）确实是自增了的，只是因为没能通过$apply进入angular context，所以模板里的dom没能得到更新。</p>
-<p>也就是说，如果我们自己执行一次$apply，那么这些$watch就会看到变化，然后根据需要更新dom。</p>
-<p>试试看看这个例子：<a href="http://jsbin.com/opimat/2/" target="_blank" rel="external">http://jsbin.com/opimat/2/</a></p>
-<ul>
-<li><p>当我们先点击ul时，像上面所讲的，虽然scope里的foo和bar都自增了，但由于element.bind(‘clilck’)事件没有封装到$apply里，所以dom没有得到更新，模板里看不到变化。</p>
-</li>
-<li><p>但当我们点击 change hello按钮时，由于ng-click事件被封装到了$apply里，所以进入了angular context里，$digest循环执行，询问每个$watch时，发现不仅$sopce.hello的值发生了变化，scope.foo和scope.bar也发生了变化。</p>
-</li>
-<li><p>浏览器更新dom时，就可以看到三处变化了。</p>
-</li>
-</ul>
-<h5 id="2、demo-1"><a href="#2、demo-1" class="headerlink" title="2、demo"></a>2、demo</h5><p>现在你在想那并不是你想要的，你想要的是点击蓝色区域的时候就更新点击数。</p>
-<p>a、很简单，执行一下$apply就可以了：</p>
-<pre><code>element.bind(&apos;click&apos;, function() {
-  scope.foo++;
-  scope.bar++;
-
-  scope.$apply();
-});
-</code></pre><p>$apply是我们的$scope（或者是direcvie里的link函数中的scope）的一个函数，调用它会强制一次$digest循环（除非当前正在执行循环，这种情况下会抛出一个异常，这是我们不需要在那里执行$apply的标志）。</p>
-<p>试试看：<a href="http://jsbin.com/opimat/3/edit" target="_blank" rel="external">http://jsbin.com/opimat/3/edit</a></p>
-<p>b、有用啦，但是有一种更好的使用$apply的方法：</p>
-<pre><code>element.bind(&apos;click&apos;, function() {
-  scope.$apply(function() {
-      scope.foo++;
-      scope.bar++;
-  });
-})
-</code></pre><p>有什么不一样的？差别就是在第一个版本中，我们是在angular context的外面更新的数据，如果有发生错误，Angular永远不知道。很明显在这个像个小玩具的例子里面不会出什么大错，但是想象一下我们如果有个alert框显示错误给用户，然后我们有个第三方的库进行一个网络调用然后失败了，如果我们不把它封装进$apply里面，Angular永远不会知道失败了，alert框就永远不会弹出来了。</p>
-<h4 id="六、使用-watch-来监视你自己的东西"><a href="#六、使用-watch-来监视你自己的东西" class="headerlink" title="六、使用 $watch 来监视你自己的东西"></a>六、使用 $watch 来监视你自己的东西</h4><p>你已经知道了我们设置的任何绑定都有一个它自己的$watch，当需要时更新DOM，但是我们如果要自定义自己的watches呢？简单</p>
-<h5 id="1、demo-3"><a href="#1、demo-3" class="headerlink" title="1、demo"></a>1、demo</h5><font color="#d44950">app.js</font>
-
-<pre><code>app.controller(&apos;MainCtrl&apos;, function($scope) {
-  $scope.name = &quot;Angular&quot;;
-
-  $scope.updated = -1;
-
-  $scope.$watch(&apos;name&apos;, function() {
-    $scope.updated++;
-  });
-});
-</code></pre><font color="#d44950">index.html</font>
-
-<pre><code>&lt;body ng-controller=&quot;MainCtrl&quot;&gt;
-  &lt;input ng-model=&quot;name&quot; /&gt;
-  Name updated: {{updated}} times.
-&lt;/body&gt;
-</code></pre><p>这就我们创造的一个新的$watch方法。</p>
-<ul>
-<li><p>第一个参数是一个字符串或函数，在这里只是一个字符串，就是我们要监视的变量的名字。</p>
-</li>
-<li><p>第二个参数是一个回调函数，当变量发生变化时被调用。</p>
-</li>
-<li><p>我们要知道的第一件事就是当controller执行到这个 $watch 时，它会立即执行一次，困此我们设置updated为 -1 。</p>
-</li>
-</ul>
-<p>试试看：<a href="http://jsbin.com/ucaxan/1/edit" target="_blank" rel="external">http://jsbin.com/ucaxan/1/edit</a></p>
-<h5 id="2、demo-2"><a href="#2、demo-2" class="headerlink" title="2、demo"></a>2、demo</h5><font color="#d44950">app.js</font>
-
-<pre><code>app.controller(&apos;MainCtrl&apos;, function($scope) {
-  $scope.name = &quot;Angular&quot;;
-
-  $scope.updated = 0;
-
-  $scope.$watch(&apos;name&apos;, function(newValue, oldValue) {
-    if (newValue === oldValue) { return; } // AKA first run
-    $scope.updated++;
-  });
-});
-</code></pre><font color="#d44950">index.html</font>
-
-<pre><code>&lt;body ng-controller=&quot;MainCtrl&quot;&gt;
-  &lt;input ng-model=&quot;name&quot; /&gt;
-  Name updated: {{updated}} times.
-&lt;/body&gt;
-</code></pre><ul>
-<li><p>watch的第二个参数接受两个参数，新值和旧值。</p>
-</li>
-<li><p>我们可以用他们来略过第一次的执行。</p>
-</li>
-<li><p>通常你不需要略过第一次执行，但在这个例子里面你是需要的。灵活点嘛少年。</p>
-</li>
-</ul>
-<h5 id="3、demo-1"><a href="#3、demo-1" class="headerlink" title="3、demo"></a>3、demo</h5><font color="#d44950">app.js</font>
-
-<pre><code>app.controller(&apos;MainCtrl&apos;, function($scope) {
-  $scope.user = { name: &quot;Fox&quot; };
-
-  $scope.updated = 0;
-
-  $scope.$watch(&apos;user&apos;, function(newValue, oldValue) {
-    if (newValue === oldValue) { return; }
-    $scope.updated++;
-  });
-});
-</code></pre><font color="#d44950">index.html</font>
-
-<pre><code>&lt;body ng-controller=&quot;MainCtrl&quot;&gt;
-  &lt;input ng-model=&quot;user.name&quot; /&gt;
-  Name updated: {{updated}} times.
-&lt;/body&gt;
-</code></pre><p>我们想要监视$scope.user对象里的任何变化，和以前一样这里只是用一个对象来代替前面的字符串。</p>
-<p>试试看：<a href="http://jsbin.com/ucaxan/3/edit" target="_blank" rel="external">http://jsbin.com/ucaxan/3/edit</a></p>
-<ul>
-<li><p>没用，为啥？</p>
-</li>
-<li><p>因为$watch默认是比较两个对象所引用的是否相同，在例子1和2里面，每次更改$scope.name都会创建一个新的基本变量，因此$watch会执行，因为对这个变量的引用已经改变了。</p>
-</li>
-<li><p>在上面的例子里，我们在监视$scope.user，当我们改变$scope.user.name时，对$scope.user的引用是不会改变的，我们只是每次创建了一个新的$scope.user.name，但是$scope.user永远是一样的。</p>
-</li>
-</ul>
-<h5 id="4、demo"><a href="#4、demo" class="headerlink" title="4、demo"></a>4、demo</h5><font color="#d44950">app.js</font>
-
-<pre><code>app.controller(&apos;MainCtrl&apos;, function($scope) {
-  $scope.user = { name: &quot;Fox&quot; };
-
-  $scope.updated = 0;
-
-  $scope.$watch(&apos;user&apos;, function(newValue, oldValue) {
-    if (newValue === oldValue) { return; }
-    $scope.updated++;
-  }, true);
-});
-</code></pre><font color="#d44950">index.html</font>
-
-<pre><code>&lt;body ng-controller=&quot;MainCtrl&quot;&gt;
-  &lt;input ng-model=&quot;user.name&quot; /&gt;
-  Name updated: {{updated}} times.
-&lt;/body&gt;
-</code></pre><p>试试看：<a href="http://jsbin.com/ucaxan/4/edit" target="_blank" rel="external">http://jsbin.com/ucaxan/4/edit</a></p>
-<ul>
-<li><p>现在有用了吧！因为我们对$watch加入了第三个参数，它是一个bool类型的参数，表示的是我们比较的是对象的值而不是引用。</p>
-</li>
-<li><p>由于当我们更新$scope.user.name时$scope.user也会改变，所以能够正确触发。</p>
-</li>
-</ul>
-<h4 id="七、总结"><a href="#七、总结" class="headerlink" title="七、总结"></a>七、总结</h4><p>1、好吧，我希望你们已经学会了在Angular中数据绑定是如何工作的。我猜想你的第一印象是dirty-checking很慢，好吧，其实是不对的。它像闪电般快。但是，是的，如果你在一个模版里有2000-3000个watch，它会开始变慢。但是我觉得如果你达到这个数量级，就可以找个用户体验专家咨询一下了</p>
-<p>2、无论如何，随着ECMAScript6的到来，在Angular未来的版本里我们将会有Object.observe那样会极大改善$digest循环的速度。同时未来的文章也会涉及一些tips&amp;tricks。</p>
-<p>3、另一方面，这个主题并不容易，如果你发现我落下了什么重要的东西或者有什么东西完全错了，请在github上提交问题或提交修正。</p>
-<h4 id="八、回到总题"><a href="#八、回到总题" class="headerlink" title="八、回到总题"></a>八、回到总题</h4><p>总结：数据绑定机制：</p>
-<p>1、angular发现一个model就会向$watch list里插入一个$watch，用来监测这个model是否发生了变化 。</p>
-<p>2、当事件触发后，比如ng-click，事件就会被封装到一个$apply。$apply决定了哪些事件触发后可以进入angular context，哪些事件触发后不会进入到angular context。</p>
-<p>3、$apply调用后，进入到angular context。</p>
-<p>4、$digest循环执行，询问每个$watch，看看它监测的model有没有发生变化。</p>
-<p>5、有变化再循环，直到没有发现变化为止。</p>
-<p>6、浏览器拿回控制权，更新相应的dom。</p>
-<p>这也就解释了为什么jquery改变scope的变量时，为什么dom没有更新。因为jQuery没有调用$apply，事件没有进入angular context，$digest循环永远没有执行。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/angularjs/angular-apply/" data-id="cjh4911g40006mtp3uf79zj5l" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-angularjs/angular-directive" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/09/14/angularjs/angular-directive/" class="article-date">
-  <time datetime="2017-09-14T01:30:09.000Z" itemprop="datePublished">2017-09-14</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/angularjs/">angularjs</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/09/14/angularjs/angular-directive/">angularJS中的指令directive</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>原文：</p>
-<p><a href="http://blog.jobbole.com/62249/" target="_blank" rel="external">AngularJS 指令实践指南（一）</a></p>
-<p><a href="http://blog.jobbole.com/62999/" target="_blank" rel="external">AngularJS 指令实践指南（二）</a></p>
-<h4 id="一、创建自定义指令"><a href="#一、创建自定义指令" class="headerlink" title="一、创建自定义指令"></a>一、创建自定义指令</h4><pre><code>var app = angular.module(&apos;myapp&apos;, []);
-
-app.directive(&apos;rabbitHeader&apos;, function() {
-  return {
-      restrict: &apos;AE&apos;,
-      replace: &apos;true&apos;,
-      template: &apos;&lt;h3&gt;Hello World!!&lt;/h3&gt;&apos;
-  };
-});
-</code></pre><h5 id="1、表现形式"><a href="#1、表现形式" class="headerlink" title="1、表现形式"></a>1、表现形式</h5><ul>
-<li><p>html元素名</p>
-<pre><code>&lt;rabbit-header&gt;&lt;/rabbit-header&gt;
-</code></pre></li>
-<li><p>元素的属性</p>
-<pre><code>&lt;div rabbit-header&gt;&lt;/div&gt;
-</code></pre></li>
-<li><p>类名        </p>
-<pre><code>&lt;div class=&quot;rabbit-header&quot;&gt;&lt;/div&gt;    
-</code></pre></li>
-<li><p>注释</p>
-<pre><code>&lt;!-- directive: rabbit-header --&gt;
-</code></pre></li>
-</ul>
-<h5 id="2、属性"><a href="#2、属性" class="headerlink" title="2、属性"></a>2、属性</h5><p><em>restrict:</em></p>
-<ul>
-<li><p>A：只限属性使用</p>
-</li>
-<li><p>C：只限类名使用</p>
-</li>
-<li><p>E：只限元素名使用</p>
-</li>
-<li><p>M：只限注释使用</p>
-</li>
-</ul>
-<p><em>template | templateUrl</em></p>
-<ul>
-<li><p>template: 不一定要是简单的字符串，可以包含其它指令或表达式{} 等</p>
-</li>
-<li><p>templateUrl: 指向模板的一个地址</p>
-</li>
-</ul>
-<p><em>replace</em></p>
-<ul>
-<li><p>true: 生成的html内容会替换掉定义此指令的html</p>
-</li>
-<li><p>false: 生成的html内容会插入到定义此指令的元素中</p>
-</li>
-</ul>
-<h5 id="3、Link函数和Scope"><a href="#3、Link函数和Scope" class="headerlink" title="3、Link函数和Scope"></a>3、Link函数和Scope</h5><ul>
-<li><p>默认情况下指令不会创建新的子scope。</p>
-</li>
-<li><p>如果指令存在于一个controller下，它会使用这个contoller的scope。</p>
-</li>
-<li><p>指令的scope在link函数中使用。</p>
-</li>
-</ul>
-<p>index.html</p>
-<pre><code>&lt;body ng-controller=&quot;MainCtrl&quot;&gt;
-  &lt;input type=&quot;text&quot; ng-model=&quot;color&quot; placeholder=&quot;Enter a color&quot; /&gt;
-  &lt;hello-world&gt;&lt;/hello-world&gt;
-&lt;/body&gt;
-</code></pre><p>app.js</p>
-<pre><code>app.directive(&apos;helloWorld&apos;, function() {
-  return {
-    restrict: &apos;AE&apos;,
-    replace: true,
-    template: &apos;&lt;p style=&quot;background-color:{{color}}&quot;&gt;Hello World&apos;,
-    link: function(scope, elem, attrs) {
-      elem.bind(&apos;click&apos;, function() {
-        elem.css(&apos;background-color&apos;, &apos;white&apos;);
-        scope.$apply(function() {
-          scope.color = &quot;white&quot;;
-        });
-      });
-      elem.bind(&apos;mouseover&apos;, function() {
-        elem.css(&apos;cursor&apos;, &apos;pointer&apos;);
-      });
-    }
-  };
-});
-</code></pre><p>link函数中的三个参数：</p>
-<ul>
-<li><p>scope - 在这个例子中，指令的scope就是controller的scope。</p>
-</li>
-<li><p>ele - 指令的jQLite(jQuery的子集)包装DOM元素。如果你在引入AngularJS之前引入了jQuery，那么这个元素就是jQuery元素，而不是jQLite元素。由于这个元素已经被jQuery/jQLite包装了，所以我们就在进行DOM操作的时候就不需要再使用 $()来进行包装。</p>
-</li>
-<li><p>attr - 一个包含了指令所在元素的属性的标准化的参数对象。举个例子，你给一个HTML元素添加了一些属性：，那么可以在 link 函数中通过 attrs.someAttribute 来使用它。</p>
-</li>
-</ul>
-<p>link函数主要用来为DOM元素添加事件监听、监视模型属性变化、以及更新DOM。</p>
-<p>在上面的指令代码片段中，我们添加了两个事件， click，和 mouseover。click 处理函数用来重置的背景色，而 mouseover 处理函数改变鼠标为 pointer。在模板中有一个表达式 {color}，当父scope中的 color 发生变化时，它用来改变 Hello World 文字的背景色。 这个plunker演示了这些概念</p>
-<h5 id="4、compile函数"><a href="#4、compile函数" class="headerlink" title="4、compile函数"></a>4、compile函数</h5><p>compile 函数在 link 函数被执行之前用来做一些DOM改造。它接收下面的参数：</p>
-<ul>
-<li>tElement – 指令所在的元素</li>
-<li>attrs – 元素上赋予的参数的标准化列表</li>
-</ul>
-<p>要注意的是 compile 函数不能访问 scope，并且必须返回一个 link 函数。但是如果没有设置 compile 函数，你可以正常地配置 link 函数，（有了compile，就不能用link，link函数由compile返回）。compile函数可以写成如下的形式：</p>
-<pre><code>app.directive(&apos;test&apos;, function() {
-  return {
-    compile: function(tElem,attrs) {
-      //do optional DOM transformation here
-      return function(scope,elem,attrs) {
-        //linking function here
-      };
-    }
-  };
-});
-</code></pre><p>大多数的情况下，你只需要使用 link 函数。这是因为大部分的指令只需要考虑注册事件监听、监视模型、以及更新DOM等，这些都可以在 link 函数中完成。 但是对于像 ng-repeat 之类的指令，需要克隆和重复 DOM 元素多次，在 link 函数执行之前由 compile 函数来完成。这就带来了一个问题，为什么我们需要两个分开的函数来完成生成过程，为什么不能只使用一个？要回答好这个问题，我们需要理解指令在Angular中是如何被编译的！</p>
-<h5 id="5、指令是如何被编译的"><a href="#5、指令是如何被编译的" class="headerlink" title="5、指令是如何被编译的"></a>5、指令是如何被编译的</h5><p>1、编译阶段 compile</p>
-<ul>
-<li><p>angular应用启动后，$compile服务遍历所有DOM元素。</p>
-</li>
-<li><p>所有指令都被识别后，angular执行他们的compile方法。</p>
-</li>
-<li><p>compile 方法返回一个 link 函数，被添加到稍后执行的 link 函数列表中。</p>
-</li>
-</ul>
-<p>2、链接阶段 linking</p>
-<ul>
-<li><p>所有收集到的link函数都将被一一执行。</p>
-</li>
-<li><p>指令创造出来的模板会在正确的scope下被解析和处理，然后返回具有事件响应的真实的DOM节点。</p>
-</li>
-</ul>
-<h5 id="6、改变指令的Scope"><a href="#6、改变指令的Scope" class="headerlink" title="6、改变指令的Scope"></a>6、改变指令的Scope</h5><p>默认情况下，指令获取它父节点的controller的scope。</p>
-<p>如果将父controller的scope暴露给指令，那么他们可以随意地修改 scope 的属性。</p>
-<p>在某些情况下，你的指令希望能够添加一些仅限内部使用的属性和方法。但是如果我们在父的scope中添加，会污染父scope。</p>
-<p>所以我们可以选择以下两种方式：</p>
-<ul>
-<li><p>一个子scope – 这个scope原型继承子父scope。</p>
-<pre><code>app.directive(&apos;helloWorld&apos;, function() {
-  return {
-    scope: true,  // use a child scope that inherits from parent
-    restrict: &apos;AE&apos;,
-    replace: &apos;true&apos;,
-    template: &apos;&lt;h3&gt;Hello World!!&lt;/h3&gt;&apos;
-  };
-});
-</code></pre></li>
-<li><p>一个隔离的scope – 一个孤立存在不继承自父scope的scope。</p>
-<pre><code>app.directive(&apos;helloWorld&apos;, function() {
-  return {
-    scope: {},  // use a new isolated scope
-    restrict: &apos;AE&apos;,
-    replace: &apos;true&apos;,
-    template: &apos;&lt;h3&gt;Hello World!!&lt;/h3&gt;&apos;
-  };
-});
-</code></pre></li>
-</ul>
-<p>这个指令使用了一个隔离的scope。</p>
-<p>隔离的scope在我们想要创建可重用的指令的时候是非常有好处的。</p>
-<p>通过使用隔离的scope，我们能够保证我们的指令是自包含的，可以被很容易的插入到HTML应用中。</p>
-<p>它内部不能访问父的scope，所保证了父scope不被污染。</p>
-<p>在我们的 helloWorld 指令例子中，如果我们将 scope 设置成 {}，那么上面的代码将不会工作。 它会创建一个新的隔离的scope，那么相应的表达式 { color } 会指向到这个新的scope中，它的值将是 undefined.</p>
-<p>使用隔离的scope并不意味着我们完全不能访问父scope的属性。其实有一些技术可以允许我们访问父scope的属性，甚至监视他们的变化。</p>
-<h4 id="二、隔离scope与父scope通信"><a href="#二、隔离scope与父scope通信" class="headerlink" title="二、隔离scope与父scope通信"></a>二、隔离scope与父scope通信</h4><h5 id="1、隔离scope与父scope之间的数据绑定"><a href="#1、隔离scope与父scope之间的数据绑定" class="headerlink" title="1、隔离scope与父scope之间的数据绑定"></a>1、隔离scope与父scope之间的数据绑定</h5><p>假设我们已经初始化完成app这个变量所指向的Angular模块。那么我们的 helloWorld 指令如下面代码所示：</p>
-<pre><code>app.directive(&apos;helloWorld&apos;, function() {
-  return {
-    scope: {},
-    restrict: &apos;AE&apos;,
-    replace: true,
-    template: &apos;&lt;p style=&quot;background-color:{{color}}&quot;&gt;Hello World&lt;/p&gt;&apos;,
-    link: function(scope, elem, attrs) {
-      elem.bind(&apos;click&apos;, function() {
-        elem.css(&apos;background-color&apos;,&apos;white&apos;);
-        scope.$apply(function() {
-          scope.color = &quot;white&quot;;
-        });
-      });
-      elem.bind(&apos;mouseover&apos;, function() {
-        elem.css(&apos;cursor&apos;, &apos;pointer&apos;);
-      });
-    }
-  };
-});
-</code></pre><p>使用这个指令的HTML标签如下：</p>
-<pre><code>&lt;body ng-controller=&quot;MainCtrl&quot;&gt;
-  &lt;input type=&quot;text&quot; ng-model=&quot;color&quot; placeholder=&quot;Enter a color&quot;/&gt;
-  &lt;hello-world/&gt;
-&lt;/body&gt;
-</code></pre><p>上面的代码现在是不能工作的。因为我们用了一个隔离的scope，指令内部的 {color} 表达式被隔离在指令内部的scope中(不是父scope)。</p>
-<p>但是外面的输入框元素中的 ng-model 指令是指向父scope中的 color 属性的。</p>
-<p>所以，我们需要一种方式来绑定隔离scope和父scope中的这两个参数。</p>
-<p>在Angular中，这种数据绑定可以通过为指令所在的HTML元素添加属性和在指令定义对象中配置相应的 scope 属性来实现。</p>
-<p>让我们来细究一下建立数据绑定的几种方式。</p>
-<h5 id="选择一：使用-实现单向文本绑定"><a href="#选择一：使用-实现单向文本绑定" class="headerlink" title="选择一：使用 @ 实现单向文本绑定"></a>选择一：使用 @ 实现单向文本绑定</h5><p>在下面的指令定义中，我们指定了隔离scope中的属性 color 绑定到指令所在HTML元素上的参数 colorAttr。</p>
-<p>在HTML标记中，你可以看到 {color}表达式被指定给了 color-attr 参数。当表达式的值发生改变时，color-attr 参数也跟着改变。隔离scope中的 color 属性的值也相应地被改变。</p>
-<pre><code>app.directive(&apos;helloWorld&apos;, function() {
-  return {
-    scope: {
-      color: &apos;@colorAttr&apos;
-    },
-    ....
-    // the rest of the configurations
-  };
-});
-</code></pre><p>更新后的HTML标记代码如下：</p>
-<pre><code>&lt;body ng-controller=&quot;MainCtrl&quot;&gt;
-  &lt;input type=&quot;text&quot; ng-model=&quot;color&quot; placeholder=&quot;Enter a color&quot;/&gt;
-  &lt;hello-world color-attr=&quot;{{color}}&quot;/&gt;
-&lt;/body&gt;
-</code></pre><p>我们称这种方式为单项绑定，是因为在这种方式下，你只能将字符串(使用表达式)传递给参数。</p>
-<p>当父scope的属性变化时，你的隔离scope模型中的属性值跟着变化。你甚至可以在指令内部监控这个scope属性的变化，并且触发一些任务。</p>
-<p>然而，反向的传递并不工作。你不能通过对隔离scope属性的操作来改变父scope的值。</p>
-<p>注意点：<br>当隔离scope属性和指令元素参数的名字一样时，你可以以更简单的方式设置scope绑定：</p>
-<pre><code>app.directive(&apos;helloWorld&apos;, function() {
-  return {
-    scope: {
-      color: &apos;@&apos;
-    },
-    ....
-    // the rest of the configurations
-  };
-});
-</code></pre><p>相应使用指令的HTML代码如下：</p>
-<hello-world color="">
-
-<h5 id="选择二：使用-实现双向绑定"><a href="#选择二：使用-实现双向绑定" class="headerlink" title="选择二：使用 = 实现双向绑定"></a>选择二：使用 = 实现双向绑定</h5><p>让我们将指令的定义改变成下面的样子：</p>
-<pre><code>app.directive(&apos;helloWorld&apos;, function() {
-  return {
-    scope: {
-      color: &apos;=&apos;
-    },
-    ....
-    // the rest of the configurations
-  };
-});
-</code></pre><p>相应的HTML修改如下：</p>
-<pre><code>&lt;body ng-controller=&quot;MainCtrl&quot;&gt;
-  &lt;input type=&quot;text&quot; ng-model=&quot;color&quot; placeholder=&quot;Enter a color&quot;/&gt;
-  &lt;hello-world color=&quot;color&quot;/&gt;
-&lt;/body&gt;
-</code></pre><p>与 @ 不同，这种方式让你能够给属性指定一个真实的scope数据模型，而不是简单的字符串。</p>
-<p>这样你就可以传递简单的字符串、数组、甚至复杂的对象给隔离scope。</p>
-<p>同时，还支持双向的绑定。每当父scope属性变化时，相对应的隔离scope中的属性也跟着改变，反之亦然。</p>
-<p>和之前的一样，你也可以监视这个scope属性的变化。</p>
-<h5 id="选择三：使用-amp-在父scope中执行函数"><a href="#选择三：使用-amp-在父scope中执行函数" class="headerlink" title="选择三：使用 &amp; 在父scope中执行函数"></a>选择三：使用 &amp; 在父scope中执行函数</h5><p>有时候从隔离scope中调用父scope中定义的函数是非常有必要的。为了能够访问外部scope中定义的函数，我们使用 &amp;。</p>
-<p>比如我们想要从指令内部调用 changColor() 方法。下面的代码告诉我们该怎么做：</p>
-<pre><code>app.directive(&apos;helloWorld&apos;,function(){
-  return{
-    scope:{
-      color:&apos;=&apos;,
-      changeColor:&apos;&amp;&apos;,
-    },
-    ...
-  }
-});
-</code></pre><p>相应的HTML代码如下：</p>
-<pre><code>&lt;body ng-controller=&quot;MainCtrl&quot;&gt;
-    &lt;input type=&quot;text&quot; ng-model=&quot;color&quot; placeholder=&quot;Enter a color&quot;/&gt;
-    &lt;hello-world color=&quot;color&quot; change-color=&apos;change()&apos;/&gt;
-&lt;/body&gt;
-</code></pre><p>这个 <a href="http://plnkr.co/edit/k4scWKwtGBJw7lfKGqVJ?p=preview" target="_blank" rel="external">Plunker</a> 例子对上面的概念做了很好的诠释。</p>
-<h5 id="2、父scope、子scope以及隔离scope的区别"><a href="#2、父scope、子scope以及隔离scope的区别" class="headerlink" title="2、父scope、子scope以及隔离scope的区别"></a>2、父scope、子scope以及隔离scope的区别</h5><p>下面的这个原则也许可以帮助你为你的指令选择正确的scope。</p>
-<ul>
-<li><p>父scope(scope: false) – 这是默认情况。如果你的指令不操作父scoe的属性，你就不需要一个新的scope。这种情况下是可以使用父scope的。</p>
-</li>
-<li><p>子scope(scope: true) – 这会为指令创建一个新的scope，并且原型继承自父scope。如果你的指令scope中的属性和方法与其他的指令以及父scope都没有关系的时候，你应该创建一个新scope。在这种方式下，你同样拥有父scope中所定义的属性和方法。</p>
-</li>
-<li><p>隔离scope(scope:{}) – 这就像一个沙箱！当你创建的指令是自包含的并且可重用的，你就需要使用这种scope。你在指令中会创建很多scope属性和方法，它们仅在指令内部使用，永远不会被外部的世界所知晓。如果是这样的话，隔离的scope是更好的选择。隔离的scope不会继承父scope。</p>
-</li>
-</ul>
-<h4 id="三、Transclusion（嵌入）"><a href="#三、Transclusion（嵌入）" class="headerlink" title="三、Transclusion（嵌入）"></a>三、Transclusion（嵌入）</h4><p>Transclusion可以让我们的指令包含任意内容的方法。</p>
-<p>如果你在指令定义中设置 transclude:true，一个新的嵌入的scope会被创建，它原型继承自父scope。</p>
-<p>如果你想要你的指令使用隔离的scope，但是它所包含的内容能够在父scope中执行，transclusion也可以帮忙。</p>
-<h5 id="1、demo"><a href="#1、demo" class="headerlink" title="1、demo"></a>1、demo</h5><p>假设我们注册一个如下的指令：</p>
-<pre><code>app.directive(&apos;outputText&apos;, function() {
-  return {
-    transclude: true,
-    scope: {},
-    template: &apos;&lt;div ng-transclude&gt;&lt;/div&gt;&apos;
-  };
-});
-</code></pre><p>它使用如下：</p>
-<pre><code>&lt;div output-text&gt;
-  &lt;p&gt;Hello {{name}}&lt;/p&gt;
-&lt;/div&gt;
-</code></pre><p>在这个例子中DOM内容 </p><p>Hello {name}</p> 被提取和放置到 <div ng-transclude=""></div> 内部。<p></p>
-<p>表达式{name}所对应的属性是在父scope中被定义的，而非子scope。</p>
-<p>你可以在这个 <a href="http://plnkr.co/edit/YQBPB9cvGgJiYMuIjzTw?p=preview" target="_blank" rel="external">Plunker</a> 例子中做一些实验。</p>
-<h5 id="2、transclude-’element’-和-transclude-true的区别"><a href="#2、transclude-’element’-和-transclude-true的区别" class="headerlink" title="2、transclude:’element’ 和 transclude:true的区别"></a>2、transclude:’element’ 和 transclude:true的区别</h5><p>有时候我我们要嵌入指令元素本身，而不仅仅是它的内容。在这种情况下，我们需要使用 transclude:’element’。</p>
-<p>它和 transclude:true 不同，它将标记了 ng-transclude 指令的元素一起包含到了指令模板中。</p>
-<p>使用transclusion，你的link函数会获得一个名叫 transclude 的链接函数，这个函数绑定了正确的指令scope，并且传入了另一个拥有被嵌入DOM元素拷贝的函数。</p>
-<p>你可以在这个 transclude 函数中执行比如修改元素拷贝或者将它添加到DOM上等操作。 类似 ng-repeat 这样的指令使用这种方式来重复DOM元素。</p>
-<p>仔细研究一下这个Plunker，它使用这种方式复制了DOM元素，并且改变了第二个实例的背景色。</p>
-<p>同样需要注意的是，在使用 transclude:’element’的时候，指令所在的元素会被转换成HTML注释。</p>
-<p>所以，如果你结合使用 transclude:’element’ 和 replace:false，那么指令模板本质上是被添加到了注释的innerHTML中——也就是说其实什么都没有发生！</p>
-<p>相反，如果你选择使用 replace:true，指令模板会替换HTML注释，那么一切就会如果所愿的工作。</p>
-<p>使用 replade:false 和 transclue:’element’有时候也是有用的，比如当你需要重复DOM元素但是并不想保留第一个元素实例（它会被转换成注释）的情况下。对这块还有疑惑的同学可以阅读stackoverflow上的这篇讨论，介绍的比较清晰。</p>
-<h4 id="四、controller-函数和-require"><a href="#四、controller-函数和-require" class="headerlink" title="四、controller 函数和 require"></a>四、controller 函数和 require</h4><p>如果想让指令与指令交互，就要用到controller函数。比如有些情况下，你需要通过组合两个指令来实现一个UI组件。那么你可以通过如下的方式来给指令添加一个 controller 函数。</p>
-<pre><code>app.directive(&apos;outerDirective&apos;, function() {
-  return {
-    scope: {},
-    restrict: &apos;AE&apos;,
-    controller: function($scope, $compile, $http) {
-      // $scope is the appropriate scope for the directive
-      this.addChild = function(nestedDirective) { // this refers to the controller
-        console.log(&apos;Got the message from nested directive:&apos; + nestedDirective.message);
-      };
-    }
-  };
-});
-</code></pre><p>这个代码为一个名叫 outerDirective的指令添加了controller。</p>
-<p>当另一个指令 innerDirective 想要与指令outerDirective交互时，innterDirective 需要声明对 outerDirective 的 controller 实例的引用(require)。</p>
-<p>可以通过如下的方式实现：</p>
-<pre><code>app.directive(&apos;innerDirective&apos;, function() {
-  return {
-    scope: {},
-    restrict: &apos;AE&apos;,
-    require: &apos;^outerDirective&apos;,
-    link: function(scope, elem, attrs, controllerInstance) {
-      //the fourth argument is the controller instance you require
-      scope.message = &quot;Hi, Parent directive&quot;;
-      controllerInstance.addChild(scope);
-    }
-  };
-});
-</code></pre><p>相应的HTML代码如下：</p>
-<pre><code>&lt;outer-directive&gt;
-  &lt;inner-directive&gt;&lt;/inner-directive&gt;
-&lt;/outer-directive&gt;
-</code></pre><p>require: ‘^outerDirective’ 告诉Angular在元素以及它的父元素outerDirective中搜索controller。</p>
-<p>这样被找到的 controller 实例会作为第四个参数controllerInstance被传入到 link 函数中。</p>
-<p>在我们的例子中，我们将嵌入的指令的scope发送给父亲指令。</p>
-<p>如果你想尝试这个代码的话，请在开启浏览器控制台的情况下打开这个<a href="http://plnkr.co/edit/NMWGE6l9p1tBZh3jCfKn?p=preview" target="_blank" rel="external">Plunker</a>。</p>
-<p>同时，<a href="https://docs.angularjs.org/guide/directive" target="_blank" rel="external">这篇Angular官方文档</a>上的最后部分给了一个非常好的关于指令交互的例子，是非常值得一读的。</p>
-<h4 id="五、一个记事本的应用"><a href="#五、一个记事本的应用" class="headerlink" title="五、一个记事本的应用"></a>五、一个记事本的应用</h4><p>这一部分，我们使用Angular指令创建一个简单的记事本应用。我们会使用HTML5的 localStorage 来存储笔记。</p>
-<p>我们会创建一个展现记事本的指令。</p>
-<p>用户可以查看他/她创建过的笔记记录。当他点击 add new 按钮的时候，记事本会进入可编辑状态，并且允许创建新的笔记。当点击 back 按钮的时候，新的笔记会被自动保存。笔记的保存使用了一个名叫 noteFactory 的工厂类，它使用了 localStorage。</p>
-<p>你可以从<a href="https://github.com/jsprodotcom/source/blob/master/AngularJS_Note_Taker-source_code.zip" target="_blank" rel="external">GitHub</a>上下到这个Demo的源代码。</p>
-<h4 id="六、总结"><a href="#六、总结" class="headerlink" title="六、总结"></a>六、总结</h4><p>一个很重要的点需要注意的是，任何使用jQuery能做的事情，我们都能用Angular指令来做到，并且使用更少的代码。</p>
-<p>所以，在使用jQuery之前，请考虑一下我们能否在不进行DOM操作的情况下以更好的方式来完成任务。试着使用Angular来最小化jQuery的使用吧。</p>
-</hello-world>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/angularjs/angular-directive/" data-id="cjh4911fr0002mtp3wf4tadkl" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-angularjs/angular-errors" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/09/14/angularjs/angular-errors/" class="article-date">
-  <time datetime="2017-09-14T01:23:54.000Z" itemprop="datePublished">2017-09-14</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/angularjs/">angularjs</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/09/14/angularjs/angular-errors/">angular应用中常见问题记录</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h5 id="1、问题：Template-for-directive-‘rabbitFooter’-must-have-exactly-one-root-element"><a href="#1、问题：Template-for-directive-‘rabbitFooter’-must-have-exactly-one-root-element" class="headerlink" title="1、问题：Template for directive ‘rabbitFooter’ must have exactly one root element"></a>1、问题：Template for directive ‘rabbitFooter’ must have exactly one root element</h5><p>控制台报错：angular.js?bust=1463908350577:13550 Error: [$compile:tplrt] Template for directive ‘rabbitFooter’ must have exactly one root element. ../../../template/tplIndex/rabbitFooter.html</p>
-<p>指令rabbitFooter对应的模板：</p>
-<pre><code>&lt;!--s footer--&gt;
-&lt;div class=&quot;footerbox&quot;&gt;
-    &lt;div class=&quot;footercon&quot;&gt;
-        ...
-    &lt;/div&gt;
-    &lt;div class=&quot;copybox&quot;&gt;
-        ...
-    &lt;/div&gt;
-    &lt;!--
-    &lt;div class=&quot;authpics&quot;&gt;
-        ...
-    &lt;/div&gt;--&gt;
-&lt;/div&gt;
-&lt;!--e footer--&gt;
-</code></pre><p>解决方案：保证模板的所有代码要有一个最外层的DIV，最外层注释也不要有。</p>
-<pre><code>&lt;div class=&quot;footerbox&quot;&gt;
-    &lt;div class=&quot;footercon&quot;&gt;
-        ...
-    &lt;/div&gt;
-    &lt;div class=&quot;copybox&quot;&gt;
-        ...
-    &lt;/div&gt;
-    &lt;!--
-    &lt;div class=&quot;authpics&quot;&gt;
-        ...
-    &lt;/div&gt;
-    --&gt;
-&lt;/div&gt;
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/angularjs/angular-errors/" data-id="cjh4911g10005mtp393e3jqj0" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
 
 
   <nav id="page-nav">
-    <a class="extend prev" rel="prev" href="/page/5/">&laquo; __('prev')</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/7/">__('next') &raquo;</a>
+    <a class="extend prev" rel="prev" href="/page/5/">&laquo; __('prev')</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/7/">__('next') &raquo;</a>
   </nav>
 </section>
         
@@ -3121,7 +3688,7 @@ app.directive(&apos;rabbitHeader&apos;, function() {
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/mybatis/">mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/mybatis/">mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/springmvc/">springmvc</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
     </div>
   </div>
 
@@ -3131,7 +3698,7 @@ app.directive(&apos;rabbitHeader&apos;, function() {
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springmvc/">springmvc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
     </div>
   </div>
 
@@ -3141,7 +3708,7 @@ app.directive(&apos;rabbitHeader&apos;, function() {
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/mybatis/" style="font-size: 17.14px;">mybatis</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/mybatis/" style="font-size: 17.14px;">mybatis</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/springmvc/" style="font-size: 14.29px;">springmvc</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
     </div>
   </div>
 
@@ -3163,23 +3730,23 @@ app.directive(&apos;rabbitHeader&apos;, function() {
       <ul>
         
           <li>
+            <a href="/2018/05/24/java/springmvc/springmvc-4/">第四章 springmvc核心技术</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/23/java/springmvc/springmvc-3/">第三章 springmvc注解式开发</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/22/java/springmvc/springmvc-2/">第二章 springmvc配置式开发</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/22/java/springmvc/springmvc-1/">第一章 springmvc概述</a>
+          </li>
+        
+          <li>
             <a href="/2018/05/13/java/mybatis/mybatis-7/">第七章 MyBatis - 查询缓存</a>
-          </li>
-        
-          <li>
-            <a href="/2018/05/12/java/mybatis/mybatis-6/">第六章 MyBatis - 延迟加载</a>
-          </li>
-        
-          <li>
-            <a href="/2018/05/12/java/mybatis/mybatis-5/">第五章 MyBatis关联关系查询 - 多对多</a>
-          </li>
-        
-          <li>
-            <a href="/2018/05/12/java/mybatis/mybatis-4/">第四章 MyBatis关联关系查询 - 自关联</a>
-          </li>
-        
-          <li>
-            <a href="/2018/05/12/java/mybatis/mybatis-3/">第三章 MyBatis关联关系查询 - 多对一</a>
           </li>
         
       </ul>

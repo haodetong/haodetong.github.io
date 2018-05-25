@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>第二章 springmvc配置式开发 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="2.1 处理器映射器 HandlerMappingHandlerMapping接口负责根据request请求找到相应的Handler处理器及Interceptor拦截器，并将它们封装在HandlerExecutionCahin对象中，返回给中央调度器。 其常用的两种实现类：  BeanNameUrlHandlerMapping  SimpleUrlHandlerMapping   (1)、Bean">
+<meta name="keywords" content="springmvc">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第二章 springmvc配置式开发">
+<meta property="og:url" content="http://yoursite.com/2018/05/22/java/springmvc/springmvc-2/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="2.1 处理器映射器 HandlerMappingHandlerMapping接口负责根据request请求找到相应的Handler处理器及Interceptor拦截器，并将它们封装在HandlerExecutionCahin对象中，返回给中央调度器。 其常用的两种实现类：  BeanNameUrlHandlerMapping  SimpleUrlHandlerMapping   (1)、Bean">
+<meta property="og:updated_time" content="2018-05-23T07:37:54.646Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="第二章 springmvc配置式开发">
+<meta name="twitter:description" content="2.1 处理器映射器 HandlerMappingHandlerMapping接口负责根据request请求找到相应的Handler处理器及Interceptor拦截器，并将它们封装在HandlerExecutionCahin对象中，返回给中央调度器。 其常用的两种实现类：  BeanNameUrlHandlerMapping  SimpleUrlHandlerMapping   (1)、Bean">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-java/springmvc/springmvc-2" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/22/java/springmvc/springmvc-2/" class="article-date">
+  <time datetime="2018-05-22T08:49:31.000Z" itemprop="datePublished">2018-05-22</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/springmvc/">springmvc</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      第二章 springmvc配置式开发
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="2-1-处理器映射器-HandlerMapping"><a href="#2-1-处理器映射器-HandlerMapping" class="headerlink" title="2.1 处理器映射器 HandlerMapping"></a>2.1 处理器映射器 HandlerMapping</h4><p>HandlerMapping接口负责根据request请求找到相应的Handler处理器及Interceptor拦截器，并将它们封装在HandlerExecutionCahin对象中，返回给中央调度器。</p>
+<p>其常用的两种实现类：</p>
+<ul>
+<li><p>BeanNameUrlHandlerMapping</p>
+</li>
+<li><p>SimpleUrlHandlerMapping</p>
+</li>
+</ul>
+<h5 id="1-、BeanNameUrlHandlerMapping"><a href="#1-、BeanNameUrlHandlerMapping" class="headerlink" title="(1)、BeanNameUrlHandlerMapping"></a>(1)、BeanNameUrlHandlerMapping</h5><p>BeanNameUrlHandlerMapping处理器映射器，会根据请求的url与spring容器中定义的处理器的bean的name值进行匹配，从而在spring容器中找到处理器bean的实例。</p>
+<pre><code>&lt;bean id=&quot;/my.do&quot; class=&quot;com.bjpowernode.handlers.MyController&quot;&gt;&lt;/bean&gt;
+</code></pre><h5 id="2-、SimpleUrlHandlerMapping"><a href="#2-、SimpleUrlHandlerMapping" class="headerlink" title="(2)、SimpleUrlHandlerMapping"></a>(2)、SimpleUrlHandlerMapping</h5><p>SimpleUrlHandlerMapping处理器映射器，不仅可以将url与处理器分离，还可以对url进行统一映射管理。</p>
+<p>SimpleUrlHandlerMapping处理器映射器，会根据请求的url与spring容器中定义的处理器映射器子标签的key属性进行匹配。匹配上后，再将该key的value值与处理器的bean的id值进行匹配，从而在spring容器中找到处理器bean。</p>
+<pre><code>&lt;!-- 注册处理器 --&gt;
+&lt;bean id=&quot;myController&quot; class=&quot;com.bjpowernode.handlers.MyController&quot;&gt;&lt;/bean&gt;
+&lt;!-- 注册处理器映射器: SimpleUrlHandlerMapping--&gt;
+&lt;bean class=&quot;org.springframework.web.servlet.handler.SimpleUrlHandlerMapping&quot;&gt;
+    &lt;!-- 
+    &lt;property name=&quot;mappings&quot;&gt;
+        &lt;props&gt;
+            &lt;prop key=&quot;/hello.do&quot;&gt;myController&lt;/prop&gt;
+            &lt;prop key=&quot;/world.do&quot;&gt;myController&lt;/prop&gt;
+        &lt;/props&gt;
+    &lt;/property&gt;
+     --&gt;
+     &lt;property name=&quot;urlMap&quot;&gt;
+         &lt;map&gt;
+             &lt;entry key=&quot;/hello.do&quot; value=&quot;myController&quot;&gt;&lt;/entry&gt;
+             &lt;entry key=&quot;/world.do&quot; value=&quot;myController&quot;&gt;&lt;/entry&gt;
+         &lt;/map&gt;
+     &lt;/property&gt;
+&lt;/bean&gt;
+</code></pre><h4 id="2-2-处理器适配器-HandlerAdapter"><a href="#2-2-处理器适配器-HandlerAdapter" class="headerlink" title="2.2 处理器适配器 HandlerAdapter"></a>2.2 处理器适配器 HandlerAdapter</h4><p>前面所写的代码中，之所以要将Handler定义为Controller接口的实现类，就是因为这里使用的处理器适配器是SimpleControllerAdapter。打开其源码，可以看到将handler强转为了Controller。在定义Handler时，若不将其定义为Controller接口的实现类，这里的强转会出错。</p>
+<p>当然，中央调度器首先会调用该适配器的supports()方法，判断该Handler是否与Controller具有is-a的关系。在具有is-a的关系的前提下，才会强转。</p>
+<p>常用的两种处理器适配器：</p>
+<p>（1）、SimpleControllerHandlerAdapter</p>
+<p>代码：</p>
+<pre><code>public class MyController implements Controller {
+
+        @Override
+        public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+            ModelAndView mv = new ModelAndView();
+            //其底层执行的是request.setAttribute()方法
+            mv.addObject(&quot;message&quot;, &quot;hello world&quot;);
+            mv.setViewName(&quot;welcome&quot;);
+            return mv;
+        }
+
+    }
+</code></pre><p>（2）、HttpRequstHandlerAdapter</p>
+<p>代码:</p>
+<pre><code>public class MyController implements HttpRequestHandler{
+
+    @Override
+    public void handleRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.setAttribute(&quot;message&quot;, &quot;hello sprngmvcworld&quot;);
+        request.getRequestDispatcher(&quot;/WEB-INF/jsp/welcome.jsp&quot;).forward(request, response);
+    }
+
+}
+</code></pre><h4 id="2-3-处理器"><a href="#2-3-处理器" class="headerlink" title="2.3 处理器"></a>2.3 处理器</h4><p>处理器除了实现Controller接口外，还可以继承自一些其它的类来完成一些特殊的功能。</p>
+<p>（1）、继承自AbstractController类</p>
+<p>若处理器继承自AbstractController类，那么该控制器就具有了一些新的功能。因为AbstractController类还继承自一个父类WebContentGenerator。</p>
+<p>WebContentGenerator类具有supportedMethods属性，可以设置支持的Http数据提交方式。默认支持GET,POST。</p>
+<pre><code>public class MyController extends AbstractController{
+
+    @Override
+    protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+        ModelAndView mv = new ModelAndView();
+        //其底层执行的是request.setAttribute()方法
+        mv.addObject(&quot;message&quot;, &quot;hello world&quot;);
+        mv.setViewName(&quot;welcome&quot;);
+        return mv;
+    }
+
+}
+</code></pre><p>springmvc.xml</p>
+<pre><code>&lt;bean id=&quot;/my.do&quot; class=&quot;com.bjpowernode.handlers.MyController&quot;&gt;
+    &lt;property name=&quot;supportedMethods&quot; value=&quot;POST&quot;&gt;&lt;/property&gt;
+&lt;/bean&gt;
+</code></pre><p>（2）、继承自MultiActionController类</p>
+<p>springmvc.xml</p>
+<pre><code>&lt;!-- 注册处理器 --&gt;
+&lt;bean id=&quot;myController&quot; class=&quot;com.bjpowernode.handlers.MyController&quot;&gt;&lt;/bean&gt;
+&lt;!-- 注册处理器映射器: SimpleUrlHandlerMapping--&gt;
+&lt;bean class=&quot;org.springframework.web.servlet.handler.SimpleUrlHandlerMapping&quot;&gt;
+     &lt;property name=&quot;urlMap&quot;&gt;
+         &lt;map&gt;
+             &lt;!-- 
+                MultiActionController类具有一个属性：方法名解析器methodNameResolver，
+                其具有默认值InternalPathMethodNameResolver，
+                该解析器将控制器中的方法名作为url中的资源名称进行解析，
+                那了就意味着，我们提交请求时，要将方法名作为资源名称出现。
+             --&gt;
+             &lt;entry key=&quot;/my/*.do&quot; value=&quot;myController&quot;&gt;&lt;/entry&gt;
+         &lt;/map&gt;
+     &lt;/property&gt;
+&lt;/bean&gt;
+</code></pre><p>控制器</p>
+<pre><code>public class MyController extends MultiActionController{
+
+    public ModelAndView doFirst(HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+        ModelAndView mv = new ModelAndView();
+        mv.addObject(&quot;message&quot;, &quot;execute dofisrt method&quot;);
+        mv.setViewName(&quot;/WEB-INF/jsp/welcome.jsp&quot;);
+        return mv;
+    }
+
+    public ModelAndView doSecond(HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+        ModelAndView mv = new ModelAndView();
+        mv.addObject(&quot;message&quot;, &quot;execute dosecond method&quot;);
+        mv.setViewName(&quot;/WEB-INF/jsp/welcome.jsp&quot;);
+        return mv;
+    }
+
+}
+</code></pre><p>访问路径    </p>
+<pre><code>http://localhost:8080/03-MultiActionController-test/my/doFirst.do
+
+http://localhost:8080/03-MultiActionController-test/my/doSecond.do
+</code></pre><p>方法名解析器methodNameResolver，除了具有默认值InternalPathMethodNameResolver方法名解析器以外，还具有另外两个方法名解析器：PropertiesMethodNmaeResolver，ParameterMethodNameResolver。</p>
+<h4 id="2-4-视图解析器"><a href="#2-4-视图解析器" class="headerlink" title="2.4 视图解析器"></a>2.4 视图解析器</h4><p>ModelAndView 即模式与视图，通过addObject()方法向模型中添加数据，通过setViewName()方法向模型添加视图名称。</p>
+<p>跟踪addObject()方法，可以知道这里的模型就是ModelMap，而ModelMap的本质就是个HashMap，向模型中添加数据，就是向ModelMap中添加数据。</p>
+<h5 id="（1）、内部资源视图解析器InternalResourceViewResolver"><a href="#（1）、内部资源视图解析器InternalResourceViewResolver" class="headerlink" title="（1）、内部资源视图解析器InternalResourceViewResolver"></a>（1）、内部资源视图解析器InternalResourceViewResolver</h5><p>该视图解析器用于完成当前应用内部资源的封装与跳转。</p>
+<pre><code>&lt;bean class=&quot;org.springframework.web.servlet.view.InternalResourceViewResolver&quot;&gt;
+    &lt;property name=&quot;prefix&quot; value=&quot;/WEB-INF/jsp/&quot;&gt;&lt;/property&gt;
+    &lt;property name=&quot;suffix&quot; value=&quot;.jsp&quot;&gt;&lt;/property&gt;
+&lt;/bean&gt;
+</code></pre><h5 id="（2）、BeanNameViewResolver视图解析器"><a href="#（2）、BeanNameViewResolver视图解析器" class="headerlink" title="（2）、BeanNameViewResolver视图解析器"></a>（2）、BeanNameViewResolver视图解析器</h5><p>该视图解析器用于将资源封装为spring容器中注册的bean实例。</p>
+<ul>
+<li><p>RedirectView：定义外部资源视图对象</p>
+</li>
+<li><p>JstlView：定义内部资源视图对象</p>
+</li>
+</ul>
+<p>springmvc.xml</p>
+<pre><code>&lt;!-- 注册视图解析器 --&gt;
+&lt;bean class=&quot;org.springframework.web.servlet.view.BeanNameViewResolver&quot;&gt;&lt;/bean&gt;
+
+&lt;!-- 注册内部和外部视图bean --&gt;
+&lt;bean id=&quot;internalResource&quot; class=&quot;org.springframework.web.servlet.view.JstlView&quot;&gt;
+    &lt;property name=&quot;url&quot; value=&quot;WEB-INF/jsp/welcome.jsp&quot;&gt;&lt;/property&gt;
+&lt;/bean&gt;
+&lt;bean id=&quot;taobao&quot; class=&quot;org.springframework.web.servlet.view.RedirectView&quot;&gt;
+    &lt;property name=&quot;url&quot; value=&quot;http://www.taobao.com&quot;&gt;&lt;/property&gt;
+&lt;/bean&gt;
+</code></pre><p>控制器</p>
+<pre><code>public class MyController implements Controller {
+
+    @Override
+    public ModelAndView handleRequest(HttpServletRequest arg0, HttpServletResponse arg1) throws Exception {
+        return new ModelAndView(&quot;taobao&quot;);
+    }
+
+}
+</code></pre><h5 id="（3）、XmlViewResolver视图解析器"><a href="#（3）、XmlViewResolver视图解析器" class="headerlink" title="（3）、XmlViewResolver视图解析器"></a>（3）、XmlViewResolver视图解析器</h5><p>专门用来定义视图bean的配置文件myViews.xml</p>
+<pre><code>&lt;bean id=&quot;internalResource&quot; class=&quot;org.springframework.web.servlet.view.JstlView&quot;&gt;
+    &lt;property name=&quot;url&quot; value=&quot;WEB-INF/jsp/welcome.jsp&quot;&gt;&lt;/property&gt;
+&lt;/bean&gt;
+&lt;bean id=&quot;taobao&quot; class=&quot;org.springframework.web.servlet.view.RedirectView&quot;&gt;
+    &lt;property name=&quot;url&quot; value=&quot;http://www.taobao.com&quot;&gt;&lt;/property&gt;
+&lt;/bean&gt;
+</code></pre><p>springmvc.xml</p>
+<pre><code>&lt;!-- 注册XmlViewResolver视图解析器 --&gt;
+&lt;bean class=&quot;org.springframework.web.servlet.view.XmlViewResolver&quot;&gt;
+    &lt;property name=&quot;location&quot; value=&quot;classpath:myViews.xml&quot;&gt;&lt;/property&gt;
+&lt;/bean&gt;
+</code></pre><h5 id="（4）、ResourceBundleViewResolver视图解析器"><a href="#（4）、ResourceBundleViewResolver视图解析器" class="headerlink" title="（4）、ResourceBundleViewResolver视图解析器"></a>（4）、ResourceBundleViewResolver视图解析器</h5><p>myVews.properties</p>
+<pre><code>taobao.(class)=org.springframework.web.servlet.view.RedirectView
+taobao.url=http://www.taobao.com
+
+internalResource.(class)=org.springframework.web.servlet.view.JstlView
+internalResource.url=/WEB-INF/jsp/welcome.jsp
+</code></pre><p>springmvc.xml</p>
+<pre><code>&lt;!-- 注册处理器 --&gt;
+&lt;bean id=&quot;/my.do&quot; class=&quot;com.bjpowernode.handlers.MyController&quot;&gt;&lt;/bean&gt;
+
+&lt;!-- 注册视图解析器 --&gt;
+&lt;bean class=&quot;org.springframework.web.servlet.view.ResourceBundleViewResolver&quot;&gt;
+    &lt;property name=&quot;basename&quot; value=&quot;myViews&quot;&gt;&lt;/property&gt;
+&lt;/bean&gt;
+</code></pre><p>注：视图解析器的优先级</p>
+<p>有时经常需要应用一些视图解析器策略来解析视图名称，即当同时存在多个视图解析器均可解析ModelAndView中的同一视图名称时，哪个视图解析器会起作用呢？</p>
+<p>视图解析器有一个order属性，专门用于设置多个视图解析器的优先级。数字越小，优先级越高。一般不会InternalResourceViewResolver解析器指定优先级，即让其优先级最低。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/05/22/java/springmvc/springmvc-2/" data-id="cjhlqourv006j47fys1v7uqoc" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/springmvc/">springmvc</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/05/23/java/springmvc/springmvc-3/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          第三章 springmvc注解式开发
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/05/22/java/springmvc/springmvc-1/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">第一章 springmvc概述</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/mybatis/">mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/springmvc/">springmvc</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springmvc/">springmvc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/mybatis/" style="font-size: 17.14px;">mybatis</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/springmvc/" style="font-size: 14.29px;">springmvc</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/05/24/java/springmvc/springmvc-4/">第四章 springmvc核心技术</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/23/java/springmvc/springmvc-3/">第三章 springmvc注解式开发</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/22/java/springmvc/springmvc-2/">第二章 springmvc配置式开发</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/22/java/springmvc/springmvc-1/">第一章 springmvc概述</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/13/java/mybatis/mybatis-7/">第七章 MyBatis - 查询缓存</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

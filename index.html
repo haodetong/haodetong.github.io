@@ -61,6 +61,1382 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-java/springmvc/springmvc-4" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/24/java/springmvc/springmvc-4/" class="article-date">
+  <time datetime="2018-05-24T07:59:14.000Z" itemprop="datePublished">2018-05-24</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/springmvc/">springmvc</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/05/24/java/springmvc/springmvc-4/">第四章 springmvc核心技术</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="4-1-请求转发与重定向"><a href="#4-1-请求转发与重定向" class="headerlink" title="4.1 请求转发与重定向"></a>4.1 请求转发与重定向</h4><p>当处理器对请求处理完毕后，向其它资源进行跳转时，有两种跳转方式：请求转发与重定向。而根据所要跳转的资源类型，又可分为两类：跳转到其它页面与跳转到其它处理器。</p>
+<p>注意，对于请求转发的页面，可以是WEB-INF中的页面；而重定向的页面，不能是WEB-INF中的页面。因为重定向相当于用户再次发出一次请求，而用户是不能直接访问WEB-INF中的资源的。</p>
+<h5 id="4-1-1-返回ModelAndView时的请求转发"><a href="#4-1-1-返回ModelAndView时的请求转发" class="headerlink" title="4.1.1 返回ModelAndView时的请求转发"></a>4.1.1 返回ModelAndView时的请求转发</h5><p>（1）、请求转发到页面</p>
+<p>（2）、请求转发到Controller</p>
+<h5 id="4-1-2-返回ModelAndView时的重定向"><a href="#4-1-2-返回ModelAndView时的重定向" class="headerlink" title="4.1.2 返回ModelAndView时的重定向"></a>4.1.2 返回ModelAndView时的重定向</h5><p>（1）、重定向到页面</p>
+<p>A、通过ModelAndView的Model携带参数</p>
+<p>index.jsp</p>
+<pre><code>&lt;form action=&quot;${pageContext.request.contextPath }/test/register.do&quot; method=&quot;POST&quot;&gt;
+    姓名：&lt;input type=&quot;text&quot; name=&quot;name&quot; /&gt;&lt;br /&gt;
+    年龄：&lt;input type=&quot;text&quot; name=&quot;age&quot; /&gt;&lt;br /&gt;
+    &lt;input type=&quot;submit&quot; value=&quot;注册&quot; /&gt;
+&lt;/form&gt;
+</code></pre><p>处理器</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+
+    @RequestMapping(&quot;/register.do&quot;)
+    public ModelAndView doSecond(String name, int age) {
+        ModelAndView mv = new ModelAndView();
+        mv.addObject(&quot;name&quot;, name);
+        mv.addObject(&quot;age&quot;, age);
+        mv.setViewName(&quot;redirect:/welcome.jsp&quot;);
+        return mv;
+    }
+}
+</code></pre><p>跳转到welcome.jsp页面获取接收参数</p>
+<pre><code>&lt;!-- 
+param.name底层执行的是request.getParameter(&quot;name&quot;) 
+requestScope.name底层执行的是request.getAttribute(&quot;name&quot;)
+--&gt;
+name = ${param.name}
+&lt;br/&gt;
+age = ${param.age}
+</code></pre><p>B、通过HttpSession携带参数</p>
+<p>（2）、重定向到Controller</p>
+<p>A、通过ModelAndView的Model携带参数</p>
+<p>B、通过HttpSession携带参数</p>
+<h5 id="4-1-3-返回String时的请求转发"><a href="#4-1-3-返回String时的请求转发" class="headerlink" title="4.1.3 返回String时的请求转发"></a>4.1.3 返回String时的请求转发</h5><p>（1）、请求转发到页面</p>
+<p>（2）、请求转发到Controller</p>
+<h5 id="4-1-4-返回String时的重定向"><a href="#4-1-4-返回String时的重定向" class="headerlink" title="4.1.4 返回String时的重定向"></a>4.1.4 返回String时的重定向</h5><p>（1）、重定向到页面</p>
+<p>（2）、重定向到Controller</p>
+<p>index.jsp</p>
+<pre><code>&lt;form action=&quot;${pageContext.request.contextPath }/test/register.do&quot; method=&quot;POST&quot;&gt;
+    姓名：&lt;input type=&quot;text&quot; name=&quot;name&quot; /&gt;&lt;br /&gt;
+    年龄：&lt;input type=&quot;text&quot; name=&quot;age&quot; /&gt;&lt;br /&gt;
+    &lt;input type=&quot;submit&quot; value=&quot;注册&quot; /&gt;
+&lt;/form&gt;
+</code></pre><p>处理器    </p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+
+    @RequestMapping(&quot;/register.do&quot;)
+    public String doRegister(String name, int age, Model model) {
+        model.addAttribute(&quot;name&quot;,name);
+        model.addAttribute(&quot;age&quot;,age);
+
+        return &quot;redirect:other.do&quot;;
+    }
+
+    @RequestMapping(&quot;/other.do&quot;)
+    public String doOther(String name,int age) {
+        System.out.println(&quot;name = &quot; + name);
+        System.out.println(&quot;age = &quot; + age);
+        return &quot;/welcome.jsp&quot;;
+    }
+}
+</code></pre><p>跳转到welcome.jsp页面获取接收参数</p>
+<pre><code>&lt;!-- 
+param.name底层执行的是request.getParameter(&quot;name&quot;) 
+requestScope.name底层执行的是request.getAttribute(&quot;name&quot;)
+--&gt;
+name = ${param.name}
+&lt;br/&gt;
+age = ${param.age}
+</code></pre><h5 id="4-1-5-返回void时的请求转发"><a href="#4-1-5-返回void时的请求转发" class="headerlink" title="4.1.5 返回void时的请求转发"></a>4.1.5 返回void时的请求转发</h5><p>（1）、请求转发到页面</p>
+<p>（2）、请求转发到Controller</p>
+<h5 id="4-1-6-返回void时的重定向"><a href="#4-1-6-返回void时的重定向" class="headerlink" title="4.1.6 返回void时的重定向"></a>4.1.6 返回void时的重定向</h5><p>（1）、重定向到页面</p>
+<p>（2）、重定向到Controller</p>
+<h4 id="4-2-异常处理"><a href="#4-2-异常处理" class="headerlink" title="4.2 异常处理"></a>4.2 异常处理</h4><p> 常用的springmvc异常处理方式主要有三种：</p>
+<ul>
+<li><p>使用系统定义好的异常处理器SimpleMappingExceptionResolver</p>
+</li>
+<li><p>使用自定义异常处理器</p>
+</li>
+<li><p>使用异常处理注解</p>
+</li>
+</ul>
+<h5 id="4-2-1-SimpleMappingExceptionResolver异常处理器"><a href="#4-2-1-SimpleMappingExceptionResolver异常处理器" class="headerlink" title="4.2.1 SimpleMappingExceptionResolver异常处理器"></a>4.2.1 SimpleMappingExceptionResolver异常处理器</h5><p>springmvc.xml</p>
+<pre><code>&lt;context:component-scan base-package=&quot;com.bjpowernode.handlers&quot;&gt;&lt;/context:component-scan&gt;
+
+&lt;bean class=&quot;org.springframework.web.servlet.handler.SimpleMappingExceptionResolver&quot;&gt;
+    &lt;property name=&quot;defaultErrorView&quot; value=&quot;/errors/error.jsp&quot;&gt;&lt;/property&gt;
+    &lt;property name=&quot;exceptionAttribute&quot; value=&quot;ex&quot;&gt;&lt;/property&gt;
+    &lt;property name=&quot;exceptionMappings&quot;&gt;
+        &lt;props&gt;
+            &lt;prop key=&quot;com.bjpowernode.exceptions.NameException&quot;&gt;/errors/nameError.jsp&lt;/prop&gt;
+            &lt;prop key=&quot;com.bjpowernode.exceptions.AgeException&quot;&gt;/errors/ageError.jsp&lt;/prop&gt;
+        &lt;/props&gt;
+    &lt;/property&gt;
+&lt;/bean&gt;
+</code></pre><p>StudentException.class</p>
+<pre><code>public class StudentException extends Exception {
+
+    public StudentException() {
+        super();
+    }
+
+    public StudentException(String message) {
+        super(message);
+    }
+
+}
+</code></pre><p>NameException.class</p>
+<pre><code>public class NameException extends StudentException {
+
+    public NameException() {
+        super();
+    }
+
+    public NameException(String message) {
+        super(message);
+    }
+
+}
+</code></pre><p>AgeException.class</p>
+<pre><code>public class AgeException extends StudentException {
+
+    public AgeException() {
+        super();
+    }
+
+    public AgeException(String message) {
+        super(message);
+    }
+
+}
+</code></pre><p>处理器</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+
+    @RequestMapping(&quot;/register.do&quot;)
+    public ModelAndView doRegister(String name, int age) {
+
+        int i = 3/0;
+
+        ModelAndView mv = new ModelAndView();
+        mv.addObject(&quot;name&quot;, name);
+        mv.addObject(&quot;age&quot;, age);
+        mv.setViewName(&quot;welcom.jsp&quot;);
+        return mv;
+    }
+
+}
+</code></pre><p>error.jsp</p>
+<pre><code>&lt;body&gt;
+    error page.&lt;br /&gt;
+    ${ex.message}
+&lt;/body&gt;
+</code></pre><p>nameError.jsp</p>
+<pre><code>name error page.
+&lt;br&gt;
+${ex.message}
+</code></pre><p>ageError.jsp</p>
+<pre><code>age error page.
+&lt;br&gt;
+${ex.message}
+</code></pre><h5 id="4-2-2-自定义异常处理器"><a href="#4-2-2-自定义异常处理器" class="headerlink" title="4.2.2 自定义异常处理器"></a>4.2.2 自定义异常处理器</h5><p>使用springmvc定义好的SimpleMappingExceptionResolver异常处理器，可以实现生指定异常后的跳转。但若要想实现在捕捉到异常时，进行一些操作，它是完成不了的。此时，就需要使用自定义异常。</p>
+<p>自定义异常处理器，需要实现HandlerExceptionResolver接口，并且该类需要在springmvc配置文件中进行注册。</p>
+<p>自定义异常处理器</p>
+<pre><code>public class MyHandlerExceptionResolver implements HandlerExceptionResolver {
+
+    @Override
+    public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler,
+            Exception ex) {
+        ModelAndView mv = new ModelAndView();
+        mv.addObject(&quot;ex&quot;, ex);
+
+        mv.setViewName(&quot;/errors/error.jsp&quot;);
+
+        if(ex instanceof NameException) {
+            mv.setViewName(&quot;/errors/nameError.jsp&quot;);
+        }
+
+        if(ex instanceof AgeException) {
+            mv.setViewName(&quot;/errors/ageError.jsp&quot;);
+        }
+
+        return mv;
+    }
+
+}
+</code></pre><p>springmvc.xml 注册</p>
+<pre><code>&lt;!-- 注册自定义异常处理器 --&gt;
+&lt;bean class=&quot;com.bjpowernode.resolvers.MyHandlerExceptionResolver&quot;&gt;&lt;/bean&gt;
+</code></pre><h5 id="4-2-3-异常处理器注解-ExceptionHandler"><a href="#4-2-3-异常处理器注解-ExceptionHandler" class="headerlink" title="4.2.3 异常处理器注解@ExceptionHandler"></a>4.2.3 异常处理器注解@ExceptionHandler</h5><p>定义异常处理器</p>
+<pre><code>@org.springframework.stereotype.Controller
+public class BaseController {
+
+    @ExceptionHandler(NameException.class)
+    public ModelAndView handlerNameException(Exception ex) {
+        ModelAndView mv = new ModelAndView();
+        mv.addObject(&quot;ex&quot;, ex);
+        mv.setViewName(&quot;/errors/nameError.jsp&quot;);
+        return mv;
+    }
+
+    @ExceptionHandler(AgeException.class)
+    public ModelAndView handlerAgeException(Exception ex) {
+        ModelAndView mv = new ModelAndView();
+        mv.addObject(&quot;ex&quot;, ex);
+        mv.setViewName(&quot;/errors/ageError.jsp&quot;);
+        return mv;
+    }
+
+    @ExceptionHandler
+    public ModelAndView handlerException(Exception ex) {
+        ModelAndView mv = new ModelAndView();
+        mv.addObject(&quot;ex&quot;, ex);
+        mv.setViewName(&quot;/errors/error.jsp&quot;);
+        return mv;
+    }
+
+}
+</code></pre><p>处理器继承异常处理器</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController extends BaseController {
+
+    @RequestMapping(&quot;/register.do&quot;)
+    public ModelAndView doRegister(String name, int age) throws StudentException {
+
+        if(!&quot;beijing&quot;.equals(name)) {
+            throw new NameException(&quot;用户名不正确&quot;);
+        }
+
+        if(age &gt; 60) {
+            throw new AgeException(&quot;年龄太大了&quot;);
+        }
+
+        ModelAndView mv = new ModelAndView();
+        mv.addObject(&quot;name&quot;, name);
+        mv.addObject(&quot;age&quot;, age);
+        mv.setViewName(&quot;/welcome.jsp&quot;);
+        return mv;
+    }
+
+}
+</code></pre><h4 id="4-3-类型转换器和初始化参数绑定"><a href="#4-3-类型转换器和初始化参数绑定" class="headerlink" title="4.3 类型转换器和初始化参数绑定"></a>4.3 类型转换器和初始化参数绑定</h4><p>可以解决提交的参数类型转换问题</p>
+<h4 id="4-4-数据验证"><a href="#4-4-数据验证" class="headerlink" title="4.4 数据验证"></a>4.4 数据验证</h4><p>springmvc支持JSR（Java Specification Requests）303-bean validation数据验证规范。而该规范的实现者很多，其中较常用的是Hibernate Valicator。</p>
+<p>需要注意的是，Hebernate Valicator是与Hibernate ORM并列的Hibernate的产品之一。</p>
+<p>第一步：导入jar包</p>
+<p>Hibernate Valicator的jar包：</p>
+<ul>
+<li><p>hibernate-validator</p>
+</li>
+<li><p>jboss-logging</p>
+</li>
+<li><p>validation-api</p>
+</li>
+</ul>
+<p>第二步：注册验证器和驱动</p>
+<p>springmvc.xml</p>
+<pre><code>&lt;!-- 注册验证器 --&gt;
+&lt;bean id=&quot;myValidator&quot; class=&quot;org.springframework.validation.beanvalidation.LocalValidatorFactoryBean&quot;&gt;
+    &lt;property name=&quot;providerClass&quot; value=&quot;org.hibernate.validator.HibernateValidator&quot;&gt;&lt;/property&gt;
+&lt;/bean&gt;
+
+&lt;!-- 注册mvc注解驱动 --&gt;
+&lt;mvc:annotation-driven validator=&quot;myValidator&quot;&gt;&lt;/mvc:annotation-driven&gt;
+</code></pre><p>第三步：实体类-验证规则</p>
+<pre><code>public class Student {
+    @NotNull(message=&quot;姓名不以为空&quot;)
+    @Size(min=3, max=6, message=&quot;姓名长度在{min}-{max}个字符之间&quot;)
+    private String name;
+
+    @Min(value=0, message=&quot;成绩不能小于{value}&quot;)
+    @Max(value=100, message=&quot;成绩不能大于{value}&quot;)
+    private double score;
+
+    @NotNull(message=&quot;电话不能为空&quot;)
+    @Pattern(regexp=&quot;^1[34578]\\d{9}$&quot;,message=&quot;手机号格式不正确&quot;)
+    private String mobile;
+
+    ....
+    getter and setter
+    ...
+
+}
+</code></pre><p>第四步：处理器</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+    @RequestMapping(value={&quot;/register.do&quot;}, method= RequestMethod.POST)
+    public ModelAndView doRegister(@Validated Student student, BindingResult br) {
+
+        ModelAndView mv = new ModelAndView();
+        mv.addObject(&quot;name&quot;, student);
+        mv.setViewName(&quot;/WEB-INF/jsp/welcome.jsp&quot;);
+
+        int errorCount = br.getErrorCount();
+        if(errorCount &gt; 0) {
+            FieldError nameError = br.getFieldError(&quot;name&quot;);
+            FieldError scoreError = br.getFieldError(&quot;score&quot;);
+            FieldError mobieError = br.getFieldError(&quot;mobile&quot;);
+
+            if(nameError != null) {
+                String nameErrorMSG = nameError.getDefaultMessage();
+                mv.addObject(&quot;nameErrorMSG&quot;, nameErrorMSG);
+            }
+
+            if(scoreError != null) {
+                String scoreErrorMSG = scoreError.getDefaultMessage();
+                mv.addObject(&quot;scoreErrorMSG&quot;, scoreErrorMSG);
+            }
+
+            if(mobieError != null) {
+                String mobileErrorMSG = mobieError.getDefaultMessage();
+                mv.addObject(&quot;mobileErrorMSG&quot;, mobileErrorMSG);
+            }
+            mv.setViewName(&quot;/index.jsp&quot;);
+        }
+
+
+        return mv;
+    }
+}
+</code></pre><p>index.jsp</p>
+<pre><code>&lt;form action=&quot;${pageContext.request.contextPath }/test/register.do&quot; method=&quot;POST&quot;&gt;
+    姓名：&lt;input type=&quot;text&quot; name=&quot;name&quot; /&gt;${nameErrorMSG }&lt;br /&gt;
+    成绩：&lt;input type=&quot;text&quot; name=&quot;score&quot; /&gt;${scoreErrorMSG }&lt;br /&gt;
+    电话：&lt;input type=&quot;text&quot; name=&quot;mobile&quot; /&gt;${mobileErrorMSG }&lt;br /&gt;
+
+    &lt;input type=&quot;submit&quot; value=&quot;注册&quot; /&gt;
+&lt;/form&gt;
+</code></pre><h4 id="4-5-文件上传"><a href="#4-5-文件上传" class="headerlink" title="4.5 文件上传"></a>4.5 文件上传</h4><h5 id="4-5-1-上传单个文件"><a href="#4-5-1-上传单个文件" class="headerlink" title="4.5.1 上传单个文件"></a>4.5.1 上传单个文件</h5><p>第一步：导入jar包</p>
+<ul>
+<li><p>commons-fileupload</p>
+</li>
+<li><p>commons-io</p>
+</li>
+</ul>
+<p>第二步：注册</p>
+<pre><code>&lt;bean id=&quot;multipartResolver&quot; class=&quot;org.springframework.web.multipart.commons.CommonsMultipartResolver&quot;&gt;
+    &lt;property name=&quot;defaultEncoding&quot; value=&quot;utf-8&quot;&gt;&lt;/property&gt;
+    &lt;property name=&quot;maxUploadSize&quot; value=&quot;1048576&quot;&gt;&lt;/property&gt;
+&lt;/bean&gt;
+
+&lt;mvc:annotation-driven&gt;&lt;/mvc:annotation-driven&gt;
+</code></pre><p>第三步：页面</p>
+<pre><code>&lt;form action=&quot;${pageContext.request.contextPath }/test/upload.do&quot; method=&quot;POST&quot; enctype=&quot;multipart/form-data&quot;&gt;
+    文件：&lt;input type=&quot;file&quot; name=&quot;img&quot; /&gt;&lt;br /&gt;
+    &lt;input type=&quot;submit&quot; value=&quot;提交&quot; /&gt;
+&lt;/form&gt;
+</code></pre><p>第四步：处理器</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+    @RequestMapping(value={&quot;/upload.do&quot;}, method= RequestMethod.POST)
+    public String doFileUpload(MultipartFile img, HttpSession session) throws Exception {
+        String path = session.getServletContext().getRealPath(&quot;/images&quot;);
+
+        if(img.getSize() &gt; 0) {            
+            String fileName = img.getOriginalFilename();
+            if(fileName.endsWith(&quot;jpg&quot;) || fileName.endsWith(&quot;png&quot;)) {                
+                File file = new File(path, fileName);
+                img.transferTo(file);
+                return &quot;/success.jsp&quot;;
+            }
+        }
+        return &quot;/fail.jsp&quot;;        
+    }
+
+}
+</code></pre><h5 id="4-5-2-上传多个文件"><a href="#4-5-2-上传多个文件" class="headerlink" title="4.5.2 上传多个文件"></a>4.5.2 上传多个文件</h5><p>处理器</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+    @RequestMapping(value={&quot;/upload.do&quot;}, method= RequestMethod.POST)
+    public String doFileUpload(@RequestParam MultipartFile[] imgs, HttpSession session) throws Exception {
+        String path = session.getServletContext().getRealPath(&quot;/images&quot;);
+
+        for(MultipartFile img:imgs) {        
+            if(img.getSize() &gt; 0) {            
+                String fileName = img.getOriginalFilename();
+                if(fileName.endsWith(&quot;jpg&quot;) || fileName.endsWith(&quot;png&quot;)) {                
+                    File file = new File(path, fileName);
+                    img.transferTo(file);
+                }
+            }
+        }
+
+        return &quot;/success.jsp&quot;;        
+    }
+
+}
+</code></pre><p>index.jsp</p>
+<pre><code>&lt;form action=&quot;${pageContext.request.contextPath }/test/upload.do&quot; method=&quot;POST&quot; enctype=&quot;multipart/form-data&quot;&gt;
+    文件1：&lt;input type=&quot;file&quot; name=&quot;imgs&quot; /&gt;&lt;br /&gt;
+    文件2：&lt;input type=&quot;file&quot; name=&quot;imgs&quot; /&gt;&lt;br /&gt;
+    文件3：&lt;input type=&quot;file&quot; name=&quot;imgs&quot; /&gt;&lt;br /&gt;
+    &lt;input type=&quot;submit&quot; value=&quot;提交&quot; /&gt;
+&lt;/form&gt;
+</code></pre><h4 id="4-6-拦截器"><a href="#4-6-拦截器" class="headerlink" title="4.6 拦截器"></a>4.6 拦截器</h4><p>springmvc中的拦截器是非常重要和相当有用的，它的主要作用是拦截指定的用户请求，并进行相应的预处理与后处理。其拦截的时间点在“处理器映射器根据用户提交的请求映射出了所要执行的处理器类，并且也找到了要执行该处理器类的处理器适配器，在处理器适配器执行处理器之前”。当然，在处理器映射器映射出所要执行的处理器类时，已经将拦截器与处理器组合为了一个处理器执行链，并返回给了中央调度器。</p>
+<h5 id="4-6-1-拦截器的实现"><a href="#4-6-1-拦截器的实现" class="headerlink" title="4.6.1 拦截器的实现"></a>4.6.1 拦截器的实现</h5><p>第一步：注册拦截器</p>
+<pre><code>&lt;!-- 注册拦截器 --&gt;
+&lt;mvc:interceptors&gt;
+    &lt;mvc:interceptor&gt;
+        &lt;mvc:mapping path=&quot;/**&quot;/&gt;
+        &lt;bean class=&quot;com.bjpowernode.interceptors.OneInterceptor&quot;&gt;&lt;/bean&gt;
+    &lt;/mvc:interceptor&gt;
+&lt;/mvc:interceptors&gt;
+</code></pre><p>第二步：拦截器</p>
+<pre><code>public class OneInterceptor implements HandlerInterceptor {    
+    @Override
+    public boolean preHandle(HttpServletRequest arg0, HttpServletResponse arg1, Object arg2) throws Exception {
+        System.out.println(&quot;execute prehandler&quot;);
+        return true;
+    }    
+
+    @Override
+    public void postHandle(HttpServletRequest arg0, HttpServletResponse arg1, Object arg2, ModelAndView arg3)
+            throws Exception {
+
+        System.out.println(&quot;execute posthandler&quot;);
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest arg0, HttpServletResponse arg1, Object arg2, Exception arg3)
+            throws Exception {
+        System.out.println(&quot;execute aftercomplete&quot;);
+    }
+}
+</code></pre><p>处理器</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+    @RequestMapping(&quot;/some.do&quot;)
+    public String doSome() {
+        System.out.println(&quot;execute dosome&quot;);
+        return &quot;/WEB-INF/jsp/welcome.jsp&quot;;
+    }
+
+}
+</code></pre><h5 id="4-6-2-权限拦截器"><a href="#4-6-2-权限拦截器" class="headerlink" title="4.6.2 权限拦截器"></a>4.6.2 权限拦截器</h5><p>处理器</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+    @RequestMapping(&quot;/some.do&quot;)
+    public String doSome() {
+        System.out.println(&quot;execute dosome&quot;);
+        return &quot;/WEB-INF/jsp/welcome.jsp&quot;;
+    }
+
+}
+</code></pre><p>拦截器</p>
+<pre><code>public class PermissionInterceptor implements HandlerInterceptor {
+
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+            throws Exception {
+
+        String user = (String) request.getSession().getAttribute(&quot;user&quot;);
+        if(&quot;beijing&quot;.equals(user)) {
+            return true;
+        }
+        request.getRequestDispatcher(&quot;/fail.jsp&quot;).forward(request, response);
+        return false;
+    }
+
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
+            ModelAndView modelAndView) throws Exception {
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
+            throws Exception {
+    }
+
+}
+</code></pre><p>注册</p>
+<pre><code>&lt;!-- 注册拦截器 --&gt;
+&lt;mvc:interceptors&gt;
+    &lt;mvc:interceptor&gt;
+        &lt;mvc:mapping path=&quot;/**&quot;/&gt;
+        &lt;bean class=&quot;com.bjpowernode.interceptors.PermissionInterceptor&quot;&gt;&lt;/bean&gt;
+    &lt;/mvc:interceptor&gt;
+&lt;/mvc:interceptors&gt;
+</code></pre><p>login.jsp</p>
+<pre><code>&lt;%
+    session.setAttribute(&quot;user&quot;, &quot;beijing&quot;);
+%&gt;&gt;
+login success.
+</code></pre><p>logout.jsp</p>
+<pre><code>&lt;%
+    session.removeAttribute(&quot;user&quot;);    
+%&gt;
+logout success.
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/05/24/java/springmvc/springmvc-4/" data-id="cjhlqourr006f47fyrezs2fsq" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/springmvc/">springmvc</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/springmvc/springmvc-3" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/23/java/springmvc/springmvc-3/" class="article-date">
+  <time datetime="2018-05-23T07:39:01.000Z" itemprop="datePublished">2018-05-23</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/springmvc/">springmvc</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/05/23/java/springmvc/springmvc-3/">第三章 springmvc注解式开发</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="3-1-第一个程序"><a href="#3-1-第一个程序" class="headerlink" title="3.1 第一个程序"></a>3.1 第一个程序</h4><h5 id="3-1-1-注解"><a href="#3-1-1-注解" class="headerlink" title="3.1.1 注解"></a>3.1.1 注解</h5><p>springmvc.xml</p>
+<pre><code>&lt;!-- 组件扫描器 --&gt;
+&lt;context:component-scan base-package=&quot;com.bjpowernode.handlers&quot;&gt;&lt;/context:component-scan&gt;
+</code></pre><p>控制器</p>
+<pre><code>@org.springframework.stereotype.Controller
+public class MyController {
+    @RequestMapping(&quot;/my.do&quot;)
+    public ModelAndView doSome(HttpServletRequest arg0, HttpServletResponse arg1) {
+        return new ModelAndView(&quot;/WEB-INF/jsp/welcome.jsp&quot;);
+    }
+
+}
+</code></pre><h5 id="3-1-2-多个请求指向同一个处理器、一个处理器中定义多个处理器方法"><a href="#3-1-2-多个请求指向同一个处理器、一个处理器中定义多个处理器方法" class="headerlink" title="3.1.2 多个请求指向同一个处理器、一个处理器中定义多个处理器方法"></a>3.1.2 多个请求指向同一个处理器、一个处理器中定义多个处理器方法</h5><pre><code>@org.springframework.stereotype.Controller
+public class MyController {
+    @RequestMapping({&quot;/first.do&quot;,&quot;hello.do&quot;})
+    public ModelAndView doFirst(HttpServletRequest arg0, HttpServletResponse arg1) {
+        return new ModelAndView(&quot;/WEB-INF/jsp/welcome.jsp&quot;);
+    }
+
+    @RequestMapping(&quot;/second.do&quot;)
+    public ModelAndView doSecond(HttpServletRequest arg0, HttpServletResponse arg1) {
+        return new ModelAndView(&quot;/WEB-INF/jsp/welcome.jsp&quot;);
+    }
+}
+</code></pre><h5 id="3-1-3-命名空间-RequestMapping"><a href="#3-1-3-命名空间-RequestMapping" class="headerlink" title="3.1.3 命名空间 @RequestMapping"></a>3.1.3 命名空间 @RequestMapping</h5><pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;xxx/ooo/jjj&quot;)
+public class MyController {
+    @RequestMapping({&quot;/first.do&quot;,&quot;hello.do&quot;})
+    public ModelAndView doFirst(HttpServletRequest arg0, HttpServletResponse arg1) {
+        return new ModelAndView(&quot;/WEB-INF/jsp/welcome.jsp&quot;);
+    }
+
+    @RequestMapping(&quot;/second.do&quot;)
+    public ModelAndView doSecond(HttpServletRequest arg0, HttpServletResponse arg1) {
+        return new ModelAndView(&quot;/WEB-INF/jsp/welcome.jsp&quot;);
+    }
+}
+</code></pre><h5 id="3-1-4-请求中的通配符"><a href="#3-1-4-请求中的通配符" class="headerlink" title="3.1.4 请求中的通配符"></a>3.1.4 请求中的通配符</h5><pre><code>@RequestMapping(&quot;/second*.do&quot;)
+</code></pre><h5 id="3-1-5-对请求提交方式的定义"><a href="#3-1-5-对请求提交方式的定义" class="headerlink" title="3.1.5 对请求提交方式的定义"></a>3.1.5 对请求提交方式的定义</h5><pre><code>@RequestMapping(value={&quot;/first.do&quot;,&quot;hello.do&quot;}, method= RequestMethod.POST)
+</code></pre><h4 id="3-2-处理器方法的参数"><a href="#3-2-处理器方法的参数" class="headerlink" title="3.2 处理器方法的参数"></a>3.2 处理器方法的参数</h4><p>处理器方法常用的参数有五类，这些参数会在系统调用时由系统自动赋值，即程序员可以在方法内直接使用。</p>
+<ul>
+<li><p>HttpServleRequest</p>
+</li>
+<li><p>HttpServletResponse</p>
+</li>
+<li><p>HttpSession</p>
+</li>
+<li><p>用于承载数据的Model</p>
+</li>
+<li><p>请求中所携带的参数</p>
+</li>
+</ul>
+<h4 id="3-3-处理器方法接收请求里的参数"><a href="#3-3-处理器方法接收请求里的参数" class="headerlink" title="3.3 处理器方法接收请求里的参数"></a>3.3 处理器方法接收请求里的参数</h4><p>index.jsp</p>
+<pre><code>&lt;form action=&quot;${pageContext.request.contextPath }/test/register.do&quot; method=&quot;POST&quot;&gt;
+    姓名：&lt;input type=&quot;text&quot; name=&quot;name&quot; /&gt;&lt;br /&gt;
+    年龄：&lt;input type=&quot;text&quot; name=&quot;age&quot; /&gt;&lt;br /&gt;
+    &lt;input type=&quot;submit&quot; value=&quot;注册&quot; /&gt;
+&lt;/form&gt;
+</code></pre><p>welcome.jsp</p>
+<pre><code>name=${name}
+age=${age }
+</code></pre><p>web.xml</p>
+<p>添加过滤器，解决中文乱码问题</p>
+<pre><code>&lt;filter&gt;
+      &lt;filter-name&gt;CharacterEncodingFilter&lt;/filter-name&gt;
+      &lt;filter-class&gt;org.springframework.web.filter.CharacterEncodingFilter&lt;/filter-class&gt;
+      &lt;init-param&gt;
+          &lt;param-name&gt;encoding&lt;/param-name&gt;
+          &lt;param-value&gt;utf-8&lt;/param-value&gt;
+      &lt;/init-param&gt;
+      &lt;init-param&gt;
+          &lt;param-name&gt;forceEncoding&lt;/param-name&gt;
+          &lt;param-value&gt;true&lt;/param-value&gt;
+      &lt;/init-param&gt;
+&lt;/filter&gt;
+
+&lt;filter-mapping&gt;
+    &lt;filter-name&gt;CharacterEncodingFilter&lt;/filter-name&gt;
+    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+&lt;/filter-mapping&gt;
+</code></pre><h5 id="3-3-1-接收请求参数-逐个接收"><a href="#3-3-1-接收请求参数-逐个接收" class="headerlink" title="3.3.1 接收请求参数 - 逐个接收"></a>3.3.1 接收请求参数 - 逐个接收</h5><p>控制器</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+    @RequestMapping(value={&quot;/register.do&quot;}, method= RequestMethod.POST)
+    public ModelAndView doRegister(String name, int age) {
+        System.out.println(&quot;name=&quot;+name);
+        System.out.println(&quot;age=&quot;+age);
+
+        ModelAndView mv = new ModelAndView();
+        mv.addObject(&quot;name&quot;, name);
+        mv.addObject(&quot;age&quot;, age);
+        mv.setViewName(&quot;/WEB-INF/jsp/welcome.jsp&quot;);
+        return mv;
+    }
+
+}
+</code></pre><h5 id="3-3-2-接收请求参数-校正请求参数名"><a href="#3-3-2-接收请求参数-校正请求参数名" class="headerlink" title="3.3.2 接收请求参数 - 校正请求参数名"></a>3.3.2 接收请求参数 - 校正请求参数名</h5><p>参数pname</p>
+<pre><code>姓名：&lt;input type=&quot;text&quot; name=&quot;pname&quot; /&gt;&lt;br /&gt;
+</code></pre><p>@RequestParam校正</p>
+<pre><code>public ModelAndView doRegister(@RequestParam(&quot;pname&quot;) String name, int age) {...}
+</code></pre><h5 id="3-3-3-接收请求参数-以对象形式整体接收"><a href="#3-3-3-接收请求参数-以对象形式整体接收" class="headerlink" title="3.3.3 接收请求参数 - 以对象形式整体接收"></a>3.3.3 接收请求参数 - 以对象形式整体接收</h5><p>Student.class</p>
+<pre><code>public class Student {
+    private String name;
+    private int age;
+
+    ...
+    getter and setter
+    ...
+
+}
+</code></pre><p>控制器</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+    @RequestMapping(value={&quot;/register.do&quot;}, method= RequestMethod.POST)
+    public ModelAndView doRegister(Student student) {
+        System.out.println(&quot;name=&quot;+student.getName());
+        System.out.println(&quot;age=&quot;+student.getAge());
+
+        ModelAndView mv = new ModelAndView();
+        mv.addObject(&quot;name&quot;, student);
+        mv.setViewName(&quot;/WEB-INF/jsp/welcome.jsp&quot;);
+        return mv;
+    }
+
+}
+</code></pre><p>整体接收，要求参数名name,age要与实体类属性名相同 </p>
+<h5 id="3-3-3-接收请求参数-域属性参数的接收"><a href="#3-3-3-接收请求参数-域属性参数的接收" class="headerlink" title="3.3.3 接收请求参数 - 域属性参数的接收"></a>3.3.3 接收请求参数 - 域属性参数的接收</h5><p>Student.class</p>
+<pre><code>public class Student {
+    private String name;
+    private int age;
+    private School school;
+    ...
+        getter and setter
+    ...
+}
+</code></pre><p>School.class</p>
+<pre><code>public class School {
+    private String sname;
+    private String address;
+    public String getSname() {
+        return sname;
+    }
+    ...
+        getter and setter
+    ...        
+}
+</code></pre><p>index.jsp</p>
+<pre><code>&lt;form action=&quot;${pageContext.request.contextPath }/test/register.do&quot; method=&quot;POST&quot;&gt;
+    姓名：&lt;input type=&quot;text&quot; name=&quot;name&quot; /&gt;&lt;br /&gt;
+    年龄：&lt;input type=&quot;text&quot; name=&quot;age&quot; /&gt;&lt;br /&gt;
+    学校：&lt;input type=&quot;text&quot; name=&quot;School.sname&quot; /&gt;&lt;br /&gt;
+    校址：&lt;input type=&quot;text&quot; name=&quot;School.address&quot; /&gt;&lt;br /&gt;
+    &lt;input type=&quot;submit&quot; value=&quot;注册&quot; /&gt;
+&lt;/form&gt;
+</code></pre><h4 id="3-4-处理器方法的返回值"><a href="#3-4-处理器方法的返回值" class="headerlink" title="3.4 处理器方法的返回值"></a>3.4 处理器方法的返回值</h4><h5 id="3-4-1-返回ModelAndView"><a href="#3-4-1-返回ModelAndView" class="headerlink" title="3.4.1 返回ModelAndView"></a>3.4.1 返回ModelAndView</h5><p>当处理器方法处理完后，既需要跳转到其它资源，也需要在资源间传递数据，那么就应该使用ModelAndView。</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+    @RequestMapping(value={&quot;/register.do&quot;}, method= RequestMethod.POST)
+    public ModelAndView doRegister(Student student) {
+        ModelAndView mv = new ModelAndView();
+        mv.addObject(&quot;name&quot;, student);
+        mv.setViewName(&quot;/WEB-INF/jsp/welcome.jsp&quot;);
+        return mv;
+    }
+
+}
+</code></pre><h5 id="3-4-2-返回String"><a href="#3-4-2-返回String" class="headerlink" title="3.4.2 返回String"></a>3.4.2 返回String</h5><p>只需要进行跳转，而不需要进行数据传递时，可以使用String。</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+    @RequestMapping(value={&quot;/register.do&quot;}, method= RequestMethod.POST)
+    public String soSome() {
+        return &quot;/WEB-INF/jsp/welcome.jsp&quot;;
+    }
+
+}
+</code></pre><p>物理视图：/WEB-INF/jsp/welcome.jsp</p>
+<p>逻辑视图：welcome，需要视图解析器转换为物理视图</p>
+<h5 id="3-4-3-返回void"><a href="#3-4-3-返回void" class="headerlink" title="3.4.3 返回void"></a>3.4.3 返回void</h5><p>index.jsp</p>
+<pre><code>&lt;script type=&quot;text/javascript&quot;&gt;
+    $(function (){
+        $(&quot;button&quot;).click(function(){
+            $.ajax({
+                url:&quot;test/ajax.do&quot;,
+                data:{
+                    name:&quot;zhangsan&quot;,
+                    age:23
+                },
+                success:function(data){
+                    var json=eval(&quot;(&quot;+ data +&quot;)&quot;);
+                    alert(json.name + json.age);
+                }
+            });
+        });
+    });
+&lt;/script&gt;
+&lt;button&gt;ajax submit&lt;/button&gt;
+</code></pre><p>处理器</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+    @RequestMapping(&quot;/ajax.do&quot;)
+    public void doAjax(String name, int age, HttpServletResponse response) throws IOException {
+        HashMap&lt;String, Object&gt; map = new HashMap&lt;String, Object&gt;();
+        map.put(&quot;name&quot;, name);
+        map.put(&quot;age&quot;, age);
+
+        JSONObject json = JSONObject.fromObject(map);
+        String jsonStr = json.toString();
+
+        PrintWriter out = response.getWriter();
+        out.println(jsonStr);
+    }
+
+}
+</code></pre><p>需要导入json-lib相关的包</p>
+<h5 id="3-4-4-返回Object"><a href="#3-4-4-返回Object" class="headerlink" title="3.4.4 返回Object"></a>3.4.4 返回Object</h5><p>处理器方法也可以返回Object对象，但返回的这个Object对象不是作为逻辑视图出现的，而是作为直接在页面显示的数据出现的。</p>
+<p>返回Object对象，需要使用@ResponseBody注解，将转换后的JSON数据放入到响应体中。</p>
+<p>#####（1）、环境搭建</p>
+<p>A、导入jar包</p>
+<p>由于返回Object数据，一般都是将数据转化为了JSON对象后传递给浏览器页面的。而这个由Object转换为JSON，是由Jackson工具完成的。所以需要导入Jackson的相关jar包。</p>
+<p>jackson-annotations、jackson-core、jackson-databind</p>
+<p>B、注册注解驱动</p>
+<p>将Object数据转化为JSON数据，需要由http消息转换器HttpMessageConvert完成。而消息转换器的开启，需要由<code>&lt;mvc:annotation-driven&gt;</code>来完成。</p>
+<p>当Spring容器进行初始化过程中在<code>&lt;mvc:annotation-driven&gt;</code>处创建注解驱动时，默认创建了七个HttpMessageConvert对象。也就是说，我们注册<code>&lt;mvc:annotation-driven&gt;</code>，就是为了让容器为我们创建HttpMessageConvert对象。</p>
+<p>C、@ResponseBody</p>
+<p>给处理器方法添加注解</p>
+<h5 id="（2）、返回Object-数值型"><a href="#（2）、返回Object-数值型" class="headerlink" title="（2）、返回Object-数值型"></a>（2）、返回Object-数值型</h5><p>springmvc.xml</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+xmlns:mvc=&quot;http://www.springframework.org/schema/mvc&quot;
+xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
+xmlns:tx=&quot;http://www.springframework.org/schema/tx&quot;
+xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context.xsd
+http://www.springframework.org/schema/aop
+http://www.springframework.org/schema/aop/spring-aop.xsd
+http://www.springframework.org/schema/tx
+http://www.springframework.org/schema/tx/spring-tx.xsd
+http://www.springframework.org/schema/mvc
+http://www.springframework.org/schema/mvc/spring-mvc.xsd&quot;&gt;
+
+    &lt;!-- 注册组件扫描器 --&gt;
+    &lt;context:component-scan base-package=&quot;com.bjpowernode.handlers&quot;&gt;&lt;/context:component-scan&gt;
+
+    &lt;!-- 注册注解驱动器 --&gt;
+    &lt;mvc:annotation-driven&gt;&lt;/mvc:annotation-driven&gt;
+
+&lt;/beans&gt;
+</code></pre><p>处理器</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+
+    @RequestMapping(&quot;/ajax.do&quot;)
+    @ResponseBody //将要返回的数据放入到响应体中
+    public Object doAjax() {
+        return 123.321;
+    }
+
+}
+</code></pre><p>index.jsp</p>
+<pre><code>&lt;script type=&quot;text/javascript&quot;&gt;
+    $(function (){
+        $(&quot;button&quot;).click(function(){
+            $.ajax({
+                url:&quot;test/ajax.do&quot;,
+                success:function(data){
+                    alert(data);
+                }
+            });
+        });
+    });
+&lt;/script&gt;
+ &lt;button&gt;ajax submit&lt;/button&gt;
+</code></pre><h5 id="（3）、返回Object-字符串"><a href="#（3）、返回Object-字符串" class="headerlink" title="（3）、返回Object-字符串"></a>（3）、返回Object-字符串</h5><pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+
+    @RequestMapping(value=&quot;/ajax.do&quot;,produces=&quot;text/html;charset=utf-8&quot;)
+    @ResponseBody //将要返回的数据放入到响应体中
+    public Object doAjax() {
+        return &quot;临沂&quot;;
+    }
+
+}
+</code></pre><p>produces指定返回的字符串格式</p>
+<h5 id="（4）、返回Object-自定义对象"><a href="#（4）、返回Object-自定义对象" class="headerlink" title="（4）、返回Object-自定义对象"></a>（4）、返回Object-自定义对象</h5><p>处理器</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+
+    @RequestMapping(&quot;/ajax.do&quot;)
+    @ResponseBody //将要返回的数据放入到响应体中
+    public Object doAjax() {
+        return new Student(&quot;zhangsan&quot;,23);
+    }
+
+}
+</code></pre><p>index.jsp</p>
+<pre><code>&lt;script type=&quot;text/javascript&quot;&gt;
+    $(function (){
+        $(&quot;button&quot;).click(function(){
+            $.ajax({
+                url:&quot;test/ajax.do&quot;,
+                success:function(data){
+                    alert(data.name + data.age);
+                }
+            });
+        });
+    });
+&lt;/script&gt;
+&lt;button&gt;ajax submit&lt;/button&gt;
+</code></pre><h5 id="（4）、返回Object-List集合"><a href="#（4）、返回Object-List集合" class="headerlink" title="（4）、返回Object-List集合"></a>（4）、返回Object-List集合</h5><p>处理器</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+
+    @RequestMapping(&quot;/ajax.do&quot;)
+    @ResponseBody //将要返回的数据放入到响应体中
+    public Object doAjax() {
+        ArrayList&lt;Student&gt; list = new ArrayList&lt;Student&gt;();
+        list.add(new Student(&quot;zhangsan&quot;,23));
+        list.add(new Student(&quot;lisi&quot;,23));
+        return list;
+    }
+
+}
+</code></pre><p>index.jsp</p>
+<pre><code>&lt;script type=&quot;text/javascript&quot;&gt;
+    $(function (){
+        $(&quot;button&quot;).click(function(){
+            $.ajax({
+                url:&quot;test/ajax.do&quot;,
+                success:function(data){
+                    $(data).each(function(index){
+                        alert(data[index].name + data[index].age);
+                    });
+                }
+            });
+        });
+    });
+&lt;/script&gt;
+ &lt;button&gt;ajax submit&lt;/button&gt;
+</code></pre><h5 id="（5）、返回Object-Map集合"><a href="#（5）、返回Object-Map集合" class="headerlink" title="（5）、返回Object-Map集合"></a>（5）、返回Object-Map集合</h5><p>处理器</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+
+    @RequestMapping(&quot;/ajax.do&quot;)
+    @ResponseBody //将要返回的数据放入到响应体中
+    public Object doAjax() {
+        HashMap&lt;String, Student&gt; map = new HashMap&lt;String,Student&gt;();
+        map.put(&quot;stu1&quot;, new Student(&quot;zhangsan&quot;,23));
+        map.put(&quot;stu2&quot;, new Student(&quot;lisi&quot;,24));
+        return map;
+    }
+
+}
+</code></pre><p>index.jsp</p>
+<pre><code>&lt;script type=&quot;text/javascript&quot;&gt;
+    $(function (){
+        $(&quot;button&quot;).click(function(){
+            $.ajax({
+                url:&quot;test/ajax.do&quot;,
+                success:function(data){
+                    $(data).each(function(index){
+                        alert(data.stu1.name + data.stu2.age);
+                    });
+                }
+            });
+        });
+    });
+&lt;/script&gt;
+&lt;button&gt;ajax submit&lt;/button&gt;    
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/05/23/java/springmvc/springmvc-3/" data-id="cjhlqourz006l47fyqhzkncgq" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/springmvc/">springmvc</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/springmvc/springmvc-2" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/22/java/springmvc/springmvc-2/" class="article-date">
+  <time datetime="2018-05-22T08:49:31.000Z" itemprop="datePublished">2018-05-22</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/springmvc/">springmvc</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/05/22/java/springmvc/springmvc-2/">第二章 springmvc配置式开发</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="2-1-处理器映射器-HandlerMapping"><a href="#2-1-处理器映射器-HandlerMapping" class="headerlink" title="2.1 处理器映射器 HandlerMapping"></a>2.1 处理器映射器 HandlerMapping</h4><p>HandlerMapping接口负责根据request请求找到相应的Handler处理器及Interceptor拦截器，并将它们封装在HandlerExecutionCahin对象中，返回给中央调度器。</p>
+<p>其常用的两种实现类：</p>
+<ul>
+<li><p>BeanNameUrlHandlerMapping</p>
+</li>
+<li><p>SimpleUrlHandlerMapping</p>
+</li>
+</ul>
+<h5 id="1-、BeanNameUrlHandlerMapping"><a href="#1-、BeanNameUrlHandlerMapping" class="headerlink" title="(1)、BeanNameUrlHandlerMapping"></a>(1)、BeanNameUrlHandlerMapping</h5><p>BeanNameUrlHandlerMapping处理器映射器，会根据请求的url与spring容器中定义的处理器的bean的name值进行匹配，从而在spring容器中找到处理器bean的实例。</p>
+<pre><code>&lt;bean id=&quot;/my.do&quot; class=&quot;com.bjpowernode.handlers.MyController&quot;&gt;&lt;/bean&gt;
+</code></pre><h5 id="2-、SimpleUrlHandlerMapping"><a href="#2-、SimpleUrlHandlerMapping" class="headerlink" title="(2)、SimpleUrlHandlerMapping"></a>(2)、SimpleUrlHandlerMapping</h5><p>SimpleUrlHandlerMapping处理器映射器，不仅可以将url与处理器分离，还可以对url进行统一映射管理。</p>
+<p>SimpleUrlHandlerMapping处理器映射器，会根据请求的url与spring容器中定义的处理器映射器子标签的key属性进行匹配。匹配上后，再将该key的value值与处理器的bean的id值进行匹配，从而在spring容器中找到处理器bean。</p>
+<pre><code>&lt;!-- 注册处理器 --&gt;
+&lt;bean id=&quot;myController&quot; class=&quot;com.bjpowernode.handlers.MyController&quot;&gt;&lt;/bean&gt;
+&lt;!-- 注册处理器映射器: SimpleUrlHandlerMapping--&gt;
+&lt;bean class=&quot;org.springframework.web.servlet.handler.SimpleUrlHandlerMapping&quot;&gt;
+    &lt;!-- 
+    &lt;property name=&quot;mappings&quot;&gt;
+        &lt;props&gt;
+            &lt;prop key=&quot;/hello.do&quot;&gt;myController&lt;/prop&gt;
+            &lt;prop key=&quot;/world.do&quot;&gt;myController&lt;/prop&gt;
+        &lt;/props&gt;
+    &lt;/property&gt;
+     --&gt;
+     &lt;property name=&quot;urlMap&quot;&gt;
+         &lt;map&gt;
+             &lt;entry key=&quot;/hello.do&quot; value=&quot;myController&quot;&gt;&lt;/entry&gt;
+             &lt;entry key=&quot;/world.do&quot; value=&quot;myController&quot;&gt;&lt;/entry&gt;
+         &lt;/map&gt;
+     &lt;/property&gt;
+&lt;/bean&gt;
+</code></pre><h4 id="2-2-处理器适配器-HandlerAdapter"><a href="#2-2-处理器适配器-HandlerAdapter" class="headerlink" title="2.2 处理器适配器 HandlerAdapter"></a>2.2 处理器适配器 HandlerAdapter</h4><p>前面所写的代码中，之所以要将Handler定义为Controller接口的实现类，就是因为这里使用的处理器适配器是SimpleControllerAdapter。打开其源码，可以看到将handler强转为了Controller。在定义Handler时，若不将其定义为Controller接口的实现类，这里的强转会出错。</p>
+<p>当然，中央调度器首先会调用该适配器的supports()方法，判断该Handler是否与Controller具有is-a的关系。在具有is-a的关系的前提下，才会强转。</p>
+<p>常用的两种处理器适配器：</p>
+<p>（1）、SimpleControllerHandlerAdapter</p>
+<p>代码：</p>
+<pre><code>public class MyController implements Controller {
+
+        @Override
+        public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+            ModelAndView mv = new ModelAndView();
+            //其底层执行的是request.setAttribute()方法
+            mv.addObject(&quot;message&quot;, &quot;hello world&quot;);
+            mv.setViewName(&quot;welcome&quot;);
+            return mv;
+        }
+
+    }
+</code></pre><p>（2）、HttpRequstHandlerAdapter</p>
+<p>代码:</p>
+<pre><code>public class MyController implements HttpRequestHandler{
+
+    @Override
+    public void handleRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.setAttribute(&quot;message&quot;, &quot;hello sprngmvcworld&quot;);
+        request.getRequestDispatcher(&quot;/WEB-INF/jsp/welcome.jsp&quot;).forward(request, response);
+    }
+
+}
+</code></pre><h4 id="2-3-处理器"><a href="#2-3-处理器" class="headerlink" title="2.3 处理器"></a>2.3 处理器</h4><p>处理器除了实现Controller接口外，还可以继承自一些其它的类来完成一些特殊的功能。</p>
+<p>（1）、继承自AbstractController类</p>
+<p>若处理器继承自AbstractController类，那么该控制器就具有了一些新的功能。因为AbstractController类还继承自一个父类WebContentGenerator。</p>
+<p>WebContentGenerator类具有supportedMethods属性，可以设置支持的Http数据提交方式。默认支持GET,POST。</p>
+<pre><code>public class MyController extends AbstractController{
+
+    @Override
+    protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+        ModelAndView mv = new ModelAndView();
+        //其底层执行的是request.setAttribute()方法
+        mv.addObject(&quot;message&quot;, &quot;hello world&quot;);
+        mv.setViewName(&quot;welcome&quot;);
+        return mv;
+    }
+
+}
+</code></pre><p>springmvc.xml</p>
+<pre><code>&lt;bean id=&quot;/my.do&quot; class=&quot;com.bjpowernode.handlers.MyController&quot;&gt;
+    &lt;property name=&quot;supportedMethods&quot; value=&quot;POST&quot;&gt;&lt;/property&gt;
+&lt;/bean&gt;
+</code></pre><p>（2）、继承自MultiActionController类</p>
+<p>springmvc.xml</p>
+<pre><code>&lt;!-- 注册处理器 --&gt;
+&lt;bean id=&quot;myController&quot; class=&quot;com.bjpowernode.handlers.MyController&quot;&gt;&lt;/bean&gt;
+&lt;!-- 注册处理器映射器: SimpleUrlHandlerMapping--&gt;
+&lt;bean class=&quot;org.springframework.web.servlet.handler.SimpleUrlHandlerMapping&quot;&gt;
+     &lt;property name=&quot;urlMap&quot;&gt;
+         &lt;map&gt;
+             &lt;!-- 
+                MultiActionController类具有一个属性：方法名解析器methodNameResolver，
+                其具有默认值InternalPathMethodNameResolver，
+                该解析器将控制器中的方法名作为url中的资源名称进行解析，
+                那了就意味着，我们提交请求时，要将方法名作为资源名称出现。
+             --&gt;
+             &lt;entry key=&quot;/my/*.do&quot; value=&quot;myController&quot;&gt;&lt;/entry&gt;
+         &lt;/map&gt;
+     &lt;/property&gt;
+&lt;/bean&gt;
+</code></pre><p>控制器</p>
+<pre><code>public class MyController extends MultiActionController{
+
+    public ModelAndView doFirst(HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+        ModelAndView mv = new ModelAndView();
+        mv.addObject(&quot;message&quot;, &quot;execute dofisrt method&quot;);
+        mv.setViewName(&quot;/WEB-INF/jsp/welcome.jsp&quot;);
+        return mv;
+    }
+
+    public ModelAndView doSecond(HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+        ModelAndView mv = new ModelAndView();
+        mv.addObject(&quot;message&quot;, &quot;execute dosecond method&quot;);
+        mv.setViewName(&quot;/WEB-INF/jsp/welcome.jsp&quot;);
+        return mv;
+    }
+
+}
+</code></pre><p>访问路径    </p>
+<pre><code>http://localhost:8080/03-MultiActionController-test/my/doFirst.do
+
+http://localhost:8080/03-MultiActionController-test/my/doSecond.do
+</code></pre><p>方法名解析器methodNameResolver，除了具有默认值InternalPathMethodNameResolver方法名解析器以外，还具有另外两个方法名解析器：PropertiesMethodNmaeResolver，ParameterMethodNameResolver。</p>
+<h4 id="2-4-视图解析器"><a href="#2-4-视图解析器" class="headerlink" title="2.4 视图解析器"></a>2.4 视图解析器</h4><p>ModelAndView 即模式与视图，通过addObject()方法向模型中添加数据，通过setViewName()方法向模型添加视图名称。</p>
+<p>跟踪addObject()方法，可以知道这里的模型就是ModelMap，而ModelMap的本质就是个HashMap，向模型中添加数据，就是向ModelMap中添加数据。</p>
+<h5 id="（1）、内部资源视图解析器InternalResourceViewResolver"><a href="#（1）、内部资源视图解析器InternalResourceViewResolver" class="headerlink" title="（1）、内部资源视图解析器InternalResourceViewResolver"></a>（1）、内部资源视图解析器InternalResourceViewResolver</h5><p>该视图解析器用于完成当前应用内部资源的封装与跳转。</p>
+<pre><code>&lt;bean class=&quot;org.springframework.web.servlet.view.InternalResourceViewResolver&quot;&gt;
+    &lt;property name=&quot;prefix&quot; value=&quot;/WEB-INF/jsp/&quot;&gt;&lt;/property&gt;
+    &lt;property name=&quot;suffix&quot; value=&quot;.jsp&quot;&gt;&lt;/property&gt;
+&lt;/bean&gt;
+</code></pre><h5 id="（2）、BeanNameViewResolver视图解析器"><a href="#（2）、BeanNameViewResolver视图解析器" class="headerlink" title="（2）、BeanNameViewResolver视图解析器"></a>（2）、BeanNameViewResolver视图解析器</h5><p>该视图解析器用于将资源封装为spring容器中注册的bean实例。</p>
+<ul>
+<li><p>RedirectView：定义外部资源视图对象</p>
+</li>
+<li><p>JstlView：定义内部资源视图对象</p>
+</li>
+</ul>
+<p>springmvc.xml</p>
+<pre><code>&lt;!-- 注册视图解析器 --&gt;
+&lt;bean class=&quot;org.springframework.web.servlet.view.BeanNameViewResolver&quot;&gt;&lt;/bean&gt;
+
+&lt;!-- 注册内部和外部视图bean --&gt;
+&lt;bean id=&quot;internalResource&quot; class=&quot;org.springframework.web.servlet.view.JstlView&quot;&gt;
+    &lt;property name=&quot;url&quot; value=&quot;WEB-INF/jsp/welcome.jsp&quot;&gt;&lt;/property&gt;
+&lt;/bean&gt;
+&lt;bean id=&quot;taobao&quot; class=&quot;org.springframework.web.servlet.view.RedirectView&quot;&gt;
+    &lt;property name=&quot;url&quot; value=&quot;http://www.taobao.com&quot;&gt;&lt;/property&gt;
+&lt;/bean&gt;
+</code></pre><p>控制器</p>
+<pre><code>public class MyController implements Controller {
+
+    @Override
+    public ModelAndView handleRequest(HttpServletRequest arg0, HttpServletResponse arg1) throws Exception {
+        return new ModelAndView(&quot;taobao&quot;);
+    }
+
+}
+</code></pre><h5 id="（3）、XmlViewResolver视图解析器"><a href="#（3）、XmlViewResolver视图解析器" class="headerlink" title="（3）、XmlViewResolver视图解析器"></a>（3）、XmlViewResolver视图解析器</h5><p>专门用来定义视图bean的配置文件myViews.xml</p>
+<pre><code>&lt;bean id=&quot;internalResource&quot; class=&quot;org.springframework.web.servlet.view.JstlView&quot;&gt;
+    &lt;property name=&quot;url&quot; value=&quot;WEB-INF/jsp/welcome.jsp&quot;&gt;&lt;/property&gt;
+&lt;/bean&gt;
+&lt;bean id=&quot;taobao&quot; class=&quot;org.springframework.web.servlet.view.RedirectView&quot;&gt;
+    &lt;property name=&quot;url&quot; value=&quot;http://www.taobao.com&quot;&gt;&lt;/property&gt;
+&lt;/bean&gt;
+</code></pre><p>springmvc.xml</p>
+<pre><code>&lt;!-- 注册XmlViewResolver视图解析器 --&gt;
+&lt;bean class=&quot;org.springframework.web.servlet.view.XmlViewResolver&quot;&gt;
+    &lt;property name=&quot;location&quot; value=&quot;classpath:myViews.xml&quot;&gt;&lt;/property&gt;
+&lt;/bean&gt;
+</code></pre><h5 id="（4）、ResourceBundleViewResolver视图解析器"><a href="#（4）、ResourceBundleViewResolver视图解析器" class="headerlink" title="（4）、ResourceBundleViewResolver视图解析器"></a>（4）、ResourceBundleViewResolver视图解析器</h5><p>myVews.properties</p>
+<pre><code>taobao.(class)=org.springframework.web.servlet.view.RedirectView
+taobao.url=http://www.taobao.com
+
+internalResource.(class)=org.springframework.web.servlet.view.JstlView
+internalResource.url=/WEB-INF/jsp/welcome.jsp
+</code></pre><p>springmvc.xml</p>
+<pre><code>&lt;!-- 注册处理器 --&gt;
+&lt;bean id=&quot;/my.do&quot; class=&quot;com.bjpowernode.handlers.MyController&quot;&gt;&lt;/bean&gt;
+
+&lt;!-- 注册视图解析器 --&gt;
+&lt;bean class=&quot;org.springframework.web.servlet.view.ResourceBundleViewResolver&quot;&gt;
+    &lt;property name=&quot;basename&quot; value=&quot;myViews&quot;&gt;&lt;/property&gt;
+&lt;/bean&gt;
+</code></pre><p>注：视图解析器的优先级</p>
+<p>有时经常需要应用一些视图解析器策略来解析视图名称，即当同时存在多个视图解析器均可解析ModelAndView中的同一视图名称时，哪个视图解析器会起作用呢？</p>
+<p>视图解析器有一个order属性，专门用于设置多个视图解析器的优先级。数字越小，优先级越高。一般不会InternalResourceViewResolver解析器指定优先级，即让其优先级最低。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/05/22/java/springmvc/springmvc-2/" data-id="cjhlqourv006j47fys1v7uqoc" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/springmvc/">springmvc</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/springmvc/springmvc-1" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/22/java/springmvc/springmvc-1/" class="article-date">
+  <time datetime="2018-05-22T07:57:36.000Z" itemprop="datePublished">2018-05-22</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/springmvc/">springmvc</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/05/22/java/springmvc/springmvc-1/">第一章 springmvc概述</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="1-1-springmvc程序"><a href="#1-1-springmvc程序" class="headerlink" title="1.1 springmvc程序"></a>1.1 springmvc程序</h4><h5 id="1、配置web-xml"><a href="#1、配置web-xml" class="headerlink" title="1、配置web.xml"></a>1、配置web.xml</h5><p>配置中央调度器</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;web-app xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns=&quot;http://java.sun.com/xml/ns/javaee&quot; xsi:schemaLocation=&quot;http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd&quot; id=&quot;WebApp_ID&quot; version=&quot;2.5&quot;&gt;
+    &lt;display-name&gt;01-springmvc-hello&lt;/display-name&gt;
+
+    &lt;!-- 中央调度器 --&gt;
+    &lt;servlet&gt;
+        &lt;servlet-name&gt;springMVC&lt;/servlet-name&gt;
+        &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;/servlet-class&gt;
+        &lt;!-- 指定springmvc配置文件的位置及文件名 --&gt;
+        &lt;init-param&gt;
+            &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;
+            &lt;param-value&gt;classpath:springmvc.xml&lt;/param-value&gt;
+        &lt;/init-param&gt;
+        &lt;!-- 在Tomcat启动时直接创建当前Servlet --&gt;
+        &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;
+    &lt;/servlet&gt;
+
+    &lt;servlet-mapping&gt;
+        &lt;servlet-name&gt;springMVC&lt;/servlet-name&gt;
+        &lt;url-pattern&gt;*.do&lt;/url-pattern&gt;
+    &lt;/servlet-mapping&gt;
+
+     &lt;welcome-file-list&gt;
+       &lt;welcome-file&gt;index.html&lt;/welcome-file&gt;
+       &lt;welcome-file&gt;index.htm&lt;/welcome-file&gt;
+       &lt;welcome-file&gt;index.jsp&lt;/welcome-file&gt;
+       &lt;welcome-file&gt;default.html&lt;/welcome-file&gt;
+       &lt;welcome-file&gt;default.htm&lt;/welcome-file&gt;
+       &lt;welcome-file&gt;default.jsp&lt;/welcome-file&gt;
+     &lt;/welcome-file-list&gt;
+&lt;/web-app&gt;
+</code></pre><h5 id="2、配置springmvc-xml"><a href="#2、配置springmvc-xml" class="headerlink" title="2、配置springmvc.xml"></a>2、配置springmvc.xml</h5><p>配置视图解析器、注册处理器</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
+xmlns:tx=&quot;http://www.springframework.org/schema/tx&quot;
+xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context.xsd
+http://www.springframework.org/schema/aop
+http://www.springframework.org/schema/aop/spring-aop.xsd
+http://www.springframework.org/schema/tx
+http://www.springframework.org/schema/tx/spring-tx.xsd&quot;&gt;
+
+    &lt;!-- 注册视图解析器 --&gt;
+    &lt;bean class=&quot;org.springframework.web.servlet.view.InternalResourceViewResolver&quot;&gt;
+        &lt;property name=&quot;prefix&quot; value=&quot;/WEB-INF/jsp/&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;suffix&quot; value=&quot;.jsp&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+    &lt;!-- 注册处理器方式一：一个url对应一个controller 使用的处理器映射器：BeanNameUrlHandlerMapping --&gt;
+    &lt;!-- &lt;bean id=&quot;/my.do&quot; class=&quot;com.bjpowernode.handlers.MyController&quot;&gt;&lt;/bean&gt; --&gt;
+
+    &lt;!-- 注册处理器方式二：多个url对应一个controller --&gt;    
+        &lt;!-- 注册处理器 --&gt;
+        &lt;bean id=&quot;myController&quot; class=&quot;com.bjpowernode.handlers.MyController&quot;&gt;&lt;/bean&gt;
+        &lt;!-- 注册处理器映射器: SimpleUrlHandlerMapping--&gt;
+        &lt;bean class=&quot;org.springframework.web.servlet.handler.SimpleUrlHandlerMapping&quot;&gt;
+            &lt;!-- 
+            &lt;property name=&quot;mappings&quot;&gt;
+                &lt;props&gt;
+                    &lt;prop key=&quot;/hello.do&quot;&gt;myController&lt;/prop&gt;
+                    &lt;prop key=&quot;/world.do&quot;&gt;myController&lt;/prop&gt;
+                &lt;/props&gt;
+            &lt;/property&gt;
+             --&gt;
+             &lt;property name=&quot;urlMap&quot;&gt;
+                 &lt;map&gt;
+                     &lt;entry key=&quot;/hello.do&quot; value=&quot;myController&quot;&gt;&lt;/entry&gt;
+                     &lt;entry key=&quot;/world.do&quot; value=&quot;myController&quot;&gt;&lt;/entry&gt;
+                 &lt;/map&gt;
+             &lt;/property&gt;
+        &lt;/bean&gt;
+
+&lt;/beans&gt;
+</code></pre><h5 id="3、处理器"><a href="#3、处理器" class="headerlink" title="3、处理器"></a>3、处理器</h5><pre><code>package com.bjpowernode.handlers;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.Controller;
+
+public class MyController implements Controller {
+
+    @Override
+    public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        ModelAndView mv = new ModelAndView();
+        //其底层执行的是request.setAttribute()方法
+        mv.addObject(&quot;message&quot;, &quot;hello world&quot;);
+        mv.setViewName(&quot;welcome&quot;);
+        return mv;
+    }
+
+}
+</code></pre><h5 id="4、视图"><a href="#4、视图" class="headerlink" title="4、视图"></a>4、视图</h5><pre><code>&lt;%@ page language=&quot;java&quot; contentType=&quot;text/html; charset=UTF-8&quot;
+    pageEncoding=&quot;UTF-8&quot;%&gt;
+&lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD HTML 4.01 Transitional//EN&quot; &quot;http://www.w3.org/TR/html4/loose.dtd&quot;&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=UTF-8&quot;&gt;
+&lt;title&gt;Insert title here&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+${message}
+aaaa
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre><h4 id="1-2-lt-url-pattern-gt-详解"><a href="#1-2-lt-url-pattern-gt-详解" class="headerlink" title="1.2 &lt;url-pattern&gt;详解"></a>1.2 <code>&lt;url-pattern&gt;</code>详解</h4><p>中央调度器的url-pattern详解</p>
+<p>（1）、建议写成*.do形式</p>
+<p>（2）、不能写为/*</p>
+<p>因为DispatcherServlet会将向动态页面的跳转请求，即向JSP页面的跳转请求也当作是一个普通的Controller请求。中央调度器会调用处理器映射器为其查找相应的处理器。当然是找不到的，在这种情况下所有的jsp页面跳转均会报404错误。</p>
+<p>（3）、最好也不要写为/</p>
+<p>因为DispatcherServlet会将向静态资源的请求，例如css,js,jpg,pgn等资源的获取请求，当作是一个普通的Controller请求。中央调度器会调用处理器映射器为其查找相应的处理器。当然也是找不到的，所以在这种情况下，所有的表态资源获取请求也均会报404错误。</p>
+<p>（4）、不得不配成/时，解决静态资源无法访问的问题。</p>
+<p>解决方式一：使用Tomcat默认的Servlet解决</p>
+<pre><code>web.xml
+
+&lt;servlet-mapping&gt;
+    &lt;servlet-name&gt;default&lt;/servlet-name&gt;
+    &lt;url-pattern&gt;*.jpg&lt;/url-pattern&gt;
+&lt;/servlet-mapping&gt;
+
+&lt;servlet-mapping&gt;
+    &lt;servlet-name&gt;default&lt;/servlet-name&gt;
+    &lt;url-pattern&gt;*.csss&lt;/url-pattern&gt;
+&lt;/servlet-mapping&gt;
+</code></pre><p>解决方式二：使用mvc的default-servlet-handler解决</p>
+<p> 其底层调用的还是tomcat默认的servlet</p>
+<pre><code>springmvc.xml
+
+&lt;mvc:default-servlet-handler/&gt;
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/05/22/java/springmvc/springmvc-1/" data-id="cjhlqourp006c47fy5575x5pz" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/springmvc/">springmvc</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-java/mybatis/mybatis-7" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/05/13/java/mybatis/mybatis-7/" class="article-date">
@@ -239,7 +1615,7 @@ Student [id=20, name=zhangsan2, age=24, score=1.0]
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/13/java/mybatis/mybatis-7/" data-id="cjh4911ly0050mtp39uyeiifc" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/05/13/java/mybatis/mybatis-7/" data-id="cjhlqouqy005c47fyxbh099vn" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mybatis/">mybatis</a></li></ul>
@@ -340,7 +1716,7 @@ PUBLIC &quot;-//mybatis.org//DTD Config 3.0//EN&quot;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/12/java/mybatis/mybatis-6/" data-id="cjh4911lv004xmtp35kbxxrql" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/05/12/java/mybatis/mybatis-6/" data-id="cjhlqour9005t47fyevxhrc8x" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mybatis/">mybatis</a></li></ul>
@@ -470,7 +1846,7 @@ public class MyTest {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/12/java/mybatis/mybatis-5/" data-id="cjh4911lr004tmtp3720t6ixn" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/05/12/java/mybatis/mybatis-5/" data-id="cjhlqouqt005547fysa8ocbtn" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mybatis/">mybatis</a></li></ul>
@@ -717,7 +2093,7 @@ public class MyTest {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/12/java/mybatis/mybatis-4/" data-id="cjh4911lk004mmtp3m8rhqzlf" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/05/12/java/mybatis/mybatis-4/" data-id="cjhlqouqp005247fybc1dnmgo" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mybatis/">mybatis</a></li></ul>
@@ -886,7 +2262,7 @@ PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/12/java/mybatis/mybatis-3/" data-id="cjh4911lp004qmtp3h2n0i4sz" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/05/12/java/mybatis/mybatis-3/" data-id="cjhlqouqn004z47fy95iv8ws4" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mybatis/">mybatis</a></li></ul>
@@ -1066,1592 +2442,10 @@ PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/12/java/mybatis/mybatis-2/" data-id="cjh4911li004imtp3bt84bhrj" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/05/12/java/mybatis/mybatis-2/" data-id="cjhlqouql004v47fy1sccvzbp" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mybatis/">mybatis</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/mybatis/mybatis-1" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/05/08/java/mybatis/mybatis-1/" class="article-date">
-  <time datetime="2018-05-08T07:25:25.000Z" itemprop="datePublished">2018-05-08</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/mybatis/">mybatis</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/05/08/java/mybatis/mybatis-1/">第一章 MyBatis单表的CURD操作</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h4 id="1-1-简介"><a href="#1-1-简介" class="headerlink" title="1.1 简介"></a>1.1 简介</h4><p>MyBatis是一个优秀的基于java的持久层框架，它内部封装了JDBC，使开发者只需关注SQL语句本身，不用再花费精力去处理诸如注册驱动、创建Connection、配置Statement等繁杂过程。</p>
-<p>MyBatis通过xml或注解的方式将要执行的各种statement配置起来，并通过Java对象和Statement中的SQL动态参数进行映射生成最终执行的SQL语句，最后由MyBatis框架执行SQL并将结果映射成Java对象并返回。</p>
-<h4 id="1-2-MyBatis与Hibernate"><a href="#1-2-MyBatis与Hibernate" class="headerlink" title="1.2 MyBatis与Hibernate"></a>1.2 MyBatis与Hibernate</h4><p>Hibernate框架是提供了全面的封装机制的“全自动”ORM，即实现了POJO和数据库表之间的映射，以及SQL的自动生成和执行。</p>
-<p>相对于此，MyBatis只能算作是“半自动”ORM。其着力点，是在POJO与SQL语句之间的映射。也就是说，MyBatis并不会为程序员自动生成SQL语句。具体的SQL需要程序员自己编写，然后通过SQL语句映射文件，将SQL所需要的参数，以及返回的结果字段映射到指定的POJO。因此MyBatis成为了“全自动”ORM的一种有益补充。</p>
-<p>与Hibernate相比，MyBaits具有以下几个特点：</p>
-<p>（1）、在XML文件中配置SQL语句，实现了SQL语句与代码的分离，给程序的维护带来了很大便利。</p>
-<p>（2）、因为需要程序员自己编写SQL语句，程序员可以结合数据库自身的特点灵活控制SQL语句，因此能够实现比Hibernate等全自动ORM框架更高的查询效率，能够完成复杂查询。</p>
-<p>（3）、简单、易于学习，易于使用，上手快。</p>
-<h4 id="1-3-Mapper动态代理"><a href="#1-3-Mapper动态代理" class="headerlink" title="1.3 Mapper动态代理"></a>1.3 Mapper动态代理</h4><p>Mybatis框架抛开了Dao的实现类，直接定位到映射文件mapper中的相应SQL语句，对DB进行操作。这种对Dao的实现方式称为Mapper的动态代理方式。</p>
-<p>Mapper动态代理方式无需程序员实现Dao接口。接口是由MyBatis结合映射文件自动生成的动态代理实现的。</p>
-<p>动态代理的实现：</p>
-<ul>
-<li><p>将mapper的namespace设为接口的全限制性类名</p>
-</li>
-<li><p>将mapper的sql语句的id设为接口的方法名</p>
-</li>
-</ul>
-<p>Dao的获取：</p>
-<pre><code>SqlSession sqlSession = MyBatisUtils.getSqlSession();
-studentDao = sqlSession.getMappper(IStudentDao.class);
-</code></pre><h4 id="1-4-CURD-单表操作"><a href="#1-4-CURD-单表操作" class="headerlink" title="1.4 CURD 单表操作"></a>1.4 CURD 单表操作</h4><p>POJO: Student.java</p>
-<pre><code>package com.bjpowernode.beans;
-
-public class Student {
-    private Integer id;
-    private String name;
-    private int age;
-    private double score;
-    public Student() {
-        super();
-    }
-    public Student(String name, int age, double score) {
-        super();
-        this.name = name;
-        this.age = age;
-        this.score = score;
-    }
-    public Integer getId() {
-        return id;
-    }
-    public void setId(Integer id) {
-        this.id = id;
-    }
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-    public int getAge() {
-        return age;
-    }
-    public void setAge(int age) {
-        this.age = age;
-    }
-    public double getScore() {
-        return score;
-    }
-    public void setScore(double score) {
-        this.score = score;
-    }
-    @Override
-    public String toString() {
-        return &quot;Student [id=&quot; + id + &quot;, name=&quot; + name + &quot;, age=&quot; + age + &quot;, score=&quot; + score + &quot;]&quot;;
-    }
-
-}
-</code></pre><p>接口：IStudentDao.java</p>
-<pre><code>package com.bjpowernode.dao;
-
-import java.util.List;
-import java.util.Map;
-
-import com.bjpowernode.beans.Student;
-
-public interface IStudentDao {
-    //插入
-    void insertStudent(Student student);
-    //插入后获取id
-    void insertStudentCatchId(Student student);
-    //删除
-    void deleteStudentById(int id);
-    //修改
-    void updateStudent(Student student);
-    //查询所有学生对象
-    List&lt;Student&gt; selectAllStudents();
-
-    //根据id查询某个学生
-    Student selectStudentById(int id);
-
-    //根据名字模糊查询
-    List&lt;Student&gt; selectStudentsByName(String name);
-}
-</code></pre><p>工具类：</p>
-<pre><code>package com.bjpowernode.utils;
-
-public class MyBatisUtils {
-    private static SqlSessionFactory sqlSessionFactory;
-
-    public static SqlSession getSqlSession() {
-        try {
-            InputStream inputStream = Resources.getResourceAsStream(&quot;mybatis.xml&quot;);
-            if(sqlSessionFactory == null) {
-                sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
-            }
-            return sqlSessionFactory.openSession();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-}    
-</code></pre><p>数据库连接四要素配置文件：jdbc_mysql.properties</p>
-<pre><code>jdbc.driver=com.mysql.jdbc.Driver
-jdbc.url=jdbc:mysql:///mydatabase
-jdbc.user=root
-jdbc.password=haojie_123456
-</code></pre><p>主配置文件：mybatis.xml</p>
-<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-&lt;!DOCTYPE configuration
-PUBLIC &quot;-//mybatis.org//DTD Config 3.0//EN&quot;
-&quot;http://mybatis.org/dtd/mybatis-3-config.dtd&quot;&gt;
-
-&lt;configuration&gt;
-    &lt;!-- 注册DB连接四要素属性文件 --&gt;
-    &lt;properties resource=&quot;jdbc_mysql.properties&quot;&gt;&lt;/properties&gt;
-
-    &lt;!-- 设置别名 --&gt;
-    &lt;typeAliases&gt;
-        &lt;!-- 将指定包中所有类的简单类名当作别名 --&gt;
-        &lt;package name=&quot;com.bjpowernode.beans&quot;/&gt;
-    &lt;/typeAliases&gt;
-
-    &lt;!-- 配置运行环境 --&gt;
-    &lt;environments default=&quot;mysqlEM&quot;&gt;
-        &lt;environment id=&quot;mysqlEM&quot;&gt;
-            &lt;transactionManager type=&quot;JDBC&quot;&gt;&lt;/transactionManager&gt;
-            &lt;dataSource type=&quot;POOLED&quot;&gt;
-                &lt;property name=&quot;driver&quot; value=&quot;${jdbc.driver}&quot;/&gt;
-                &lt;property name=&quot;url&quot; value=&quot;${jdbc.url}&quot;/&gt;
-                &lt;property name=&quot;username&quot; value=&quot;${jdbc.user}&quot;/&gt;
-                &lt;property name=&quot;password&quot; value=&quot;${jdbc.password}&quot;/&gt;
-            &lt;/dataSource&gt;
-        &lt;/environment&gt;
-    &lt;/environments&gt;
-
-    &lt;!-- 注册映射文件 --&gt;
-    &lt;mappers&gt;
-        &lt;mapper resource=&quot;com/bjpowernode/dao/mapper.xml&quot; /&gt;    
-    &lt;/mappers&gt;
-
-&lt;/configuration&gt;
-</code></pre><p>映射文件：mapper.xml</p>
-<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-&lt;!DOCTYPE mapper
-PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
-&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
-
-&lt;mapper namespace=&quot;com.bjpowernode.dao.IStudentDao&quot;&gt;
-
-    &lt;insert id=&quot;insertStudent&quot; parameterType=&quot;Student&quot;&gt;
-        insert into student(name,age,score) values(#{name},#{age},#{score})
-    &lt;/insert&gt;
-
-    &lt;insert id=&quot;insertStudentCatchId&quot;&gt;
-        insert into student(name,age,score) values(#{name},#{age},#{score})
-        &lt;selectKey resultType=&quot;int&quot; keyProperty=&quot;id&quot; order=&quot;AFTER&quot;&gt;
-            select @@identity
-        &lt;/selectKey&gt;
-    &lt;/insert&gt;
-
-    &lt;delete id=&quot;deleteStudentById&quot;&gt;
-        delete from student where id=#{aaa} &lt;!-- 这里的#{}仅仅是个占位符，里面放什么都行 --&gt;
-    &lt;/delete&gt;
-
-    &lt;update id=&quot;updateStudent&quot;&gt;
-        update student set name=#{name}, age=#{age}, score=#{score} where id=#{id}
-    &lt;/update&gt;
-
-    &lt;select id=&quot;selectAllStudents&quot; resultType=&quot;Student&quot;&gt;
-        select id,name,age,score from student
-    &lt;/select&gt;
-
-    &lt;!-- 
-        resultType: 表示通过反映机制，调用set+属性名的方式，将结果封装为Student对象
-        如果属性名和字段名不一致，表中的字段为tid,tname,tage,score，属性名为id,name,age,score
-        解决方式一：字段别名 select tid id, tname name, tage age, score frome student
-        解决方式二：resultMap 
-            &lt;resultMap type=&quot;Student&quot; id=&quot;studentMapper&quot;&gt;
-                &lt;id column=&quot;tid&quot; property=&quot;id&quot; /&gt;
-                &lt;result column=&quot;tname&quot; property=&quot;name&quot; /&gt;
-                &lt;result column=&quot;tage&quot; property=&quot;age&quot; /&gt;
-            &lt;/resultMap&gt;
-            &lt;select id=&quot;selectAllStudents&quot; resultMap=&quot;studentMapper&quot;&gt;
-                select id,name,age,score from student
-            &lt;/select&gt;        
-     --&gt;    
-
-    &lt;select id=&quot;selectStudentById&quot; resultType=&quot;Student&quot;&gt;
-        select id,name,age,score from student where id=#{bbbbbb}
-    &lt;/select&gt;
-
-    &lt;select id=&quot;selectStudentsByName&quot; resultType=&quot;Student&quot;&gt;
-        &lt;!-- select id,name,age,score from student where name like concat(&apos;%&apos;,#{xxx},&apos;%&apos;) --&gt;
-        select id,name,age,score from student where name like &apos;%&apos; #{xxx} &apos;%&apos;
-    &lt;/select&gt;
-
-&lt;/mapper&gt;
-</code></pre><p>测试文件：Mytest.java</p>
-<pre><code>package com.bjpowernode.test;
-
-public class MyTest {
-
-    private IStudentDao dao;
-    private SqlSession sqlSession;
-
-    @Before
-    public void Before() {
-        sqlSession = MyBatisUtils.getSqlSession();
-        //dao:是一个动态代理
-        dao = sqlSession.getMapper(IStudentDao.class);
-    }
-
-    @After
-    public void after() {
-        if(sqlSession != null) {
-            sqlSession.close();
-        }
-    }
-
-    @Test
-    public void testInsertStudent() {
-        Student student = new Student(&quot;zhangsan2&quot;, 24, 1);
-        dao.insertStudent(student);
-        sqlSession.commit();
-    }
-
-    @Test
-    public void insertStudentCatchId() {
-        Student student = new Student(&quot;lisi&quot;, 24, 94);
-        System.out.println(&quot;插入前：student=&quot;+student);
-        dao.insertStudentCatchId(student);
-        System.out.println(&quot;插入后：student=&quot;+student);
-    }
-
-    @Test
-    public void testDeleteStudentById() {
-        dao.deleteStudentById(13);
-    }
-
-    @Test
-    public void testUpdateStudent() {
-        Student student = new Student(&quot;wangwu&quot;,25,95);
-        student.setId(14);
-        dao.updateStudent(student);
-    }
-
-    @Test
-    public void testSelectAllStudents() {
-        List&lt;Student&gt; students = dao.selectAllStudents();
-        for(Student student:students) {
-            System.out.println(student);
-        }
-    }
-
-    @Test
-    public void testSelectStudentById() {
-        Student student = dao.selectStudentById(14);
-        System.out.println(student);
-    }
-
-    @Test
-    public void testSelectStudentByName() {
-        List&lt;Student&gt; students = dao.selectStudentsByName(&quot;zhang&quot;);
-        for(Student student:students) {
-            System.out.println(student);
-        }
-    }
-}
-</code></pre><h4 id="1-5-多条件查询问题-根据Map查询"><a href="#1-5-多条件查询问题-根据Map查询" class="headerlink" title="1.5 多条件查询问题 - 根据Map查询"></a>1.5 多条件查询问题 - 根据Map查询</h4><p>接口：IStudentDao.java</p>
-<pre><code>package com.bjpowernode.dao;
-
-public interface IStudentDao {    
-    List&lt;Student&gt; selectStudentsByCondition(Map&lt;String, Object&gt; map);
-}
-</code></pre><p>映射文件：</p>
-<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-&lt;!DOCTYPE mapper
-PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
-&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
-
-&lt;mapper namespace=&quot;com.bjpowernode.dao.IStudentDao&quot;&gt;
-
-
-    &lt;select id=&quot;selectStudentsByCondition&quot; resultType=&quot;Student&quot;&gt;
-        &lt;!-- #{}里面可以放对象的属性名，也可以放map的key，也可以直接通过对象获取属性：如student.score --&gt;
-        select id,name,age,score from student where name like &apos;%&apos; #{nameCondition} &apos;%&apos; and age &gt; #{ageCondition}
-    &lt;/select&gt;
-
-&lt;/mapper&gt;
-</code></pre><p>测试类：MyTest.java</p>
-<pre><code>package com.bjpowernode.test;
-
-public class MyTest {
-
-    private IStudentDao dao;
-    private SqlSession sqlSession;
-
-    @Before
-    public void Before() {
-        sqlSession = MyBatisUtils.getSqlSession();
-        //dao:是一个动态代理
-        dao = sqlSession.getMapper(IStudentDao.class);
-    }
-
-    @After
-    public void after() {
-        if(sqlSession != null) {
-            sqlSession.close();
-        }
-    }
-
-    @Test
-    public void testSelectStudentsByCondition() {
-         Map&lt;String, Object&gt; map = new HashMap&lt;String, Object&gt;();
-         map.put(&quot;nameCondition&quot;, &quot;zhang&quot;);
-         map.put(&quot;ageCondition&quot;, 10);
-
-         List&lt;Student&gt; students = dao.selectStudentsByCondition(map);
-         for(Student student:students) {
-             System.out.println(student);
-         }
-    }
-}
-</code></pre><h4 id="1-6-多条件查询问题-使用索引号"><a href="#1-6-多条件查询问题-使用索引号" class="headerlink" title="1.6 多条件查询问题 - 使用索引号"></a>1.6 多条件查询问题 - 使用索引号</h4><p>接口类</p>
-<pre><code>package com.bjpowernode.dao;
-
-public interface IStudentDao {    
-    List&lt;Student&gt; selectStudentsByCondition(String name, int age);
-}
-</code></pre><p>映射文件：</p>
-<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-&lt;!DOCTYPE mapper
-PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
-&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
-
-&lt;mapper namespace=&quot;com.bjpowernode.dao.IStudentDao&quot;&gt;
-
-
-    &lt;select id=&quot;selectStudentsByCondition&quot; resultType=&quot;Student&quot;&gt;
-        &lt;!-- 
-            #{}里面可以放:
-            1、对象的属性名，
-            2、参数为map时，可以放map的key，
-            3、参数为map时，或key所对应的value为对象，则可以放入对象的属性如：Student.score 
-            4、也可以放索引
-            5、当#{}是个占位符时，可以放随意字符
-        --&gt;
-        select id,name,age,score 
-        from student 
-        where name like &apos;%&apos; #{0} &apos;%&apos; 
-        and age &gt; #{1}
-    &lt;/select&gt;
-
-&lt;/mapper&gt;
-</code></pre><p>测试类</p>
-<pre><code>package com.bjpowernode.test;
-
-public class MyTest {
-
-    private IStudentDao dao;
-    private SqlSession sqlSession;
-
-    @Before
-    public void Before() {
-        sqlSession = MyBatisUtils.getSqlSession();
-        //dao:是一个动态代理
-        dao = sqlSession.getMapper(IStudentDao.class);
-    }
-
-    @After
-    public void after() {
-        if(sqlSession != null) {
-            sqlSession.close();
-        }
-    }
-
-
-    @Test
-    public void testSelectStudentsByCondition() {
-
-         List&lt;Student&gt; students = dao.selectStudentsByCondition(&quot;zhang&quot;,23);
-         for(Student student:students) {
-             System.out.println(student);
-         }
-    }
-}
-</code></pre><h4 id="1-7-动态SQL"><a href="#1-7-动态SQL" class="headerlink" title="1.7 动态SQL"></a>1.7 动态SQL</h4><p>动态SQL，主要用于解决查询条件不确定的情况：在程序运行期间，根据用户提交的查询条件进行查询。提交的查询条件不同，执行的SQL语句不同。若将每种情况均逐一列出，对所有条件进行排列组合，将会出现大理的SQL语句。此时，可使用动态SQL来解决这样的问题。</p>
-<h5 id="动态SQL-if、where、choose、foreach、foreach-list、foreach-泛型自定义类型list"><a href="#动态SQL-if、where、choose、foreach、foreach-list、foreach-泛型自定义类型list" class="headerlink" title="动态SQL - if、where、choose、foreach、foreach-list、foreach-泛型自定义类型list"></a>动态SQL - if、where、choose、foreach、foreach-list、foreach-泛型自定义类型list</h5><p>测试类：</p>
-<pre><code>package com.bjpowernode.test;
-
-public class MyTest {
-
-    private IStudentDao dao;
-    private SqlSession sqlSession;
-
-    @Before
-    public void Before() {
-        sqlSession = MyBatisUtils.getSqlSession();
-        //dao:是一个动态代理
-        dao = sqlSession.getMapper(IStudentDao.class);
-    }
-
-    @After
-    public void after() {
-        if(sqlSession != null) {
-            sqlSession.close();
-        }
-    }
-
-    @Test
-    public void testSelectStudentsByIf() {
-        Student student = new Student(&quot;zhang&quot;,23,0);
-         List&lt;Student&gt; students = dao.selectStudentsByIf(student);
-         for(Student student1:students) {
-             System.out.println(student1);
-         }
-    }
-
-    @Test
-    public void testSelectStudentsByWhere() {
-        Student student = new Student(&quot;&quot;,0,0);
-         List&lt;Student&gt; students = dao.selectStudentsByWhere(student);
-         for(Student student1:students) {
-             System.out.println(student1);
-         }
-    }
-
-    @Test
-    public void testSelectStudentsByChoose() {
-        Student student = new Student(&quot;&quot;,0,0);
-         List&lt;Student&gt; students = dao.selectStudentsByChoose(student);
-         for(Student student1:students) {
-             System.out.println(student1);
-         }
-    }
-
-    @Test
-    public void testForeach() {
-        int[] ids = {14,16,18};
-        List&lt;Student&gt; students = dao.selectStudentsByForeach(ids);
-        for(Student student1:students) {
-            System.out.println(student1);
-        }
-    }
-
-    @Test
-    public void testForeachList() {
-        List&lt;Integer&gt; ids = new ArrayList&lt;&gt;();
-        ids.add(14);
-        ids.add(16);
-        ids.add(18);
-        List&lt;Student&gt; students = dao.selectStudentsByForeachList(ids);
-        for(Student student1:students) {
-            System.out.println(student1);
-        }
-    }
-
-    @Test
-    public void testForeachObject() {
-        Student stu1 = new Student();
-        stu1.setId(14);
-
-        Student stu2 = new Student();
-        stu2.setId(16);
-
-        List&lt;Student&gt; stus = new ArrayList&lt;&gt;();
-        stus.add(stu1);
-        stus.add(stu2);
-
-        List&lt;Student&gt; students = dao.selectStudentsByForeachObject(stus);
-        for(Student student1:students) {
-            System.out.println(student1);
-        }
-    }
-}
-</code></pre><p>接口</p>
-<pre><code>package com.bjpowernode.dao;
-
-public interface IStudentDao {
-    List&lt;Student&gt; selectStudentsByIf(Student student);
-
-    List&lt;Student&gt; selectStudentsByWhere(Student student);
-
-    List&lt;Student&gt; selectStudentsByChoose(Student student);
-
-    List&lt;Student&gt; selectStudentsByForeach(int[] ids);
-
-    List&lt;Student&gt; selectStudentsByForeachList(List&lt;Integer&gt; ids);
-
-    List&lt;Student&gt; selectStudentsByForeachObject(List&lt;Student&gt; students);
-
-}
-</code></pre><p>映射文件</p>
-<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-&lt;!DOCTYPE mapper
-PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
-&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
-
-&lt;mapper namespace=&quot;com.bjpowernode.dao.IStudentDao&quot;&gt;
-
-    &lt;select id=&quot;selectStudentsByIf&quot; resultType=&quot;Student&quot;&gt;
-        select id,name,age,score 
-        from student 
-        where 1 = 1 
-        &lt;if test=&quot;name != null and name !=&apos;&apos;&quot;&gt;
-            and name like &apos;%&apos; #{name} &apos;%&apos;
-        &lt;/if&gt;
-        &lt;if test=&quot;age &gt; 0&quot;&gt;
-            and age &gt; #{age}
-        &lt;/if&gt;
-    &lt;/select&gt;
-
-    &lt;select id=&quot;selectStudentsByWhere&quot; resultType=&quot;Student&quot;&gt;
-        select id,name,age,score 
-        from student 
-        &lt;where&gt;
-            &lt;if test=&quot;name != null and name !=&apos;&apos;&quot;&gt;
-                and name like &apos;%&apos; #{name} &apos;%&apos;
-            &lt;/if&gt;
-            &lt;if test=&quot;age &gt; 0&quot;&gt;
-                and age &gt; #{age}
-            &lt;/if&gt;
-        &lt;/where&gt;
-    &lt;/select&gt;
-
-    &lt;!-- 
-        若姓名不空，则按姓名查询；若年龄不空，则按年龄查询；都为空，不查询。
-     --&gt;
-    &lt;select id=&quot;selectStudentsByChoose&quot; resultType=&quot;Student&quot;&gt;
-        select id,name,age,score 
-        from student 
-        &lt;where&gt;
-            &lt;choose&gt;
-                &lt;when test=&quot;name != null and name != &apos;&apos;&quot;&gt;
-                    and name like &apos;%&apos; #{name} &apos;%&apos;
-                &lt;/when&gt;
-                &lt;when test=&quot;age &gt; 0&quot;&gt;
-                    and age &gt; #{age}
-                &lt;/when&gt;
-                &lt;otherwise&gt;
-                    1 &gt; 2
-                &lt;/otherwise&gt;
-            &lt;/choose&gt;
-        &lt;/where&gt;
-    &lt;/select&gt;
-
-    &lt;select id=&quot;selectStudentsByForeach&quot; resultType=&quot;Student&quot;&gt;
-        &lt;!-- select id,name,age,score from student where id in (1,3,5) --&gt;
-        select id,name,age,score 
-        from student 
-        &lt;if test=&quot;array.length &gt; 0&quot;&gt;
-            where id in 
-            &lt;foreach collection=&quot;array&quot; item=&quot;myid&quot; open=&quot;(&quot; close=&quot;)&quot; separator=&quot;,&quot;&gt;
-                #{myid}
-            &lt;/foreach&gt;
-        &lt;/if&gt;
-    &lt;/select&gt;
-
-    &lt;select id=&quot;selectStudentsByForeachList&quot; resultType=&quot;Student&quot;&gt;
-        &lt;!-- select id,name,age,score from student where id in (1,3,5) --&gt;
-        select id,name,age,score 
-        from student 
-        &lt;if test=&quot;list.size &gt; 0&quot;&gt;
-            where id in 
-            &lt;foreach collection=&quot;list&quot; item=&quot;myid&quot; open=&quot;(&quot; close=&quot;)&quot; separator=&quot;,&quot;&gt;
-                #{myid}
-            &lt;/foreach&gt;
-        &lt;/if&gt;
-    &lt;/select&gt;
-
-    &lt;select id=&quot;selectStudentsByForeachObject&quot; resultType=&quot;Student&quot;&gt;
-        select id,name,age,score 
-        from student 
-        &lt;if test=&quot;list.size &gt; 0&quot;&gt;
-            where id in 
-            &lt;foreach collection=&quot;list&quot; item=&quot;stu&quot; open=&quot;(&quot; close=&quot;)&quot; separator=&quot;,&quot;&gt;
-                #{stu.id}
-            &lt;/foreach&gt;
-        &lt;/if&gt;
-    &lt;/select&gt;
-
-    &lt;sql id=&quot;&quot;&gt;
-
-    &lt;/sql&gt;
-
-&lt;/mapper&gt;    
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/08/java/mybatis/mybatis-1/" data-id="cjh4911le004emtp3pryz22si" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mybatis/">mybatis</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/spring/spring-10" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/05/08/java/spring/spring-10/" class="article-date">
-  <time datetime="2018-05-08T01:50:30.000Z" itemprop="datePublished">2018-05-08</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/spring/">spring</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/05/08/java/spring/spring-10/">第十章 Spring事务管理</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h4 id="10-1-事务管理器接口"><a href="#10-1-事务管理器接口" class="headerlink" title="10.1 事务管理器接口"></a>10.1 事务管理器接口</h4><p>事务管理器是PlatformTransactionManager接口对象。其主要用于完成事务的提交、回滚及获取事务的状态信息。</p>
-<h5 id="常用的两个实现类"><a href="#常用的两个实现类" class="headerlink" title="常用的两个实现类"></a>常用的两个实现类</h5><ul>
-<li><p>DataSourceTransactionManager：使用JDBC或iBatis进行持久化数据时使用。</p>
-</li>
-<li><p>HibernateTransactionManager：使用Hibernate进行持久化数据时使用。</p>
-</li>
-</ul>
-<h5 id="Spring的回滚方式"><a href="#Spring的回滚方式" class="headerlink" title="Spring的回滚方式"></a>Spring的回滚方式</h5><p>Spring事务的默认回滚方式是：发生运行异常时回滚，发生受查异常时提交。</p>
-<p>运行异常指的是继承自RuntimeException的异常类，受查异常指的是继承自Exception的异常类。</p>
-<h4 id="10-2-事务定义接口"><a href="#10-2-事务定义接口" class="headerlink" title="10.2 事务定义接口"></a>10.2 事务定义接口</h4><p>TransactionDefinition</p>
-<h5 id="隔离级别："><a href="#隔离级别：" class="headerlink" title="隔离级别："></a>隔离级别：</h5><ul>
-<li><p>static int    ISOLATION_DEFAULT          0</p>
-</li>
-<li><p>static int    ISOLATION_READ_COMMITTED   2</p>
-</li>
-<li><p>static int    ISOLATION_READ_UNCOMMITED  1 </p>
-</li>
-<li><p>static int    ISOLATION_REPEATABLE_READ  4</p>
-</li>
-<li><p>static int    ISOLATION_SERIALIZABLE     8</p>
-</li>
-</ul>
-<p>MYSQL默认的是可重复读，ORACLE默认的是读已提交</p>
-<h5 id="事务的传播行为"><a href="#事务的传播行为" class="headerlink" title="事务的传播行为"></a>事务的传播行为</h5><p>定义了七个事务传播行为。</p>
-<p>doSome()方法调用doOther()方法，或doSome()方法存在于事务中，则doOther()方法加入到该事务中执行；若doSome()方法在调用doOther()方法时没有在事务内执行，则doOther()方法会创建一个事务，并在其中执行。</p>
-<h4 id="10-3-程序举例"><a href="#10-3-程序举例" class="headerlink" title="10.3 程序举例"></a>10.3 程序举例</h4><p>两个实体：银行账户Account与股票账户Stock。当要购买股票时，从Account中扣除相应金额的存款，同时在Stock中增加相应的股票数量。在这个过程中，抛出一个用户自定义的异常，使两个操作回滚。</p>
-<h4 id="10-4-定义实体及DB表"><a href="#10-4-定义实体及DB表" class="headerlink" title="10.4 定义实体及DB表"></a>10.4 定义实体及DB表</h4><p>Account.java</p>
-<pre><code>package com.bjpowernode.beans;
-
-public class Account {
-    private Integer aid;
-    private String aname;
-    private double balance;
-    public Account() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
-    public Account(String aname, double balance) {
-        super();
-        this.aname = aname;
-        this.balance = balance;
-    }
-    public Integer getAid() {
-        return aid;
-    }
-    public void setAid(Integer aid) {
-        this.aid = aid;
-    }
-    public String getAname() {
-        return aname;
-    }
-    public void setAname(String aname) {
-        this.aname = aname;
-    }
-    public double getBalance() {
-        return balance;
-    }
-    public void setBalance(double balance) {
-        this.balance = balance;
-    }
-    @Override
-    public String toString() {
-        return &quot;Account [aid=&quot; + aid + &quot;, aname=&quot; + aname + &quot;, balance=&quot; + balance + &quot;]&quot;;
-    }
-
-}
-</code></pre><p>Stock.java</p>
-<pre><code>package com.bjpowernode.beans;
-
-public class Stock {
-    private Integer sid;
-    private String sname;
-    private int count;
-
-    public Stock() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
-
-    public Stock(String sname, int count) {
-        super();
-        this.sname = sname;
-        this.count = count;
-    }
-
-    public Integer getSid() {
-        return sid;
-    }
-
-    public void setSid(Integer sid) {
-        this.sid = sid;
-    }
-
-    public String getSname() {
-        return sname;
-    }
-
-    public void setSname(String sname) {
-        this.sname = sname;
-    }
-
-    public int getCount() {
-        return count;
-    }
-
-    public void setCount(int count) {
-        this.count = count;
-    }
-
-    @Override
-    public String toString() {
-        return &quot;Stock [sid=&quot; + sid + &quot;, sname=&quot; + sname + &quot;, count=&quot; + count + &quot;]&quot;;
-    }
-
-}
-</code></pre><h4 id="10-5-定义service"><a href="#10-5-定义service" class="headerlink" title="10.5 定义service"></a>10.5 定义service</h4><p>业务接口</p>
-<pre><code>package com.bjpowernode.service;
-
-public interface IBuyStockService {
-    void openAccount(String aname, double money);
-    void openStock(String sname, int amount);
-    void buyStock(String aname, double money, String sname, int amount) throws BuyStockException;
-}
-</code></pre><p>业务实现类</p>
-<pre><code>package com.bjpowernode.service;
-
-import com.bjpowernode.Dao.IAccountDao;
-import com.bjpowernode.Dao.IStockDao;
-
-public class BuyStockServiceImpl implements IBuyStockService {
-    private IAccountDao adao;
-    private IStockDao sdao;
-
-    public void setAdao(IAccountDao adao) {
-        this.adao = adao;
-    }
-
-    public void setSdao(IStockDao sdao) {
-        this.sdao = sdao;
-    }
-
-    @Override
-    public void openAccount(String aname, double money) {
-        adao.insertAccount(aname, money);
-    }
-
-    @Override
-    public void openStock(String sname, int amount) {
-        sdao.insertStock(sname, amount);
-    }
-
-    @Override
-    public void buyStock(String aname, double money, String sname, int amount) throws BuyStockException {
-        boolean isBuy = true;
-        adao.updateAccount(aname, money, isBuy);
-        if(true) {
-            throw new BuyStockException(&quot;购买股票异常&quot;);
-        }
-        sdao.updateStock(sname, amount, isBuy);
-    }
-
-}
-</code></pre><h4 id="10-6-定义Dao"><a href="#10-6-定义Dao" class="headerlink" title="10.6 定义Dao"></a>10.6 定义Dao</h4><p>IAccountDao</p>
-<pre><code>package com.bjpowernode.Dao;
-
-public interface IAccountDao {
-
-    void insertAccount(String aname, double money);
-
-    void updateAccount(String aname, double money, boolean isBuy);
-
-}
-</code></pre><p>AccountDaoImpl</p>
-<pre><code>package com.bjpowernode.Dao;
-
-import org.springframework.jdbc.core.support.JdbcDaoSupport;
-
-public class AccountDaoImpl extends JdbcDaoSupport implements IAccountDao {
-
-    @Override
-    public void insertAccount(String aname, double money) {
-        String sql = &quot;insert into account(aname, balance) values(?,?)&quot;;
-        this.getJdbcTemplate().update(sql, aname, money);
-    }
-
-    @Override
-    public void updateAccount(String aname, double money, boolean isBuy) {
-        String sql = &quot;update account set balance = balance + ? where aname=?&quot;;
-        if(isBuy) {
-            sql = &quot;update account set balance = balance - ? where aname=?&quot;;
-        }
-        this.getJdbcTemplate().update(sql, money, aname);
-    }
-
-}
-</code></pre><p>IStockDao</p>
-<pre><code>package com.bjpowernode.Dao;
-
-public interface IStockDao {
-
-    void insertStock(String sname, int amount);
-
-    void updateStock(String sname, int amount, boolean isBuy);
-
-}
-</code></pre><p>StockDaoImpl</p>
-<pre><code>package com.bjpowernode.Dao;
-
-import org.springframework.jdbc.core.support.JdbcDaoSupport;
-
-public class StockDaoImpl extends JdbcDaoSupport implements IStockDao {
-
-    @Override
-    public void insertStock(String sname, int amount) {
-        String sql = &quot;insert into stock(sname, count) values(?,?)&quot;;
-        this.getJdbcTemplate().update(sql, sname, amount);
-    }
-
-    @Override
-    public void updateStock(String sname, int amount, boolean isBuy) {
-        String sql = &quot;update stock set count = count-? where sname=?&quot;;
-        if(isBuy) {
-            sql = &quot;update stock set count = count+? where sname=?&quot;;            
-        }
-        this.getJdbcTemplate().update(sql, amount, sname);
-    }
-
-}
-</code></pre><h4 id="10-7-定义测试类"><a href="#10-7-定义测试类" class="headerlink" title="10.7 定义测试类"></a>10.7 定义测试类</h4><p>MyTest.java</p>
-<pre><code>package com.bjpowernode.test;
-
-import java.nio.channels.AcceptPendingException;
-import java.util.List;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.cache.support.AbstractCacheManager;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.dao.support.DaoSupport;
-
-import com.bjpowernode.service.BuyStockException;
-import com.bjpowernode.service.IBuyStockService;
-
-
-public class MyTest {
-
-    private IBuyStockService service;
-
-    @Before
-    public void before() {
-        String source = &quot;applicationContext.xml&quot;;
-        ApplicationContext ac = new ClassPathXmlApplicationContext(source);
-        service = (IBuyStockService) ac.getBean(&quot;buyStockService&quot;);
-    }
-
-    @Test
-    public void test01() {
-        service.openAccount(&quot;张三&quot;, 10000);
-        service.openStock(&quot;动力节点&quot;, 0);
-    }    
-
-    @Test
-    public void test02() {
-        try {
-            service.buyStock(&quot;张三&quot;, 2000, &quot;动力节点&quot;, 5);
-        } catch (BuyStockException e) {
-            e.printStackTrace();
-        }
-    }    
-
-}
-</code></pre><h4 id="10-8-异常类"><a href="#10-8-异常类" class="headerlink" title="10.8 异常类"></a>10.8 异常类</h4><pre><code>package com.bjpowernode.service;
-
-public class BuyStockException extends Exception {
-
-    public BuyStockException() {
-        super();
-    }
-
-    public BuyStockException(String message) {
-        super(message);
-    }
-
-}
-</code></pre><h4 id="10-9-注册"><a href="#10-9-注册" class="headerlink" title="10.9 注册"></a>10.9 注册</h4><p>applicationContext.xml</p>
-<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
-
-&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
-xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
-xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
-xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
-xmlns:tx=&quot;http://www.springframework.org/schema/tx&quot;
-xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
-http://www.springframework.org/schema/beans/spring-beans.xsd
-http://www.springframework.org/schema/context
-http://www.springframework.org/schema/context/spring-context.xsd
-http://www.springframework.org/schema/aop
-http://www.springframework.org/schema/aop/spring-aop.xsd
-http://www.springframework.org/schema/tx
-http://www.springframework.org/schema/tx/spring-tx.xsd&quot;&gt;
-
-    &lt;!-- 注册属性文件：从属性文件读取DB连接四要素：方式二 --&gt;
-    &lt;context:property-placeholder location=&quot;classpath:jdbc.properties&quot;/&gt;
-
-    &lt;!-- 注册数据源:Spring内置的连接池 --&gt;
-    &lt;bean id=&quot;myDataSource&quot; class=&quot;org.springframework.jdbc.datasource.DriverManagerDataSource&quot;&gt;
-        &lt;property name=&quot;driverClassName&quot; value=&quot;${jdbc.driver}&quot;&gt;&lt;/property&gt;
-        &lt;property name=&quot;url&quot; value=&quot;${jdbc.url}&quot;&gt;&lt;/property&gt;
-        &lt;property name=&quot;username&quot; value=&quot;${jdbc.user}&quot;&gt;&lt;/property&gt;
-        &lt;property name=&quot;password&quot; value=&quot;${jdbc.password}&quot;&gt;&lt;/property&gt;
-    &lt;/bean&gt;
-
-    &lt;!-- 注册dao --&gt;
-    &lt;bean id=&quot;accountDao&quot; class=&quot;com.bjpowernode.Dao.AccountDaoImpl&quot;&gt;
-        &lt;property name=&quot;dataSource&quot; ref=&quot;myDataSource&quot;&gt;&lt;/property&gt;
-    &lt;/bean&gt;
-
-    &lt;bean id=&quot;stockDao&quot; class=&quot;com.bjpowernode.Dao.StockDaoImpl&quot;&gt;
-        &lt;property name=&quot;dataSource&quot; ref=&quot;myDataSource&quot;&gt;&lt;/property&gt;
-    &lt;/bean&gt;
-
-    &lt;!-- 注册service --&gt;
-    &lt;bean id=&quot;buyStockService&quot; class=&quot;com.bjpowernode.service.BuyStockServiceImpl&quot;&gt;
-        &lt;property name=&quot;adao&quot; ref=&quot;accountDao&quot;&gt;&lt;/property&gt;
-        &lt;property name=&quot;sdao&quot; ref=&quot;stockDao&quot;&gt;&lt;/property&gt;
-    &lt;/bean&gt;
-
-&lt;!-- ============================ AOP ===================================================  --&gt;
-
-    &lt;!-- 注册事务管理器 --&gt;
-    &lt;bean id=&quot;myTransactionManager&quot; class=&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;&gt;
-        &lt;property name=&quot;dataSource&quot; ref=&quot;myDataSource&quot;&gt;&lt;/property&gt;
-    &lt;/bean&gt;
-
-    &lt;!-- 注册事务通知 --&gt;
-    &lt;tx:advice id=&quot;txAdvice&quot; transaction-manager=&quot;myTransactionManager&quot;&gt;
-        &lt;tx:attributes&gt;
-            &lt;!-- 这里指定的是：为每一个连接点指定所要应用的事务属性 --&gt;
-            &lt;tx:method name=&quot;open*&quot; isolation=&quot;DEFAULT&quot; propagation=&quot;REQUIRED&quot;/&gt;
-            &lt;tx:method name=&quot;buyStock&quot; isolation=&quot;DEFAULT&quot; propagation=&quot;REQUIRED&quot; rollback-for=&quot;BuyStockException&quot;/&gt;
-        &lt;/tx:attributes&gt;
-    &lt;/tx:advice&gt;
-
-    &lt;aop:config&gt;
-        &lt;!-- 这里指定的是切入点 --&gt;
-        &lt;aop:pointcut expression=&quot;execution(* *..service.*.buyStock(..))&quot; id=&quot;myPointcut&quot;/&gt;
-        &lt;aop:advisor advice-ref=&quot;txAdvice&quot; pointcut-ref=&quot;myPointcut&quot;/&gt;    
-    &lt;/aop:config&gt;
-
-&lt;/beans&gt;
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/08/java/spring/spring-10/" data-id="cjh4911md005jmtp3kcdaj7ph" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/spring/spring-9" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/05/06/java/spring/spring-9/" class="article-date">
-  <time datetime="2018-05-06T08:17:07.000Z" itemprop="datePublished">2018-05-06</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/spring/">spring</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/05/06/java/spring/spring-9/">第九章 spring与JDBC模板</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>为了避免直接使用JDBC而带来的复杂且冗长的代码，Spring提供了一个强有力的模板类-JdbcTemplate来简化JDBC操作。并且，数据源DataSource对象与模板JdbcTemplate对象均通过Bean的形式定义在配置文件中，充分发挥了依赖注入的威力。</p>
-<h4 id="9-1-导入jar包"><a href="#9-1-导入jar包" class="headerlink" title="9.1 导入jar包"></a>9.1 导入jar包</h4><p>spring-jdbc-*.jar</p>
-<p>spring的事务 spring-tx-*.jar</p>
-<p>c3p0: com.springsource.com.mchange.v2.c3p0-**.jar</p>
-<p>dbcp: </p>
-<ul>
-<li><p>com.springsource.org.apache.commons.dbcp-*.osgi.jar</p>
-</li>
-<li><p>com.springsource.org.apache.commons.pool-*.jar</p>
-</li>
-</ul>
-<p>mysql驱动：mysql-connector-java-*-bin.jar</p>
-<h4 id="9-3-定义实体类与DB表"><a href="#9-3-定义实体类与DB表" class="headerlink" title="9.3 定义实体类与DB表"></a>9.3 定义实体类与DB表</h4><p>student类</p>
-<pre><code>package com.bjpowernode.beans;
-
-public class Student {
-    private Integer id;
-    private String name;
-    private int age;
-
-    public Student() {
-        super();
-    }
-
-
-    public Student(Integer id, String name, int age) {
-        super();
-        this.id = id;
-        this.name = name;
-        this.age = age;
-    }
-
-
-    public Student(String name, int age) {
-        super();
-        this.name = name;
-        this.age = age;
-    }
-
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-
-    public Integer getId() {
-        return id;
-    }
-
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-
-    @Override
-    public String toString() {
-        return &quot;Student [name=&quot; + name + &quot;, age=&quot; + age + &quot;]&quot;;
-    }
-
-}
-</code></pre><p>导出student.sql放入项目中</p>
-<h4 id="9-4-定义Service"><a href="#9-4-定义Service" class="headerlink" title="9.4 定义Service"></a>9.4 定义Service</h4><p>IStudentService接口</p>
-<pre><code>package com.bjpowernode.service;
-
-import java.util.List;
-
-import com.bjpowernode.beans.Student;
-
-public interface IStudentService {
-
-    void addStudent(Student student);
-    void removeById(int id);
-    void modifyStudent(Student student);
-
-    List&lt;String&gt; findAllStudentsNames();
-    String findStudentNameById(int id);
-
-    List&lt;Student&gt; findAllStudents();
-    Student findStudentById(int id);
-
-}
-</code></pre><p>StudentServiceImpl实现类</p>
-<pre><code>package com.bjpowernode.service;
-
-import java.util.List;
-
-import com.bjpowernode.Dao.IStudentDao;
-import com.bjpowernode.beans.Student;
-
-public class StudentServiceImpl implements IStudentService {
-
-    private IStudentDao dao;
-
-    public void setDao(IStudentDao dao) {
-        this.dao = dao;
-    }
-
-
-    @Override
-    public void addStudent(Student student) {
-        dao.insertStudent(student);
-    }
-
-    @Override
-    public void removeById(int id) {
-        dao.deleteById(id);
-    }
-
-    @Override
-    public void modifyStudent(Student student) {
-        dao.updateStudent(student);
-    }
-
-    @Override
-    public List&lt;String&gt; findAllStudentsNames() {
-        return dao.selectAllStudentsNames();
-    }
-
-    @Override
-    public String findStudentNameById(int id) {
-        return dao.selectStudentNameById(id);
-    }
-
-    @Override
-    public List&lt;Student&gt; findAllStudents() {
-        return dao.selectAllStudents();
-    }
-
-    @Override
-    public Student findStudentById(int id) {
-        return dao.selectStudentById(id);
-    }    
-}
-</code></pre><h4 id="9-5-定义Dao"><a href="#9-5-定义Dao" class="headerlink" title="9.5 定义Dao"></a>9.5 定义Dao</h4><p>IStudentDao</p>
-<pre><code>package com.bjpowernode.Dao;
-
-import java.util.List;
-
-import com.bjpowernode.beans.Student;
-
-public interface IStudentDao {
-
-
-    void insertStudent(Student student);
-    void deleteById(int id);
-    void updateStudent(Student student);
-
-    List&lt;String&gt; selectAllStudentsNames();
-    String selectStudentNameById(int id);
-
-    List&lt;Student&gt; selectAllStudents();
-    Student selectStudentById(int id); 
-}
-</code></pre><p>StudentDaoImpl</p>
-<pre><code>package com.bjpowernode.Dao;
-
-import java.util.List;
-
-import org.springframework.jdbc.core.support.JdbcDaoSupport;
-
-import com.bjpowernode.beans.Student;
-
-//继承JdbcDaoSupport
-public class StudentDaoImpl extends JdbcDaoSupport implements IStudentDao {
-
-    //增
-    @Override
-    public void insertStudent(Student student) {
-        String sql = &quot;insert into student(name,age) values(?,?)&quot;;
-        this.getJdbcTemplate().update(sql, student.getName(), student.getAge());
-    }
-
-    //删
-    @Override
-    public void deleteById(int id) {
-        String sql = &quot;delete from student where id=?&quot;;
-        this.getJdbcTemplate().update(sql,id);
-    }
-
-    //改
-    @Override
-    public void updateStudent(Student student) {
-        String sql = &quot;update student set name=?, age=? where id=?&quot;;
-        this.getJdbcTemplate().update(sql, student.getName(), student.getAge(), student.getId());
-    }
-
-    //查
-    @Override
-    public List&lt;String&gt; selectAllStudentsNames() {
-        String sql = &quot;select name from student&quot;;
-        return this.getJdbcTemplate().queryForList(sql, String.class);
-    }
-
-    @Override
-    public String selectStudentNameById(int id) {
-        String sql = &quot;select name from student where id=?&quot;;
-        return this.getJdbcTemplate().queryForObject(sql, String.class, id);
-    }
-
-    @Override
-    public List&lt;Student&gt; selectAllStudents() {
-        String sql = &quot;select id,name,age from student&quot;;
-        //手动封装查询的数据集
-        return this.getJdbcTemplate().query(sql, new StudentRowMapper());
-    }
-
-    @Override
-    public Student selectStudentById(int id) {
-        String sql = &quot;select id,name,age from student where id=?&quot;;
-        return this.getJdbcTemplate().queryForObject(sql, new StudentRowMapper(), id);
-    }
-
-
-}
-</code></pre><h4 id="9-6-定义测试类"><a href="#9-6-定义测试类" class="headerlink" title="9.6 定义测试类"></a>9.6 定义测试类</h4><p>MyTest.java</p>
-<pre><code>package com.bjpowernode.test;
-
-public class MyTest {
-
-    private IStudentService service;
-
-    @Before
-    public void before() {
-        String source = &quot;applicationContext.xml&quot;;
-        ApplicationContext ac = new ClassPathXmlApplicationContext(source);
-        service = (IStudentService) ac.getBean(&quot;studentService&quot;);
-    }
-
-    //增
-    @Test
-    public void test01() {
-        Student student = new Student(&quot;王五2&quot;, 26);
-        service.addStudent(student);
-    }
-
-    //删
-    @Test
-    public void test02() {
-        service.removeById(2);
-    }
-
-    //改
-    @Test
-    public void test03() {
-        Student student = new Student(1,&quot;李四2&quot;,23);
-        service.modifyStudent(student);
-    }
-
-    //查所有学生的名字
-    @Test
-    public void test04() {
-        List&lt;String&gt; names = service.findAllStudentsNames();
-        System.out.println(names);
-    }
-
-    //查某个学生的名字
-    @Test
-    public void test05() {
-        String name = service.findStudentNameById(1);
-        System.out.println(name);
-    }
-
-    //查所有学生
-    @Test
-    public void test06() {
-        List&lt;Student&gt; students = service.findAllStudents();
-        for(Student student:students) {
-            System.out.println(student);
-        }
-    }
-
-    //查某个学生
-    @Test
-    public void test07() {
-        Student student = service.findStudentById(1);
-        System.out.println(student);
-    }
-
-}
-</code></pre><h4 id="9-7-配置"><a href="#9-7-配置" class="headerlink" title="9.7 配置"></a>9.7 配置</h4><p>jdbc.properties 连接四要素</p>
-<pre><code>jdbc.driver=com.mysql.jdbc.Driver
-jdbc.url=jdbc:mysql://127.0.0.1:3306/test
-jdbc.user=root
-jdbc.password=haojie_123456
-</code></pre><p>applicationContext.xml</p>
-<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
-    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
-    xmlns:context=&quot;http://www.springframework.org/schema/context&quot; xsi:schemaLocation=&quot;
-        http://www.springframework.org/schema/beans 
-        http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://www.springframework.org/schema/context 
-        http://www.springframework.org/schema/context/spring-context.xsd&quot;&gt;
-
-    &lt;!-- 注册数据源:Spring内置的连接池 --&gt;
-    &lt;!-- &lt;bean id=&quot;myDataSource&quot; class=&quot;org.springframework.jdbc.datasource.DriverManagerDataSource&quot;&gt;
-        &lt;property name=&quot;driverClassName&quot; value=&quot;com.mysql.jdbc.Driver&quot;&gt;&lt;/property&gt;
-        &lt;property name=&quot;url&quot; value=&quot;jdbc:mysql://127.0.0.1:3306/mydatabase&quot;&gt;&lt;/property&gt;
-        &lt;property name=&quot;username&quot; value=&quot;root&quot;&gt;&lt;/property&gt;
-        &lt;property name=&quot;password&quot; value=&quot;haojie_123456&quot;&gt;&lt;/property&gt;
-    &lt;/bean&gt; --&gt;
-
-    &lt;!-- 注册数据源:DBCP --&gt;
-    &lt;!-- &lt;bean id=&quot;myDataSource&quot; class=&quot;org.apache.tomcat.dbcp.dbcp.BasicDataSource&quot;&gt;
-        &lt;property name=&quot;driverClassName&quot; value=&quot;com.mysql.jdbc.Driver&quot;&gt;&lt;/property&gt;
-        &lt;property name=&quot;url&quot; value=&quot;jdbc:mysql://127.0.0.1:3306/mydatabase&quot;&gt;&lt;/property&gt;
-        &lt;property name=&quot;username&quot; value=&quot;root&quot;&gt;&lt;/property&gt;
-        &lt;property name=&quot;password&quot; value=&quot;haojie_123456&quot;&gt;&lt;/property&gt;
-    &lt;/bean&gt; --&gt;
-
-    &lt;!-- 注册数据源:C3P0 --&gt;
-    &lt;!-- &lt;bean id=&quot;myDataSource&quot; class=&quot;com.mchange.v2.c3p0.ComboPooledDataSource&quot;&gt;
-        &lt;property name=&quot;driverClass&quot; value=&quot;com.mysql.jdbc.Driver&quot;&gt;&lt;/property&gt;
-        &lt;property name=&quot;jdbcurl&quot; value=&quot;jdbc:mysql://127.0.0.1:3306/mydatabase&quot;&gt;&lt;/property&gt;
-        &lt;property name=&quot;user&quot; value=&quot;root&quot;&gt;&lt;/property&gt;
-        &lt;property name=&quot;password&quot; value=&quot;haojie_123456&quot;&gt;&lt;/property&gt;
-    &lt;/bean&gt; --&gt;
-
-    &lt;!-- 注册属性文件：从属性文件读取DB连接四要素：方式一 --&gt;
-    &lt;!-- &lt;bean class=&quot;org.springframework.beans.factory.config.PropertyPlaceholderConfigurer&quot;&gt;
-        &lt;property name=&quot;location&quot; value=&quot;classpath:jdbc.properties&quot;&gt;&lt;/property&gt;
-    &lt;/bean&gt; --&gt;
-
-    &lt;!-- 注册属性文件：从属性文件读取DB连接四要素：方式二 --&gt;
-    &lt;!-- &lt;context:property-placeholder location=&quot;classpath:jdbc.properties&quot;/&gt; --&gt;
-
-    &lt;bean id=&quot;myDataSource&quot; class=&quot;org.springframework.jdbc.datasource.DriverManagerDataSource&quot;&gt;
-        &lt;property name=&quot;driverClassName&quot; value=&quot;com.mysql.jdbc.Driver&quot;&gt;&lt;/property&gt;
-        &lt;property name=&quot;url&quot; value=&quot;jdbc:mysql://127.0.0.1:3306/mydatabase&quot;&gt;&lt;/property&gt;
-        &lt;property name=&quot;username&quot; value=&quot;root&quot;&gt;&lt;/property&gt;
-        &lt;property name=&quot;password&quot; value=&quot;haojie_123456&quot;&gt;&lt;/property&gt;
-    &lt;/bean&gt;
-
-    &lt;!-- 将数据源注入给dao：方式一 --&gt;
-
-            &lt;!-- 注册jdbctemplate --&gt;
-            &lt;!-- &lt;bean id=&quot;myJdbcTemplate&quot; class=&quot;org.springframework.jdbc.core.JdbcTemplate&quot;&gt;
-                &lt;property name=&quot;dataSource&quot; ref=&quot;myDataSource&quot;&gt;&lt;/property&gt;
-            &lt;/bean&gt; --&gt;
-
-            &lt;!-- 注册dao --&gt;
-            &lt;!-- &lt;bean id=&quot;studentDao&quot; class=&quot;com.bjpowernode.Dao.StudentDaoImpl&quot;&gt;
-                &lt;property name=&quot;jdbcTemplate&quot; ref=&quot;myJdbcTemplate&quot;&gt;&lt;/property&gt;
-            &lt;/bean&gt; --&gt;
-
-    &lt;!-- 将数据源注入给dao：方式二 --&gt;
-
-            &lt;!-- 注册dao --&gt;
-            &lt;bean id=&quot;studentDao&quot; class=&quot;com.bjpowernode.Dao.StudentDaoImpl&quot;&gt;
-                &lt;property name=&quot;dataSource&quot; ref=&quot;myDataSource&quot;&gt;&lt;/property&gt;
-            &lt;/bean&gt;
-
-
-    &lt;!-- 注册实现类 --&gt;
-    &lt;bean id=&quot;studentService&quot; class=&quot;com.bjpowernode.service.StudentServiceImpl&quot;&gt;
-        &lt;property name=&quot;dao&quot; ref=&quot;studentDao&quot;&gt;&lt;/property&gt;
-    &lt;/bean&gt;
-
-&lt;/beans&gt;
-</code></pre><h4 id="9-8-Jdbc模板的对象是多例的"><a href="#9-8-Jdbc模板的对象是多例的" class="headerlink" title="9.8 Jdbc模板的对象是多例的"></a>9.8 Jdbc模板的对象是多例的</h4><p>JdbcTemplate对象是多例的，即系统会为每一个使用模板对象的线程（方法）创建一个JdbcTemplate实例，并且在该线程（方法）结束时，自动释放JdbcTemplate实例。所以在每次使用JdbcTemplate对象时，都需要通过getJdbcTemplate()方法获取。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/06/java/spring/spring-9/" data-id="cjh4911mt0063mtp36uz4wd1z" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/spring/spring-8" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/05/06/java/spring/spring-8/" class="article-date">
-  <time datetime="2018-05-06T03:05:27.000Z" itemprop="datePublished">2018-05-06</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/spring/">spring</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/05/06/java/spring/spring-8/">第八章 Spring与AOP AspectJ基于XML的AOP实现</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h4 id="AspectJ基于XML的AOP实现"><a href="#AspectJ基于XML的AOP实现" class="headerlink" title="AspectJ基于XML的AOP实现"></a>AspectJ基于XML的AOP实现</h4><p>切面</p>
-<pre><code>//切面
-public class MyAspect {
-
-    public void myBefore() {
-        System.out.println(&quot;执行前置方法&quot;);
-    }
-
-    public void myBefore(JoinPoint jp) {
-        System.out.println(&quot;执行前置方法jp=&quot;+jp);
-    }
-
-    public void myAfterReturning(String result) {
-        System.out.println(&quot;执行后置方法 result=&quot;+result);
-    }
-
-    public Object myAround(ProceedingJoinPoint pjp) throws Throwable {
-        System.out.println(&quot;执行环绕通知方法，目标方法执行之前&quot;);
-        //目标方法
-        Object result = pjp.proceed();
-        System.out.println(&quot;执行环绕通知方法，目标方法执行之后&quot;);
-        if(result != null) {
-            result = ((String)result).toUpperCase();
-        }
-        return result;
-    }
-
-    public void myAfterThrowing(UsernameException ex) {
-        System.out.println(&quot;发生用户名异常:&quot;+ex.getMessage());
-    }
-
-    public void myAfterThrowing(PasswordException ex) {
-        System.out.println(&quot;发生密码异常:&quot;+ex.getMessage());
-    }
-
-    public void myAfterThrowing(Exception ex) {
-        System.out.println(&quot;发生其它异常:&quot;+ex.getMessage());
-    }
-
-    public void myAfter() {
-        System.out.println(&quot;执行最终通知&quot;);
-    }
-
-
-}
-</code></pre><p>配置文件</p>
-<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
-    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
-    xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot; xsi:schemaLocation=&quot;
-        http://www.springframework.org/schema/beans 
-        http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://www.springframework.org/schema/aop 
-        http://www.springframework.org/schema/aop/spring-aop.xsd&quot;&gt; 
-
-        &lt;!-- 注册切面 --&gt;
-        &lt;bean id=&quot;myAspect&quot; class=&quot;com.siyantu.xml.MyAspect&quot;&gt;&lt;/bean&gt;
-
-         &lt;!-- 注册实现类 --&gt;
-        &lt;bean id=&quot;someService&quot; class=&quot;com.siyantu.xml.SomeServiceImpl&quot; /&gt;
-
-        &lt;!-- AOP配置 --&gt;
-        &lt;aop:config&gt;
-                &lt;!-- 定义切入点 --&gt;
-                &lt;aop:pointcut expression=&quot;execution(* *..ISomeService.doFirst(..))&quot; id=&quot;doFirstPointcut&quot;/&gt;
-                &lt;aop:pointcut expression=&quot;execution(* *..ISomeService.doSecond(..))&quot; id=&quot;doSecondPointcut&quot;/&gt;
-                &lt;aop:pointcut expression=&quot;execution(* *..ISomeService.doThird(..))&quot; id=&quot;doThirdPointcut&quot;/&gt;
-
-                &lt;aop:aspect ref=&quot;myAspect&quot;&gt;
-                    &lt;!-- 前置通知 --&gt;
-                    &lt;aop:before method=&quot;myBefore&quot; pointcut-ref=&quot;doFirstPointcut&quot; /&gt;
-                    &lt;!-- 指定参数类型 --&gt;
-                    &lt;aop:before method=&quot;myBefore(org.aspectj.lang.JoinPoint)&quot; pointcut-ref=&quot;doFirstPointcut&quot; /&gt;
-
-                    &lt;!-- 后置通知 --&gt;
-                    &lt;aop:after-returning method=&quot;myAfterReturning&quot; pointcut-ref=&quot;doSecondPointcut&quot; returning=&quot;result&quot; /&gt;
-
-                    &lt;!-- 环绕通知 --&gt;
-                    &lt;aop:around method=&quot;myAround(org.aspectj.lang.ProceedingJoinPoint)&quot; pointcut-ref=&quot;doSecondPointcut&quot; /&gt;
-
-                    &lt;!-- 异常通知 --&gt;
-                    &lt;aop:after-throwing method=&quot;myAfterThrowing(com.siyantu.xml.UsernameException)&quot; pointcut-ref=&quot;doThirdPointcut&quot; throwing=&quot;ex&quot; /&gt;
-                    &lt;aop:after-throwing method=&quot;myAfterThrowing(com.siyantu.xml.PasswordException)&quot; pointcut-ref=&quot;doThirdPointcut&quot; throwing=&quot;ex&quot; /&gt;
-                    &lt;aop:after-throwing method=&quot;myAfterThrowing(java.lang.Exception)&quot; pointcut-ref=&quot;doThirdPointcut&quot; throwing=&quot;ex&quot; /&gt;
-
-                    &lt;!-- 最终通知 --&gt;
-                    &lt;aop:after method=&quot;myAfter&quot; pointcut-ref=&quot;doThirdPointcut&quot; /&gt;
-
-                &lt;/aop:aspect&gt;
-
-        &lt;/aop:config&gt;
-
-&lt;/beans&gt;
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/06/java/spring/spring-8/" data-id="cjh4911mz0069mtp379fq62ge" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
 
     </footer>
   </div>
@@ -2663,7 +2457,7 @@ public class MyAspect {
 
 
   <nav id="page-nav">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/2/">__('next') &raquo;</a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/2/">__('next') &raquo;</a>
   </nav>
 </section>
         
@@ -2673,7 +2467,7 @@ public class MyAspect {
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/mybatis/">mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/mybatis/">mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/springmvc/">springmvc</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
     </div>
   </div>
 
@@ -2683,7 +2477,7 @@ public class MyAspect {
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springmvc/">springmvc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
     </div>
   </div>
 
@@ -2693,7 +2487,7 @@ public class MyAspect {
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/mybatis/" style="font-size: 17.14px;">mybatis</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/mybatis/" style="font-size: 17.14px;">mybatis</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/springmvc/" style="font-size: 14.29px;">springmvc</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
     </div>
   </div>
 
@@ -2715,23 +2509,23 @@ public class MyAspect {
       <ul>
         
           <li>
+            <a href="/2018/05/24/java/springmvc/springmvc-4/">第四章 springmvc核心技术</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/23/java/springmvc/springmvc-3/">第三章 springmvc注解式开发</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/22/java/springmvc/springmvc-2/">第二章 springmvc配置式开发</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/22/java/springmvc/springmvc-1/">第一章 springmvc概述</a>
+          </li>
+        
+          <li>
             <a href="/2018/05/13/java/mybatis/mybatis-7/">第七章 MyBatis - 查询缓存</a>
-          </li>
-        
-          <li>
-            <a href="/2018/05/12/java/mybatis/mybatis-6/">第六章 MyBatis - 延迟加载</a>
-          </li>
-        
-          <li>
-            <a href="/2018/05/12/java/mybatis/mybatis-5/">第五章 MyBatis关联关系查询 - 多对多</a>
-          </li>
-        
-          <li>
-            <a href="/2018/05/12/java/mybatis/mybatis-4/">第四章 MyBatis关联关系查询 - 自关联</a>
-          </li>
-        
-          <li>
-            <a href="/2018/05/12/java/mybatis/mybatis-3/">第三章 MyBatis关联关系查询 - 多对一</a>
           </li>
         
       </ul>

@@ -61,6 +61,1588 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-java/mybatis/mybatis-1" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/08/java/mybatis/mybatis-1/" class="article-date">
+  <time datetime="2018-05-08T07:25:25.000Z" itemprop="datePublished">2018-05-08</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/mybatis/">mybatis</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/05/08/java/mybatis/mybatis-1/">第一章 MyBatis单表的CURD操作</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="1-1-简介"><a href="#1-1-简介" class="headerlink" title="1.1 简介"></a>1.1 简介</h4><p>MyBatis是一个优秀的基于java的持久层框架，它内部封装了JDBC，使开发者只需关注SQL语句本身，不用再花费精力去处理诸如注册驱动、创建Connection、配置Statement等繁杂过程。</p>
+<p>MyBatis通过xml或注解的方式将要执行的各种statement配置起来，并通过Java对象和Statement中的SQL动态参数进行映射生成最终执行的SQL语句，最后由MyBatis框架执行SQL并将结果映射成Java对象并返回。</p>
+<h4 id="1-2-MyBatis与Hibernate"><a href="#1-2-MyBatis与Hibernate" class="headerlink" title="1.2 MyBatis与Hibernate"></a>1.2 MyBatis与Hibernate</h4><p>Hibernate框架是提供了全面的封装机制的“全自动”ORM，即实现了POJO和数据库表之间的映射，以及SQL的自动生成和执行。</p>
+<p>相对于此，MyBatis只能算作是“半自动”ORM。其着力点，是在POJO与SQL语句之间的映射。也就是说，MyBatis并不会为程序员自动生成SQL语句。具体的SQL需要程序员自己编写，然后通过SQL语句映射文件，将SQL所需要的参数，以及返回的结果字段映射到指定的POJO。因此MyBatis成为了“全自动”ORM的一种有益补充。</p>
+<p>与Hibernate相比，MyBaits具有以下几个特点：</p>
+<p>（1）、在XML文件中配置SQL语句，实现了SQL语句与代码的分离，给程序的维护带来了很大便利。</p>
+<p>（2）、因为需要程序员自己编写SQL语句，程序员可以结合数据库自身的特点灵活控制SQL语句，因此能够实现比Hibernate等全自动ORM框架更高的查询效率，能够完成复杂查询。</p>
+<p>（3）、简单、易于学习，易于使用，上手快。</p>
+<h4 id="1-3-Mapper动态代理"><a href="#1-3-Mapper动态代理" class="headerlink" title="1.3 Mapper动态代理"></a>1.3 Mapper动态代理</h4><p>Mybatis框架抛开了Dao的实现类，直接定位到映射文件mapper中的相应SQL语句，对DB进行操作。这种对Dao的实现方式称为Mapper的动态代理方式。</p>
+<p>Mapper动态代理方式无需程序员实现Dao接口。接口是由MyBatis结合映射文件自动生成的动态代理实现的。</p>
+<p>动态代理的实现：</p>
+<ul>
+<li><p>将mapper的namespace设为接口的全限制性类名</p>
+</li>
+<li><p>将mapper的sql语句的id设为接口的方法名</p>
+</li>
+</ul>
+<p>Dao的获取：</p>
+<pre><code>SqlSession sqlSession = MyBatisUtils.getSqlSession();
+studentDao = sqlSession.getMappper(IStudentDao.class);
+</code></pre><h4 id="1-4-CURD-单表操作"><a href="#1-4-CURD-单表操作" class="headerlink" title="1.4 CURD 单表操作"></a>1.4 CURD 单表操作</h4><p>POJO: Student.java</p>
+<pre><code>package com.bjpowernode.beans;
+
+public class Student {
+    private Integer id;
+    private String name;
+    private int age;
+    private double score;
+    public Student() {
+        super();
+    }
+    public Student(String name, int age, double score) {
+        super();
+        this.name = name;
+        this.age = age;
+        this.score = score;
+    }
+    public Integer getId() {
+        return id;
+    }
+    public void setId(Integer id) {
+        this.id = id;
+    }
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public int getAge() {
+        return age;
+    }
+    public void setAge(int age) {
+        this.age = age;
+    }
+    public double getScore() {
+        return score;
+    }
+    public void setScore(double score) {
+        this.score = score;
+    }
+    @Override
+    public String toString() {
+        return &quot;Student [id=&quot; + id + &quot;, name=&quot; + name + &quot;, age=&quot; + age + &quot;, score=&quot; + score + &quot;]&quot;;
+    }
+
+}
+</code></pre><p>接口：IStudentDao.java</p>
+<pre><code>package com.bjpowernode.dao;
+
+import java.util.List;
+import java.util.Map;
+
+import com.bjpowernode.beans.Student;
+
+public interface IStudentDao {
+    //插入
+    void insertStudent(Student student);
+    //插入后获取id
+    void insertStudentCatchId(Student student);
+    //删除
+    void deleteStudentById(int id);
+    //修改
+    void updateStudent(Student student);
+    //查询所有学生对象
+    List&lt;Student&gt; selectAllStudents();
+
+    //根据id查询某个学生
+    Student selectStudentById(int id);
+
+    //根据名字模糊查询
+    List&lt;Student&gt; selectStudentsByName(String name);
+}
+</code></pre><p>工具类：</p>
+<pre><code>package com.bjpowernode.utils;
+
+public class MyBatisUtils {
+    private static SqlSessionFactory sqlSessionFactory;
+
+    public static SqlSession getSqlSession() {
+        try {
+            InputStream inputStream = Resources.getResourceAsStream(&quot;mybatis.xml&quot;);
+            if(sqlSessionFactory == null) {
+                sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+            }
+            return sqlSessionFactory.openSession();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+}    
+</code></pre><p>数据库连接四要素配置文件：jdbc_mysql.properties</p>
+<pre><code>jdbc.driver=com.mysql.jdbc.Driver
+jdbc.url=jdbc:mysql:///mydatabase
+jdbc.user=root
+jdbc.password=haojie_123456
+</code></pre><p>主配置文件：mybatis.xml</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE configuration
+PUBLIC &quot;-//mybatis.org//DTD Config 3.0//EN&quot;
+&quot;http://mybatis.org/dtd/mybatis-3-config.dtd&quot;&gt;
+
+&lt;configuration&gt;
+    &lt;!-- 注册DB连接四要素属性文件 --&gt;
+    &lt;properties resource=&quot;jdbc_mysql.properties&quot;&gt;&lt;/properties&gt;
+
+    &lt;!-- 设置别名 --&gt;
+    &lt;typeAliases&gt;
+        &lt;!-- 将指定包中所有类的简单类名当作别名 --&gt;
+        &lt;package name=&quot;com.bjpowernode.beans&quot;/&gt;
+    &lt;/typeAliases&gt;
+
+    &lt;!-- 配置运行环境 --&gt;
+    &lt;environments default=&quot;mysqlEM&quot;&gt;
+        &lt;environment id=&quot;mysqlEM&quot;&gt;
+            &lt;transactionManager type=&quot;JDBC&quot;&gt;&lt;/transactionManager&gt;
+            &lt;dataSource type=&quot;POOLED&quot;&gt;
+                &lt;property name=&quot;driver&quot; value=&quot;${jdbc.driver}&quot;/&gt;
+                &lt;property name=&quot;url&quot; value=&quot;${jdbc.url}&quot;/&gt;
+                &lt;property name=&quot;username&quot; value=&quot;${jdbc.user}&quot;/&gt;
+                &lt;property name=&quot;password&quot; value=&quot;${jdbc.password}&quot;/&gt;
+            &lt;/dataSource&gt;
+        &lt;/environment&gt;
+    &lt;/environments&gt;
+
+    &lt;!-- 注册映射文件 --&gt;
+    &lt;mappers&gt;
+        &lt;mapper resource=&quot;com/bjpowernode/dao/mapper.xml&quot; /&gt;    
+    &lt;/mappers&gt;
+
+&lt;/configuration&gt;
+</code></pre><p>映射文件：mapper.xml</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE mapper
+PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+
+&lt;mapper namespace=&quot;com.bjpowernode.dao.IStudentDao&quot;&gt;
+
+    &lt;insert id=&quot;insertStudent&quot; parameterType=&quot;Student&quot;&gt;
+        insert into student(name,age,score) values(#{name},#{age},#{score})
+    &lt;/insert&gt;
+
+    &lt;insert id=&quot;insertStudentCatchId&quot;&gt;
+        insert into student(name,age,score) values(#{name},#{age},#{score})
+        &lt;selectKey resultType=&quot;int&quot; keyProperty=&quot;id&quot; order=&quot;AFTER&quot;&gt;
+            select @@identity
+        &lt;/selectKey&gt;
+    &lt;/insert&gt;
+
+    &lt;delete id=&quot;deleteStudentById&quot;&gt;
+        delete from student where id=#{aaa} &lt;!-- 这里的#{}仅仅是个占位符，里面放什么都行 --&gt;
+    &lt;/delete&gt;
+
+    &lt;update id=&quot;updateStudent&quot;&gt;
+        update student set name=#{name}, age=#{age}, score=#{score} where id=#{id}
+    &lt;/update&gt;
+
+    &lt;select id=&quot;selectAllStudents&quot; resultType=&quot;Student&quot;&gt;
+        select id,name,age,score from student
+    &lt;/select&gt;
+
+    &lt;!-- 
+        resultType: 表示通过反映机制，调用set+属性名的方式，将结果封装为Student对象
+        如果属性名和字段名不一致，表中的字段为tid,tname,tage,score，属性名为id,name,age,score
+        解决方式一：字段别名 select tid id, tname name, tage age, score frome student
+        解决方式二：resultMap 
+            &lt;resultMap type=&quot;Student&quot; id=&quot;studentMapper&quot;&gt;
+                &lt;id column=&quot;tid&quot; property=&quot;id&quot; /&gt;
+                &lt;result column=&quot;tname&quot; property=&quot;name&quot; /&gt;
+                &lt;result column=&quot;tage&quot; property=&quot;age&quot; /&gt;
+            &lt;/resultMap&gt;
+            &lt;select id=&quot;selectAllStudents&quot; resultMap=&quot;studentMapper&quot;&gt;
+                select id,name,age,score from student
+            &lt;/select&gt;        
+     --&gt;    
+
+    &lt;select id=&quot;selectStudentById&quot; resultType=&quot;Student&quot;&gt;
+        select id,name,age,score from student where id=#{bbbbbb}
+    &lt;/select&gt;
+
+    &lt;select id=&quot;selectStudentsByName&quot; resultType=&quot;Student&quot;&gt;
+        &lt;!-- select id,name,age,score from student where name like concat(&apos;%&apos;,#{xxx},&apos;%&apos;) --&gt;
+        select id,name,age,score from student where name like &apos;%&apos; #{xxx} &apos;%&apos;
+    &lt;/select&gt;
+
+&lt;/mapper&gt;
+</code></pre><p>测试文件：Mytest.java</p>
+<pre><code>package com.bjpowernode.test;
+
+public class MyTest {
+
+    private IStudentDao dao;
+    private SqlSession sqlSession;
+
+    @Before
+    public void Before() {
+        sqlSession = MyBatisUtils.getSqlSession();
+        //dao:是一个动态代理
+        dao = sqlSession.getMapper(IStudentDao.class);
+    }
+
+    @After
+    public void after() {
+        if(sqlSession != null) {
+            sqlSession.close();
+        }
+    }
+
+    @Test
+    public void testInsertStudent() {
+        Student student = new Student(&quot;zhangsan2&quot;, 24, 1);
+        dao.insertStudent(student);
+        sqlSession.commit();
+    }
+
+    @Test
+    public void insertStudentCatchId() {
+        Student student = new Student(&quot;lisi&quot;, 24, 94);
+        System.out.println(&quot;插入前：student=&quot;+student);
+        dao.insertStudentCatchId(student);
+        System.out.println(&quot;插入后：student=&quot;+student);
+    }
+
+    @Test
+    public void testDeleteStudentById() {
+        dao.deleteStudentById(13);
+    }
+
+    @Test
+    public void testUpdateStudent() {
+        Student student = new Student(&quot;wangwu&quot;,25,95);
+        student.setId(14);
+        dao.updateStudent(student);
+    }
+
+    @Test
+    public void testSelectAllStudents() {
+        List&lt;Student&gt; students = dao.selectAllStudents();
+        for(Student student:students) {
+            System.out.println(student);
+        }
+    }
+
+    @Test
+    public void testSelectStudentById() {
+        Student student = dao.selectStudentById(14);
+        System.out.println(student);
+    }
+
+    @Test
+    public void testSelectStudentByName() {
+        List&lt;Student&gt; students = dao.selectStudentsByName(&quot;zhang&quot;);
+        for(Student student:students) {
+            System.out.println(student);
+        }
+    }
+}
+</code></pre><h4 id="1-5-多条件查询问题-根据Map查询"><a href="#1-5-多条件查询问题-根据Map查询" class="headerlink" title="1.5 多条件查询问题 - 根据Map查询"></a>1.5 多条件查询问题 - 根据Map查询</h4><p>接口：IStudentDao.java</p>
+<pre><code>package com.bjpowernode.dao;
+
+public interface IStudentDao {    
+    List&lt;Student&gt; selectStudentsByCondition(Map&lt;String, Object&gt; map);
+}
+</code></pre><p>映射文件：</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE mapper
+PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+
+&lt;mapper namespace=&quot;com.bjpowernode.dao.IStudentDao&quot;&gt;
+
+
+    &lt;select id=&quot;selectStudentsByCondition&quot; resultType=&quot;Student&quot;&gt;
+        &lt;!-- #{}里面可以放对象的属性名，也可以放map的key，也可以直接通过对象获取属性：如student.score --&gt;
+        select id,name,age,score from student where name like &apos;%&apos; #{nameCondition} &apos;%&apos; and age &gt; #{ageCondition}
+    &lt;/select&gt;
+
+&lt;/mapper&gt;
+</code></pre><p>测试类：MyTest.java</p>
+<pre><code>package com.bjpowernode.test;
+
+public class MyTest {
+
+    private IStudentDao dao;
+    private SqlSession sqlSession;
+
+    @Before
+    public void Before() {
+        sqlSession = MyBatisUtils.getSqlSession();
+        //dao:是一个动态代理
+        dao = sqlSession.getMapper(IStudentDao.class);
+    }
+
+    @After
+    public void after() {
+        if(sqlSession != null) {
+            sqlSession.close();
+        }
+    }
+
+    @Test
+    public void testSelectStudentsByCondition() {
+         Map&lt;String, Object&gt; map = new HashMap&lt;String, Object&gt;();
+         map.put(&quot;nameCondition&quot;, &quot;zhang&quot;);
+         map.put(&quot;ageCondition&quot;, 10);
+
+         List&lt;Student&gt; students = dao.selectStudentsByCondition(map);
+         for(Student student:students) {
+             System.out.println(student);
+         }
+    }
+}
+</code></pre><h4 id="1-6-多条件查询问题-使用索引号"><a href="#1-6-多条件查询问题-使用索引号" class="headerlink" title="1.6 多条件查询问题 - 使用索引号"></a>1.6 多条件查询问题 - 使用索引号</h4><p>接口类</p>
+<pre><code>package com.bjpowernode.dao;
+
+public interface IStudentDao {    
+    List&lt;Student&gt; selectStudentsByCondition(String name, int age);
+}
+</code></pre><p>映射文件：</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE mapper
+PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+
+&lt;mapper namespace=&quot;com.bjpowernode.dao.IStudentDao&quot;&gt;
+
+
+    &lt;select id=&quot;selectStudentsByCondition&quot; resultType=&quot;Student&quot;&gt;
+        &lt;!-- 
+            #{}里面可以放:
+            1、对象的属性名，
+            2、参数为map时，可以放map的key，
+            3、参数为map时，或key所对应的value为对象，则可以放入对象的属性如：Student.score 
+            4、也可以放索引
+            5、当#{}是个占位符时，可以放随意字符
+        --&gt;
+        select id,name,age,score 
+        from student 
+        where name like &apos;%&apos; #{0} &apos;%&apos; 
+        and age &gt; #{1}
+    &lt;/select&gt;
+
+&lt;/mapper&gt;
+</code></pre><p>测试类</p>
+<pre><code>package com.bjpowernode.test;
+
+public class MyTest {
+
+    private IStudentDao dao;
+    private SqlSession sqlSession;
+
+    @Before
+    public void Before() {
+        sqlSession = MyBatisUtils.getSqlSession();
+        //dao:是一个动态代理
+        dao = sqlSession.getMapper(IStudentDao.class);
+    }
+
+    @After
+    public void after() {
+        if(sqlSession != null) {
+            sqlSession.close();
+        }
+    }
+
+
+    @Test
+    public void testSelectStudentsByCondition() {
+
+         List&lt;Student&gt; students = dao.selectStudentsByCondition(&quot;zhang&quot;,23);
+         for(Student student:students) {
+             System.out.println(student);
+         }
+    }
+}
+</code></pre><h4 id="1-7-动态SQL"><a href="#1-7-动态SQL" class="headerlink" title="1.7 动态SQL"></a>1.7 动态SQL</h4><p>动态SQL，主要用于解决查询条件不确定的情况：在程序运行期间，根据用户提交的查询条件进行查询。提交的查询条件不同，执行的SQL语句不同。若将每种情况均逐一列出，对所有条件进行排列组合，将会出现大理的SQL语句。此时，可使用动态SQL来解决这样的问题。</p>
+<h5 id="动态SQL-if、where、choose、foreach、foreach-list、foreach-泛型自定义类型list"><a href="#动态SQL-if、where、choose、foreach、foreach-list、foreach-泛型自定义类型list" class="headerlink" title="动态SQL - if、where、choose、foreach、foreach-list、foreach-泛型自定义类型list"></a>动态SQL - if、where、choose、foreach、foreach-list、foreach-泛型自定义类型list</h5><p>测试类：</p>
+<pre><code>package com.bjpowernode.test;
+
+public class MyTest {
+
+    private IStudentDao dao;
+    private SqlSession sqlSession;
+
+    @Before
+    public void Before() {
+        sqlSession = MyBatisUtils.getSqlSession();
+        //dao:是一个动态代理
+        dao = sqlSession.getMapper(IStudentDao.class);
+    }
+
+    @After
+    public void after() {
+        if(sqlSession != null) {
+            sqlSession.close();
+        }
+    }
+
+    @Test
+    public void testSelectStudentsByIf() {
+        Student student = new Student(&quot;zhang&quot;,23,0);
+         List&lt;Student&gt; students = dao.selectStudentsByIf(student);
+         for(Student student1:students) {
+             System.out.println(student1);
+         }
+    }
+
+    @Test
+    public void testSelectStudentsByWhere() {
+        Student student = new Student(&quot;&quot;,0,0);
+         List&lt;Student&gt; students = dao.selectStudentsByWhere(student);
+         for(Student student1:students) {
+             System.out.println(student1);
+         }
+    }
+
+    @Test
+    public void testSelectStudentsByChoose() {
+        Student student = new Student(&quot;&quot;,0,0);
+         List&lt;Student&gt; students = dao.selectStudentsByChoose(student);
+         for(Student student1:students) {
+             System.out.println(student1);
+         }
+    }
+
+    @Test
+    public void testForeach() {
+        int[] ids = {14,16,18};
+        List&lt;Student&gt; students = dao.selectStudentsByForeach(ids);
+        for(Student student1:students) {
+            System.out.println(student1);
+        }
+    }
+
+    @Test
+    public void testForeachList() {
+        List&lt;Integer&gt; ids = new ArrayList&lt;&gt;();
+        ids.add(14);
+        ids.add(16);
+        ids.add(18);
+        List&lt;Student&gt; students = dao.selectStudentsByForeachList(ids);
+        for(Student student1:students) {
+            System.out.println(student1);
+        }
+    }
+
+    @Test
+    public void testForeachObject() {
+        Student stu1 = new Student();
+        stu1.setId(14);
+
+        Student stu2 = new Student();
+        stu2.setId(16);
+
+        List&lt;Student&gt; stus = new ArrayList&lt;&gt;();
+        stus.add(stu1);
+        stus.add(stu2);
+
+        List&lt;Student&gt; students = dao.selectStudentsByForeachObject(stus);
+        for(Student student1:students) {
+            System.out.println(student1);
+        }
+    }
+}
+</code></pre><p>接口</p>
+<pre><code>package com.bjpowernode.dao;
+
+public interface IStudentDao {
+    List&lt;Student&gt; selectStudentsByIf(Student student);
+
+    List&lt;Student&gt; selectStudentsByWhere(Student student);
+
+    List&lt;Student&gt; selectStudentsByChoose(Student student);
+
+    List&lt;Student&gt; selectStudentsByForeach(int[] ids);
+
+    List&lt;Student&gt; selectStudentsByForeachList(List&lt;Integer&gt; ids);
+
+    List&lt;Student&gt; selectStudentsByForeachObject(List&lt;Student&gt; students);
+
+}
+</code></pre><p>映射文件</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE mapper
+PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+
+&lt;mapper namespace=&quot;com.bjpowernode.dao.IStudentDao&quot;&gt;
+
+    &lt;select id=&quot;selectStudentsByIf&quot; resultType=&quot;Student&quot;&gt;
+        select id,name,age,score 
+        from student 
+        where 1 = 1 
+        &lt;if test=&quot;name != null and name !=&apos;&apos;&quot;&gt;
+            and name like &apos;%&apos; #{name} &apos;%&apos;
+        &lt;/if&gt;
+        &lt;if test=&quot;age &gt; 0&quot;&gt;
+            and age &gt; #{age}
+        &lt;/if&gt;
+    &lt;/select&gt;
+
+    &lt;select id=&quot;selectStudentsByWhere&quot; resultType=&quot;Student&quot;&gt;
+        select id,name,age,score 
+        from student 
+        &lt;where&gt;
+            &lt;if test=&quot;name != null and name !=&apos;&apos;&quot;&gt;
+                and name like &apos;%&apos; #{name} &apos;%&apos;
+            &lt;/if&gt;
+            &lt;if test=&quot;age &gt; 0&quot;&gt;
+                and age &gt; #{age}
+            &lt;/if&gt;
+        &lt;/where&gt;
+    &lt;/select&gt;
+
+    &lt;!-- 
+        若姓名不空，则按姓名查询；若年龄不空，则按年龄查询；都为空，不查询。
+     --&gt;
+    &lt;select id=&quot;selectStudentsByChoose&quot; resultType=&quot;Student&quot;&gt;
+        select id,name,age,score 
+        from student 
+        &lt;where&gt;
+            &lt;choose&gt;
+                &lt;when test=&quot;name != null and name != &apos;&apos;&quot;&gt;
+                    and name like &apos;%&apos; #{name} &apos;%&apos;
+                &lt;/when&gt;
+                &lt;when test=&quot;age &gt; 0&quot;&gt;
+                    and age &gt; #{age}
+                &lt;/when&gt;
+                &lt;otherwise&gt;
+                    1 &gt; 2
+                &lt;/otherwise&gt;
+            &lt;/choose&gt;
+        &lt;/where&gt;
+    &lt;/select&gt;
+
+    &lt;select id=&quot;selectStudentsByForeach&quot; resultType=&quot;Student&quot;&gt;
+        &lt;!-- select id,name,age,score from student where id in (1,3,5) --&gt;
+        select id,name,age,score 
+        from student 
+        &lt;if test=&quot;array.length &gt; 0&quot;&gt;
+            where id in 
+            &lt;foreach collection=&quot;array&quot; item=&quot;myid&quot; open=&quot;(&quot; close=&quot;)&quot; separator=&quot;,&quot;&gt;
+                #{myid}
+            &lt;/foreach&gt;
+        &lt;/if&gt;
+    &lt;/select&gt;
+
+    &lt;select id=&quot;selectStudentsByForeachList&quot; resultType=&quot;Student&quot;&gt;
+        &lt;!-- select id,name,age,score from student where id in (1,3,5) --&gt;
+        select id,name,age,score 
+        from student 
+        &lt;if test=&quot;list.size &gt; 0&quot;&gt;
+            where id in 
+            &lt;foreach collection=&quot;list&quot; item=&quot;myid&quot; open=&quot;(&quot; close=&quot;)&quot; separator=&quot;,&quot;&gt;
+                #{myid}
+            &lt;/foreach&gt;
+        &lt;/if&gt;
+    &lt;/select&gt;
+
+    &lt;select id=&quot;selectStudentsByForeachObject&quot; resultType=&quot;Student&quot;&gt;
+        select id,name,age,score 
+        from student 
+        &lt;if test=&quot;list.size &gt; 0&quot;&gt;
+            where id in 
+            &lt;foreach collection=&quot;list&quot; item=&quot;stu&quot; open=&quot;(&quot; close=&quot;)&quot; separator=&quot;,&quot;&gt;
+                #{stu.id}
+            &lt;/foreach&gt;
+        &lt;/if&gt;
+    &lt;/select&gt;
+
+    &lt;sql id=&quot;&quot;&gt;
+
+    &lt;/sql&gt;
+
+&lt;/mapper&gt;    
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/05/08/java/mybatis/mybatis-1/" data-id="cjhlqouqh004s47fyfltfoflg" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mybatis/">mybatis</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/spring/spring-10" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/08/java/spring/spring-10/" class="article-date">
+  <time datetime="2018-05-08T01:50:30.000Z" itemprop="datePublished">2018-05-08</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/spring/">spring</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/05/08/java/spring/spring-10/">第十章 Spring事务管理</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="10-1-事务管理器接口"><a href="#10-1-事务管理器接口" class="headerlink" title="10.1 事务管理器接口"></a>10.1 事务管理器接口</h4><p>事务管理器是PlatformTransactionManager接口对象。其主要用于完成事务的提交、回滚及获取事务的状态信息。</p>
+<h5 id="常用的两个实现类"><a href="#常用的两个实现类" class="headerlink" title="常用的两个实现类"></a>常用的两个实现类</h5><ul>
+<li><p>DataSourceTransactionManager：使用JDBC或iBatis进行持久化数据时使用。</p>
+</li>
+<li><p>HibernateTransactionManager：使用Hibernate进行持久化数据时使用。</p>
+</li>
+</ul>
+<h5 id="Spring的回滚方式"><a href="#Spring的回滚方式" class="headerlink" title="Spring的回滚方式"></a>Spring的回滚方式</h5><p>Spring事务的默认回滚方式是：发生运行异常时回滚，发生受查异常时提交。</p>
+<p>运行异常指的是继承自RuntimeException的异常类，受查异常指的是继承自Exception的异常类。</p>
+<h4 id="10-2-事务定义接口"><a href="#10-2-事务定义接口" class="headerlink" title="10.2 事务定义接口"></a>10.2 事务定义接口</h4><p>TransactionDefinition</p>
+<h5 id="隔离级别："><a href="#隔离级别：" class="headerlink" title="隔离级别："></a>隔离级别：</h5><ul>
+<li><p>static int    ISOLATION_DEFAULT          0</p>
+</li>
+<li><p>static int    ISOLATION_READ_COMMITTED   2</p>
+</li>
+<li><p>static int    ISOLATION_READ_UNCOMMITED  1 </p>
+</li>
+<li><p>static int    ISOLATION_REPEATABLE_READ  4</p>
+</li>
+<li><p>static int    ISOLATION_SERIALIZABLE     8</p>
+</li>
+</ul>
+<p>MYSQL默认的是可重复读，ORACLE默认的是读已提交</p>
+<h5 id="事务的传播行为"><a href="#事务的传播行为" class="headerlink" title="事务的传播行为"></a>事务的传播行为</h5><p>定义了七个事务传播行为。</p>
+<p>doSome()方法调用doOther()方法，或doSome()方法存在于事务中，则doOther()方法加入到该事务中执行；若doSome()方法在调用doOther()方法时没有在事务内执行，则doOther()方法会创建一个事务，并在其中执行。</p>
+<h4 id="10-3-程序举例"><a href="#10-3-程序举例" class="headerlink" title="10.3 程序举例"></a>10.3 程序举例</h4><p>两个实体：银行账户Account与股票账户Stock。当要购买股票时，从Account中扣除相应金额的存款，同时在Stock中增加相应的股票数量。在这个过程中，抛出一个用户自定义的异常，使两个操作回滚。</p>
+<h4 id="10-4-定义实体及DB表"><a href="#10-4-定义实体及DB表" class="headerlink" title="10.4 定义实体及DB表"></a>10.4 定义实体及DB表</h4><p>Account.java</p>
+<pre><code>package com.bjpowernode.beans;
+
+public class Account {
+    private Integer aid;
+    private String aname;
+    private double balance;
+    public Account() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+    public Account(String aname, double balance) {
+        super();
+        this.aname = aname;
+        this.balance = balance;
+    }
+    public Integer getAid() {
+        return aid;
+    }
+    public void setAid(Integer aid) {
+        this.aid = aid;
+    }
+    public String getAname() {
+        return aname;
+    }
+    public void setAname(String aname) {
+        this.aname = aname;
+    }
+    public double getBalance() {
+        return balance;
+    }
+    public void setBalance(double balance) {
+        this.balance = balance;
+    }
+    @Override
+    public String toString() {
+        return &quot;Account [aid=&quot; + aid + &quot;, aname=&quot; + aname + &quot;, balance=&quot; + balance + &quot;]&quot;;
+    }
+
+}
+</code></pre><p>Stock.java</p>
+<pre><code>package com.bjpowernode.beans;
+
+public class Stock {
+    private Integer sid;
+    private String sname;
+    private int count;
+
+    public Stock() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+    public Stock(String sname, int count) {
+        super();
+        this.sname = sname;
+        this.count = count;
+    }
+
+    public Integer getSid() {
+        return sid;
+    }
+
+    public void setSid(Integer sid) {
+        this.sid = sid;
+    }
+
+    public String getSname() {
+        return sname;
+    }
+
+    public void setSname(String sname) {
+        this.sname = sname;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
+
+    @Override
+    public String toString() {
+        return &quot;Stock [sid=&quot; + sid + &quot;, sname=&quot; + sname + &quot;, count=&quot; + count + &quot;]&quot;;
+    }
+
+}
+</code></pre><h4 id="10-5-定义service"><a href="#10-5-定义service" class="headerlink" title="10.5 定义service"></a>10.5 定义service</h4><p>业务接口</p>
+<pre><code>package com.bjpowernode.service;
+
+public interface IBuyStockService {
+    void openAccount(String aname, double money);
+    void openStock(String sname, int amount);
+    void buyStock(String aname, double money, String sname, int amount) throws BuyStockException;
+}
+</code></pre><p>业务实现类</p>
+<pre><code>package com.bjpowernode.service;
+
+import com.bjpowernode.Dao.IAccountDao;
+import com.bjpowernode.Dao.IStockDao;
+
+public class BuyStockServiceImpl implements IBuyStockService {
+    private IAccountDao adao;
+    private IStockDao sdao;
+
+    public void setAdao(IAccountDao adao) {
+        this.adao = adao;
+    }
+
+    public void setSdao(IStockDao sdao) {
+        this.sdao = sdao;
+    }
+
+    @Override
+    public void openAccount(String aname, double money) {
+        adao.insertAccount(aname, money);
+    }
+
+    @Override
+    public void openStock(String sname, int amount) {
+        sdao.insertStock(sname, amount);
+    }
+
+    @Override
+    public void buyStock(String aname, double money, String sname, int amount) throws BuyStockException {
+        boolean isBuy = true;
+        adao.updateAccount(aname, money, isBuy);
+        if(true) {
+            throw new BuyStockException(&quot;购买股票异常&quot;);
+        }
+        sdao.updateStock(sname, amount, isBuy);
+    }
+
+}
+</code></pre><h4 id="10-6-定义Dao"><a href="#10-6-定义Dao" class="headerlink" title="10.6 定义Dao"></a>10.6 定义Dao</h4><p>IAccountDao</p>
+<pre><code>package com.bjpowernode.Dao;
+
+public interface IAccountDao {
+
+    void insertAccount(String aname, double money);
+
+    void updateAccount(String aname, double money, boolean isBuy);
+
+}
+</code></pre><p>AccountDaoImpl</p>
+<pre><code>package com.bjpowernode.Dao;
+
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+
+public class AccountDaoImpl extends JdbcDaoSupport implements IAccountDao {
+
+    @Override
+    public void insertAccount(String aname, double money) {
+        String sql = &quot;insert into account(aname, balance) values(?,?)&quot;;
+        this.getJdbcTemplate().update(sql, aname, money);
+    }
+
+    @Override
+    public void updateAccount(String aname, double money, boolean isBuy) {
+        String sql = &quot;update account set balance = balance + ? where aname=?&quot;;
+        if(isBuy) {
+            sql = &quot;update account set balance = balance - ? where aname=?&quot;;
+        }
+        this.getJdbcTemplate().update(sql, money, aname);
+    }
+
+}
+</code></pre><p>IStockDao</p>
+<pre><code>package com.bjpowernode.Dao;
+
+public interface IStockDao {
+
+    void insertStock(String sname, int amount);
+
+    void updateStock(String sname, int amount, boolean isBuy);
+
+}
+</code></pre><p>StockDaoImpl</p>
+<pre><code>package com.bjpowernode.Dao;
+
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+
+public class StockDaoImpl extends JdbcDaoSupport implements IStockDao {
+
+    @Override
+    public void insertStock(String sname, int amount) {
+        String sql = &quot;insert into stock(sname, count) values(?,?)&quot;;
+        this.getJdbcTemplate().update(sql, sname, amount);
+    }
+
+    @Override
+    public void updateStock(String sname, int amount, boolean isBuy) {
+        String sql = &quot;update stock set count = count-? where sname=?&quot;;
+        if(isBuy) {
+            sql = &quot;update stock set count = count+? where sname=?&quot;;            
+        }
+        this.getJdbcTemplate().update(sql, amount, sname);
+    }
+
+}
+</code></pre><h4 id="10-7-定义测试类"><a href="#10-7-定义测试类" class="headerlink" title="10.7 定义测试类"></a>10.7 定义测试类</h4><p>MyTest.java</p>
+<pre><code>package com.bjpowernode.test;
+
+import java.nio.channels.AcceptPendingException;
+import java.util.List;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.cache.support.AbstractCacheManager;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.dao.support.DaoSupport;
+
+import com.bjpowernode.service.BuyStockException;
+import com.bjpowernode.service.IBuyStockService;
+
+
+public class MyTest {
+
+    private IBuyStockService service;
+
+    @Before
+    public void before() {
+        String source = &quot;applicationContext.xml&quot;;
+        ApplicationContext ac = new ClassPathXmlApplicationContext(source);
+        service = (IBuyStockService) ac.getBean(&quot;buyStockService&quot;);
+    }
+
+    @Test
+    public void test01() {
+        service.openAccount(&quot;张三&quot;, 10000);
+        service.openStock(&quot;动力节点&quot;, 0);
+    }    
+
+    @Test
+    public void test02() {
+        try {
+            service.buyStock(&quot;张三&quot;, 2000, &quot;动力节点&quot;, 5);
+        } catch (BuyStockException e) {
+            e.printStackTrace();
+        }
+    }    
+
+}
+</code></pre><h4 id="10-8-异常类"><a href="#10-8-异常类" class="headerlink" title="10.8 异常类"></a>10.8 异常类</h4><pre><code>package com.bjpowernode.service;
+
+public class BuyStockException extends Exception {
+
+    public BuyStockException() {
+        super();
+    }
+
+    public BuyStockException(String message) {
+        super(message);
+    }
+
+}
+</code></pre><h4 id="10-9-注册"><a href="#10-9-注册" class="headerlink" title="10.9 注册"></a>10.9 注册</h4><p>applicationContext.xml</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
+xmlns:tx=&quot;http://www.springframework.org/schema/tx&quot;
+xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context.xsd
+http://www.springframework.org/schema/aop
+http://www.springframework.org/schema/aop/spring-aop.xsd
+http://www.springframework.org/schema/tx
+http://www.springframework.org/schema/tx/spring-tx.xsd&quot;&gt;
+
+    &lt;!-- 注册属性文件：从属性文件读取DB连接四要素：方式二 --&gt;
+    &lt;context:property-placeholder location=&quot;classpath:jdbc.properties&quot;/&gt;
+
+    &lt;!-- 注册数据源:Spring内置的连接池 --&gt;
+    &lt;bean id=&quot;myDataSource&quot; class=&quot;org.springframework.jdbc.datasource.DriverManagerDataSource&quot;&gt;
+        &lt;property name=&quot;driverClassName&quot; value=&quot;${jdbc.driver}&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;url&quot; value=&quot;${jdbc.url}&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;username&quot; value=&quot;${jdbc.user}&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;password&quot; value=&quot;${jdbc.password}&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+    &lt;!-- 注册dao --&gt;
+    &lt;bean id=&quot;accountDao&quot; class=&quot;com.bjpowernode.Dao.AccountDaoImpl&quot;&gt;
+        &lt;property name=&quot;dataSource&quot; ref=&quot;myDataSource&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+    &lt;bean id=&quot;stockDao&quot; class=&quot;com.bjpowernode.Dao.StockDaoImpl&quot;&gt;
+        &lt;property name=&quot;dataSource&quot; ref=&quot;myDataSource&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+    &lt;!-- 注册service --&gt;
+    &lt;bean id=&quot;buyStockService&quot; class=&quot;com.bjpowernode.service.BuyStockServiceImpl&quot;&gt;
+        &lt;property name=&quot;adao&quot; ref=&quot;accountDao&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;sdao&quot; ref=&quot;stockDao&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+&lt;!-- ============================ AOP ===================================================  --&gt;
+
+    &lt;!-- 注册事务管理器 --&gt;
+    &lt;bean id=&quot;myTransactionManager&quot; class=&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;&gt;
+        &lt;property name=&quot;dataSource&quot; ref=&quot;myDataSource&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+    &lt;!-- 注册事务通知 --&gt;
+    &lt;tx:advice id=&quot;txAdvice&quot; transaction-manager=&quot;myTransactionManager&quot;&gt;
+        &lt;tx:attributes&gt;
+            &lt;!-- 这里指定的是：为每一个连接点指定所要应用的事务属性 --&gt;
+            &lt;tx:method name=&quot;open*&quot; isolation=&quot;DEFAULT&quot; propagation=&quot;REQUIRED&quot;/&gt;
+            &lt;tx:method name=&quot;buyStock&quot; isolation=&quot;DEFAULT&quot; propagation=&quot;REQUIRED&quot; rollback-for=&quot;BuyStockException&quot;/&gt;
+        &lt;/tx:attributes&gt;
+    &lt;/tx:advice&gt;
+
+    &lt;aop:config&gt;
+        &lt;!-- 这里指定的是切入点 --&gt;
+        &lt;aop:pointcut expression=&quot;execution(* *..service.*.buyStock(..))&quot; id=&quot;myPointcut&quot;/&gt;
+        &lt;aop:advisor advice-ref=&quot;txAdvice&quot; pointcut-ref=&quot;myPointcut&quot;/&gt;    
+    &lt;/aop:config&gt;
+
+&lt;/beans&gt;
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/05/08/java/spring/spring-10/" data-id="cjhlqour0005g47fylqo4e286" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/spring/spring-9" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/06/java/spring/spring-9/" class="article-date">
+  <time datetime="2018-05-06T08:17:07.000Z" itemprop="datePublished">2018-05-06</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/spring/">spring</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/05/06/java/spring/spring-9/">第九章 spring与JDBC模板</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>为了避免直接使用JDBC而带来的复杂且冗长的代码，Spring提供了一个强有力的模板类-JdbcTemplate来简化JDBC操作。并且，数据源DataSource对象与模板JdbcTemplate对象均通过Bean的形式定义在配置文件中，充分发挥了依赖注入的威力。</p>
+<h4 id="9-1-导入jar包"><a href="#9-1-导入jar包" class="headerlink" title="9.1 导入jar包"></a>9.1 导入jar包</h4><p>spring-jdbc-*.jar</p>
+<p>spring的事务 spring-tx-*.jar</p>
+<p>c3p0: com.springsource.com.mchange.v2.c3p0-**.jar</p>
+<p>dbcp: </p>
+<ul>
+<li><p>com.springsource.org.apache.commons.dbcp-*.osgi.jar</p>
+</li>
+<li><p>com.springsource.org.apache.commons.pool-*.jar</p>
+</li>
+</ul>
+<p>mysql驱动：mysql-connector-java-*-bin.jar</p>
+<h4 id="9-3-定义实体类与DB表"><a href="#9-3-定义实体类与DB表" class="headerlink" title="9.3 定义实体类与DB表"></a>9.3 定义实体类与DB表</h4><p>student类</p>
+<pre><code>package com.bjpowernode.beans;
+
+public class Student {
+    private Integer id;
+    private String name;
+    private int age;
+
+    public Student() {
+        super();
+    }
+
+
+    public Student(Integer id, String name, int age) {
+        super();
+        this.id = id;
+        this.name = name;
+        this.age = age;
+    }
+
+
+    public Student(String name, int age) {
+        super();
+        this.name = name;
+        this.age = age;
+    }
+
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+
+    public Integer getId() {
+        return id;
+    }
+
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+
+    @Override
+    public String toString() {
+        return &quot;Student [name=&quot; + name + &quot;, age=&quot; + age + &quot;]&quot;;
+    }
+
+}
+</code></pre><p>导出student.sql放入项目中</p>
+<h4 id="9-4-定义Service"><a href="#9-4-定义Service" class="headerlink" title="9.4 定义Service"></a>9.4 定义Service</h4><p>IStudentService接口</p>
+<pre><code>package com.bjpowernode.service;
+
+import java.util.List;
+
+import com.bjpowernode.beans.Student;
+
+public interface IStudentService {
+
+    void addStudent(Student student);
+    void removeById(int id);
+    void modifyStudent(Student student);
+
+    List&lt;String&gt; findAllStudentsNames();
+    String findStudentNameById(int id);
+
+    List&lt;Student&gt; findAllStudents();
+    Student findStudentById(int id);
+
+}
+</code></pre><p>StudentServiceImpl实现类</p>
+<pre><code>package com.bjpowernode.service;
+
+import java.util.List;
+
+import com.bjpowernode.Dao.IStudentDao;
+import com.bjpowernode.beans.Student;
+
+public class StudentServiceImpl implements IStudentService {
+
+    private IStudentDao dao;
+
+    public void setDao(IStudentDao dao) {
+        this.dao = dao;
+    }
+
+
+    @Override
+    public void addStudent(Student student) {
+        dao.insertStudent(student);
+    }
+
+    @Override
+    public void removeById(int id) {
+        dao.deleteById(id);
+    }
+
+    @Override
+    public void modifyStudent(Student student) {
+        dao.updateStudent(student);
+    }
+
+    @Override
+    public List&lt;String&gt; findAllStudentsNames() {
+        return dao.selectAllStudentsNames();
+    }
+
+    @Override
+    public String findStudentNameById(int id) {
+        return dao.selectStudentNameById(id);
+    }
+
+    @Override
+    public List&lt;Student&gt; findAllStudents() {
+        return dao.selectAllStudents();
+    }
+
+    @Override
+    public Student findStudentById(int id) {
+        return dao.selectStudentById(id);
+    }    
+}
+</code></pre><h4 id="9-5-定义Dao"><a href="#9-5-定义Dao" class="headerlink" title="9.5 定义Dao"></a>9.5 定义Dao</h4><p>IStudentDao</p>
+<pre><code>package com.bjpowernode.Dao;
+
+import java.util.List;
+
+import com.bjpowernode.beans.Student;
+
+public interface IStudentDao {
+
+
+    void insertStudent(Student student);
+    void deleteById(int id);
+    void updateStudent(Student student);
+
+    List&lt;String&gt; selectAllStudentsNames();
+    String selectStudentNameById(int id);
+
+    List&lt;Student&gt; selectAllStudents();
+    Student selectStudentById(int id); 
+}
+</code></pre><p>StudentDaoImpl</p>
+<pre><code>package com.bjpowernode.Dao;
+
+import java.util.List;
+
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+
+import com.bjpowernode.beans.Student;
+
+//继承JdbcDaoSupport
+public class StudentDaoImpl extends JdbcDaoSupport implements IStudentDao {
+
+    //增
+    @Override
+    public void insertStudent(Student student) {
+        String sql = &quot;insert into student(name,age) values(?,?)&quot;;
+        this.getJdbcTemplate().update(sql, student.getName(), student.getAge());
+    }
+
+    //删
+    @Override
+    public void deleteById(int id) {
+        String sql = &quot;delete from student where id=?&quot;;
+        this.getJdbcTemplate().update(sql,id);
+    }
+
+    //改
+    @Override
+    public void updateStudent(Student student) {
+        String sql = &quot;update student set name=?, age=? where id=?&quot;;
+        this.getJdbcTemplate().update(sql, student.getName(), student.getAge(), student.getId());
+    }
+
+    //查
+    @Override
+    public List&lt;String&gt; selectAllStudentsNames() {
+        String sql = &quot;select name from student&quot;;
+        return this.getJdbcTemplate().queryForList(sql, String.class);
+    }
+
+    @Override
+    public String selectStudentNameById(int id) {
+        String sql = &quot;select name from student where id=?&quot;;
+        return this.getJdbcTemplate().queryForObject(sql, String.class, id);
+    }
+
+    @Override
+    public List&lt;Student&gt; selectAllStudents() {
+        String sql = &quot;select id,name,age from student&quot;;
+        //手动封装查询的数据集
+        return this.getJdbcTemplate().query(sql, new StudentRowMapper());
+    }
+
+    @Override
+    public Student selectStudentById(int id) {
+        String sql = &quot;select id,name,age from student where id=?&quot;;
+        return this.getJdbcTemplate().queryForObject(sql, new StudentRowMapper(), id);
+    }
+
+
+}
+</code></pre><h4 id="9-6-定义测试类"><a href="#9-6-定义测试类" class="headerlink" title="9.6 定义测试类"></a>9.6 定义测试类</h4><p>MyTest.java</p>
+<pre><code>package com.bjpowernode.test;
+
+public class MyTest {
+
+    private IStudentService service;
+
+    @Before
+    public void before() {
+        String source = &quot;applicationContext.xml&quot;;
+        ApplicationContext ac = new ClassPathXmlApplicationContext(source);
+        service = (IStudentService) ac.getBean(&quot;studentService&quot;);
+    }
+
+    //增
+    @Test
+    public void test01() {
+        Student student = new Student(&quot;王五2&quot;, 26);
+        service.addStudent(student);
+    }
+
+    //删
+    @Test
+    public void test02() {
+        service.removeById(2);
+    }
+
+    //改
+    @Test
+    public void test03() {
+        Student student = new Student(1,&quot;李四2&quot;,23);
+        service.modifyStudent(student);
+    }
+
+    //查所有学生的名字
+    @Test
+    public void test04() {
+        List&lt;String&gt; names = service.findAllStudentsNames();
+        System.out.println(names);
+    }
+
+    //查某个学生的名字
+    @Test
+    public void test05() {
+        String name = service.findStudentNameById(1);
+        System.out.println(name);
+    }
+
+    //查所有学生
+    @Test
+    public void test06() {
+        List&lt;Student&gt; students = service.findAllStudents();
+        for(Student student:students) {
+            System.out.println(student);
+        }
+    }
+
+    //查某个学生
+    @Test
+    public void test07() {
+        Student student = service.findStudentById(1);
+        System.out.println(student);
+    }
+
+}
+</code></pre><h4 id="9-7-配置"><a href="#9-7-配置" class="headerlink" title="9.7 配置"></a>9.7 配置</h4><p>jdbc.properties 连接四要素</p>
+<pre><code>jdbc.driver=com.mysql.jdbc.Driver
+jdbc.url=jdbc:mysql://127.0.0.1:3306/test
+jdbc.user=root
+jdbc.password=haojie_123456
+</code></pre><p>applicationContext.xml</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+    xmlns:context=&quot;http://www.springframework.org/schema/context&quot; xsi:schemaLocation=&quot;
+        http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd&quot;&gt;
+
+    &lt;!-- 注册数据源:Spring内置的连接池 --&gt;
+    &lt;!-- &lt;bean id=&quot;myDataSource&quot; class=&quot;org.springframework.jdbc.datasource.DriverManagerDataSource&quot;&gt;
+        &lt;property name=&quot;driverClassName&quot; value=&quot;com.mysql.jdbc.Driver&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;url&quot; value=&quot;jdbc:mysql://127.0.0.1:3306/mydatabase&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;username&quot; value=&quot;root&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;password&quot; value=&quot;haojie_123456&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt; --&gt;
+
+    &lt;!-- 注册数据源:DBCP --&gt;
+    &lt;!-- &lt;bean id=&quot;myDataSource&quot; class=&quot;org.apache.tomcat.dbcp.dbcp.BasicDataSource&quot;&gt;
+        &lt;property name=&quot;driverClassName&quot; value=&quot;com.mysql.jdbc.Driver&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;url&quot; value=&quot;jdbc:mysql://127.0.0.1:3306/mydatabase&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;username&quot; value=&quot;root&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;password&quot; value=&quot;haojie_123456&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt; --&gt;
+
+    &lt;!-- 注册数据源:C3P0 --&gt;
+    &lt;!-- &lt;bean id=&quot;myDataSource&quot; class=&quot;com.mchange.v2.c3p0.ComboPooledDataSource&quot;&gt;
+        &lt;property name=&quot;driverClass&quot; value=&quot;com.mysql.jdbc.Driver&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;jdbcurl&quot; value=&quot;jdbc:mysql://127.0.0.1:3306/mydatabase&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;user&quot; value=&quot;root&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;password&quot; value=&quot;haojie_123456&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt; --&gt;
+
+    &lt;!-- 注册属性文件：从属性文件读取DB连接四要素：方式一 --&gt;
+    &lt;!-- &lt;bean class=&quot;org.springframework.beans.factory.config.PropertyPlaceholderConfigurer&quot;&gt;
+        &lt;property name=&quot;location&quot; value=&quot;classpath:jdbc.properties&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt; --&gt;
+
+    &lt;!-- 注册属性文件：从属性文件读取DB连接四要素：方式二 --&gt;
+    &lt;!-- &lt;context:property-placeholder location=&quot;classpath:jdbc.properties&quot;/&gt; --&gt;
+
+    &lt;bean id=&quot;myDataSource&quot; class=&quot;org.springframework.jdbc.datasource.DriverManagerDataSource&quot;&gt;
+        &lt;property name=&quot;driverClassName&quot; value=&quot;com.mysql.jdbc.Driver&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;url&quot; value=&quot;jdbc:mysql://127.0.0.1:3306/mydatabase&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;username&quot; value=&quot;root&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;password&quot; value=&quot;haojie_123456&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+    &lt;!-- 将数据源注入给dao：方式一 --&gt;
+
+            &lt;!-- 注册jdbctemplate --&gt;
+            &lt;!-- &lt;bean id=&quot;myJdbcTemplate&quot; class=&quot;org.springframework.jdbc.core.JdbcTemplate&quot;&gt;
+                &lt;property name=&quot;dataSource&quot; ref=&quot;myDataSource&quot;&gt;&lt;/property&gt;
+            &lt;/bean&gt; --&gt;
+
+            &lt;!-- 注册dao --&gt;
+            &lt;!-- &lt;bean id=&quot;studentDao&quot; class=&quot;com.bjpowernode.Dao.StudentDaoImpl&quot;&gt;
+                &lt;property name=&quot;jdbcTemplate&quot; ref=&quot;myJdbcTemplate&quot;&gt;&lt;/property&gt;
+            &lt;/bean&gt; --&gt;
+
+    &lt;!-- 将数据源注入给dao：方式二 --&gt;
+
+            &lt;!-- 注册dao --&gt;
+            &lt;bean id=&quot;studentDao&quot; class=&quot;com.bjpowernode.Dao.StudentDaoImpl&quot;&gt;
+                &lt;property name=&quot;dataSource&quot; ref=&quot;myDataSource&quot;&gt;&lt;/property&gt;
+            &lt;/bean&gt;
+
+
+    &lt;!-- 注册实现类 --&gt;
+    &lt;bean id=&quot;studentService&quot; class=&quot;com.bjpowernode.service.StudentServiceImpl&quot;&gt;
+        &lt;property name=&quot;dao&quot; ref=&quot;studentDao&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+&lt;/beans&gt;
+</code></pre><h4 id="9-8-Jdbc模板的对象是多例的"><a href="#9-8-Jdbc模板的对象是多例的" class="headerlink" title="9.8 Jdbc模板的对象是多例的"></a>9.8 Jdbc模板的对象是多例的</h4><p>JdbcTemplate对象是多例的，即系统会为每一个使用模板对象的线程（方法）创建一个JdbcTemplate实例，并且在该线程（方法）结束时，自动释放JdbcTemplate实例。所以在每次使用JdbcTemplate对象时，都需要通过getJdbcTemplate()方法获取。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/05/06/java/spring/spring-9/" data-id="cjhlqourm006947fywz0c78ud" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/spring/spring-8" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/06/java/spring/spring-8/" class="article-date">
+  <time datetime="2018-05-06T03:05:27.000Z" itemprop="datePublished">2018-05-06</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/spring/">spring</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/05/06/java/spring/spring-8/">第八章 Spring与AOP AspectJ基于XML的AOP实现</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="AspectJ基于XML的AOP实现"><a href="#AspectJ基于XML的AOP实现" class="headerlink" title="AspectJ基于XML的AOP实现"></a>AspectJ基于XML的AOP实现</h4><p>切面</p>
+<pre><code>//切面
+public class MyAspect {
+
+    public void myBefore() {
+        System.out.println(&quot;执行前置方法&quot;);
+    }
+
+    public void myBefore(JoinPoint jp) {
+        System.out.println(&quot;执行前置方法jp=&quot;+jp);
+    }
+
+    public void myAfterReturning(String result) {
+        System.out.println(&quot;执行后置方法 result=&quot;+result);
+    }
+
+    public Object myAround(ProceedingJoinPoint pjp) throws Throwable {
+        System.out.println(&quot;执行环绕通知方法，目标方法执行之前&quot;);
+        //目标方法
+        Object result = pjp.proceed();
+        System.out.println(&quot;执行环绕通知方法，目标方法执行之后&quot;);
+        if(result != null) {
+            result = ((String)result).toUpperCase();
+        }
+        return result;
+    }
+
+    public void myAfterThrowing(UsernameException ex) {
+        System.out.println(&quot;发生用户名异常:&quot;+ex.getMessage());
+    }
+
+    public void myAfterThrowing(PasswordException ex) {
+        System.out.println(&quot;发生密码异常:&quot;+ex.getMessage());
+    }
+
+    public void myAfterThrowing(Exception ex) {
+        System.out.println(&quot;发生其它异常:&quot;+ex.getMessage());
+    }
+
+    public void myAfter() {
+        System.out.println(&quot;执行最终通知&quot;);
+    }
+
+
+}
+</code></pre><p>配置文件</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+    xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot; xsi:schemaLocation=&quot;
+        http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop 
+        http://www.springframework.org/schema/aop/spring-aop.xsd&quot;&gt; 
+
+        &lt;!-- 注册切面 --&gt;
+        &lt;bean id=&quot;myAspect&quot; class=&quot;com.siyantu.xml.MyAspect&quot;&gt;&lt;/bean&gt;
+
+         &lt;!-- 注册实现类 --&gt;
+        &lt;bean id=&quot;someService&quot; class=&quot;com.siyantu.xml.SomeServiceImpl&quot; /&gt;
+
+        &lt;!-- AOP配置 --&gt;
+        &lt;aop:config&gt;
+                &lt;!-- 定义切入点 --&gt;
+                &lt;aop:pointcut expression=&quot;execution(* *..ISomeService.doFirst(..))&quot; id=&quot;doFirstPointcut&quot;/&gt;
+                &lt;aop:pointcut expression=&quot;execution(* *..ISomeService.doSecond(..))&quot; id=&quot;doSecondPointcut&quot;/&gt;
+                &lt;aop:pointcut expression=&quot;execution(* *..ISomeService.doThird(..))&quot; id=&quot;doThirdPointcut&quot;/&gt;
+
+                &lt;aop:aspect ref=&quot;myAspect&quot;&gt;
+                    &lt;!-- 前置通知 --&gt;
+                    &lt;aop:before method=&quot;myBefore&quot; pointcut-ref=&quot;doFirstPointcut&quot; /&gt;
+                    &lt;!-- 指定参数类型 --&gt;
+                    &lt;aop:before method=&quot;myBefore(org.aspectj.lang.JoinPoint)&quot; pointcut-ref=&quot;doFirstPointcut&quot; /&gt;
+
+                    &lt;!-- 后置通知 --&gt;
+                    &lt;aop:after-returning method=&quot;myAfterReturning&quot; pointcut-ref=&quot;doSecondPointcut&quot; returning=&quot;result&quot; /&gt;
+
+                    &lt;!-- 环绕通知 --&gt;
+                    &lt;aop:around method=&quot;myAround(org.aspectj.lang.ProceedingJoinPoint)&quot; pointcut-ref=&quot;doSecondPointcut&quot; /&gt;
+
+                    &lt;!-- 异常通知 --&gt;
+                    &lt;aop:after-throwing method=&quot;myAfterThrowing(com.siyantu.xml.UsernameException)&quot; pointcut-ref=&quot;doThirdPointcut&quot; throwing=&quot;ex&quot; /&gt;
+                    &lt;aop:after-throwing method=&quot;myAfterThrowing(com.siyantu.xml.PasswordException)&quot; pointcut-ref=&quot;doThirdPointcut&quot; throwing=&quot;ex&quot; /&gt;
+                    &lt;aop:after-throwing method=&quot;myAfterThrowing(java.lang.Exception)&quot; pointcut-ref=&quot;doThirdPointcut&quot; throwing=&quot;ex&quot; /&gt;
+
+                    &lt;!-- 最终通知 --&gt;
+                    &lt;aop:after method=&quot;myAfter&quot; pointcut-ref=&quot;doThirdPointcut&quot; /&gt;
+
+                &lt;/aop:aspect&gt;
+
+        &lt;/aop:config&gt;
+
+&lt;/beans&gt;
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/05/06/java/spring/spring-8/" data-id="cjhlqourg006347fyawuj7a99" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-java/spring/spring-7" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/05/06/java/spring/spring-7/" class="article-date">
@@ -321,7 +1903,7 @@ public class MyAspect {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/06/java/spring/spring-7/" data-id="cjh4911mw0066mtp3t0fhkr9k" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/05/06/java/spring/spring-7/" data-id="cjhlqourj006647fylbkd79ta" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
@@ -390,7 +1972,7 @@ public class MyAspect {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/05/java/spring/spring-6/" data-id="cjh4911mq005zmtp3s7fxho62" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/05/05/java/spring/spring-6/" data-id="cjhlqoure006047fy0waua0ds" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
@@ -444,7 +2026,7 @@ public class MyAspect {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/05/java/spring/spring-5/" data-id="cjh4911mn005wmtp3v2ivy5v4" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/05/05/java/spring/spring-5/" data-id="cjhlqourb005w47fyiw4s650x" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
@@ -565,7 +2147,7 @@ public class MyTest {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/05/java/spring/spring-4/" data-id="cjh4911mk005smtp3h1ihz8uv" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/05/05/java/spring/spring-4/" data-id="cjhlqour4005m47fytdk9fg4s" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
@@ -791,7 +2373,7 @@ ApplicationContext ac = new ClassPathXmlApplicationContext(source);
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/05/java/spring/spring-3/" data-id="cjh4911mf005mmtp39fmg11q7" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/05/05/java/spring/spring-3/" data-id="cjhlqour6005q47fyhuxnhkaj" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
@@ -955,1380 +2537,10 @@ ISomeService service2 = (ISomeService) ac.getBean(&quot;myService&quot;);
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/04/java/spring/spring-2/" data-id="cjh4911mi005qmtp3caexrlhh" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/05/04/java/spring/spring-2/" data-id="cjhlqour2005j47fyk7hksb2x" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/spring/spring-1" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/05/04/java/spring/spring-1/" class="article-date">
-  <time datetime="2018-05-04T06:33:18.000Z" itemprop="datePublished">2018-05-04</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/spring/">spring</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/05/04/java/spring/spring-1/">第一章 spring概述</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h4 id="1-1-概述"><a href="#1-1-概述" class="headerlink" title="1.1 概述"></a>1.1 概述</h4><p>spring的核心是控制反转（IOC）和面向切面编程（AOP）。</p>
-<p>spring的主要作用就是为代码“解耦”，降低代码间的耦合度。</p>
-<p>spring根据代码功能特点，将降低耦合度的方式分为了两类：IOC与AOP。<br>IOC使得主业务在相互调用过程中，不用再自己维护关系了，即不用再自己创建使用的对象了。而是由spring容器统一管理，自动“注入”。而AOP使得系统级服务得到了最大复用，且不用由程序员手工将系统级服务“混杂”到主业务逻辑中了，而是由spring容器统一完成“织入”。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/05/04/java/spring/spring-1/" data-id="cjh4911ma005fmtp3nee1sve4" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/java-session-cookie/session-cookie" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/04/27/java/java-session-cookie/session-cookie/" class="article-date">
-  <time datetime="2018-04-27T02:12:04.000Z" itemprop="datePublished">2018-04-27</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/java/">java</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/04/27/java/java-session-cookie/session-cookie/">session&amp;cookie</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h4 id="1-1-cookie简介"><a href="#1-1-cookie简介" class="headerlink" title="1.1 cookie简介"></a>1.1 cookie简介</h4><p>cookie是1993年由网景公司前雇员发明的一种进行网络会话状态跟踪的技术。</p>
-<p>会话是由一组请求与响应组成，是围绕着一种相关事情所进行的请求与响应。所以这些请求与响应之间一定是需要有数据传递的，即需要进行会话状态跟踪。然而HTTP协议是一种无状态协议，在不同的请求之间是无法进行数据传递的。此时就需要一种可以进行请求之间进行数据传递的会话跟踪技术，而cookie就是一种这样的技术。</p>
-<p>cookie是由服务器生成，保存在客户端的一种信息载体。这个载体中存放着用记访问该站点的会话状态信息。只在cookie没有被清空，或者cookie没有失效，那么，保存在其中的会话状态就有效。</p>
-<p>用户在提交第一次请求后，由服务器生成cookie，并将其封装到响应头中，以响应的形式发送给客户端。客户端接收到这个响应后，将cookie保存到客户端。当客户端再次发送同类请求后（资源路径相同，资源名称不同），在请求中会携带保存在客户端的cookie数据，发送到客户端，由服务器对会话进行跟踪。</p>
-<p>cookie技术并不是jvavaweb开发的专属技术，而是属于web开发的技术，是所有web开发语言均支持的技术。</p>
-<p>cookie是由若干键值对构成，键值对均为字符串。</p>
-<h4 id="1-2-javaEE中的cookie"><a href="#1-2-javaEE中的cookie" class="headerlink" title="1.2 javaEE中的cookie"></a>1.2 javaEE中的cookie</h4><p>在javaEE中的javax.servlet.http包中存在一个类Cookie，就是用于完成会话跟踪的Cookie。其只有一个带参构造器。</p>
-<h5 id="默认绑定路径"><a href="#默认绑定路径" class="headerlink" title="默认绑定路径"></a>默认绑定路径</h5><p>访问路径由资源路径与资源名称构成。默认情况下，cookie与访问路径中的资源路径绑定。只要用户发出带有绑定资源路径的请求，则在请求头部，将会自动携带与之绑定的cookie路径。</p>
-<h5 id="生成cookie"><a href="#生成cookie" class="headerlink" title="生成cookie"></a>生成cookie</h5><pre><code>public class SomeServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
-
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.getWriter().append(&quot;Served at: &quot;).append(request.getContextPath());
-        //创建两个Cookie
-        Cookie cookie = new Cookie(&quot;company&quot;,&quot;abc&quot;);
-        Cookie cookie2 = new Cookie(&quot;teacher&quot;,&quot;def&quot;);
-
-        //指定cookie绑定的资源路径。必须加上项目名称
-        cookie.setPath(request.getContextPath() + &quot;/aaa/bbb/ccc&quot;);
-        cookie2.setPath(request.getContextPath() + &quot;/ddd/eee/fff&quot;);
-
-        //设置cookie有效期
-        //大于0，表示将cookie存放到客户端硬盘
-        //小于0，与不设置一样，会将cookie存放到浏览器的缓存
-        //等于0，表示cookie一生成，马上失效
-        cookie.setMaxAge(60 * 60);
-        cookie2.setMaxAge(60 * 60 * 24 * 10);
-
-        //向响应中添加Cookie
-        response.addCookie(cookie);
-        response.addCookie(cookie2);
-
-    }
-}
-</code></pre><h5 id="获取cookie"><a href="#获取cookie" class="headerlink" title="获取cookie"></a>获取cookie</h5><pre><code>public class OhterServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
-
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.getWriter().append(&quot;Served at: &quot;).append(request.getContextPath());
-
-        Cookie[] cookies = request.getCookies();
-
-        for(Cookie cookie:cookies) {
-            System.out.println(cookie.getName() + &quot;===&quot; + cookie.getValue());
-            if(cookie.getName().equals(&quot;teacher&quot;) &amp;&amp; cookie.getValue().equals(&quot;aaa&quot;)) {
-                //...
-            } else {
-                //..
-            }
-        }
-    }
-
-}
-</code></pre><h4 id="2-1-HttpSession"><a href="#2-1-HttpSession" class="headerlink" title="2.1 HttpSession"></a>2.1 HttpSession</h4><p> session，即会话，是web开发中的一种会话状态跟踪技术。不同的是,cookie是将会话状态保存在了客户端，而session是将会话状态保存在了服务器端。</p>
-<p> 在javaweb开发中，session是以javax.servlet.HttpSession的接口对象的形式出现。</p>
-<hr>
-<p>对于request的getSession()的用法：</p>
-<ul>
-<li><p>一般情况下，若要向session域中写入数据，则需要使用getSession(true)，即getSession()方法。意味着有老的session用老的，没有老的则创建新的。</p>
-</li>
-<li><p>若要从session中读取数据，则需要使用getSession(false)。意味着有老的session用老的，没有老的返回null。</p>
-</li>
-</ul>
-<hr>
-<pre><code>&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-&lt;meta charset=&quot;UTF-8&quot;&gt;
-&lt;title&gt;Insert title here&lt;/title&gt;
-&lt;/head&gt;
-&lt;body&gt;
-    &lt;form action = &quot;FirstServlet&quot; method = &quot;POST&quot;&gt;
-        用户名：&lt;input type = &quot;text&quot; name = &quot;username&quot; /&gt;
-        &lt;input type = &quot;submit&quot; value = &quot;提交&quot; /&gt;
-    &lt;/form&gt;
-&lt;/body&gt;
-&lt;/html&gt;
-</code></pre><p> FirstServlet</p>
-<pre><code>public class FirstServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
-
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        //获取用户提交的数据
-        String username = request.getParameter(&quot;username&quot;);
-
-        //将参数放到request域
-        request.setAttribute(&quot;user&quot;, username);
-
-        //获取session对象
-        HttpSession session = request.getSession();
-
-        //向session域中写入数据
-        session.setAttribute(&quot;username&quot;, username);
-
-        response.getWriter().print(&quot;SomeServlet&quot; + username);
-
-    }
-
-}
-</code></pre><p>SecondServlet</p>
-<pre><code>public class SecondServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
-
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        //从request域中读取user属性
-        Object user = request.getAttribute(&quot;user&quot;);
-
-        //获取session
-        HttpSession session = request.getSession(false);
-
-        //从session中读取指定属性
-        String username = null;
-        if(session != null) {
-            username = (String) session.getAttribute(&quot;username&quot;);
-        }
-
-        PrintWriter out = response.getWriter();
-        out.println(&quot;user = &quot; + user);
-        out.println(&quot;username = &quot; + username);
-        out.println(&quot;session = &quot; + session);
-    }
-
-}
-</code></pre><h4 id="2-2-Session的工作原理"><a href="#2-2-Session的工作原理" class="headerlink" title="2.2 Session的工作原理"></a>2.2 Session的工作原理</h4><p>在服务器中系统会为每个会话维护一个Session。不同的会话，对应不同的Session。那么，系统是如何识别Session对象的？即是如何做到在同一个会话过程中，一直使用的是同一个Session对象呢？</p>
-<h5 id="（1）、写入Session列表"><a href="#（1）、写入Session列表" class="headerlink" title="（1）、写入Session列表"></a>（1）、写入Session列表</h5><p>服务器对当前应用中的Session是以Map的形式进行管理的，这个Map称为Session列表。该Map的key为一个32位长度的随机串，这个随机串称为JSessionID，value则为Session对象的引用。</p>
-<p>当用户每一次提交请求时，服务端Servlet中执行到request.getSession()方法后，会自动生成一个Map.entry对象，key为一个根据某种算法新生成的JSessionID，value则为新创建的HttpSession对象。</p>
-<h5 id="2-、服务器生成并发送cookie"><a href="#2-、服务器生成并发送cookie" class="headerlink" title="(2)、服务器生成并发送cookie"></a>(2)、服务器生成并发送cookie</h5><p>在将session信息写入session列表后，系统还会自动将“JSessionID”作为name,这个32位长度的随机串作为value，以cookie的形式存放到响应报头中，并随着响应，将该cookie发送到客户端。</p>
-<p><a href="http://localhost:8080/sessioncookie" target="_blank" rel="external">http://localhost:8080/sessioncookie</a><br>提交表单，跳转到FirstServlet后，</p>
-<pre><code>Response Headers
-
-Content-Length: 13
-
-Date: Fri, 27 Apr 2018 07:54:40 GMT
-
-Set-Cookie: JSESSIONID=DCCE10CC2F5A6FAE40B716CA91B01EB0; Path=/sessioncookie; HttpOnly
-</code></pre><h5 id="3-、客户端接收并发送cookie"><a href="#3-、客户端接收并发送cookie" class="headerlink" title="(3)、客户端接收并发送cookie"></a>(3)、客户端接收并发送cookie</h5><p>客户端接收到这个cookie后会将其存放到浏览器缓存中。即，只要客户端浏览器不关闭，浏览器缓存中的cookie就不会消失。</p>
-<p>当用户提交第二次请求时，会将缓存中的这个cookie，伴随着请求的头部信息，一块发送到服务端。</p>
-<p>再次发送请求时，<a href="http://localhost:8080/sessioncookie/SecondServlet" target="_blank" rel="external">http://localhost:8080/sessioncookie/SecondServlet</a></p>
-<pre><code>Request Headers
-
-...
-
-Cookie: JSESSIONID=DCCE10CC2F5A6FAE40B716CA91B01EB0
-
-Host: localhost:8080
-</code></pre><p>（4）、从session列表中查找</p>
-<p>服务端从请求中读取到客户端发送来的cookie，并根据cookie的SeesionID的值，从Map中查找相应key所对应的value，即session对象。然后，该session的域属性进行读写操作。</p>
-<h4 id="2-3-Session的失效"><a href="#2-3-Session的失效" class="headerlink" title="2.3 Session的失效"></a>2.3 Session的失效</h4><p>若某个session在指定的时间内一直未被访问，那么session将超时，即将失效。</p>
-<p>在web.xml中可以通过<code>&lt;session-config /&gt;</code>标签设置session的超时时间，单位为分钟。默认的超时时间为30分钟。时间从最后一次访问开始计时。</p>
-<pre><code>&lt;session-config&gt;
-    &lt;session-timeout&gt;120&lt;/session-timeout&gt;
-&lt;/session-config&gt;
-</code></pre><p>若未到超时时间，也可以通过HttpSession中的方法invalide()，使得session失效。</p>
-<h4 id="2-4-cookie禁用后的session"><a href="#2-4-cookie禁用后的session" class="headerlink" title="2.4 cookie禁用后的session"></a>2.4 cookie禁用后的session</h4><p>cookie禁用后，从someServlet跳转到otherServlet时，</p>
-<pre><code>protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        //获取用户提交的数据
-        String username = request.getParameter(&quot;username&quot;);
-
-        //获取session对象
-        HttpSession session = request.getSession();
-
-        //向session域中写入数据
-        session.setAttribute(&quot;username&quot;, username);
-
-        //跳转到otherServlet
-        response.sendRedirect(request.getContextPath() + &quot;/otherServlet&quot;);    
-    }
-</code></pre><p>someServlet发送到客户端的包含有sessionid的cookie并没有被客户端保存，所以在发送otherServlet请求时，没有将该包含有sessionid的cookie发送到服务端，因此otherServlet服务端找不到该session，也就不能读取里面的数据。</p>
-<h5 id="解决方法："><a href="#解决方法：" class="headerlink" title="解决方法："></a>解决方法：</h5><p>request.encodeRedirectURL()方法</p>
-<pre><code>protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    //获取用户提交的数据
-    String username = request.getParameter(&quot;username&quot;);
-
-    //获取session对象
-    HttpSession session = request.getSession();
-
-    //向session域中写入数据
-    session.setAttribute(&quot;username&quot;, username);
-
-    //跳转到otherServlet
-    String uri = request.getContextPath() + &quot;/otherServlet&quot;;
-    uri = request.encodeRedirectURL(uri);
-    response.sendRedirect(uri);    
-}
-</code></pre><p>这样的话，跳转到otherServlet时，会将sessionid包含到访问地址中。</p>
-<pre><code>http://localhost/8080/sessioncookie/otherServlet;jsessionid=6BD1D909077DF0798ASSSJAK8200EC12
-</code></pre><p>这样的话，发送请求到OtherServlet时，就会将该sessionid发送到服务端。</p>
-<h4 id="2-5-cookie禁用后非重定向跳转时session的跟踪"><a href="#2-5-cookie禁用后非重定向跳转时session的跟踪" class="headerlink" title="2.5 cookie禁用后非重定向跳转时session的跟踪"></a>2.5 cookie禁用后非重定向跳转时session的跟踪</h4><p>HttpServletResponse具有一个方法encdodeURL()，可以完成类似超链接这样的非重定向页面跳转的URL的重写，即在其路径后自动添加jsessionid</p>
-<pre><code>protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    //获取用户提交的数据
-    String username = request.getParameter(&quot;username&quot;);
-
-    //获取session对象
-    HttpSession session = request.getSession();
-
-    //向session域中写入数据
-    session.setAttribute(&quot;username&quot;, username);
-
-    //跳转到otherServlet
-    response.setContentType(&quot;text/html;charset=utf-8&quot;);
-    PrintWriter out = response.getWriter();
-    String uri = &quot;otherServlet&quot;;
-    uri = response.encodeURL(uri);
-    out.println(&quot;&lt;a href=&apos;&quot; + uri + &quot;&apos;&gt;跳转&lt;/a&gt;到otherservlet&quot;);
-}
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/04/27/java/java-session-cookie/session-cookie/" data-id="cjh4911m40057mtp3sst7kf5f" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/session-cookie/">session cookie</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/java-jsp/java-jsp-3" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/03/07/java/java-jsp/java-jsp-3/" class="article-date">
-  <time datetime="2018-03-07T03:23:34.000Z" itemprop="datePublished">2018-03-07</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/java/">java</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/03/07/java/java-jsp/java-jsp-3/">第3章 jsp系统开发模型</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="第3章-系统开发模型"><a href="#第3章-系统开发模型" class="headerlink" title="第3章 系统开发模型"></a>第3章 系统开发模型</h3><h4 id="3-1-1-纯jsp"><a href="#3-1-1-纯jsp" class="headerlink" title="3.1.1 纯jsp"></a>3.1.1 纯jsp</h4><h4 id="3-1-2-jsp-javaBean的Model1"><a href="#3-1-2-jsp-javaBean的Model1" class="headerlink" title="3.1.2 jsp+javaBean的Model1"></a>3.1.2 jsp+javaBean的Model1</h4><p>广义的javaBean分为数据承载Bean和业务处理Bean</p>
-<p>狭义的javaBean，需要满足javaBean规范。</p>
-<ul>
-<li>public 修饰</li>
-<li>实现Serializable接口</li>
-<li>无参构造器</li>
-<li>成员变量私有化，且提供getter和setter</li>
-</ul>
-<h4 id="3-1-3-MVC的Modle2"><a href="#3-1-3-MVC的Modle2" class="headerlink" title="3.1.3 MVC的Modle2"></a>3.1.3 MVC的Modle2</h4><h4 id="3-1-4-三层架构"><a href="#3-1-4-三层架构" class="headerlink" title="3.1.4 三层架构"></a>3.1.4 三层架构</h4><p>View层：视图层、表现层、Web层。</p>
-<p>Service层：业务层、逻辑层。</p>
-<p>Dao层：持久层、数据访问层。data access object</p>
-<p>三层架构的设计中，采用面向抽象编程。即上层对下层的调用，是通过调用接口的方法实现的。而下层对上层真正的服务提供者，是下层接口的实现类。</p>
-<p>提供报务的接口相同，服务的实现类可以更换，实现了层间解耦。</p>
-<h4 id="3-1-5-MVC-三层架构"><a href="#3-1-5-MVC-三层架构" class="headerlink" title="3.1.5 MVC+三层架构"></a>3.1.5 MVC+三层架构</h4><p>View Level：Contoller(Servlet) + View(jsp)</p>
-<p>Service Level：Interfaces + Impls</p>
-<p>Dao Level：Interfaces + Impls</p>
-<p>将MVC的Model分为了两层：Service层与Dao层，分别用于处理业务逻辑和持久化操作。</p>
-<h3 id="3-2-学生注册登录系统"><a href="#3-2-学生注册登录系统" class="headerlink" title="3.2 学生注册登录系统"></a>3.2 学生注册登录系统</h3><p>package: com.test.beans</p>
-<p>//定义狭义的javaBean Student</p>
-<pre><code>public class Sdudent implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-    private Integer id;//业务无关主键
-    private String password;
-    private String num;//学号
-    private String name;
-    private String age;
-    private double score;
-    public Sdudent() {
-        super();
-    }
-    public Sdudent(String num, String name, String age, double score) {
-        super();
-        this.num = num;
-        this.name = name;
-        this.age = age;
-        this.score = score;
-    }
-    public Integer getId() {
-        return id;
-    }
-    public void setId(Integer id) {
-        this.id = id;
-    }
-    public String getPassword() {
-        return password;
-    }
-    public void setPassword(String password) {
-        this.password = password;
-    }
-    public String getNum() {
-        return num;
-    }
-    public void setNum(String num) {
-        this.num = num;
-    }
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-    public String getAge() {
-        return age;
-    }
-    public void setAge(String age) {
-        this.age = age;
-    }
-    public double getScore() {
-        return score;
-    }
-    public void setScore(double score) {
-        this.score = score;
-    }
-    @Override
-    public String toString() {
-        return &quot;Sdudent [id=&quot; + id + &quot;, password=&quot; + password + &quot;, num=&quot; + num + &quot;, name=&quot; + name + &quot;, age=&quot; + age
-                + &quot;, score=&quot; + score + &quot;]&quot;;
-    }
-
-}
-</code></pre><p>建表sdudent</p>
-<p>//login.jsp 修改欢迎页面为login.jsp</p>
-<pre><code>&lt;form action=&quot;${pageContext.request.contextPath }/loginServlet&quot;&gt;
-    学号：&lt;input type=&quot;text&quot; name=&quot;num&quot; /&gt;
-    密码：&lt;input type=&quot;text&quot; name=&quot;password&quot; /&gt;
-    &lt;input type=&quot;submit&quot; value=&quot;登录&quot; /&gt;
-&lt;/form&gt;
-&lt;a href=&quot;${pageContext.request.contextPath}/register.jsp&quot;&gt;注册&lt;/a&gt;
-</code></pre><p>//register.jsp</p>
-<pre><code>${message }&lt;br /&gt;
-&lt;form action=&quot;${pageContext.request.contextPath }/registerServlet&quot;&gt;
-    学号：&lt;input type=&quot;text&quot; name=&quot;num&quot; /&gt;
-    密码：&lt;input type=&quot;text&quot; name=&quot;password&quot; /&gt;
-    &lt;input type=&quot;submit&quot; value=&quot;登录&quot; /&gt;
-&lt;/form&gt;
-</code></pre><p>//连接数据库，工具类</p>
-<pre><code>package com.test.utils;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-
-public class JdbcUtils {
-    //加载DB驱动
-    static {
-        //将驱动mysql-connector-java-5.1.7-bin.jar放到lib下
-        try {
-            Class.forName(&quot;com.mysql.jdbc.Driver&quot;);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static Connection conn;        
-
-    //获取connection对象
-    public static Connection getConnection() throws SQLException {
-
-        String url = &quot;jdbc:mysql://127.0.0.1:3306/test&quot;;
-        String user = &quot;root&quot;;
-        String password = &quot;&quot;;
-        if(conn == null || conn.isClosed()) {
-            conn = DriverManager.getConnection(url, user, password);
-        }
-        return conn;
-
-    }
-
-    //关闭资源
-    public static void close(Connection conn, Statement stmt, ResultSet rs) throws SQLException {
-
-        if(conn != null &amp;&amp; !conn.isClosed()) {
-            conn.close();
-        }
-        if(stmt != null &amp;&amp; !stmt.isClosed()) {
-            stmt.close();
-        }
-        if(rs != null &amp;&amp; !rs.isClosed()) {
-            rs.close();
-        }
-
-    }
-
-}
-</code></pre><p>//登录的servlet</p>
-<pre><code>package com.test.servlets;
-
-public class LoginServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        //1、接收请求参数
-        String num = request.getParameter(&quot;num&quot;);
-        String password = request.getParameter(&quot;password&quot;);
-
-        HttpSession session = request.getSession();
-
-        if(num == null || &quot;&quot;.equals(num.trim())) {
-            session.setAttribute(&quot;message&quot;, &quot;输入不能为空&quot;);
-            response.sendRedirect(request.getContextPath() + &quot;/login.jsp&quot;);
-            return;
-        }
-
-        //2、创建Service对象
-        IStudentService service = new StudentServiceImpl();
-
-        //3、调用Service对象的checkUser验证方法
-        Student sdudent = service.checkUser(num, password);
-
-        //4、验证失败，跳转到登录页面
-        if(sdudent == null) {
-            session.setAttribute(&quot;message&quot;, &quot;输入错误&quot;);
-            response.sendRedirect(request.getContextPath() + &quot;/login.jsp&quot;);
-            return;
-        }
-
-        //5、验证通过，跳转到index.jsp
-        response.sendRedirect(request.getContextPath() + &quot;/index.jsp&quot;);
-
-    }
-}
-</code></pre><p>//注册的servlet</p>
-<pre><code>package com.test.servlets;
-public class RegisterServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
-
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-        //1、获取表单参数
-        request.setCharacterEncoding(&quot;UTF-8&quot;);
-        String num = request.getParameter(&quot;num&quot;);
-        String password = request.getParameter(&quot;password&quot;);
-        String name = request.getParameter(&quot;name&quot;);
-        String ageStr = request.getParameter(&quot;age&quot;);
-        String scoreStr = request.getParameter(&quot;score&quot;);
-
-        Integer age = Integer.valueOf(ageStr);
-        Double score = Double.valueOf(scoreStr);
-
-        //2、创建Student对象
-        Student student = new Student(num,name,age,score);
-        student.setPassword(password);
-
-        //3、创建Service对象
-        IStudentService service = new StudentServiceImpl();
-
-        //4、调用Service对象的saveStudent()方法，写入DB
-        Integer id = service.saveStudent(student);
-
-        //5、写入失败，跳转到注册页面，重新注册
-        if(id == null) {
-            response.sendRedirect(request.getContextPath() + &quot;/register.jsp&quot;);
-        }
-
-        //6、写入成功，跳转到登录页面
-        response.sendRedirect(request.getContextPath() + &quot;/login.jsp&quot;);
-    }
-
-}
-</code></pre><p>service层</p>
-<p>//服务层接口</p>
-<pre><code>package com.test.service;
-
-import com.test.beans.Student;
-
-public interface IStudentService {
-    //对登录用户进行验证
-    Student checkUser(String num, String password);
-
-    //向DB中添加Student
-    Integer saveStudent(Student student);
-}
-</code></pre><p>//服务层实现类</p>
-<pre><code>package com.test.service;
-
-import com.test.beans.Student;
-import com.test.dao.IStudentDao;
-import com.test.dao.SdudentDaoImpl;
-
-public class StudentServiceImpl implements IStudentService {
-    private IStudentDao dao;
-
-    public StudentServiceImpl() {
-        dao = new SdudentDaoImpl();
-    }
-
-    @Override
-    public Student checkUser(String num, String password) {
-        return dao.selectStudentLogin(num,password);
-    }
-
-    @Override
-    public Integer saveStudent(Student student) {
-        return dao.insertStudent(student);
-    }
-
-}
-</code></pre><p>//dao层</p>
-<p>//dao层接口</p>
-<pre><code>package com.test.dao;
-
-import com.test.beans.Student;
-
-public interface IStudentDao {
-
-    Student selectStudentLogin(String num, String password);
-
-    Integer insertStudent(Student student);
-
-}
-</code></pre><p>//dao层实现类</p>
-<pre><code>package com.test.dao;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-
-import com.test.beans.Student;
-import com.test.utils.JdbcUtils;
-
-public class SdudentDaoImpl implements IStudentDao {
-    private Connection conn;
-    private Statement stmt;
-    private PreparedStatement ps;
-    private ResultSet rs;
-
-    @Override
-    public Student selectStudentLogin(String num, String password) {
-        Student student = null;
-        try {
-            conn = JdbcUtils.getConnection();
-            String sql = &quot;select * from student where num=? and password=?&quot;;
-            ps = conn.prepareStatement(sql);
-            ps.setString(1, num);
-            ps.setString(2, password);
-            rs = ps.executeQuery();
-            if(rs.next()) {
-                student = new Student();
-                student.setId(rs.getInt(&quot;id&quot;));
-                student.setNum(rs.getString(&quot;num&quot;));
-                student.setPassword(rs.getString(&quot;password&quot;));
-                student.setName(rs.getString(&quot;name&quot;));
-                student.setAge(rs.getInt(&quot;age&quot;));
-                student.setScore(rs.getDouble(&quot;score&quot;));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                JdbcUtils.close(conn, ps, rs);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        return student;
-    }
-
-    @Override
-    public Integer insertStudent(Student student) {
-        Integer id = null;
-        try {
-            conn = JdbcUtils.getConnection();
-            String sql = &quot;insert into student(num,password,name,age,score) values(?,?,?,?,?)&quot;;
-            ps = conn.prepareStatement(sql);
-            ps.setString(1, student.getNum());
-            ps.setString(2, student.getPassword());
-            ps.setString(3, student.getName());
-            ps.setInt(4, student.getAge());
-            ps.setDouble(5, student.getScore());
-
-            ps.executeUpdate();
-
-            sql = &quot;select @@identity newId&quot;;
-            ps = conn.prepareStatement(sql);
-            rs = ps.executeQuery();
-            if(rs.next()) {
-                id = rs.getInt(&quot;newId&quot;);
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                JdbcUtils.close(conn, ps, rs);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        return id;
-    }
-
-}
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/03/07/java/java-jsp/java-jsp-3/" data-id="cjh4911ky0040mtp3avhg2o1v" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/jsp/">jsp</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/java-jsp/java-jsp-2" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/31/java/java-jsp/java-jsp-2/" class="article-date">
-  <time datetime="2018-01-31T11:54:50.000Z" itemprop="datePublished">2018-01-31</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/java/">java</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/31/java/java-jsp/java-jsp-2/">第2章 JSP核心</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="第2章-JSP核心"><a href="#第2章-JSP核心" class="headerlink" title="第2章 JSP核心"></a>第2章 JSP核心</h3><h3 id="2-1-内置对象"><a href="#2-1-内置对象" class="headerlink" title="2.1 内置对象"></a>2.1 内置对象</h3><h4 id="2-1-1-pageContext"><a href="#2-1-1-pageContext" class="headerlink" title="2.1.1 pageContext"></a>2.1.1 pageContext</h4><p>javax.servlet.jsp.PageContext</p>
-<p>页面上下文，具有一个只在当前页面范围的域属性空间，即其具有setAttribute()方法和getAttribute()方法。</p>
-<p>EL表达式，访问变量时，只能访问域属性空间内的变量。因此，可以将变量先存放到该域属性空间，或其它三个域属性空间（request、session、application）。</p>
-<p>pageContext具有一些get方法，可以获取Request、Response、Session、ServletContext、ServletConfig、page(即当前Servlet)、exception、out等其它八个内置对象</p>
-<h4 id="2-1-2-application"><a href="#2-1-2-application" class="headerlink" title="2.1.2 application"></a>2.1.2 application</h4><p>即ServletContext</p>
-<p>ServletContext所具有的方法，application都有。</p>
-<p>常用的方法，例如：</p>
-<p>void setAttribute(String name, Object object);</p>
-<p>Object getAttribute(String name);</p>
-<p>Object removeAttribute(String name);</p>
-<h4 id="2-1-3-out"><a href="#2-1-3-out" class="headerlink" title="2.1.3 out"></a>2.1.3 out</h4><p>所属类型：javax.servlet.jsp.JspWriter</p>
-<p>JspWriter类继承自IO流的Writer类。</p>
-<p>即out就是一个输出流。</p>
-<h4 id="2-1-4-page"><a href="#2-1-4-page" class="headerlink" title="2.1.4 page"></a>2.1.4 page</h4><p>查看jsp翻译的servlet，page对象即Servlet对象本身。</p>
-<p>final java.lang.Object page = this.</p>
-<h4 id="2-1-5-exception"><a href="#2-1-5-exception" class="headerlink" title="2.1.5 exception"></a>2.1.5 exception</h4><p>普通的jsp页面中，不能使用exception内置对象。因为打开jsp翻译的servlet，发现其中并没有exception对象。</p>
-<p>若要在页面中直接使用exception对象，则需要配合着page指令使用。</p>
-<h4 id="2-1-6-其它对象"><a href="#2-1-6-其它对象" class="headerlink" title="2.1.6 其它对象"></a>2.1.6 其它对象</h4><p>request,response,session,config，用法与servlet时的用法相同。</p>
-<h3 id="2-2-JSP指令-directive"><a href="#2-2-JSP指令-directive" class="headerlink" title="2.2 JSP指令(directive)"></a>2.2 JSP指令(directive)</h3><p>jsp中包含三类指令：</p>
-<h5 id="page指令"><a href="#page指令" class="headerlink" title="page指令"></a>page指令</h5><h5 id="include指令"><a href="#include指令" class="headerlink" title="include指令"></a>include指令</h5><h5 id="taglib标签库指令"><a href="#taglib标签库指令" class="headerlink" title="taglib标签库指令"></a>taglib标签库指令</h5><p>&lt;%@ 指令名称 属性名 = 属性值 属性名 = 属性值 %&gt;</p>
-<h4 id="2-1-1-page指令"><a href="#2-1-1-page指令" class="headerlink" title="2.1.1 page指令"></a>2.1.1 page指令</h4><p>（1）、pageEncodeing属性</p>
-<p>&lt;%@ page pageEncoding = “utf-8”%&gt;</p>
-<p>默认的MIME类型为text/html</p>
-<p>//servlet<br>response.setContentType(“text/html;charset=UTF-8”);</p>
-<p>(2)、contentType属性</p>
-<p>&lt;%@ page contentType = “text/html; charset=UTF-8” %&gt;</p>
-<p>//servlet<br>response.setContentType(“text/html;charset=UTF-8”);</p>
-<p>可以对pageEncoding默认的MIMe类型进行修改</p>
-<p>（3）、import属性</p>
-<p>&lt;%@ page import = “java.util.Date”%&gt;</p>
-<p>(4)、errorPage\isErrorPage属性</p>
-<pre><code>&lt;%@ page errorPage = &quot;/error.jsp&quot; %&gt;
-</code></pre><p>//error.jsp</p>
-<pre><code>&lt;%@ page isErrorPage = &quot;true&quot;%&gt;
-&lt;html&gt;
-    &lt;body&gt;
-        error page&lt;br /&gt;
-        ex = &lt;%=exception.getMessage() %&gt;
-    &lt;/body&gt;
-&lt;/html&gt;
-</code></pre><p>//serlvet</p>
-<pre><code>public void _jspService(...){
-    ...
-    java.lang.Throwable exception = ...;
-    ...
-}
-</code></pre><p>(5)、Session属性</p>
-<p>//hello1.jsp</p>
-<pre><code>&lt;body&gt;
-    &lt;%
-        session.setAttribute(&quot;user&quot;,&quot;zhangsan&quot;);
-    %&gt;
-&lt;/body&gt;
-</code></pre><p>//servlet</p>
-<pre><code>session = pageContext.getSession();
-
-查看源码发现，返回的还是request.getSession()
-</code></pre><p>1、    设置</p>
-<p>HttpSession session = request.getSession(true);<br>session.setAttribute(…);</p>
-<p>设为true，意味着没有session对象时才创建，有则不创建。</p>
-<p>2、读取</p>
-<p>HttpSession session = request.getSession(false);<br>if(session != null){<br>    session.getAttribute(“…”);<br>}</p>
-<p>设为false，意味着获取现有的session对象，如果没有，也不创建。</p>
-<p>//hello2.jsp</p>
-<pre><code>&lt;%@ page contentType = &quot;text/html; charset = UTF-8&quot;%&gt;
-&lt;%-- 清除内置的Session对象 --%&gt;
-&lt;%@ page session = &quot;fasle&quot;%&gt;
-
-&lt;body&gt;
-    HttpSession session =     request.getSession(false);
-    if(session != null){
-        String user = (String) session.getAttribute(&quot;user&quot;);
-        out.print(&quot;user = &quot; + user);
-    }        
-&lt;body/&gt;
-</code></pre><h4 id="2-2-2-include指令"><a href="#2-2-2-include指令" class="headerlink" title="2.2.2 include指令"></a>2.2.2 include指令</h4><p>(1)、用法</p>
-<p>可以包含动态文件也可以包含静态页面文件。</p>
-<p>index.jsp</p>
-<pre><code>&lt;html&gt;
-&lt;body&gt;
-    index page before&lt;br /&gt;
-
-    &lt;%@ include file = &quot;/next.jsp&quot;%&gt;
-
-    index page after&lt;br /&gt;
-&lt;/body&gt;
-&lt;/html&gt;
-</code></pre><p>next.jsp</p>
-<pre><code>&lt;html&gt;
-&lt;body&gt;
-    next page
-&lt;/body&gt;
-&lt;/html&gt;
-</code></pre><p>（2）、静态联编</p>
-<p>只生成了一个index_jsp.java的servlet源文件，没有生成next_jsp.java文件。</p>
-<p>jsp翻译引擎，将include指令包含的next.jsp文件直接翻译到了index.jsp对应的servlet中，形成了一个.java文件。</p>
-<p>该包含操作是在编译之前，由jsp翻译引擎完成的，而不是在程序运行期间完成的。</p>
-<p>这种包含是一种静态包含，称为静态联编。</p>
-<p>整个过程只一个_jspService()方法。也就是说，index.jsp和next.jsp之间是可以相互访问局部变量的。</p>
-<h3 id="2-3-JSP动作（Action）"><a href="#2-3-JSP动作（Action）" class="headerlink" title="2.3 JSP动作（Action）"></a>2.3 JSP动作（Action）</h3><p>页面中，应该使用EL表达式、JSTL标签及JSP动作，来代替java代码块、表达式。</p>
-<p>JSP动作的语法格式</p>
-<p><code>&lt;jsp:动作名称 属性名 = 属性值 属性名 = 属性值 ...&gt;&lt;/jsp:动作名称&gt;</code></p>
-<p>或</p>
-<p><code>&lt;jsp:动作名称 属性名 = 属性值 属性名 = 属性值 ... /&gt;</code></p>
-<p>实际开发中，常用的就两个forward和include。</p>
-<p>底层使用的是<code>request.getRequestDispatcher(&quot;&quot;).forward(...)和.include()</code>。</p>
-<h4 id="2-3-1-forward动作"><a href="#2-3-1-forward动作" class="headerlink" title="2.3.1 forward动作"></a>2.3.1 forward动作</h4><p>index.jsp</p>
-<pre><code>&lt;body&gt;
-    index page befor &lt;br /&gt;
-
-    &lt;jsp:forward page=&quot;/next.jsp&quot;&gt;&lt;/jsp:forward&gt;
-
-    index page after &lt;br /&gt;
-
-&lt;body/&gt;
-</code></pre><p>next.jsp</p>
-<pre><code>&lt;body&gt;
-    next page
-&lt;/body&gt;
-</code></pre><p>forward跳转时，只显示</p>
-<pre><code>next page
-</code></pre><h4 id="2-3-2-include动作"><a href="#2-3-2-include动作" class="headerlink" title="2.3.2 include动作"></a>2.3.2 include动作</h4><p>index.jsp</p>
-<pre><code>&lt;body&gt;
-    index page befor &lt;br /&gt;
-
-    &lt;jsp:include page=&quot;/next.jsp&quot;&gt;&lt;/jsp:include&gt;
-
-    index page after &lt;br /&gt;
-
-&lt;body/&gt;
-</code></pre><p>next.jsp</p>
-<pre><code>&lt;body&gt;
-    next page
-&lt;/body&gt;
-</code></pre><p>include跳转时，全显示</p>
-<pre><code>index page befor
-next page
-index page after 
-</code></pre><p>(注)：</p>
-<p>生成了两个.java文件：index_jsp.java与left_jsp.java。</p>
-<p>这个包含动作是在程序运行过程中，由index_jsp文件中的_jspService()方法通过JspRuntimeLibrary类的include()方法调用了left_jsp文件中的_jspService()方法完成的。</p>
-<p>这种在运行期执行的包含，称为动态联编。    </p>
-<h3 id="2-4-EL表达式"><a href="#2-4-EL表达式" class="headerlink" title="2.4 EL表达式"></a>2.4 EL表达式</h3><p>Expression Language，表达式语言。</p>
-<p>${expression}获取到指定表达式的值。</p>
-<h4 id="2-4-1-获取数据"><a href="#2-4-1-获取数据" class="headerlink" title="2.4.1 获取数据"></a>2.4.1 获取数据</h4><p>(1)、EL只能从四大域中获取数据</p>
-<p>其查找数据的顺序是，依次按照由小到大的范围，从四大域中查找指定名称的属性值，找到后就不再继续往下查找。</p>
-<pre><code>&lt;body&gt;
-    &lt;%
-        String username = &quot;abc&quot;;
-        pageContext.setAttribute(&quot;username&quot;, username);
-        request.setAttribute(&quot;username&quot;, username);
-        session.setAttribute(&quot;username&quot;, username);
-        application.setAttribute(&quot;username&quot;, username);
-    %&gt;
-    //从四大域属性空间中依次查找
-    username = ${username}
-
-&lt;/body&gt;
-</code></pre><p>（2）、从指定域中获取数据</p>
-<pre><code>//通过EL的内置对象，从指定的域属性空间中查找
-username = ${requestScope.username}
-</code></pre><p>（3）、访问Bean的属性</p>
-<pre><code>&lt;body&gt;
-    &lt;%
-        School school = new School(&quot;qinghua&quot;,&quot;beijing&quot;);        
-        Student studentb = new Student(&quot;zhangsan&quot;,23);
-        pageContext.setAttribute(&quot;student&quot;, student);
-    %&gt;
-
-    student = ${student}
-
-    name = ${student.name}
-
-    schoolName = ${student.school.sname}
-
-&lt;/body&gt;
-</code></pre><p>（4）、获取数组中的元素</p>
-<pre><code>&lt;body&gt;
-
-    &lt;%
-        String[] names = {&quot;zhangsan&quot;, &quot;lisi&quot;, &quot;wangwu&quot;};
-        pageContext.setAttribute(&quot;names&quot;, names);
-    %&gt;
-
-    names[1] = ${names[1]}
-
-    &lt;%
-        School[] schools = new School[3];
-        schools[0] = new School(&quot;qinghua&quot;, &quot;beijing&quot;);
-        schools[1] = new School(&quot;haiyang&quot;, &quot;qingdao&quot;);
-        schools[2] = new School(&quot;shanda&quot;, &quot;shandong&quot;);
-        pageContext.setAttribute(&quot;chools&quot;, schools);
-    %&gt;
-
-    chools[2].sname = ${schools[2].sname}
-
-&lt;/body&gt;
-</code></pre><p>（5）、获取List中的元素</p>
-<pre><code>EL可以通过索引访问List，但无法访问Set。因为Set中没有索引的概念。
-
-&lt;body&gt;
-    &lt;%
-        List&lt;String&gt; names = new ArrayList&lt;String&gt;();
-        names.add(&quot;zhangsan&quot;);
-        names.add(&quot;lisi&quot;);
-        names.add(&quot;wangwu&quot;);
-        pageContext.setAttribute(&quot;names&quot;,names);
-    %&gt;
-
-    names[2] = ${names[2]};
-
-&lt;body/&gt;
-</code></pre><p>（6）、获取Map中的元素</p>
-<pre><code>&lt;body&gt;
-    &lt;%
-        Map&lt;String, Object&gt; map = new Map&lt;&gt;();
-        map.put(&quot;school&quot;, new School(&quot;qinghua&quot;, &quot;beijing&quot;));
-        map.put(&quot;mobile&quot;, &quot;1111111&quot;);
-        map.put(&quot;age&quot;, 21);
-        pageContext.setAttribute(&quot;map&quot;, map);
-    %&gt;
-
-    school.name = ${map.school.sname}
-
-    mobile = ${map.mobile};
-
-    age = ${map.age}；
-
-&lt;/body&gt;
-</code></pre><h4 id="2-4-2-运算符"><a href="#2-4-2-运算符" class="headerlink" title="2.4.2 运算符"></a>2.4.2 运算符</h4><p>算术运算符，关系运算符，逻辑运算符，条件运算符，取值运算符</p>
-<p>除了这些，还有一个empty</p>
-<p>${empty 变量}</p>
-<ul>
-<li>变量未定义，返回true</li>
-<li>变量为String类型，空串返回true</li>
-<li>变量为引用类型，其值为null返回true</li>
-<li>变量为集合类型，不包含任何元素，返回true</li>
-</ul>
-<h4 id="2-4-3-EL内置对象"><a href="#2-4-3-EL内置对象" class="headerlink" title="2.4.3 EL内置对象"></a>2.4.3 EL内置对象</h4><p>EL中表示四个域属性空间的内置对象：pageScope requestScope sessionScope applicationScope</p>
-<p>其它的常用内置对象还有：</p>
-<p>（1）、pageContext</p>
-<p>EL中的pageContext与JSP中内置对象中的pageContext是同一个对象。</p>
-<p>通过该对象，可以获取request、response、session、servletContext、servletConfig等对象。</p>
-<ul>
-<li><p><code>${pageContext.request.contextPath}</code>，获取项目根目录，一般用在JSP页面的路径前。</p>
-<form action="${pageContext.request.contextPath/register.do}" method="post"><br>   …<br></form>
-</li>
-<li><p>pageContext.request 其底层实际调用的是pageContext.getRequest()方法</p>
-</li>
-<li><p>在EL的11个内置对象中，除了pageContext外，其它10个内置对象，其类型均为java.util.Map类型。    </p>
-</li>
-</ul>
-<p>（2）、param</p>
-<p>获取请求中指定参数的值</p>
-<p>GET: http:localhost:8080/textproject/index.jsp?name=abc</p>
-<p>//index.jsp</p>
-<p>param.name = ${param.name}</p>
-<p>POST:</p>
-<pre><code>&lt;form action = &quot;${pageContext.request.contextPath/show.jsp}&quot;&gt;
-    姓名：&lt;input type = &quot;text&quot; name = &quot;name&quot; /&gt;
-    年龄：&lt;input type = &quot;text&quot; name = &quot;age&quot; /&gt;
-    爱好：
-    &lt;input type = &quot;checkbox&quot; name = &quot;hobby&quot; value = &quot;swimming&quot; /&gt;
-    &lt;input type = &quot;checkbox&quot; name = &quot;hobby&quot; value = &quot;climbing&quot; /&gt;
-    &lt;input type = &quot;checkbox&quot; name = &quot;hobby&quot; value = &quot;reading&quot; /&gt;
-&lt;/form&gt;
-</code></pre><p>//show.jsp</p>
-<pre><code>name = ${param.name}
-age = ${param.age}
-</code></pre><p>（3）、paramValues</p>
-<pre><code>hobby[0] = ${paramValues.hobby[0]}
-hobby[1] = ${paramValues.hobby[0]}
-hobby[2] = ${paramValues.hobby[0]}
-</code></pre><p>（4）、initParam</p>
-<p>获取web.xml中初始化参数</p>
-<p>web.xml</p>
-<pre><code>&lt;context-param&gt;
-    &lt;param-name&gt;company&lt;param-name/&gt;
-    &lt;param-value&gt;powernode&lt;param-value/&gt;
-&lt;/context-param&gt;
-</code></pre><p>jsp页面</p>
-<pre><code>company = ${initParam.company}
-</code></pre><h4 id="2-4-4-自定义EL函数"><a href="#2-4-4-自定义EL函数" class="headerlink" title="2.4.4 自定义EL函数"></a>2.4.4 自定义EL函数</h4><p>自定义EL函数，实际字符串连接的功能</p>
-<p>1、定义类</p>
-<pre><code>public class ELFunctions{
-    public static String lowerToUpper(String source){
-        return source.toUpperCase();
-    }
-
-    public static String upperToLower(String source){
-        return source.toLowerCase();
-    }
-}
-</code></pre><p>2、标签库定义 注册</p>
-<p>自定义的类及其函数，需要在扩展名为.tld的XML文件中进行注册</p>
-<p>XML文件是需要约束的，即需要配置文件头部。这个头部约束可以从以下文件中复制。</p>
-<p>comcat-9/webapps/examples/web-inf/jsp2/jsp2-example-taglib.tld</p>
-<p>//WEB-INF/myElFuns.tld</p>
-<pre><code>&lt;tablib ...&gt;
-
-    //定义标签库信息
-    &lt;tlib-version&gt;1.0&lt;/tlib-version&gt;
-    &lt;show-name&gt;myElFuncs&lt;/short-name&gt;
-    &lt;uri&gt;http://www.test.com/myproject/jsp/el/customElFuncs&lt;/uri&gt;
-
-    //注册函数
-    &lt;function&gt;
-        &lt;name&gt;myLowerToUpper&lt;/name&gt;
-        &lt;function-class&gt;myproject.testpackage. ELFunctions&lt;/function-class&gt;
-        &lt;function-signature&gt;java.lang.String. lowerToUpper(java.lang.String)&lt;/function-signature&gt;
-    &lt;function/&gt;
-
-    &lt;function&gt;
-        &lt;name&gt;myUpperToLower&lt;/name&gt;
-        &lt;function-class&gt;myproject.testpackage. ELFunctions&lt;/function-class&gt;
-        &lt;function-signature&gt;java.lang.String. upperToLower(java.lang.String)&lt;/function-signature&gt;
-    &lt;function/&gt;
-
-&lt;/tablib&gt;
-</code></pre><p>//index.jsp</p>
-<pre><code>&lt;%@ taglib uri = &quot;http://www.test.com/myproject/jsp/el/customElFuncs&quot; prefix = &quot;myElFuncs&quot;%&gt;
-&lt;body&gt;
-    ${myElFuncs:myLowerToUpper(&quot;abc&quot;)}
-&lt;/body&gt;
-</code></pre><h4 id="2-4-5-JSTL中的EL函数"><a href="#2-4-5-JSTL中的EL函数" class="headerlink" title="2.4.5 JSTL中的EL函数"></a>2.4.5 JSTL中的EL函数</h4><p>JSTL，JSP Standard Tag Library，即JSP标准标签库。</p>
-<p>该标签库中，定义好了一套处理字符串的函数标签库。</p>
-<p>将JSTL的Jar包导入WEb/lib后，在jsp页面中即可直接使用。</p>
-<p>//index.jsp</p>
-<pre><code>&lt;%@ taglib uri = &quot;http://java.sun.com/jsp/jstl/functions&quot; prefix = &quot;fn&quot;%&gt;
-
-&lt;body&gt;
-    ${fun.substring(&quot;abcdefg&quot;, 2, 5)}
-    .....
-    .....
-&lt;/body&gt;
-</code></pre><h4 id="2-4-6-EL总结"><a href="#2-4-6-EL总结" class="headerlink" title="2.4.6 EL总结"></a>2.4.6 EL总结</h4><ul>
-<li>EL不能出现在java代码块、表达式块等jsp动态代码部分</li>
-<li>EL只能从pageContext、request、session、application四大域属性空间中获取数据</li>
-<li>EL不会抛出空指针异常</li>
-<li>EL不会抛出数组访问越界异常</li>
-<li>EL不具有字符串处理能力，只能通过JSTL标签库来处理</li>
-</ul>
-<h3 id="2-5-自定义标签"><a href="#2-5-自定义标签" class="headerlink" title="2.5 自定义标签"></a>2.5 自定义标签</h3><p>简化代码，替代java代码块。</p>
-<h4 id="2-5-1-基本用法"><a href="#2-5-1-基本用法" class="headerlink" title="2.5.1 基本用法"></a>2.5.1 基本用法</h4><p>（1）、需求</p>
-<p>自定义标签，输出客户端Ip</p>
-<p>（2）、定义标签处理器</p>
-<p>实现处理器接口：javax.servlet.jsp.tagext.simpleTag</p>
-<pre><code>//定义标签处理器
-public class ClientIpTag extends SimpleTagSupport {
-    @Override
-    public void doTag() throws JspException, IOException {
-        //获取pageContext
-        PageContext pc = (PageContext) this.getJspContext();
-        //获取请求对象
-        ServletRequest request = pc.getRequest();
-        //获取客户端IP
-        String clientIp = request.getRemoteAddr();
-        //获取标准输出流
-        JspWriter out = pc.getOut();
-        //输出
-        out.print(clientIp);
-    }
-}
-</code></pre><p>（3）、注册标签处理器</p>
-<p>//customTags.tld</p>
-<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-&lt;taglib xmlns=&quot;http://java.sun.com/xml/ns/j2ee&quot;
-    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
-    xsi:schemaLocation=&quot;http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd&quot;
-    version=&quot;2.0&quot;&gt;
-    &lt;!--配置标签库信息--&gt;
-    &lt;tlib-version&gt;1.0&lt;/tlib-version&gt;
-    &lt;short-name&gt;customTags&lt;/short-name&gt;
-    &lt;uri&gt;http://www.jstlproject.com/jsp/tags/custom&lt;/uri&gt;
-    &lt;!--注册标签--&gt;
-    &lt;tag&gt;
-        &lt;name&gt;clientIp&lt;/name&gt;
-        &lt;tag-class&gt;tags.ClientIpTag&lt;/tag-class&gt;
-        &lt;body-content&gt;empty&lt;/body-content&gt;
-    &lt;/tag&gt;
-
-&lt;/taglib&gt;
-</code></pre><p>（4）、使用自定义标签</p>
-<pre><code>&lt;%@ taglib uri = &quot;http://www.jstlproject.com/jsp/tags/custom&quot; prefix = &quot;customTags&quot; %&gt;
-&lt;body&gt;
-    &lt;% 
-        String ip = request.getRemoteAddr();
-        out.println(&quot;ip = &quot; + ip);
-    %&gt;
-    &lt;br/&gt;
-    &lt;customTags:clientIp /&gt;
-&lt;/body&gt;
-</code></pre><h4 id="2-5-2-定义带标签体的标签"><a href="#2-5-2-定义带标签体的标签" class="headerlink" title="2.5.2 定义带标签体的标签"></a>2.5.2 定义带标签体的标签</h4><p>//标签处理器 - 小写变大写</p>
-<pre><code>public class LowerToUpperTag extends SimpleTagSupport {
-    @Override
-    public void doTag() throws JspException, IOException {
-        //获取标签体对象
-        JspFragment jspbody = this.getJspBody();
-        //创建字符串输出流
-        StringWriter strWriter = new StringWriter();
-        //标签体对象写入字符串输出流
-        jspbody.invoke(strWriter);
-        //字符串输出流中的数据
-        String str = strWriter.toString();
-        //小写变大写
-        str = str.toUpperCase();
-        //写入标准输出流
-        this.getJspContext().getOut().print(str);
-    }
-}
-</code></pre><p>注册</p>
-<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-&lt;taglib xmlns=&quot;http://java.sun.com/xml/ns/j2ee&quot;
-    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
-    xsi:schemaLocation=&quot;http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd&quot;
-    version=&quot;2.0&quot;&gt;
-    &lt;!--配置标签库信息--&gt;
-    &lt;tlib-version&gt;1.0&lt;/tlib-version&gt;
-    &lt;short-name&gt;customTags&lt;/short-name&gt;
-    &lt;uri&gt;http://www.jstlproject.com/jsp/tags/custom&lt;/uri&gt;
-    &lt;!--注册标签--&gt;
-    &lt;tag&gt;
-        &lt;name&gt;clientIp&lt;/name&gt;
-        &lt;tag-class&gt;tags.ClientIpTag&lt;/tag-class&gt;
-        &lt;body-content&gt;empty&lt;/body-content&gt;
-    &lt;/tag&gt;
-    &lt;tag&gt;
-        &lt;name&gt;lowerToUpper&lt;/name&gt;
-        &lt;tag-class&gt;tags.LowerToUpperTag&lt;/tag-class&gt;
-        &lt;body-content&gt;scriptless&lt;/body-content&gt;
-    &lt;/tag&gt;
-
-&lt;/taglib&gt;
-</code></pre><p>附：<body-content></body-content></p>
-<ul>
-<li>empty:表示当前标签没有标签体</li>
-<li>scriptless：表示当前标签具有标签体，对el表达式解析。</li>
-<li>jsp:原样输出，已过时</li>
-<li>tagdependent: 原样输出到浏览器，不解析el表达式</li>
-</ul>
-<p>//index.jsp</p>
-<pre><code>&lt;%@ taglib uri = &quot;http://www.jstlproject.com/jsp/tags/custom&quot; prefix = &quot;customTags&quot; %&gt;
-
-&lt;body&gt;
-
-    &lt;%
-        String username = &quot;aaa&quot;;
-        pageContext.setAttribute(&quot;username&quot;, username);
-    %&gt;
-    &lt;customTags:lowerToUpper&gt;${username }&lt;/customTags:lowerToUpper&gt;
-
-&lt;/body&gt;
-</code></pre><h4 id="2-5-3-定义带属性的标签"><a href="#2-5-3-定义带属性的标签" class="headerlink" title="2.5.3 定义带属性的标签"></a>2.5.3 定义带属性的标签</h4><p>//注册标签</p>
-<pre><code>&lt;tag&gt;
-    &lt;name&gt;if&lt;/name&gt;
-    &lt;tag-class&gt;tags.IfTag&lt;/tag-class&gt;
-    &lt;body-content&gt;tagdependent&lt;/body-content&gt;
-        &lt;attribute&gt;
-            &lt;name&gt;test&lt;/name&gt;
-            &lt;required&gt;true&lt;/required&gt;
-            &lt;!-- runtime expression value 
-                true:该属性的值支持el表达式与jsp表达式
-            --&gt;
-            &lt;rtexprvalue&gt;true&lt;/rtexprvalue&gt;
-        &lt;/attribute&gt;
-&lt;/tag&gt;
-</code></pre><p>//定义标签处理器</p>
-<pre><code>public class IfTag extends SimpleTagSupport {
-    private boolean test;
-    //标签的属性反映到标签处理器中，就是一个set属性
-    public void setTest(boolean test) {
-        this.test = test;
-    }
-    @Override
-    public void doTag() throws JspException, IOException {
-        if(test) {
-            /*
-            JspFragment jspbody = this.getJspBody();
-            jspbody.invoke(this.getJspContext().getOut());
-            */
-            //以上代码等价于以下代码
-            this.getJspBody().invoke(null);
-        }
-    }
-}
-</code></pre><p>//index.jsp</p>
-<pre><code>&lt;customTages:if test = ${gender} }} }&gt;男&lt;/customTages:if&gt;
-&lt;customTages:if test = not gender }&gt;女&lt;/customTages:if&gt;
-</code></pre><h4 id="2-5-4-定义forEach标签"><a href="#2-5-4-定义forEach标签" class="headerlink" title="2.5.4 定义forEach标签"></a>2.5.4 定义forEach标签</h4><p>//定义标签处理器，遍历collection集合和数组</p>
-<pre><code>public class ForEachTag extends SimpleTagSupport {
-
-    private Object items;
-    private String var;
-
-    public void setItems(Object items) {
-        this.items = items;
-    }    
-
-    public void setVar(String var) {
-        this.var = var;
-    }
-
-    public Collection getcoll() {
-        if(items instanceof List) {
-            return (List) items;
-        }else if(items instanceof Set) {
-            return (Set) items;
-        }else if(items instanceof Map) {
-            return ((Map) items).entrySet();
-        }else if(items instanceof Object[]) {
-            return Arrays.asList((Object[])items);
-        }
-        return null;
-    }
-
-    @Override
-    public void doTag() throws JspException, IOException {
-        for (Object obj:getcoll()) {
-            this.getJspContext().setAttribute(var, obj);
-            this.getJspBody().invoke(null);
-        }
-    }
-
-}
-</code></pre><p>//注册</p>
-<pre><code> &lt;tag&gt;
-    &lt;name&gt;forEach&lt;/name&gt;
-    &lt;tag-class&gt;tags.ForEachTag&lt;/tag-class&gt;
-    &lt;body-content&gt;scriptless&lt;/body-content&gt;
-        &lt;attribute&gt;
-            &lt;name&gt;items&lt;/name&gt;
-            &lt;required&gt;true&lt;/required&gt;
-            &lt;rtexprvalue&gt;true&lt;/rtexprvalue&gt;
-        &lt;/attribute&gt;
-        &lt;attribute&gt;
-            &lt;name&gt;var&lt;/name&gt;
-            &lt;required&gt;true&lt;/required&gt;
-            &lt;rtexprvalue&gt;false&lt;/rtexprvalue&gt;
-        &lt;/attribute&gt;
-&lt;/tag&gt;
-</code></pre><p>//index.jsp</p>
-<pre><code>&lt;customTags:forEach items=&quot;${citys}&quot; var=&quot;city&quot;&gt;
-    ${city }&lt;br&gt;
-&lt;/customTags:forEach&gt;
-</code></pre><h4 id="2-5-5-将自定义标签库打包发行"><a href="#2-5-5-将自定义标签库打包发行" class="headerlink" title="2.5.5 将自定义标签库打包发行"></a>2.5.5 将自定义标签库打包发行</h4><p>1、右键export选择jar包，只打包源码。</p>
-<p>2、把.tld注册文件，放到jar包里的META-INFO里面。</p>
-<p>3、把jar包放到项目的WEB-INF的lib下。</p>
-<p>4、jsp页面中导入标签库，就可以直接用了。</p>
-<h3 id="2-6-JSTL"><a href="#2-6-JSTL" class="headerlink" title="2.6 JSTL"></a>2.6 JSTL</h3><p>jsp standard tag library，包含五个子库。</p>
-<p>核心标签库、格式化标签库、EL函数标签库、SQL操作标签库（过时）、XML操作标签库（过时）。</p>
-<p>导入jstl.jar包和standard.jar包</p>
-<h4 id="2-6-1-核心标签库"><a href="#2-6-1-核心标签库" class="headerlink" title="2.6.1 核心标签库"></a>2.6.1 核心标签库</h4><p>&lt;%@ taglib uri=”<a href="http://java.sun.com/jsp/jstl/core" target="_blank" rel="external">http://java.sun.com/jsp/jstl/core</a>“ prefix=”c” %&gt;</p>
-<p>（1）、c:set</p>
-<pre><code>//将变量存放到指定域中
-&lt;c:set var=&quot;name&quot; value=&quot;zhangsan&quot; scope=&quot;session&quot;&gt;
-name = ${sessionScope.name}
-
-//为Bean的属性赋值
-&lt;%
-    Student student = new Student();
-    pageContext.setAttribute(&quot;student&quot;, student);
-%&gt;
-&lt;c:set value=&quot;lisi&quot; property=&quot;name&quot; target=&quot;${pageScope.student}&quot;&gt;&lt;/c:set&gt;
-student = ${student}
-
-//为map赋值
-&lt;%
-    Map&lt;String, Object&gt; map = new HashMap&lt;&gt;();
-    pageContext.setAttribute(&quot;map&quot;, map);
-%&gt;
-&lt;c:set value=&quot;abc&quot; property=&quot;company&quot; target=&quot;${pageScope.map}&quot;&gt;&lt;/c:set&gt;
-map = ${map}
-</code></pre><p>（2）、c:remove</p>
-<pre><code>//从域属性空间中删除变量
-&lt;c:remove var=&quot;school&quot;&gt;
-</code></pre><p>（3）、c:out</p>
-<pre><code>//输出指定的变量
-&lt;c:set var=&quot;city&quot; value=&quot;&lt;h1&gt;beijing&lt;/h1&gt;&quot;&gt;
-
-city1 = &lt;c:out value=&quot;${city}&quot;/&gt;
-
-&lt;br /&gt;
-
-city2 = &lt;c:out value=&quot;${city}&quot; escapeXml=&quot;false&quot; /&gt;
-
-city1对h1标签进行了解析。
-
-city2对h1标签没有进行解析，直接输出。
-</code></pre><p>（4）、c:catch</p>
-<pre><code>//获取异常信息
-&lt;c:catch var=&quot;ex&quot;&gt;
-    &lt;%
-        int i = 3/0;
-    %&gt;
-&lt;/c:catch&gt;
-</code></pre><p>（5）、c:if</p>
-<pre><code>&lt;c:if test=&quot;${user == &quot;zhangsan&quot;}&quot;&gt;
-    &lt;a href=&quot;#&quot;&gt;进入系统&lt;/a&gt;
-&lt;/c:if&gt;
-</code></pre><p>（6）、c:choose</p>
-<pre><code>&lt;c:choose&gt;
-    &lt;c:when test=&quot;${pagenumber == 1}&quot;&gt;
-        第一页
-    &lt;/c:when&gt;
-    &lt;c:when test=&quot;${pagenumber == 2}&quot;&gt;
-        第二页
-    &lt;/c:when&gt;
-    &lt;c:otherwise&gt;
-        第三页
-    &lt;/c:otherwise&gt;
-&lt;/c:choose&gt;
-</code></pre><p>（7）、c:forEach</p>
-<pre><code>//遍历集合
-&lt;c:forEach items=&quot;${citys}&quot; var=&quot;city&quot; begin=&quot;0&quot; end=&quot;7&quot; step=&quot;4&quot;&gt;
-    ${city} &lt;br&gt;
-&lt;/c:forEach&gt;
-
-//输出行号
-&lt;c:forEach items=&quot;${students}&quot; var=&quot;student&quot; varStatus=&quot;vs&quot;&gt;
-    &lt;tr class=&quot;${vs.count/2 == 0 ? &apos;even&apos; : &apos;odd&apos;}&quot;&gt;
-        &lt;td&gt;${vs.count}&lt;/td&gt;
-        &lt;td&gt;${student.name}&lt;/td&gt;
-        &lt;td&gt;${student.age}&lt;/td&gt;
-    &lt;/tr&gt;
-&lt;/c:forEach&gt;
-</code></pre><h4 id="2-6-1-格式化标签库"><a href="#2-6-1-格式化标签库" class="headerlink" title="2.6.1 格式化标签库"></a>2.6.1 格式化标签库</h4><p>&lt;%@ taglib uri=”<a href="http://java.sun.com/jsp/jstl/fmt" target="_blank" rel="external">http://java.sun.com/jsp/jstl/fmt</a>“ prefix=”fmt” %&gt;</p>
-<pre><code>&lt;%
-    Date now = new Date();
-    pageContext.setAttribute(&quot;now&quot;, now);
-%&gt;
-
-//格式化日期，输出到浏览器
-now = &lt;fmt:formatDate value=&quot;${now}&quot; pattern=&quot;yyyy-MM-dd&quot;&gt;
-
-//格式化日期，将结果放到域中的变量里
-&lt;fmt:formatDate value=&quot;${now}&quot; pattern=&quot;yyyy-MM-dd&quot; var=&quot;birth&quot;&gt;
-生日：&lt;input type=&quot;text&quot; name=&quot;birthday&quot; value=&quot;${birth}&quot; /&gt;
-</code></pre><h4 id="2-6-2-jstl下载"><a href="#2-6-2-jstl下载" class="headerlink" title="2.6.2 jstl下载"></a>2.6.2 jstl下载</h4><p>apache.org –&gt; Tomcat –&gt; Taglibs –&gt; Download</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/31/java/java-jsp/java-jsp-2/" data-id="cjh4911l40044mtp3slki7sza" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/jsp/">jsp</a></li></ul>
 
     </footer>
   </div>
@@ -2340,7 +2552,7 @@ now = &lt;fmt:formatDate value=&quot;${now}&quot; pattern=&quot;yyyy-MM-dd&quot;
 
 
   <nav id="page-nav">
-    <a class="extend prev" rel="prev" href="/">&laquo; __('prev')</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/3/">__('next') &raquo;</a>
+    <a class="extend prev" rel="prev" href="/">&laquo; __('prev')</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="extend next" rel="next" href="/page/3/">__('next') &raquo;</a>
   </nav>
 </section>
         
@@ -2350,7 +2562,7 @@ now = &lt;fmt:formatDate value=&quot;${now}&quot; pattern=&quot;yyyy-MM-dd&quot;
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/mybatis/">mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/mybatis/">mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/springmvc/">springmvc</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
     </div>
   </div>
 
@@ -2360,7 +2572,7 @@ now = &lt;fmt:formatDate value=&quot;${now}&quot; pattern=&quot;yyyy-MM-dd&quot;
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springmvc/">springmvc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
     </div>
   </div>
 
@@ -2370,7 +2582,7 @@ now = &lt;fmt:formatDate value=&quot;${now}&quot; pattern=&quot;yyyy-MM-dd&quot;
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/mybatis/" style="font-size: 17.14px;">mybatis</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/mybatis/" style="font-size: 17.14px;">mybatis</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/springmvc/" style="font-size: 14.29px;">springmvc</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
     </div>
   </div>
 
@@ -2392,23 +2604,23 @@ now = &lt;fmt:formatDate value=&quot;${now}&quot; pattern=&quot;yyyy-MM-dd&quot;
       <ul>
         
           <li>
+            <a href="/2018/05/24/java/springmvc/springmvc-4/">第四章 springmvc核心技术</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/23/java/springmvc/springmvc-3/">第三章 springmvc注解式开发</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/22/java/springmvc/springmvc-2/">第二章 springmvc配置式开发</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/22/java/springmvc/springmvc-1/">第一章 springmvc概述</a>
+          </li>
+        
+          <li>
             <a href="/2018/05/13/java/mybatis/mybatis-7/">第七章 MyBatis - 查询缓存</a>
-          </li>
-        
-          <li>
-            <a href="/2018/05/12/java/mybatis/mybatis-6/">第六章 MyBatis - 延迟加载</a>
-          </li>
-        
-          <li>
-            <a href="/2018/05/12/java/mybatis/mybatis-5/">第五章 MyBatis关联关系查询 - 多对多</a>
-          </li>
-        
-          <li>
-            <a href="/2018/05/12/java/mybatis/mybatis-4/">第四章 MyBatis关联关系查询 - 自关联</a>
-          </li>
-        
-          <li>
-            <a href="/2018/05/12/java/mybatis/mybatis-3/">第三章 MyBatis关联关系查询 - 多对一</a>
           </li>
         
       </ul>

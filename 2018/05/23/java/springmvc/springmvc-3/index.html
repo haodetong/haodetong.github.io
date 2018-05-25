@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>第三章 springmvc注解式开发 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="3.1 第一个程序3.1.1 注解springmvc.xml &amp;lt;!-- 组件扫描器 --&amp;gt; &amp;lt;context:component-scan base-package=&amp;quot;com.bjpowernode.handlers&amp;quot;&amp;gt;&amp;lt;/context:component-scan&amp;gt; 控制器 @org.springframework.stereotype.">
+<meta name="keywords" content="springmvc">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第三章 springmvc注解式开发">
+<meta property="og:url" content="http://yoursite.com/2018/05/23/java/springmvc/springmvc-3/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="3.1 第一个程序3.1.1 注解springmvc.xml &amp;lt;!-- 组件扫描器 --&amp;gt; &amp;lt;context:component-scan base-package=&amp;quot;com.bjpowernode.handlers&amp;quot;&amp;gt;&amp;lt;/context:component-scan&amp;gt; 控制器 @org.springframework.stereotype.">
+<meta property="og:updated_time" content="2018-05-24T07:58:13.287Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="第三章 springmvc注解式开发">
+<meta name="twitter:description" content="3.1 第一个程序3.1.1 注解springmvc.xml &amp;lt;!-- 组件扫描器 --&amp;gt; &amp;lt;context:component-scan base-package=&amp;quot;com.bjpowernode.handlers&amp;quot;&amp;gt;&amp;lt;/context:component-scan&amp;gt; 控制器 @org.springframework.stereotype.">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-java/springmvc/springmvc-3" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/23/java/springmvc/springmvc-3/" class="article-date">
+  <time datetime="2018-05-23T07:39:01.000Z" itemprop="datePublished">2018-05-23</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/springmvc/">springmvc</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      第三章 springmvc注解式开发
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="3-1-第一个程序"><a href="#3-1-第一个程序" class="headerlink" title="3.1 第一个程序"></a>3.1 第一个程序</h4><h5 id="3-1-1-注解"><a href="#3-1-1-注解" class="headerlink" title="3.1.1 注解"></a>3.1.1 注解</h5><p>springmvc.xml</p>
+<pre><code>&lt;!-- 组件扫描器 --&gt;
+&lt;context:component-scan base-package=&quot;com.bjpowernode.handlers&quot;&gt;&lt;/context:component-scan&gt;
+</code></pre><p>控制器</p>
+<pre><code>@org.springframework.stereotype.Controller
+public class MyController {
+    @RequestMapping(&quot;/my.do&quot;)
+    public ModelAndView doSome(HttpServletRequest arg0, HttpServletResponse arg1) {
+        return new ModelAndView(&quot;/WEB-INF/jsp/welcome.jsp&quot;);
+    }
+
+}
+</code></pre><h5 id="3-1-2-多个请求指向同一个处理器、一个处理器中定义多个处理器方法"><a href="#3-1-2-多个请求指向同一个处理器、一个处理器中定义多个处理器方法" class="headerlink" title="3.1.2 多个请求指向同一个处理器、一个处理器中定义多个处理器方法"></a>3.1.2 多个请求指向同一个处理器、一个处理器中定义多个处理器方法</h5><pre><code>@org.springframework.stereotype.Controller
+public class MyController {
+    @RequestMapping({&quot;/first.do&quot;,&quot;hello.do&quot;})
+    public ModelAndView doFirst(HttpServletRequest arg0, HttpServletResponse arg1) {
+        return new ModelAndView(&quot;/WEB-INF/jsp/welcome.jsp&quot;);
+    }
+
+    @RequestMapping(&quot;/second.do&quot;)
+    public ModelAndView doSecond(HttpServletRequest arg0, HttpServletResponse arg1) {
+        return new ModelAndView(&quot;/WEB-INF/jsp/welcome.jsp&quot;);
+    }
+}
+</code></pre><h5 id="3-1-3-命名空间-RequestMapping"><a href="#3-1-3-命名空间-RequestMapping" class="headerlink" title="3.1.3 命名空间 @RequestMapping"></a>3.1.3 命名空间 @RequestMapping</h5><pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;xxx/ooo/jjj&quot;)
+public class MyController {
+    @RequestMapping({&quot;/first.do&quot;,&quot;hello.do&quot;})
+    public ModelAndView doFirst(HttpServletRequest arg0, HttpServletResponse arg1) {
+        return new ModelAndView(&quot;/WEB-INF/jsp/welcome.jsp&quot;);
+    }
+
+    @RequestMapping(&quot;/second.do&quot;)
+    public ModelAndView doSecond(HttpServletRequest arg0, HttpServletResponse arg1) {
+        return new ModelAndView(&quot;/WEB-INF/jsp/welcome.jsp&quot;);
+    }
+}
+</code></pre><h5 id="3-1-4-请求中的通配符"><a href="#3-1-4-请求中的通配符" class="headerlink" title="3.1.4 请求中的通配符"></a>3.1.4 请求中的通配符</h5><pre><code>@RequestMapping(&quot;/second*.do&quot;)
+</code></pre><h5 id="3-1-5-对请求提交方式的定义"><a href="#3-1-5-对请求提交方式的定义" class="headerlink" title="3.1.5 对请求提交方式的定义"></a>3.1.5 对请求提交方式的定义</h5><pre><code>@RequestMapping(value={&quot;/first.do&quot;,&quot;hello.do&quot;}, method= RequestMethod.POST)
+</code></pre><h4 id="3-2-处理器方法的参数"><a href="#3-2-处理器方法的参数" class="headerlink" title="3.2 处理器方法的参数"></a>3.2 处理器方法的参数</h4><p>处理器方法常用的参数有五类，这些参数会在系统调用时由系统自动赋值，即程序员可以在方法内直接使用。</p>
+<ul>
+<li><p>HttpServleRequest</p>
+</li>
+<li><p>HttpServletResponse</p>
+</li>
+<li><p>HttpSession</p>
+</li>
+<li><p>用于承载数据的Model</p>
+</li>
+<li><p>请求中所携带的参数</p>
+</li>
+</ul>
+<h4 id="3-3-处理器方法接收请求里的参数"><a href="#3-3-处理器方法接收请求里的参数" class="headerlink" title="3.3 处理器方法接收请求里的参数"></a>3.3 处理器方法接收请求里的参数</h4><p>index.jsp</p>
+<pre><code>&lt;form action=&quot;${pageContext.request.contextPath }/test/register.do&quot; method=&quot;POST&quot;&gt;
+    姓名：&lt;input type=&quot;text&quot; name=&quot;name&quot; /&gt;&lt;br /&gt;
+    年龄：&lt;input type=&quot;text&quot; name=&quot;age&quot; /&gt;&lt;br /&gt;
+    &lt;input type=&quot;submit&quot; value=&quot;注册&quot; /&gt;
+&lt;/form&gt;
+</code></pre><p>welcome.jsp</p>
+<pre><code>name=${name}
+age=${age }
+</code></pre><p>web.xml</p>
+<p>添加过滤器，解决中文乱码问题</p>
+<pre><code>&lt;filter&gt;
+      &lt;filter-name&gt;CharacterEncodingFilter&lt;/filter-name&gt;
+      &lt;filter-class&gt;org.springframework.web.filter.CharacterEncodingFilter&lt;/filter-class&gt;
+      &lt;init-param&gt;
+          &lt;param-name&gt;encoding&lt;/param-name&gt;
+          &lt;param-value&gt;utf-8&lt;/param-value&gt;
+      &lt;/init-param&gt;
+      &lt;init-param&gt;
+          &lt;param-name&gt;forceEncoding&lt;/param-name&gt;
+          &lt;param-value&gt;true&lt;/param-value&gt;
+      &lt;/init-param&gt;
+&lt;/filter&gt;
+
+&lt;filter-mapping&gt;
+    &lt;filter-name&gt;CharacterEncodingFilter&lt;/filter-name&gt;
+    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+&lt;/filter-mapping&gt;
+</code></pre><h5 id="3-3-1-接收请求参数-逐个接收"><a href="#3-3-1-接收请求参数-逐个接收" class="headerlink" title="3.3.1 接收请求参数 - 逐个接收"></a>3.3.1 接收请求参数 - 逐个接收</h5><p>控制器</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+    @RequestMapping(value={&quot;/register.do&quot;}, method= RequestMethod.POST)
+    public ModelAndView doRegister(String name, int age) {
+        System.out.println(&quot;name=&quot;+name);
+        System.out.println(&quot;age=&quot;+age);
+
+        ModelAndView mv = new ModelAndView();
+        mv.addObject(&quot;name&quot;, name);
+        mv.addObject(&quot;age&quot;, age);
+        mv.setViewName(&quot;/WEB-INF/jsp/welcome.jsp&quot;);
+        return mv;
+    }
+
+}
+</code></pre><h5 id="3-3-2-接收请求参数-校正请求参数名"><a href="#3-3-2-接收请求参数-校正请求参数名" class="headerlink" title="3.3.2 接收请求参数 - 校正请求参数名"></a>3.3.2 接收请求参数 - 校正请求参数名</h5><p>参数pname</p>
+<pre><code>姓名：&lt;input type=&quot;text&quot; name=&quot;pname&quot; /&gt;&lt;br /&gt;
+</code></pre><p>@RequestParam校正</p>
+<pre><code>public ModelAndView doRegister(@RequestParam(&quot;pname&quot;) String name, int age) {...}
+</code></pre><h5 id="3-3-3-接收请求参数-以对象形式整体接收"><a href="#3-3-3-接收请求参数-以对象形式整体接收" class="headerlink" title="3.3.3 接收请求参数 - 以对象形式整体接收"></a>3.3.3 接收请求参数 - 以对象形式整体接收</h5><p>Student.class</p>
+<pre><code>public class Student {
+    private String name;
+    private int age;
+
+    ...
+    getter and setter
+    ...
+
+}
+</code></pre><p>控制器</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+    @RequestMapping(value={&quot;/register.do&quot;}, method= RequestMethod.POST)
+    public ModelAndView doRegister(Student student) {
+        System.out.println(&quot;name=&quot;+student.getName());
+        System.out.println(&quot;age=&quot;+student.getAge());
+
+        ModelAndView mv = new ModelAndView();
+        mv.addObject(&quot;name&quot;, student);
+        mv.setViewName(&quot;/WEB-INF/jsp/welcome.jsp&quot;);
+        return mv;
+    }
+
+}
+</code></pre><p>整体接收，要求参数名name,age要与实体类属性名相同 </p>
+<h5 id="3-3-3-接收请求参数-域属性参数的接收"><a href="#3-3-3-接收请求参数-域属性参数的接收" class="headerlink" title="3.3.3 接收请求参数 - 域属性参数的接收"></a>3.3.3 接收请求参数 - 域属性参数的接收</h5><p>Student.class</p>
+<pre><code>public class Student {
+    private String name;
+    private int age;
+    private School school;
+    ...
+        getter and setter
+    ...
+}
+</code></pre><p>School.class</p>
+<pre><code>public class School {
+    private String sname;
+    private String address;
+    public String getSname() {
+        return sname;
+    }
+    ...
+        getter and setter
+    ...        
+}
+</code></pre><p>index.jsp</p>
+<pre><code>&lt;form action=&quot;${pageContext.request.contextPath }/test/register.do&quot; method=&quot;POST&quot;&gt;
+    姓名：&lt;input type=&quot;text&quot; name=&quot;name&quot; /&gt;&lt;br /&gt;
+    年龄：&lt;input type=&quot;text&quot; name=&quot;age&quot; /&gt;&lt;br /&gt;
+    学校：&lt;input type=&quot;text&quot; name=&quot;School.sname&quot; /&gt;&lt;br /&gt;
+    校址：&lt;input type=&quot;text&quot; name=&quot;School.address&quot; /&gt;&lt;br /&gt;
+    &lt;input type=&quot;submit&quot; value=&quot;注册&quot; /&gt;
+&lt;/form&gt;
+</code></pre><h4 id="3-4-处理器方法的返回值"><a href="#3-4-处理器方法的返回值" class="headerlink" title="3.4 处理器方法的返回值"></a>3.4 处理器方法的返回值</h4><h5 id="3-4-1-返回ModelAndView"><a href="#3-4-1-返回ModelAndView" class="headerlink" title="3.4.1 返回ModelAndView"></a>3.4.1 返回ModelAndView</h5><p>当处理器方法处理完后，既需要跳转到其它资源，也需要在资源间传递数据，那么就应该使用ModelAndView。</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+    @RequestMapping(value={&quot;/register.do&quot;}, method= RequestMethod.POST)
+    public ModelAndView doRegister(Student student) {
+        ModelAndView mv = new ModelAndView();
+        mv.addObject(&quot;name&quot;, student);
+        mv.setViewName(&quot;/WEB-INF/jsp/welcome.jsp&quot;);
+        return mv;
+    }
+
+}
+</code></pre><h5 id="3-4-2-返回String"><a href="#3-4-2-返回String" class="headerlink" title="3.4.2 返回String"></a>3.4.2 返回String</h5><p>只需要进行跳转，而不需要进行数据传递时，可以使用String。</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+    @RequestMapping(value={&quot;/register.do&quot;}, method= RequestMethod.POST)
+    public String soSome() {
+        return &quot;/WEB-INF/jsp/welcome.jsp&quot;;
+    }
+
+}
+</code></pre><p>物理视图：/WEB-INF/jsp/welcome.jsp</p>
+<p>逻辑视图：welcome，需要视图解析器转换为物理视图</p>
+<h5 id="3-4-3-返回void"><a href="#3-4-3-返回void" class="headerlink" title="3.4.3 返回void"></a>3.4.3 返回void</h5><p>index.jsp</p>
+<pre><code>&lt;script type=&quot;text/javascript&quot;&gt;
+    $(function (){
+        $(&quot;button&quot;).click(function(){
+            $.ajax({
+                url:&quot;test/ajax.do&quot;,
+                data:{
+                    name:&quot;zhangsan&quot;,
+                    age:23
+                },
+                success:function(data){
+                    var json=eval(&quot;(&quot;+ data +&quot;)&quot;);
+                    alert(json.name + json.age);
+                }
+            });
+        });
+    });
+&lt;/script&gt;
+&lt;button&gt;ajax submit&lt;/button&gt;
+</code></pre><p>处理器</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+    @RequestMapping(&quot;/ajax.do&quot;)
+    public void doAjax(String name, int age, HttpServletResponse response) throws IOException {
+        HashMap&lt;String, Object&gt; map = new HashMap&lt;String, Object&gt;();
+        map.put(&quot;name&quot;, name);
+        map.put(&quot;age&quot;, age);
+
+        JSONObject json = JSONObject.fromObject(map);
+        String jsonStr = json.toString();
+
+        PrintWriter out = response.getWriter();
+        out.println(jsonStr);
+    }
+
+}
+</code></pre><p>需要导入json-lib相关的包</p>
+<h5 id="3-4-4-返回Object"><a href="#3-4-4-返回Object" class="headerlink" title="3.4.4 返回Object"></a>3.4.4 返回Object</h5><p>处理器方法也可以返回Object对象，但返回的这个Object对象不是作为逻辑视图出现的，而是作为直接在页面显示的数据出现的。</p>
+<p>返回Object对象，需要使用@ResponseBody注解，将转换后的JSON数据放入到响应体中。</p>
+<p>#####（1）、环境搭建</p>
+<p>A、导入jar包</p>
+<p>由于返回Object数据，一般都是将数据转化为了JSON对象后传递给浏览器页面的。而这个由Object转换为JSON，是由Jackson工具完成的。所以需要导入Jackson的相关jar包。</p>
+<p>jackson-annotations、jackson-core、jackson-databind</p>
+<p>B、注册注解驱动</p>
+<p>将Object数据转化为JSON数据，需要由http消息转换器HttpMessageConvert完成。而消息转换器的开启，需要由<code>&lt;mvc:annotation-driven&gt;</code>来完成。</p>
+<p>当Spring容器进行初始化过程中在<code>&lt;mvc:annotation-driven&gt;</code>处创建注解驱动时，默认创建了七个HttpMessageConvert对象。也就是说，我们注册<code>&lt;mvc:annotation-driven&gt;</code>，就是为了让容器为我们创建HttpMessageConvert对象。</p>
+<p>C、@ResponseBody</p>
+<p>给处理器方法添加注解</p>
+<h5 id="（2）、返回Object-数值型"><a href="#（2）、返回Object-数值型" class="headerlink" title="（2）、返回Object-数值型"></a>（2）、返回Object-数值型</h5><p>springmvc.xml</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+xmlns:mvc=&quot;http://www.springframework.org/schema/mvc&quot;
+xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
+xmlns:tx=&quot;http://www.springframework.org/schema/tx&quot;
+xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context.xsd
+http://www.springframework.org/schema/aop
+http://www.springframework.org/schema/aop/spring-aop.xsd
+http://www.springframework.org/schema/tx
+http://www.springframework.org/schema/tx/spring-tx.xsd
+http://www.springframework.org/schema/mvc
+http://www.springframework.org/schema/mvc/spring-mvc.xsd&quot;&gt;
+
+    &lt;!-- 注册组件扫描器 --&gt;
+    &lt;context:component-scan base-package=&quot;com.bjpowernode.handlers&quot;&gt;&lt;/context:component-scan&gt;
+
+    &lt;!-- 注册注解驱动器 --&gt;
+    &lt;mvc:annotation-driven&gt;&lt;/mvc:annotation-driven&gt;
+
+&lt;/beans&gt;
+</code></pre><p>处理器</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+
+    @RequestMapping(&quot;/ajax.do&quot;)
+    @ResponseBody //将要返回的数据放入到响应体中
+    public Object doAjax() {
+        return 123.321;
+    }
+
+}
+</code></pre><p>index.jsp</p>
+<pre><code>&lt;script type=&quot;text/javascript&quot;&gt;
+    $(function (){
+        $(&quot;button&quot;).click(function(){
+            $.ajax({
+                url:&quot;test/ajax.do&quot;,
+                success:function(data){
+                    alert(data);
+                }
+            });
+        });
+    });
+&lt;/script&gt;
+ &lt;button&gt;ajax submit&lt;/button&gt;
+</code></pre><h5 id="（3）、返回Object-字符串"><a href="#（3）、返回Object-字符串" class="headerlink" title="（3）、返回Object-字符串"></a>（3）、返回Object-字符串</h5><pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+
+    @RequestMapping(value=&quot;/ajax.do&quot;,produces=&quot;text/html;charset=utf-8&quot;)
+    @ResponseBody //将要返回的数据放入到响应体中
+    public Object doAjax() {
+        return &quot;临沂&quot;;
+    }
+
+}
+</code></pre><p>produces指定返回的字符串格式</p>
+<h5 id="（4）、返回Object-自定义对象"><a href="#（4）、返回Object-自定义对象" class="headerlink" title="（4）、返回Object-自定义对象"></a>（4）、返回Object-自定义对象</h5><p>处理器</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+
+    @RequestMapping(&quot;/ajax.do&quot;)
+    @ResponseBody //将要返回的数据放入到响应体中
+    public Object doAjax() {
+        return new Student(&quot;zhangsan&quot;,23);
+    }
+
+}
+</code></pre><p>index.jsp</p>
+<pre><code>&lt;script type=&quot;text/javascript&quot;&gt;
+    $(function (){
+        $(&quot;button&quot;).click(function(){
+            $.ajax({
+                url:&quot;test/ajax.do&quot;,
+                success:function(data){
+                    alert(data.name + data.age);
+                }
+            });
+        });
+    });
+&lt;/script&gt;
+&lt;button&gt;ajax submit&lt;/button&gt;
+</code></pre><h5 id="（4）、返回Object-List集合"><a href="#（4）、返回Object-List集合" class="headerlink" title="（4）、返回Object-List集合"></a>（4）、返回Object-List集合</h5><p>处理器</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+
+    @RequestMapping(&quot;/ajax.do&quot;)
+    @ResponseBody //将要返回的数据放入到响应体中
+    public Object doAjax() {
+        ArrayList&lt;Student&gt; list = new ArrayList&lt;Student&gt;();
+        list.add(new Student(&quot;zhangsan&quot;,23));
+        list.add(new Student(&quot;lisi&quot;,23));
+        return list;
+    }
+
+}
+</code></pre><p>index.jsp</p>
+<pre><code>&lt;script type=&quot;text/javascript&quot;&gt;
+    $(function (){
+        $(&quot;button&quot;).click(function(){
+            $.ajax({
+                url:&quot;test/ajax.do&quot;,
+                success:function(data){
+                    $(data).each(function(index){
+                        alert(data[index].name + data[index].age);
+                    });
+                }
+            });
+        });
+    });
+&lt;/script&gt;
+ &lt;button&gt;ajax submit&lt;/button&gt;
+</code></pre><h5 id="（5）、返回Object-Map集合"><a href="#（5）、返回Object-Map集合" class="headerlink" title="（5）、返回Object-Map集合"></a>（5）、返回Object-Map集合</h5><p>处理器</p>
+<pre><code>@org.springframework.stereotype.Controller
+@RequestMapping(&quot;/test&quot;)
+public class MyController {
+
+    @RequestMapping(&quot;/ajax.do&quot;)
+    @ResponseBody //将要返回的数据放入到响应体中
+    public Object doAjax() {
+        HashMap&lt;String, Student&gt; map = new HashMap&lt;String,Student&gt;();
+        map.put(&quot;stu1&quot;, new Student(&quot;zhangsan&quot;,23));
+        map.put(&quot;stu2&quot;, new Student(&quot;lisi&quot;,24));
+        return map;
+    }
+
+}
+</code></pre><p>index.jsp</p>
+<pre><code>&lt;script type=&quot;text/javascript&quot;&gt;
+    $(function (){
+        $(&quot;button&quot;).click(function(){
+            $.ajax({
+                url:&quot;test/ajax.do&quot;,
+                success:function(data){
+                    $(data).each(function(index){
+                        alert(data.stu1.name + data.stu2.age);
+                    });
+                }
+            });
+        });
+    });
+&lt;/script&gt;
+&lt;button&gt;ajax submit&lt;/button&gt;    
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/05/23/java/springmvc/springmvc-3/" data-id="cjhlqourz006l47fyqhzkncgq" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/springmvc/">springmvc</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/05/24/java/springmvc/springmvc-4/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          第四章 springmvc核心技术
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/05/22/java/springmvc/springmvc-2/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">第二章 springmvc配置式开发</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/mybatis/">mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/springmvc/">springmvc</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springmvc/">springmvc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/mybatis/" style="font-size: 17.14px;">mybatis</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/springmvc/" style="font-size: 14.29px;">springmvc</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/05/24/java/springmvc/springmvc-4/">第四章 springmvc核心技术</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/23/java/springmvc/springmvc-3/">第三章 springmvc注解式开发</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/22/java/springmvc/springmvc-2/">第二章 springmvc配置式开发</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/22/java/springmvc/springmvc-1/">第一章 springmvc概述</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/13/java/mybatis/mybatis-7/">第七章 MyBatis - 查询缓存</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
