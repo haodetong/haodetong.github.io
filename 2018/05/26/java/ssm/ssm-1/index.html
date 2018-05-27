@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>第一章 搭建SSM开发环境 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="1.1 导入Jar包（1）、mybatis的jar包  asm-4.2.jar cglib-3.1.jar commons-logging-1.2.jar log4j-1.2.17.jar log4j-api-2.2.jar log4j-core-2.2.jar mybatis-3.3.0.jar slf4j-api-1.7.12.jar slf4j-log4j12-1.7.12.jar  （2）">
+<meta name="keywords" content="ssm">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第一章 搭建SSM开发环境">
+<meta property="og:url" content="http://yoursite.com/2018/05/26/java/ssm/ssm-1/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="1.1 导入Jar包（1）、mybatis的jar包  asm-4.2.jar cglib-3.1.jar commons-logging-1.2.jar log4j-1.2.17.jar log4j-api-2.2.jar log4j-core-2.2.jar mybatis-3.3.0.jar slf4j-api-1.7.12.jar slf4j-log4j12-1.7.12.jar  （2）">
+<meta property="og:updated_time" content="2018-05-27T03:41:59.318Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="第一章 搭建SSM开发环境">
+<meta name="twitter:description" content="1.1 导入Jar包（1）、mybatis的jar包  asm-4.2.jar cglib-3.1.jar commons-logging-1.2.jar log4j-1.2.17.jar log4j-api-2.2.jar log4j-core-2.2.jar mybatis-3.3.0.jar slf4j-api-1.7.12.jar slf4j-log4j12-1.7.12.jar  （2）">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-java/ssm/ssm-1" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/26/java/ssm/ssm-1/" class="article-date">
+  <time datetime="2018-05-26T08:45:17.000Z" itemprop="datePublished">2018-05-26</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/ssm/">ssm</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      第一章 搭建SSM开发环境
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="1-1-导入Jar包"><a href="#1-1-导入Jar包" class="headerlink" title="1.1 导入Jar包"></a>1.1 导入Jar包</h4><p>（1）、mybatis的jar包</p>
+<ul>
+<li>asm-4.2.jar</li>
+<li>cglib-3.1.jar</li>
+<li>commons-logging-1.2.jar</li>
+<li>log4j-1.2.17.jar</li>
+<li>log4j-api-2.2.jar</li>
+<li>log4j-core-2.2.jar</li>
+<li>mybatis-3.3.0.jar</li>
+<li>slf4j-api-1.7.12.jar</li>
+<li>slf4j-log4j12-1.7.12.jar</li>
+</ul>
+<p>（2）、ehcache的Jar包</p>
+<ul>
+<li>ehcache-core-2.6.8.jar</li>
+<li>mybatis-ehcache-1.0.3.jar</li>
+</ul>
+<p>（3）、Spring的Jar包</p>
+<ul>
+<li>com.springsource.org.aopalliance-1.0.0.jar</li>
+<li>com.springsource.org.aspectj.weaver-1.6.8.RELEASE.jar</li>
+<li>spring-aop-4.2.1.RELEASE.jar</li>
+<li>spring-aspects-4.2.1.RELEASE.jar</li>
+<li>spring-beans-4.2.1.RELEASE.jar</li>
+<li>spring-context-4.2.1.RELEASE.jar</li>
+<li>spring-context-support-4.2.1.RELEASE.jar</li>
+<li>spring-core-4.2.1.RELEASE.jar</li>
+<li>spring-expression-4.2.1.RELEASE.jar</li>
+<li>spring-jdbc-4.2.1.RELEASE.jar</li>
+<li>spring-orm-4.2.1.RELEASE.jar</li>
+<li>spring-tx-4.2.1.RELEASE.jar</li>
+<li>spring-web-4.2.1.RELEASE.jar</li>
+<li>spring-webmvc-4.2.1.RELEASE.jar</li>
+</ul>
+<p>（4）、mybatis与spring整合的Jar包</p>
+<ul>
+<li>mybatis-spring-1.2.3.jar</li>
+</ul>
+<p>（5）、JSON的Jar包</p>
+<ul>
+<li><p>commons-beanutils-1.8.0.jar</p>
+</li>
+<li><p>commons-collections-3.2.1.jar</p>
+</li>
+<li><p>commons-lang-2.5.jar</p>
+</li>
+<li><p>commons-logging-1.1.1.jar</p>
+</li>
+<li><p>ezmorph-1.0.6.jar</p>
+</li>
+<li><p>json-lib-2.4-jdk15.jar</p>
+</li>
+</ul>
+<p>（6）、Jackson的Jar包</p>
+<ul>
+<li><p>jackson-annotations-2.6.0-xh.jar</p>
+</li>
+<li><p>jackson-core-2.6.0-xh.jar</p>
+</li>
+<li><p>jackson-databind-2.6.0-xh.jar</p>
+</li>
+<li><p>jackson-jr-all-2.4.3-xh.jar</p>
+</li>
+</ul>
+<p>（7）、Hebernate验证器Jar包</p>
+<ul>
+<li><p>hibernate-validator-5.1.0.Final.jar</p>
+</li>
+<li><p>jboss-logging-3.1.3.GA.jar</p>
+</li>
+<li><p>validation-api-1.1.0.Final.jar</p>
+</li>
+</ul>
+<p>（8）、其它Jar包</p>
+<ul>
+<li><p>mysql-connector-java-5.1.44-bin.jar</p>
+</li>
+<li><p>c3p0-0.9.2.1</p>
+</li>
+<li><p>c3p0-oracle-thin-extras-0.9.2.1</p>
+</li>
+<li><p>mchange-commons-java-0.2.3.4</p>
+</li>
+</ul>
+<h4 id="1-2-配置式开发"><a href="#1-2-配置式开发" class="headerlink" title="1.2 配置式开发"></a>1.2 配置式开发</h4><h5 id="1-2-1-定义实体类及DB表"><a href="#1-2-1-定义实体类及DB表" class="headerlink" title="1.2.1 定义实体类及DB表"></a>1.2.1 定义实体类及DB表</h5><p>package com.bjpowernode.beans;</p>
+<p>public class Student {<br>    private Integer id;<br>    private String name;<br>    private int age;</p>
+<pre><code>public Student() {
+    super();
+    // TODO Auto-generated constructor stub
+}
+
+public Student(String name, int age) {
+    super();
+    this.name = name;
+    this.age = age;
+}
+...
+getter and setter
+...
+</code></pre><p>}</p>
+<h5 id="1-2-2-定义表单页及处理器"><a href="#1-2-2-定义表单页及处理器" class="headerlink" title="1.2.2 定义表单页及处理器"></a>1.2.2 定义表单页及处理器</h5><p>index.jsp</p>
+<pre><code>&lt;form action=&quot;${pageContext.request.contextPath }/test/register.do&quot; method=&quot;POST&quot;&gt;
+    姓名：&lt;input type=&quot;text&quot; name=&quot;name&quot; /&gt;&lt;br /&gt;
+    年龄：&lt;input type=&quot;text&quot; name=&quot;age&quot; /&gt;&lt;br /&gt;
+    &lt;input type=&quot;submit&quot; value=&quot;注册&quot; /&gt;
+&lt;/form&gt;
+</code></pre><p>StudentController</p>
+<pre><code>package com.bjpowernode.handlers;
+
+public class StudentController implements Controller {
+
+    private IStudentService service;
+
+    public void setService(IStudentService service) {
+        this.service = service;
+    }
+
+    @Override
+    public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+        String name = request.getParameter(&quot;name&quot;);
+        String ageStr = request.getParameter(&quot;age&quot;);
+        Integer age = Integer.valueOf(ageStr);
+        Student student = new Student(name,age);
+
+        service.addStudent(student);
+
+        return new ModelAndView(&quot;/welcome.jsp&quot;);
+    }
+
+}
+</code></pre><h5 id="1-2-3-定义service"><a href="#1-2-3-定义service" class="headerlink" title="1.2.3 定义service"></a>1.2.3 定义service</h5><p>service interface</p>
+<pre><code>package com.bjpowernode.service;
+public interface IStudentService {    
+    void addStudent(Student student);
+}
+</code></pre><p>service implements</p>
+<pre><code>package com.bjpowernode.service;
+public class StudentServiceImpl implements IStudentService {
+
+    private IStudentDao dao;
+
+    public void setDao(IStudentDao dao) {
+        this.dao = dao;
+    }
+
+    @Override
+    public void addStudent(Student student) {
+        dao.insertStudent(student);
+    }
+
+}
+</code></pre><h5 id="1-2-4-定义dao"><a href="#1-2-4-定义dao" class="headerlink" title="1.2.4 定义dao"></a>1.2.4 定义dao</h5><p>dao interface</p>
+<pre><code>package com.bjpowernode.dao;
+public interface IStudentDao {    
+    void insertStudent(Student student);
+}
+</code></pre><h5 id="1-2-5-定义mybatis两个配置文件"><a href="#1-2-5-定义mybatis两个配置文件" class="headerlink" title="1.2.5 定义mybatis两个配置文件"></a>1.2.5 定义mybatis两个配置文件</h5><p>mybatis主配置文件：mybatis.xml</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt; 
+&lt;!DOCTYPE configuration
+PUBLIC &quot;-//mybatis.org//DTD Config 3.0//EN&quot;
+&quot;http://mybatis.org/dtd/mybatis-3-config.dtd&quot;&gt;
+
+&lt;configuration&gt;
+    &lt;!-- 为实体类指定别名，简单类名 --&gt;
+    &lt;typeAliases&gt;
+        &lt;package name=&quot;com.bjpowernode.beans&quot;/&gt;
+    &lt;/typeAliases&gt;
+    &lt;!-- 注册映射文件 --&gt;
+    &lt;mappers&gt;
+        &lt;package name=&quot;com.bjpowernode.dao&quot;/&gt;
+    &lt;/mappers&gt;
+&lt;/configuration&gt;
+</code></pre><p>IStudentDao.xml</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt; 
+&lt;!DOCTYPE mapper
+PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+
+&lt;mapper namespace=&quot;com.bjpowernode.dao.IStudentDao&quot;&gt;
+    &lt;insert id=&quot;insertStudent&quot;&gt;
+        insert into student(name,age) values(#{name},#{age})
+    &lt;/insert&gt;
+&lt;/mapper&gt;
+</code></pre><h5 id="1-2-6-注册数据源"><a href="#1-2-6-注册数据源" class="headerlink" title="1.2.6 注册数据源"></a>1.2.6 注册数据源</h5><p>jdbc.properties</p>
+<pre><code>jdbc.driver=com.mysql.jdbc.Driver
+jdbc.url=jdbc:mysql:///mydatabase
+jdbc.user=root
+jdbc.password=haojie_123456
+</code></pre><p>spring-db.xml</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+xmlns:mvc=&quot;http://www.springframework.org/schema/mvc&quot;
+xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
+xmlns:tx=&quot;http://www.springframework.org/schema/tx&quot;
+xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/aop
+    http://www.springframework.org/schema/aop/spring-aop.xsd
+    http://www.springframework.org/schema/tx
+    http://www.springframework.org/schema/tx/spring-tx.xsd
+    http://www.springframework.org/schema/mvc
+    http://www.springframework.org/schema/mvc/spring-mvc.xsd&quot;&gt;
+
+    &lt;!-- 注册c3p0数据源 --&gt;
+    &lt;bean id=&quot;dataSource&quot; class=&quot;com.mchange.v2.c3p0.ComboPooledDataSource&quot;&gt;
+        &lt;property name=&quot;driverClass&quot; value=&quot;${jdbc.driver}&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;jdbcUrl&quot; value=&quot;${jdbc.url}&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;user&quot; value=&quot;${jdbc.user}&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;password&quot; value=&quot;${jdbc.password}&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+    &lt;!-- 注册属性文件 --&gt;
+    &lt;context:property-placeholder location=&quot;classpath:resources/jdbc.properties&quot; /&gt;
+
+&lt;/beans&gt;
+</code></pre><h5 id="1-2-7-生成Dao的代理对象"><a href="#1-2-7-生成Dao的代理对象" class="headerlink" title="1.2.7 生成Dao的代理对象"></a>1.2.7 生成Dao的代理对象</h5><p>spring-mybatis.xml</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+xmlns:mvc=&quot;http://www.springframework.org/schema/mvc&quot;
+xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
+xmlns:tx=&quot;http://www.springframework.org/schema/tx&quot;
+xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/aop
+    http://www.springframework.org/schema/aop/spring-aop.xsd
+    http://www.springframework.org/schema/tx
+    http://www.springframework.org/schema/tx/spring-tx.xsd
+    http://www.springframework.org/schema/mvc
+    http://www.springframework.org/schema/mvc/spring-mvc.xsd&quot;&gt;
+
+    &lt;!-- 注册sqlSessionFactory --&gt;
+    &lt;bean id=&quot;sqlSessionFactory&quot; class=&quot;org.mybatis.spring.SqlSessionFactoryBean&quot;&gt;
+        &lt;property name=&quot;configLocation&quot; value=&quot;classpath:resources/mybatis.xml&quot;&gt;&lt;/property&gt;        
+        &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+    &lt;!-- 生成Dao的代理对象 --&gt;
+    &lt;bean class=&quot;org.mybatis.spring.mapper.MapperScannerConfigurer&quot;&gt;
+        &lt;property name=&quot;sqlSessionFactoryBeanName&quot; value=&quot;sqlSessionFactory&quot;&gt;&lt;/property&gt;
+        &lt;property name=&quot;basePackage&quot; value=&quot;com.bjpowernode.dao&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+&lt;/beans&gt;
+</code></pre><h5 id="1-2-8-注册service"><a href="#1-2-8-注册service" class="headerlink" title="1.2.8 注册service"></a>1.2.8 注册service</h5><p>spring-service.xml</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+xmlns:mvc=&quot;http://www.springframework.org/schema/mvc&quot;
+xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
+xmlns:tx=&quot;http://www.springframework.org/schema/tx&quot;
+xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context.xsd
+http://www.springframework.org/schema/aop
+http://www.springframework.org/schema/aop/spring-aop.xsd
+http://www.springframework.org/schema/tx
+http://www.springframework.org/schema/tx/spring-tx.xsd
+http://www.springframework.org/schema/mvc
+http://www.springframework.org/schema/mvc/spring-mvc.xsd&quot;&gt;
+
+    &lt;bean id=&quot;studentService&quot; class=&quot;com.bjpowernode.service.StudentServiceImpl&quot;&gt;
+        &lt;property name=&quot;dao&quot; ref=&quot;IStudentDao&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+&lt;/beans&gt;
+</code></pre><h5 id="1-2-9-注册springmvc处理器"><a href="#1-2-9-注册springmvc处理器" class="headerlink" title="1.2.9 注册springmvc处理器"></a>1.2.9 注册springmvc处理器</h5><p>spring-mvc.xml</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+xmlns:mvc=&quot;http://www.springframework.org/schema/mvc&quot;
+xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
+xmlns:tx=&quot;http://www.springframework.org/schema/tx&quot;
+xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/aop
+    http://www.springframework.org/schema/aop/spring-aop.xsd
+    http://www.springframework.org/schema/tx
+    http://www.springframework.org/schema/tx/spring-tx.xsd
+    http://www.springframework.org/schema/mvc
+    http://www.springframework.org/schema/mvc/spring-mvc.xsd&quot;&gt;
+
+    &lt;!-- 注册处理器 --&gt;
+    &lt;bean id=&quot;/test/register.do&quot; class=&quot;com.bjpowernode.handlers.StudentController&quot;&gt;
+        &lt;property name=&quot;service&quot; ref=&quot;studentService&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+&lt;/beans&gt; 
+</code></pre><h5 id="1-2-10-配置spring事务"><a href="#1-2-10-配置spring事务" class="headerlink" title="1.2.10 配置spring事务"></a>1.2.10 配置spring事务</h5><p>spring-tx.xml</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+xmlns:mvc=&quot;http://www.springframework.org/schema/mvc&quot;
+xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
+xmlns:tx=&quot;http://www.springframework.org/schema/tx&quot;
+xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context.xsd
+http://www.springframework.org/schema/aop
+http://www.springframework.org/schema/aop/spring-aop.xsd
+http://www.springframework.org/schema/tx
+http://www.springframework.org/schema/tx/spring-tx.xsd
+http://www.springframework.org/schema/mvc
+http://www.springframework.org/schema/mvc/spring-mvc.xsd&quot;&gt;
+
+    &lt;!-- 注册事务管理器 --&gt;
+    &lt;bean id=&quot;transactionManager&quot; class=&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;&gt;
+        &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+    &lt;!-- 注册事务通知 --&gt;
+    &lt;tx:advice id=&quot;txAdvice&quot;&gt;
+        &lt;tx:attributes&gt;
+            &lt;tx:method name=&quot;add*&quot; isolation=&quot;DEFAULT&quot; propagation=&quot;REQUIRED&quot;/&gt;
+        &lt;/tx:attributes&gt;
+    &lt;/tx:advice&gt;
+
+    &lt;!-- AOP配置 --&gt;
+    &lt;aop:config&gt;
+        &lt;aop:pointcut expression=&quot;execution(* *..service.*.*(..))&quot; id=&quot;studentPointcut&quot;/&gt;
+        &lt;aop:advisor advice-ref=&quot;txAdvice&quot; pointcut-ref=&quot;studentPointcut&quot;/&gt;
+    &lt;/aop:config&gt;
+
+&lt;/beans&gt;
+</code></pre><h4 id="1-3-注解式开发"><a href="#1-3-注解式开发" class="headerlink" title="1.3 注解式开发"></a>1.3 注解式开发</h4><h4 id="1-3-1-将springmvc改为注解"><a href="#1-3-1-将springmvc改为注解" class="headerlink" title="1.3.1 将springmvc改为注解"></a>1.3.1 将springmvc改为注解</h4><p>springmvc.xml</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+xmlns:mvc=&quot;http://www.springframework.org/schema/mvc&quot;
+xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
+xmlns:tx=&quot;http://www.springframework.org/schema/tx&quot;
+xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/aop
+    http://www.springframework.org/schema/aop/spring-aop.xsd
+    http://www.springframework.org/schema/tx
+    http://www.springframework.org/schema/tx/spring-tx.xsd
+    http://www.springframework.org/schema/mvc
+    http://www.springframework.org/schema/mvc/spring-mvc.xsd&quot;&gt;
+
+    &lt;!-- 注册处理器 --&gt;
+    &lt;!-- 
+    &lt;bean id=&quot;/test/register.do&quot; class=&quot;com.bjpowernode.handlers.StudentController&quot;&gt;
+        &lt;property name=&quot;service&quot; ref=&quot;studentService&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+     --&gt;
+
+     &lt;!-- 注册组件扫描器 --&gt;
+     &lt;context:component-scan base-package=&quot;com.bjpowernode.handlers&quot;&gt;&lt;/context:component-scan&gt;
+
+&lt;/beans&gt;
+</code></pre><p>StudentController</p>
+<ul>
+<li><p>请求路径</p>
+</li>
+<li><p>处理器</p>
+</li>
+<li><p>依赖注入</p>
+</li>
+</ul>
+<p>============</p>
+<pre><code>package com.bjpowernode.handlers;
+
+@Controller
+@RequestMapping(&quot;/test&quot;)
+public class StudentController {
+
+    @Autowired
+    @Qualifier(&quot;studentService&quot;)
+    //@Resource(name=&quot;studentService&quot;)
+    private IStudentService service;
+
+    public void setService(IStudentService service) {
+        this.service = service;
+    }
+
+    @RequestMapping(&quot;/register.do&quot;)
+    public ModelAndView doRegister(String name, int age) {
+
+        Student student = new Student(name,age);
+
+        service.addStudent(student);
+
+        return new ModelAndView(&quot;/welcome.jsp&quot;);
+    }
+}
+</code></pre><h4 id="1-3-2-将spring改为注解"><a href="#1-3-2-将spring改为注解" class="headerlink" title="1.3.2 将spring改为注解"></a>1.3.2 将spring改为注解</h4><p>spring-service.xml</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+xmlns:mvc=&quot;http://www.springframework.org/schema/mvc&quot;
+xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
+xmlns:tx=&quot;http://www.springframework.org/schema/tx&quot;
+xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context.xsd
+http://www.springframework.org/schema/aop
+http://www.springframework.org/schema/aop/spring-aop.xsd
+http://www.springframework.org/schema/tx
+http://www.springframework.org/schema/tx/spring-tx.xsd
+http://www.springframework.org/schema/mvc
+http://www.springframework.org/schema/mvc/spring-mvc.xsd&quot;&gt;
+    &lt;!-- 
+    &lt;bean id=&quot;studentService&quot; class=&quot;com.bjpowernode.service.StudentServiceImpl&quot;&gt;
+        &lt;property name=&quot;dao&quot; ref=&quot;IStudentDao&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+    --&gt;
+
+    &lt;!-- 注册组件扫描器 --&gt;
+    &lt;context:component-scan base-package=&quot;com.bjpowernode.service&quot;&gt;&lt;/context:component-scan&gt; 
+
+&lt;/beans&gt;
+</code></pre><p>student service implements</p>
+<pre><code>package com.bjpowernode.service;
+
+@Service(&quot;studentService&quot;)
+public class StudentServiceImpl implements IStudentService {
+
+    @Resource(name=&quot;IStudentDao&quot;)
+    private IStudentDao dao;
+
+    public void setDao(IStudentDao dao) {
+        this.dao = dao;
+    }
+
+    @Override
+    @Transactional
+    public void addStudent(Student student) {
+        dao.insertStudent(student);
+    }
+
+}
+</code></pre><p>spring-tx.xml</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+xmlns:mvc=&quot;http://www.springframework.org/schema/mvc&quot;
+xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;
+xmlns:tx=&quot;http://www.springframework.org/schema/tx&quot;
+xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context.xsd
+http://www.springframework.org/schema/aop
+http://www.springframework.org/schema/aop/spring-aop.xsd
+http://www.springframework.org/schema/tx
+http://www.springframework.org/schema/tx/spring-tx.xsd
+http://www.springframework.org/schema/mvc
+http://www.springframework.org/schema/mvc/spring-mvc.xsd&quot;&gt;
+
+    &lt;!-- 注册事务管理器 --&gt;
+    &lt;bean id=&quot;transactionManager&quot; class=&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;&gt;
+        &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot;&gt;&lt;/property&gt;
+    &lt;/bean&gt;
+
+    &lt;!--  
+    注册事务通知
+    &lt;tx:advice id=&quot;txAdvice&quot;&gt;
+        &lt;tx:attributes&gt;
+            &lt;tx:method name=&quot;add*&quot; isolation=&quot;DEFAULT&quot; propagation=&quot;REQUIRED&quot;/&gt;
+        &lt;/tx:attributes&gt;
+    &lt;/tx:advice&gt;
+
+    AOP配置
+    &lt;aop:config&gt;
+        &lt;aop:pointcut expression=&quot;execution(* *..service.*.*(..))&quot; id=&quot;studentPointcut&quot;/&gt;
+        &lt;aop:advisor advice-ref=&quot;txAdvice&quot; pointcut-ref=&quot;studentPointcut&quot;/&gt;
+    &lt;/aop:config&gt;
+    --&gt;
+
+    &lt;!-- 注册事务驱动 --&gt;
+    &lt;tx:annotation-driven transaction-manager=&quot;transactionManager&quot; /&gt;
+
+&lt;/beans&gt;
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/05/26/java/ssm/ssm-1/" data-id="cjhniujho006i2ufyqb76hshz" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ssm/">ssm</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2018/05/24/java/springmvc/springmvc-4/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">第四章 springmvc核心技术</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/mybatis/">mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/springmvc/">springmvc</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/ssm/">ssm</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springmvc/">springmvc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssm/">ssm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/mybatis/" style="font-size: 17.14px;">mybatis</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/springmvc/" style="font-size: 14.29px;">springmvc</a> <a href="/tags/ssm/" style="font-size: 10px;">ssm</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/05/26/java/ssm/ssm-1/">第一章 搭建SSM开发环境</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/24/java/springmvc/springmvc-4/">第四章 springmvc核心技术</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/23/java/springmvc/springmvc-3/">第三章 springmvc注解式开发</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/22/java/springmvc/springmvc-2/">第二章 springmvc配置式开发</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/22/java/springmvc/springmvc-1/">第一章 springmvc概述</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

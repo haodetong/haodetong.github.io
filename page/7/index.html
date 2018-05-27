@@ -61,6 +61,669 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-css/css-grid" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/09/14/css/css-grid/" class="article-date">
+  <time datetime="2017-09-14T02:43:24.000Z" itemprop="datePublished">2017-09-14</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/转载/">转载</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/09/14/css/css-grid/">网格布局</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>原文地址：<a href="http://www.w3cplus.com/css3/a-complete-guide-css-grid-layout.html" target="_blank" rel="external">CSS Grid布局指南</a></p>
+<p>英文出处：<a href="http://chris.house/blog/a-complete-guide-css-grid-layout/" target="_blank" rel="external">A Complete Guide to CSS Grid Layout</a></p>
+<h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><p>CSS Grid布局 （又名”网格”），是一个基于二维网格布局的系统，主要目的是改变我们基于网格设计的用户接口方式。如我们所知，CSS 总是用于网页的样式设置，但它并没有起到很好的作用。刚开始的时候我们使用表格(table)，然后使用浮动(float)、 定位(position)和内联块(inline-block)，但所有这些方法本质上来讲都是hacks，存留了很多需要实现的重要功能问题(例如，<a href="http://www.w3cplus.com/blog/tags/357.html" target="_blank" rel="external">垂直居中</a>)。虽然<a href="http://www.w3cplus.com/blog/tags/157.html" target="_blank" rel="external">Flexbox</a>可以起到一定的补救作用，但是它只可以实现简单的一维布局，并不适用于复杂的二维布局(实际上 Flexbox 和 Grid 可以一起结合使用起到最佳效果)。网格是 CSS 第一次专门创建的模块，用来解决我们之前在制作网站时使用hacks处理布局问题。</p>
+<p>这里有两件事情启发我创建本指南。第一个是 Rachel Andrew 的令人敬畏的书–<a href="http://abookapart.com/products/get-ready-for-css-grid-layout" target="_blank" rel="external">为 CSS Grid 布局做好准备</a>。这本书很详尽明确的的介绍了Grid，如果你想很好的掌握Grid的基础知识，我强烈建议你去购买。另外一个很大的灵感来自于 Chris Coyier 的– <a href="http://www.w3cplus.com/css3/a-guide-to-flexbox-new.html" target="_blank" rel="external">Flexbox完整指南</a>，这本书是我了解Flebox的一个很优秀的资源。这里，我还想补充一句，当你使用谷歌搜索”flexbox”时，会出现很多类似的资源，但是为什么不直接利用最好的资源呢？</p>
+<p>我书写此指南的目的是基于目前最新版本，规范其网格概念。所以我不会再次提及过时的 IE 语法，并且随着规范的成熟，我会尽力定期更新此指南。</p>
+<h4 id="基础知识与浏览器支持"><a href="#基础知识与浏览器支持" class="headerlink" title="基础知识与浏览器支持"></a>基础知识与浏览器支持</h4><p>Grid 的入门是很容易的。你只需要定义一个容器元素并设置display：grid，使用grid-template-columns 和 grid-template-rows属性设置网格的列与 行的大小，然后使用grid-column 和 grid-row属性将其子元素放入网格之中。与flexbox类似，网格项的源顺序无关紧要。为了更好地使你的网格与媒体查询相结合使用，你可以在 CSS 中任意放置。想象一下你定义的整个页面布局，然后如果想要完全重新布局以适应不同的屏幕宽度，这时仅仅使用几行 CSS 代码就可以实现。Grid是曾经介绍过的最强大 CSS 模块之一。</p>
+<p>关于 Grid 一件很重要的事情就是它现在还不适用于项目使用。目前还处于 <a href="https://www.w3.org/TR/css-grid-1/" target="_blank" rel="external">W3C 的工作草案</a>之中，并且默认情况下，还不被所有的浏览器所支持。Internet Explorer 10 和 11 已经可以实现支持，但也是利用一种过时的语法实现的。现在出于示例演示，我建议你使用启用了特殊标志的 Chrome, Opera 或者 Firefox 。在 Chrome，导航到chrome://flags 并启用” web 实验平台功能”。该方法同样适用于 Opera (opera://flags)。在Firefox中，启用 layout.css.grid.enabled 标志。</p>
+<iframe src="http://caniuse.com/css-grid/embed" frameborder="0" width="100%" height="413px"></iframe>
+
+<p>除了Microsoft，浏览器厂商似乎想要等到Grid规范成熟后再加以推广。这是一件好事，因为这意味着我们就不需要担心学习多个语法。</p>
+<p>等待 Grid 的使用，只是时间的问题。但是现在你需要开始学习它了。</p>
+<h4 id="重要术语"><a href="#重要术语" class="headerlink" title="重要术语"></a>重要术语</h4><p>在深入研究Grid之前，我们需要理解其相关术语概念。因为这里涉及到的术语在概念上都有点类似，如果你没有首先记住Grid规范中的相关定义，你就会很容易将其与另一个概念相混淆。但是不需要担心，这里的属性并不是很多。</p>
+<p>网格容器(Grid Container)</p>
+<p>当一个元素设置display: grid属性时，它就会成为所有网格项(Grid Items)的父元素。在下面的示例中，container就是网格容器。</p>
+<pre><code>&lt;div class=&quot;container&quot;&gt;
+    &lt;div class=&quot;item item-1&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;item item-2&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;item item-3&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+</code></pre><h4 id="网格项-Grid-Item"><a href="#网格项-Grid-Item" class="headerlink" title="网格项(Grid Item)"></a>网格项(Grid Item)</h4><p>网格容器的孩子(e.g. 子元素)。这里item元素都是网格项，但是sub-item不包含其中。</p>
+<pre><code>&lt;div class=&quot;container&quot;&gt;
+    &lt;div class=&quot;item&quot;&gt;&lt;/div&gt; 
+    &lt;div class=&quot;item&quot;&gt;
+        &lt;p class=&quot;sub-item&quot;&gt;&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;item&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+</code></pre><h4 id="网格线-Grid-Line"><a href="#网格线-Grid-Line" class="headerlink" title="网格线(Grid Line)"></a>网格线(Grid Line)</h4><p>分界线构成了网格的结构。他们可以是垂直的(“列网格线”)也可以是水平的(“行网格线”)，并且存在于一行或一列的任一侧。下面图片中的黄线就是列网格线的一个例子。</p>
+<p><img src="http://cdn.w3cplus.com/cdn/farfuture/gKpvc25w95A-Rw4rzvxuvooFq21vgQLTMvLHI9d9I9k/mtime:1460132248/sites/default/files/blogs/2016/1604/grid-line.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<h4 id="网格轨道-Grid-Track"><a href="#网格轨道-Grid-Track" class="headerlink" title="网格轨道(Grid Track)"></a>网格轨道(Grid Track)</h4><p>两个相邻网格线之间的空间。你可以把它们想像成网格的行或列。下图所示的是第二行和第三行网格线之间的网格轨道。</p>
+<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/gOiQ2Q-w5thxu5hsyw5c9UiGQq7RmnTs-qNKEfnSQxI/mtime:1460132250/sites/default/files/blogs/2016/1604/grid-track.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<h4 id="网格单元格-Grid-Cell"><a href="#网格单元格-Grid-Cell" class="headerlink" title="网格单元格(Grid Cell)"></a>网格单元格(Grid Cell)</h4><p>两个相邻的行和两个相邻的列之间的网格线空间。它是网格的一个”单位”。下面图片所示的是行网格线 1 和 2 与列网格线 2 和 3 之间的网格单元格。</p>
+<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/seD6LEaaFyvVwPATSrWehDkUrCdsHApObOg12OlXNm4/mtime:1460132245/sites/default/files/blogs/2016/1604/grid-cell.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<h4 id="网格区域-Grid-Area"><a href="#网格区域-Grid-Area" class="headerlink" title="网格区域(Grid Area)"></a>网格区域(Grid Area)</h4><p>四条网格线所包围的所有空间。网格区域可由任意数量的网格单元格组成。下面图片所示的是行网格线 1 和 3 和列网格线 1 和 3 之间的网格区域。</p>
+<p><img src="http://cdn.w3cplus.com/cdn/farfuture/t4WyvkNvPqgPU-Jly_aF7ZGgDaM6AxgAedTXkfx4L74/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-area.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<h4 id="网格容器属性-Grid-Container"><a href="#网格容器属性-Grid-Container" class="headerlink" title="网格容器属性(Grid Container)"></a>网格容器属性(Grid Container)</h4><h5 id="display"><a href="#display" class="headerlink" title="display"></a>display</h5><p>定义一个元素成为网格容器，并对其内容建立一个网格格式的上下文。</p>
+<h5 id="属性值"><a href="#属性值" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><p>grid: 产生一个块级的网格</p>
+</li>
+<li><p>inline-grid: 产生内联级网格</p>
+<pre><code>.container{
+    display: grid | inline-grid   
+}
+</code></pre></li>
+</ul>
+<p>注: column, float, clear, 和 vertical-align 元素对网格容器不起作用。</p>
+<h4 id="grid-template-rows"><a href="#grid-template-rows" class="headerlink" title="grid-template-rows"></a>grid-template-rows</h4><p>利用以空格分隔的值定义网格的列和行。值的大小代表轨道的大小，并且它们之间的空格表示网格线。</p>
+<h5 id="属性值-1"><a href="#属性值-1" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><p><track-size>: 可以是一个长度、百分比或者是网格中自由空间的一小部分(使用fr单位)</track-size></p>
+</li>
+<li><p><line-name>: 你选择的任意名称</line-name></p>
+</li>
+<li><p>subgrid - 如果你的网格容器本身就是一个网格项(即嵌套网格)，你可以使用此属性指定行和列的大小继承于父元素而不是自身指定。</p>
+<pre><code>.container{
+    grid-template-columns: &lt;track-size&gt; ... | &lt;line-name&gt; &lt;track-size&gt; ... | subgrid;
+    grid-template-rows: &lt;track-size&gt; ... | &lt;line-name&gt; &lt;track-size&gt; ... | subgrid;
+}
+</code></pre></li>
+</ul>
+<h4 id="示例"><a href="#示例" class="headerlink" title="示例:"></a>示例:</h4><p>当你在值之间留有空格时，网络线就会自动分配数值名称:</p>
+<pre><code>.container{
+    grid-template-columns: 40px 50px auto 50px 40px;
+    grid-template-rows: 25% 100px auto;
+}
+</code></pre><p><img src="http://cdn2.w3cplus.com/cdn/farfuture/X_DM7Y2QqrzK1H9w41DkpyGLmZeMkaq5pbyVZevlgBg/mtime:1460132249/sites/default/files/blogs/2016/1604/grid-numbers.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<p>但是你也可以显示命名，请参考下面括号语法中的名称命名方式:</p>
+<pre><code>.container{
+    grid-template-columns: [first] 40px [line2] 50px [line3] auto [col4-start] 50px [five] 40px [end];
+    grid-template-rows: [row1-start] 25% [row1-end] 100% [third-line] auto [last-line];
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/TeK_YrqYf9wK7TYBGo00d8vzqb0ErZkCLNVZrRWSRdM/mtime:1460132249/sites/default/files/blogs/2016/1604/grid-names.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<p>请注意，一条网格线可以具有有多个名称。例如，这里的第二行将有两个名字: row1-end 和 row2-start:</p>
+<pre><code>.container{
+    grid-template-rows: [row1-start] 25% [row1-end row2-start] 25% [row2-end];
+}
+</code></pre><p>如果你的定义中包含重复的部分，你可以使用 repeat() 表示法进行精简:</p>
+<pre><code>.container{
+    grid-template-columns: repeat(3, 20px [col-start]) 5%;
+}
+</code></pre><p>等效于:</p>
+<pre><code>.container{
+    grid-template-columns: 20px [col-start] 20px [col-start] 20px [col-start] 5%;
+}
+</code></pre><p>fr 单位允许你将一个轨道大小设置为网格容器内自由空间的一小部分。如下所示，每个网格项就会占据网格容器宽度的三分之一:</p>
+<pre><code>.container{
+    grid-template-columns: 1fr 1fr 1fr;
+}
+</code></pre><p>这里自由空间表示除去非弹性项以后剩余的空间。在此示例中的 fr 单位的可用空间表示减去50px以后的空间大小:</p>
+<pre><code>.container{
+    grid-template-columns: 1fr 50px 1fr 1fr;
+}
+</code></pre><h4 id="grid-template-areas"><a href="#grid-template-areas" class="headerlink" title="grid-template-areas"></a>grid-template-areas</h4><p>使用grid-area属性定义网格区域名称，从而定义网格模板。网格区域重复的名称就会导致内容跨越这些单元格。句点表示一个空单元格。语法本身提供了一种可视化的网格结构。</p>
+<h5 id="属性值-2"><a href="#属性值-2" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><p><grid-area-name>: 使用grid-area属性定义网格区域名称</grid-area-name></p>
+</li>
+<li><p>.: 句点表示一个空单元格</p>
+</li>
+<li><p>none: 无网格区域被定义</p>
+<pre><code>.container{
+    grid-template-areas: &quot;&lt;grid-area-name&gt; | . | none | ...&quot;
+                      &quot;...&quot;
+}
+</code></pre></li>
+</ul>
+<h5 id="示例-1"><a href="#示例-1" class="headerlink" title="示例:"></a>示例:</h5><pre><code>.item-a{
+    grid-area: header;
+}
+.item-b{
+    grid-area: main;
+}
+.item-c{
+    grid-area: sidebar;
+}
+.item-d{
+    grid-area: footer;
+}
+.container{
+    grid-template-columns: 50px 50px 50px 50px;
+    grid-template-rows: auto;
+    grid-template-areas: &quot;header header header header&quot;
+                         &quot;main main . sidebar&quot;
+                         &quot;footer footer footer footer&quot;
+}
+</code></pre><p>这将创建一个四列三行的网格。最上面的一行为header区域。中间一行由两个main区域，一个空单元格和一个sidebar区域。最后一行是footer区域。</p>
+<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/p5O591xAPbyGPVI0pepIgQIQyo25GEzXJc4FqPnkCgI/mtime:1460132550/sites/default/files/blogs/2016/1604/grid-template-areas.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<p>你所声明的每一行都需要具有相同数目的单元格。</p>
+<p>你可以使用任意数量的句点(.)声明单个空单元格。只要句点之间没有空格就表示一个空单元格。</p>
+<p>注意，你只是使用此语法进行网格区域命名，而不是网格线命名。当你使用此语法时，区域两边的线就会得到自动命名。如果网格区域名称为foo,则其行线和列线的名称就将为foo-start，最后一行线及其最后一列线的名字就会为foo-end。这意味着一些线就可能具有多个名称，如上面示例中所示，拥有三个名称: header-start, main-start, 以及footer-start。</p>
+<h4 id="grid-column-gap和grid-row-gap"><a href="#grid-column-gap和grid-row-gap" class="headerlink" title="grid-column-gap和grid-row-gap"></a>grid-column-gap和grid-row-gap</h4><p>指定网格线的大小。你可以把它想像成在行/列之间设置间距宽度。</p>
+<h5 id="属性值-3"><a href="#属性值-3" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><code>&lt;line-size&gt;</code>: 一个长度值</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    grid-column-gap: &lt;line-size&gt;;</div><div class="line">    grid-row-gap: &lt;line-size&gt;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="示例-2"><a href="#示例-2" class="headerlink" title="示例:"></a>示例:</h5><pre><code>.container{
+    grid-template-columns: 100px 50px 100px;
+    grid-template-rows: 80px auto 80px; 
+    grid-column-gap: 10px;
+    grid-row-gap: 15px;
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/NkH6E9Mt_yBnhLMcuOO2bvijzL-d1dr4PcHROe1jQTw/mtime:1460132245/sites/default/files/blogs/2016/1604/grid-column-row-gap.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<p>间距仅仅在列/行之间产生，而不会在边缘区。</p>
+<h4 id="grid-gap"><a href="#grid-gap" class="headerlink" title="grid-gap"></a>grid-gap</h4><p>grid-column-gap 和 grid-row-gap的简写值。</p>
+<h5 id="属性值-4"><a href="#属性值-4" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><grid-column-gap> <grid-row-gap>: 长度值</grid-row-gap></grid-column-gap></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    grid-gap: &lt;grid-column-gap&gt; &lt;grid-row-gap&gt;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="示例-3"><a href="#示例-3" class="headerlink" title="示例:"></a>示例:</h5><pre><code>.container{
+    grid-template-columns: 100px 50px 100px;
+    grid-template-rows: 80px auto 80px; 
+    grid-gap: 10px 15px;
+}
+</code></pre><p>如果没有指定grid-row-gap属性的值，默认与grid-column-gap属性值相同</p>
+<h4 id="justify-items"><a href="#justify-items" class="headerlink" title="justify-items"></a>justify-items</h4><p>沿列轴对齐网格项中的内容(相反于align-item属性定义的沿行轴对齐)。此值适用于容器内所有的网格项。</p>
+<h5 id="属性值-5"><a href="#属性值-5" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><p>start: 内容与网格区域的左端对齐</p>
+</li>
+<li><p>end: 内容与网格区域的右端对齐</p>
+</li>
+<li><p>center: 内容处于网格区域的中间位置</p>
+</li>
+<li><p>stretch: 内容宽度占据整个网格区域空间(默认值)</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    justify-items: start | end | center | stretch;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="示例-4"><a href="#示例-4" class="headerlink" title="示例:"></a>示例:</h5><pre><code>.container{
+    justify-items: start;
+}
+</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/DeEsJc9aJ197-ygaKH5umTPYax9LHpKqb6UNjOz87AE/mtime:1460132247/sites/default/files/blogs/2016/1604/grid-justify-items-start.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    justify-items: end;
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/Z3ZWMZKBOshRlLnyD_ezkqsI_MswMPWela1e_HJzAH8/mtime:1460132247/sites/default/files/blogs/2016/1604/grid-justify-items-end.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    justify-items: center;
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/VxU0G7HhPCZ9mXhfkuCGrXXjGsvV-JKGdNQ-OzSe6b8/mtime:1460132247/sites/default/files/blogs/2016/1604/grid-justify-items-center.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    justify-items: stretch;
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/k4EK27vIfTqh5nmhucLhomEhun0LTJqUckrTctj41Ag/mtime:1460132248/sites/default/files/blogs/2016/1604/grid-justify-items-stretch.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<p>这也可以使用justify-self属性对各个网格项进行设置。</p>
+<h4 id="align-items"><a href="#align-items" class="headerlink" title="align-items"></a>align-items</h4><p>沿行轴对齐网格项中的内容(相反于justify-item属性定义的沿列轴对齐)。此值适用于容器内所有的网格项。</p>
+<h5 id="属性值-6"><a href="#属性值-6" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><p>start: 内容与网格区域的顶端对齐</p>
+</li>
+<li><p>end: 内容与网格区域的底部对齐</p>
+</li>
+<li><p>center: 内容处于网格区域的中间位置</p>
+</li>
+<li><p>stretch: 内容高度占据整个网格区域空间(默认值)</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    align-items: start | end | center | stretch;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="示例-5"><a href="#示例-5" class="headerlink" title="示例:"></a>示例:</h5><pre><code>.container{
+    align-items: start;
+}
+</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/SBt28c71z4UWwWCA6VMBJUPVUk5XLccB8-c2gB5RWlQ/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-align-items-start.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    align-items: end;
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/aVcTwfxWM3eKLHtrVECcY0PH-YrinUfDm4m3_eN5lXs/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-align-items-end.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    align-items: center;
+}
+</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/DYCXxtNsb_VN7Yz5qL8qDro-cRnENpRSl7irBEd3vTE/mtime:1460132243/sites/default/files/blogs/2016/1604/grid-align-items-center.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    align-items: stretch;
+}
+</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/fGHKY7-aeOfgpniLoTxQmsgCbLDRt1GiPaVXAl-4LOM/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-align-items-stretch.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<p>这也可以使用align-self属性对各个网格项进行设置。</p>
+<h4 id="justify-content"><a href="#justify-content" class="headerlink" title="justify-content"></a>justify-content</h4><p>当你使用px这种非响应式的单位对你的网格项进行大小设置时，就有可能出现一种情况–你的网格大小可能小于其网格容器的大小。在这种情况下，你就可以设置网格容器内网格的对齐方式。此属性会将网格沿列轴进行对齐(相反于align-content属性定义的沿行轴对齐)。</p>
+<h5 id="属性值-7"><a href="#属性值-7" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><p>start: 网格与网格容器的左端对齐</p>
+</li>
+<li><p>end: 网格与网格容器的右端对齐</p>
+</li>
+<li><p>center: 网格处于网格容器的中间</p>
+</li>
+<li><p>stretch: 调整网格项的大小，使其宽度填充整个网格容器</p>
+</li>
+<li><p>space-around: 在网格项之间设置偶数个空格间隙，其最边缘间隙大小为中间空格间隙大小的一半</p>
+</li>
+<li><p>space-between: 在网格项之间设置偶数个空格间隙，其最边缘不存在空格间隙</p>
+</li>
+<li><p>space-evenly: 在网格项之间设置偶数个空格间隙，同样适用于最边缘区域</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    justify-content: start | end | center | stretch | space-around | space-between | space-evenly;    </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>示例:</p>
+<pre><code>.container{
+    justify-content: start;
+}
+</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/V86BK0l5PPe8ypiC_ewHQnFOJGsHzAJFq81nEvaIzh0/mtime:1460132246/sites/default/files/blogs/2016/1604/grid-justify-content-start.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    justify-content: end; 
+}
+</code></pre><p><img src="http://cdn2.w3cplus.com/cdn/farfuture/OT3tWVLBz8oPeolOD2q01eBHPgyRPay198nZsNyplOw/mtime:1460132245/sites/default/files/blogs/2016/1604/grid-justify-content-end.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    justify-content: center;  
+}
+</code></pre><p><img src="http://cdn2.w3cplus.com/cdn/farfuture/x02TnVK7AWfQrBFo3BmtUW5-9ZdOLp2eBQKShftkYnM/mtime:1460132245/sites/default/files/blogs/2016/1604/grid-justify-content-center.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    justify-content: stretch; 
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/KhGlUpKr2znYjX26PmOrTvEXgf5SfBjuysXm0UwzxYk/mtime:1460132247/sites/default/files/blogs/2016/1604/grid-justify-content-stretch.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    justify-content: space-around;    
+}
+</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/0hwm5rYzTdMYuZV4dTK6ROAEgdxZsoKG0w9Z1utQoIQ/mtime:1460132246/sites/default/files/blogs/2016/1604/grid-justify-content-space-around.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    justify-content: space-between;   
+}
+</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/-Z5SERN8i6b_AFz-KvfhRxP-cHoaIeIYn9G4V5i31F0/mtime:1460132246/sites/default/files/blogs/2016/1604/grid-justify-content-space-between.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+  justify-content: space-evenly;    
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/akDy0eshtzxnti20ICE8V3JyJmotAXjkgLGyMa2HMic/mtime:1460132246/sites/default/files/blogs/2016/1604/grid-justify-content-space-evenly.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<h4 id="align-content"><a href="#align-content" class="headerlink" title="align-content"></a>align-content</h4><p>当你使用px这种非响应式的单位对你的网格项进行大小设置时，就有可能出现一种情况–你的网格大小可能小于其网格容器的大小。在这种情况下，你就可以设置网格容器内网格的对齐方式。此属性会将网格沿行轴进行对齐(相反于justify-content属性定义的沿列轴对齐)。</p>
+<h5 id="属性值-8"><a href="#属性值-8" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><p>start: 网格与网格容器的顶端对齐</p>
+</li>
+<li><p>end: 网格与网格容器的底部对齐</p>
+</li>
+<li><p>center: 网格处于网格容器的中间</p>
+</li>
+<li><p>stretch: 调整网格项的大小，使其高度填充整个网格容器</p>
+</li>
+<li><p>space-around: 在网格项之间设置偶数个空格间隙，其最边缘间隙大小为中间空格空隙大小的一半</p>
+</li>
+<li><p>space-between: 在网格项之间设置偶数个空格间隙，其最边缘不存在空格间隙</p>
+</li>
+<li><p>space-evenly: 在网格项之间设置偶数个空格间隙，同样适用于最边缘区域</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    align-content: start | end | center | stretch | space-around | space-between | space-evenly;  </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>#####示例:</p>
+<pre><code>.container{
+    align-content: start; 
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/hojdd_caTcpZcB5rA6bf9yu1nd-VzBCviKhKWdNlzmU/mtime:1460132243/sites/default/files/blogs/2016/1604/grid-align-content-start.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    align-content: end;   
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/Z4qpR9QCYog6YQuroNQV1MllyNGMaXdIJkwBmO9-FgE/mtime:1460132243/sites/default/files/blogs/2016/1604/grid-align-content-end.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    align-content: center;    
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/wgXMAOUrFkvw1g5JcA9hlb_d9gb3b_WWAAUxmnIUwMY/mtime:1460132242/sites/default/files/blogs/2016/1604/grid-align-content-center.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    align-content: stretch;   
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/vg-a2_oeUlNgPGVXTeKL-4N5UJlTH2x77cR3fmAgaqI/mtime:1460132243/sites/default/files/blogs/2016/1604/grid-align-content-stretch.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    align-content: space-around;  
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/O4UjhRmD81HKp0JycpbCreC1n59MuMZbLqq-U5ZGT10/mtime:1460132242/sites/default/files/blogs/2016/1604/grid-align-content-space-around.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    align-content: space-between; 
+}
+</code></pre><p><img src="http://cdn2.w3cplus.com/cdn/farfuture/ebLV62oCnLHL9gL8q0h3j44aXZGd-6jJnTGk3Zx9Fe0/mtime:1460132242/sites/default/files/blogs/2016/1604/grid-align-content-space-between.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.container{
+    align-content: space-evenly;  
+}
+</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/14tRJmA8NGCIZ7UUAksJfSU2cot8Eyiwjw9Sgx7R0r4/mtime:1460132242/sites/default/files/blogs/2016/1604/grid-align-content-space-evenly.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<h4 id="grid-auto-columns和grid-auto-rows"><a href="#grid-auto-columns和grid-auto-rows" class="headerlink" title="grid-auto-columns和grid-auto-rows"></a>grid-auto-columns和grid-auto-rows</h4><p>指定任何自动生成的网格轨道(隐式网格跟踪)的大小。当你显式定位行或列(使用 grid-template-rows/grid-template-columns属性)时,就会产生超出定义范围内的隐式网格轨道。</p>
+<h5 id="属性值-9"><a href="#属性值-9" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><code>&lt;track-siz&gt;</code>: 可以是长度、 百分比或网格自由空间的一小部分(使用fr单位)</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    grid-auto-columns: &lt;track-size&gt; ...;</div><div class="line">    grid-auto-rows: &lt;track-size&gt; ...;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>为了说明隐式网格轨道是如何被创造出来的，请思考如下代码:</p>
+<pre><code>.container{
+    grid-template-columns: 60px 60px;
+    grid-template-rows: 90px 90px
+}
+</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/Dqn09IqXrYUqk3YP5ALD5KsauBp-8VFeVe0nO0U-Nqk/mtime:1460132245/sites/default/files/blogs/2016/1604/grid-auto.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<p>这里创建了一个2 x 2 的网格。</p>
+<p>但是现在你想象你使用grid-column 和 grid-row 来定位网格项，如下所示:</p>
+<pre><code>.item-a{
+    grid-column: 1 / 2;
+    grid-row: 2 / 3;
+}
+.item-b{
+    grid-column: 5 / 6;
+    grid-row: 2 / 3;
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/5cMq7ShQn3RVBpbPAIz_5V7m05azOp_8HNZAE3QmB_I/mtime:1460132250/sites/default/files/blogs/2016/1604/implicit-tracks.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<p>这里我们定义.item b开始于列线 5 并结束于在列线 6，但是我们从来没有定义列线 5 或 6。因为我们引用不存在的线，宽度为0的隐式轨道的就会被创建用来填补空白。我们可以使用grid-auto-columns 和 grid-auto-rows属性来设置这些隐式轨道的宽度:</p>
+<pre><code>.container{
+    grid-auto-columns: 60px;
+}
+</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/IS-UCPIfqtPIuj_V24vZqOXgiJbsSusPwIzbzg56yIM/mtime:1460132250/sites/default/files/blogs/2016/1604/implicit-tracks-with-widths.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<h4 id="grid-auto-flow"><a href="#grid-auto-flow" class="headerlink" title="grid-auto-flow"></a>grid-auto-flow</h4><p>如果你不显式的在网格中放置网格项，自动布局算法就会自动踢出此网格项。此属性用来控制自动布局算法的工作原理。</p>
+<h5 id="属性值-10"><a href="#属性值-10" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><p>row: 告诉自动布局算法填充每一行，必要时添加新行</p>
+</li>
+<li><p>column: 告诉自动布局算法填充每一列，必要时添加新列</p>
+</li>
+<li><p>dense: 告诉自动布局算法试图填补网格中之前较小的网格项留有的空白</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    grid-auto-flow: row | column | row dense | column dense</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>注意:dense值可能会导致更改网格项的顺序。</p>
+<h5 id="示例-6"><a href="#示例-6" class="headerlink" title="示例:"></a>示例:</h5><p>考虑如下HTMl代码:</p>
+<pre><code>&lt;section class=&quot;container&quot;&gt;
+    &lt;div class=&quot;item-a&quot;&gt;item-a&lt;/div&gt;
+    &lt;div class=&quot;item-b&quot;&gt;item-b&lt;/div&gt;
+    &lt;div class=&quot;item-c&quot;&gt;item-c&lt;/div&gt;
+    &lt;div class=&quot;item-d&quot;&gt;item-d&lt;/div&gt;
+    &lt;div class=&quot;item-e&quot;&gt;item-e&lt;/div&gt;
+&lt;/section&gt;
+</code></pre><p>这里定义了一个两列五行的网格，并将 grid-auto-flow属性设置为row(即默认值):</p>
+<pre><code>.container{
+    display: grid;
+    grid-template-columns: 60px 60px 60px 60px 60px;
+    grid-template-rows: 30px 30px;
+    grid-auto-flow: row;
+}
+</code></pre><p>将网格项放置在网格中时只需要其中的两个网格项:</p>
+<pre><code>.item-a{
+    grid-column: 1;
+    grid-row: 1 / 3;
+}
+.item-e{
+    grid-column: 5;
+    grid-row: 1 / 3;
+}
+</code></pre><p>因为我们将grid-auto-flow属性设置为了row，所以我们的网格看起来会像这个样子。注意我们我们没有对其进行设置的三个网格项(item-b, item-c and item-d),会沿行轴进行布局。</p>
+<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/DBQZgbw82BJwGw7Q61UdcDRlRANo-_2iJW2wQlUcDrw/mtime:1460132245/sites/default/files/blogs/2016/1604/grid-auto-flow-row.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<p>如果我们将grid-auto-flow属性设置为 column,item-b, item-c 和 item-d 就会沿列轴进行布局。</p>
+<pre><code>.container{
+    display: grid;
+    grid-template-columns: 60px 60px 60px 60px 60px;
+    grid-template-rows: 30px 30px;
+    grid-auto-flow: column;
+}
+</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/TPY1m3jC4Lir0oDl8aASuAUOwn5lJmAyiQdkzHJwg54/mtime:1460132245/sites/default/files/blogs/2016/1604/grid-auto-flow-column.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<h4 id="grid"><a href="#grid" class="headerlink" title="grid"></a>grid</h4><p>在一行声明中设置一下所有属性的简写形式:grid-template-rows, grid-template-columns, grid-template-areas, grid-auto-rows, grid-auto-columns, 以及 grid-auto-flow。它将 grid-column-gap 和 grid-row-gap属性设置为初始值，即使它们不能显示的设置此属性。</p>
+<h5 id="属性值-11"><a href="#属性值-11" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><p>none: 将所有的子属性设置为初始值</p>
+</li>
+<li><p>subgrid: 将grid-template-rows 和 grid-template-columns属性值设置为subgrid,其余子属性设置为初始值</p>
+</li>
+<li><p><code>&lt;grid-template-rows&gt;</code> / <code>&lt;grid-template-columns&gt;</code>: 将grid-template-rows 和 grid-template-columns属性值设置为指定值，其余子属性设置为初始值</p>
+</li>
+<li><p><code>&lt;grid-auto-flow&gt;</code>[<code>&lt;grid-auto-rows&gt;</code> [ / <code>&lt;grid-auto-columns&gt;</code>] ] : grid-auto-flow, grid-auto-rows 和 grid-auto-columns属性分别接受相同的值,如果省略了grid-auto-columns属性，它将设置为grid-auto-rows属性的值。如果两者均被忽略，那么都将被设置为初始值。</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.container&#123;</div><div class="line">    grid: none | subgrid | &lt;grid-template-rows&gt; / &lt;grid-template-columns&gt; | &lt;grid-auto-flow&gt; [&lt;grid-auto-rows&gt; [/ &lt;grid-auto-columns&gt;]];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="示例-7"><a href="#示例-7" class="headerlink" title="示例:"></a>示例:</h5><p>下面两个代码块是等效的:</p>
+<pre><code>.container{
+    grid: 200px auto / 1fr auto 1fr;
+}
+
+.container{
+    grid-template-rows: 200px auto;
+    grid-template-columns: 1fr auto 1fr;
+    grid-template-areas: none;
+}
+</code></pre><p>同样，下面的两个代码块也是等效的:</p>
+<pre><code>.container{
+    grid: column 1fr / auto;
+}
+
+.container{
+    grid-auto-flow: column;
+    grid-auto-rows: 1fr;
+    grid-auto-columns: auto;
+}
+</code></pre><p>它还接受一次性设置所有属性，更复杂但非常方便的语法。指定grid-template-areas, grid-auto-rows 和 grid-auto-columns属性，其他所有子属性都将设置为其初始值。你现在所做的是在其网格区域内，指定网格线名称和内联轨道大小。下面是最简单的描述:</p>
+<pre><code>.container{
+    grid: [row1-start] &quot;header header header&quot; 1fr [row1-end]
+          [row2-start] &quot;footer footer footer&quot; 25px [row2-end]
+          / auto 50px auto;
+}
+</code></pre><p>等效于:</p>
+<pre><code>.container{
+    grid-template-areas: &quot;header header header&quot;
+                         &quot;footer footer footer&quot;;
+    grid-template-rows: [row1-start] 1fr [row1-end row2-start] 25px [row2-end];
+    grid-template-columns: auto 50px auto;    
+}
+</code></pre><h4 id="网格项属性-Grid-Items"><a href="#网格项属性-Grid-Items" class="headerlink" title="网格项属性(Grid Items)"></a>网格项属性(Grid Items)</h4><h5 id="grid-column-start-grid-column-end-grid-row-start-grid-row-end"><a href="#grid-column-start-grid-column-end-grid-row-start-grid-row-end" class="headerlink" title="grid-column-start/grid-column-end/grid-row-start/grid-row-end"></a>grid-column-start/grid-column-end/grid-row-start/grid-row-end</h5><p>使用特定的网格线确定网格项在网格内的位置。grid-column-start/grid-row-start 属性表示网格项的网格线的起始位置，grid-column-end/grid-row-end属性表示网格项的网格线的终止位置。</p>
+<h5 id="属性值-12"><a href="#属性值-12" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><p><code>&lt;line&gt;</code>: 可以是一个数字来引用相应编号的网格线，或者使用名称引用相应命名的网格线</p>
+</li>
+<li><p>span <code>&lt;number&gt;</code>: 网格项包含指定数量的网格轨道</p>
+</li>
+<li><p>span <code>&lt;name&gt;</code>: 网格项包含指定名称网格项的网格线之前的网格轨道</p>
+</li>
+<li><p>auto: 表明自动定位，自动跨度或者默认跨度之一</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">.item&#123;</div><div class="line">    grid-column-start: &lt;number&gt; | &lt;name&gt; | span &lt;number&gt; | span &lt;name&gt; | auto</div><div class="line">    grid-column-end: &lt;number&gt; | &lt;name&gt; | span &lt;number&gt; | span &lt;name&gt; | auto</div><div class="line">    grid-row-start: &lt;number&gt; | &lt;name&gt; | span &lt;number&gt; | span &lt;name&gt; | auto</div><div class="line">    grid-row-end: &lt;number&gt; | &lt;name&gt; | span &lt;number&gt; | span &lt;name&gt; | auto</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>示例:</p>
+<pre><code>.item-a{
+    grid-column-start: 2;
+    grid-column-end: five;
+    grid-row-start: row1-start
+    grid-row-end: 3
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/_qe1h2tf7kOnbma7mv0npHmPxuqdtgBhz-ue5plGF7s/mtime:1460132249/sites/default/files/blogs/2016/1604/grid-start-end-a.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.item-b{
+    grid-column-start: 1;
+    grid-column-end: span col4-start;
+    grid-row-start: 2
+    grid-row-end: span 2
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/alQ0HIXYmT5gbNObM3SG329ddcjN0R53iwUYRx7mxu4/mtime:1460132249/sites/default/files/blogs/2016/1604/grid-start-end-b.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<p>如果没有声明grid-column-end/grid-row-end属性，默认情况下网格项的跨度为1。</p>
+<p>网格项可以互相重叠。可以使用z-index属性控制堆叠顺序。</p>
+<h4 id="grid-column-grid-row"><a href="#grid-column-grid-row" class="headerlink" title="grid-column/grid-row"></a>grid-column/grid-row</h4><h5 id="grid-column-start-grid-column-end-和-grid-row-start-grid-row-end属性分别的简写形式。"><a href="#grid-column-start-grid-column-end-和-grid-row-start-grid-row-end属性分别的简写形式。" class="headerlink" title="grid-column-start + grid-column-end, 和 grid-row-start + grid-row-end属性分别的简写形式。"></a>grid-column-start + grid-column-end, 和 grid-row-start + grid-row-end属性分别的简写形式。</h5><h5 id="属性值-13"><a href="#属性值-13" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><code>&lt;start-line&gt;</code> / <code>&lt;end-line&gt;</code>： 每一个属性均接收一个相同值，包括跨度。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">.item&#123;</div><div class="line">    grid-column: &lt;start-line&gt; / &lt;end-line&gt; | &lt;start-line&gt; / span &lt;value&gt;;</div><div class="line">    grid-row: &lt;start-line&gt; / &lt;end-line&gt; | &lt;start-line&gt; / span &lt;value&gt;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="示例-8"><a href="#示例-8" class="headerlink" title="示例:"></a>示例:</h5><pre><code>.item-c{
+    grid-column: 3 / span 2;
+    grid-row: third-line / 4;
+}
+</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/9cHMaarlw9Q6EUB4uXNHygG6E2jez75tLEKURdJ6byc/mtime:1460132250/sites/default/files/blogs/2016/1604/grid-start-end-c.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<p>如果没有声明结束网格线值，默认网格轨道跨度为1.</p>
+<h4 id="grid-area"><a href="#grid-area" class="headerlink" title="grid-area"></a>grid-area</h4><p>给网格项进行命名以便于模板使用grid-template-areas属性创建时可以加以引用。另外也可以被grid-row-start + grid-column-start + grid-row-end + grid-column-end属性更为简洁的加以引用。</p>
+<h5 id="属性值-14"><a href="#属性值-14" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><p><code>&lt;name&gt;</code>: 你所定义的名称</p>
+</li>
+<li><p><code>&lt;row-start&gt;</code> / <code>&lt;column-start&gt;</code> / <code>&lt;row-end&gt;</code> / <code>&lt;column-end&gt;</code>: 可以为数字或者名称</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item&#123;</div><div class="line">    grid-area: &lt;name&gt; | &lt;row-start&gt; / &lt;column-start&gt; / &lt;row-end&gt; / &lt;column-end&gt;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="示例-9"><a href="#示例-9" class="headerlink" title="示例:"></a>示例:</h5><p>对网格项进行命名的一种方式:</p>
+<pre><code>.item-d{
+    grid-area: header
+}
+</code></pre><p>grid-row-start + grid-column-start + grid-row-end + grid-column-end属性的一种简写方式:</p>
+<pre><code>.item-d{
+    grid-area: 1 / col4-start / last-line / 6
+}
+</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/KPiJbq66MU7EYvSn5VTCzBseoZJIX5DKxJ1EiTYcEQM/mtime:1460132250/sites/default/files/blogs/2016/1604/grid-start-end-d.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<h4 id="justify-self"><a href="#justify-self" class="headerlink" title="justify-self"></a>justify-self</h4><p>沿列轴对齐网格项中的内容(相反于align-item属性定义的沿行轴对齐)。此值适用于单一网格项中的内容。</p>
+<h5 id="属性值-15"><a href="#属性值-15" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><p>start: 内容与网格区域的左端对齐</p>
+</li>
+<li><p>end: 内容与网格区域的右端对齐</p>
+</li>
+<li><p>center: 内容处于网格区域的中间位置</p>
+</li>
+<li><p>stretch: 内容宽度占据整个网格区域空间(默认值)</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item&#123;</div><div class="line">    justify-self: start | end | center | stretch;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h5 id="示例-10"><a href="#示例-10" class="headerlink" title="示例"></a>示例</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item-a&#123;</div><div class="line">    justify-self: start;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/FAa3UWcKAWEOIkPH8lXG5jfZE8OuistoRRDCRctpTbQ/mtime:1460132248/sites/default/files/blogs/2016/1604/grid-justify-self-start.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.item-a{
+    justify-self: end;
+}
+</code></pre><p><img src="http://cdn.w3cplus.com/cdn/farfuture/wGYKmY8P1ZXvDQ-7hZD5PpaQNqx7DRcXJX8sJWoHqOQ/mtime:1460132248/sites/default/files/blogs/2016/1604/grid-justify-self-end.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.item-a{
+    justify-self: center;
+}
+</code></pre><p><img src="http://cdn1.w3cplus.com/cdn/farfuture/ucq6X4Lajn6Nc9er0fx6XvcvZTFlD9fFfo_Otls8rP4/mtime:1460132248/sites/default/files/blogs/2016/1604/grid-justify-self-center.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<pre><code>.item-a{
+    justify-self: stretch;
+}
+</code></pre><p><img src="http://cdn2.w3cplus.com/cdn/farfuture/fIfcjkknWhPK0DrPTKv-0Klh8Lb1_JiiaY--htE70Vc/mtime:1460132249/sites/default/files/blogs/2016/1604/grid-justify-self-stretch.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<p>设置网格中所有网格项的对齐方式，可以使用网格容器上的justify-items属性。</p>
+<h4 id="align-self"><a href="#align-self" class="headerlink" title="align-self"></a>align-self</h4><p>沿行轴对齐网格项中的内容(相反于justify-item属性定义的沿列轴对齐)。此值适用于单一网格项中的内容。</p>
+<h5 id="属性值-16"><a href="#属性值-16" class="headerlink" title="属性值:"></a>属性值:</h5><ul>
+<li><p>start: 内容与网格区域的顶端对齐</p>
+</li>
+<li><p>end: 内容与网格区域的底部对齐</p>
+</li>
+<li><p>center: 内容处于网格区域的中间位置</p>
+</li>
+<li><p>stretch: 内容高度占据整个网格区域空间(默认值)</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item&#123;</div><div class="line">    align-self: start | end | center | stretch;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>示例:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item-a&#123;</div><div class="line">    align-self: start;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><img src="http://cdn.w3cplus.com/cdn/farfuture/jQeKs_UnuosaBK6-eJDD9pMd9FBBr7PCs67KCOCz3iE/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-align-self-start.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item-a&#123;</div><div class="line">    align-self: end;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/abkBl5xW-qmCOAc1lSdD6GnsmO8Ngi2wjBcnbFp1_Nk/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-align-self-end.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item-a&#123;</div><div class="line">    align-self: center;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/A8Or3mJI9h3CLZ6JZ0iMk3SHp3vWsnlAHGSlVic3uO4/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-align-self-center.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">.item-a&#123;</div><div class="line">    align-self: stretch;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><img src="http://cdn1.w3cplus.com/cdn/farfuture/pl7ZPQIMBPLDqNIjZQXxIfmBEqIjhPhh8GQcG9Ec0aA/mtime:1460132244/sites/default/files/blogs/2016/1604/grid-align-self-stretch.png" alt="Grid布局指南"></p>
+<center>Grid布局指南</center>
+
+<p>使网格中所有的网格项对齐，可以使用网格容器上的align-items属性。</p>
+<p>特别声明：本文来自于<a href="http://chris.house/blog/a-complete-guide-css-grid-layout/" target="_blank" rel="external">Chris House写的指南</a>，此份指南由Chris himself所写，并且会不断的保持更新。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/09/14/css/css-grid/" data-id="cjhniuj9t00032ufyug4pxbkw" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/css-grid/">css-grid</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-bootstrap/bootstrap-notes" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2017/09/14/bootstrap/bootstrap-notes/" class="article-date">
@@ -288,7 +951,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/bootstrap/bootstrap-notes/" data-id="cjhlqoulq000j47fy52r0cw51" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/09/14/bootstrap/bootstrap-notes/" data-id="cjhniuja900072ufy9fbv6amf" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/bootstrap/">bootstrap</a></li></ul>
@@ -617,7 +1280,7 @@ app.controller(&apos;MainCtrl&apos;, function($scope) {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/angularjs/angular-apply/" data-id="cjhlqoukt000147fyjxafplrd" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/09/14/angularjs/angular-apply/" data-id="cjhniujac00082ufydam7g7ib" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
@@ -995,7 +1658,7 @@ app.directive(&apos;rabbitHeader&apos;, function() {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/angularjs/angular-directive/" data-id="cjhlqoul4000547fyqg6876wf" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/09/14/angularjs/angular-directive/" data-id="cjhniujaj000e2ufyix0ve5qj" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
@@ -1067,7 +1730,7 @@ app.directive(&apos;rabbitHeader&apos;, function() {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/09/14/angularjs/angular-errors/" data-id="cjhlqoukv000247fy31w8qr6m" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/09/14/angularjs/angular-errors/" data-id="cjhniujap000j2ufyso4oysut" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
@@ -1430,7 +2093,7 @@ export default Enhance(MyComponent); // Enhanced component
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/08/17/react/react-native-es5-es6/" data-id="cjhlqoum5000x47fyk2tlqydd" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/08/17/react/react-native-es5-es6/" data-id="cjhniujaz000t2ufyfydpi08y" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/react/">react</a></li></ul>
@@ -1726,7 +2389,7 @@ hexo d -g
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/08/14/github/github-hexo-blog/" data-id="cjhlqoult000m47fymdbdhnla" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/08/14/github/github-hexo-blog/" data-id="cjhniuja300062ufyz3x05bc9" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/github/">github</a></li></ul>
@@ -1773,7 +2436,7 @@ hexo d -g
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/08/14/hello-world/" data-id="cjhlqouj0000047fy728ofl6g" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/08/14/hello-world/" data-id="cjhniuj8a00012ufylij1ercp" class="article-share-link">Share</a>
       
       
     </footer>
@@ -1944,7 +2607,7 @@ hexo d -g
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/17/angularjs/angular-requirejs/" data-id="cjhlqouli000b47fyom84qx5u" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/17/angularjs/angular-requirejs/" data-id="cjhniujan000h2ufybbpchh5u" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
@@ -1993,86 +2656,10 @@ hexo d -g
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/05/18/personal-notes/Soccer-Superstars/" data-id="cjhlqoum1000u47fybec9gqfy" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/05/18/personal-notes/Soccer-Superstars/" data-id="cjhniuj9p00022ufy9dpkofoi" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/足球/">足球</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-angularjs/angular-jsonp" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2016/05/16/angularjs/angular-jsonp/" class="article-date">
-  <time datetime="2016-05-16T07:39:59.000Z" itemprop="datePublished">2016-05-16</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/angularjs/">angularjs</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/05/16/angularjs/angular-jsonp/">angularJS使用.jsonp方法</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>angularJS与服务器通信中的$http中有一个$http.jsonp方法，在网上偶然间看到一篇文章，对此解释得非常清楚。</p>
-<p>原文地址：<a href="JSONP跨域访问数据传输">【AngularJs】 – JSONP跨域访问数据传输</a></p>
-<p>json:数据存储格式.</p>
-<p>jsonp:一种非官方的跨域数据交互协议.</p>
-<p>AngularJS在http服务中的jsonp函数如下所示：</p>
-<pre><code>$http.jsonp(&quot;https://api.github.com?callback=JSON_CALLBACK&quot;).success(function(data) {
-    //执行回调
-})
-</code></pre><p>1、当请求被发送时，AngularJS会在DOM中生成一个如下所示的<code>&lt;script&gt;</code>标签：</p>
-<pre><code>&lt;script src=&quot;https://api.github.com?callback=angular.callbacks._0&quot; type=&quot;text/javascript&quot;&gt;
-</code></pre><p>2、当支持JSONP的服务器返回数据时，数据会被包装在由AngularJS生成的具名函数angular.callbacks._0中。</p>
-<p>3、在这个例子中，Github服务器响应如下：</p>
-<pre><code>angular.callbacks._0({ 
-    &apos;meta&apos;: {
-        &apos;X-RateLimit-Limit&apos;: &apos;60&apos;, 
-        &apos;status&apos;: 200 
-    },
-    &apos;data&apos;: {
-        &apos;current_user_url&apos;: &apos;https://api.github.com/user&apos; 
-    } 
-}) 
-</code></pre><p>4、angularJS中jsonp的使用</p>
-<pre><code>myUrl = &quot;http://localhost:8090/api/test?callback=JSON_CALLBACK&quot;;
-
-$http.jsonp(myUrl).success(
-　　function(data){
-　　　　alert(data);
-　　}
-);
-</code></pre><p>1.angularJS中使用$http.jsonp函数</p>
-<p>2.指定callback和回调函数名，函数名为JSON_CALLBACK时，会调用success回调函数，JSON_CALLBACK必须全为大写。</p>
-<p>3.也可以指定其它回调函数，但必须是定义在window下的全局函数。</p>
-<p>4.url中必须加上callback</p>
-<p>5.当callback为JSON_CALLBACK时，只会调用success，即使window中有JSON_CALLBACK函数，也不会调用该函数。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/05/16/angularjs/angular-jsonp/" data-id="cjhlqoul6000647fytcpobhkn" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/angular/">angular</a></li></ul>
 
     </footer>
   </div>
@@ -2094,7 +2681,7 @@ $http.jsonp(myUrl).success(
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/mybatis/">mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/springmvc/">springmvc</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/mybatis/">mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/springmvc/">springmvc</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/ssm/">ssm</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
     </div>
   </div>
 
@@ -2104,7 +2691,7 @@ $http.jsonp(myUrl).success(
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springmvc/">springmvc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springmvc/">springmvc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssm/">ssm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
     </div>
   </div>
 
@@ -2114,7 +2701,7 @@ $http.jsonp(myUrl).success(
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/mybatis/" style="font-size: 17.14px;">mybatis</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/springmvc/" style="font-size: 14.29px;">springmvc</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/mybatis/" style="font-size: 17.14px;">mybatis</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/springmvc/" style="font-size: 14.29px;">springmvc</a> <a href="/tags/ssm/" style="font-size: 10px;">ssm</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
     </div>
   </div>
 
@@ -2136,6 +2723,10 @@ $http.jsonp(myUrl).success(
       <ul>
         
           <li>
+            <a href="/2018/05/26/java/ssm/ssm-1/">第一章 搭建SSM开发环境</a>
+          </li>
+        
+          <li>
             <a href="/2018/05/24/java/springmvc/springmvc-4/">第四章 springmvc核心技术</a>
           </li>
         
@@ -2149,10 +2740,6 @@ $http.jsonp(myUrl).success(
         
           <li>
             <a href="/2018/05/22/java/springmvc/springmvc-1/">第一章 springmvc概述</a>
-          </li>
-        
-          <li>
-            <a href="/2018/05/13/java/mybatis/mybatis-7/">第七章 MyBatis - 查询缓存</a>
           </li>
         
       </ul>
