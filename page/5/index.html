@@ -61,9 +61,9 @@
       <div class="outer">
         <section id="main">
   
-    <article id="post-java/java-io/IO-18-array" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-java/java-io/IO-7-stream-rule-demo" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2018/01/10/java/java-io/IO-18-array/" class="article-date">
+    <a href="/2018/01/10/java/java-io/IO-7-stream-rule-demo/" class="article-date">
   <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
 </a>
     
@@ -79,7 +79,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/10/java/java-io/IO-18-array/">IO流 - 十八、操作数组的流</a>
+      <a class="article-title" href="/2018/01/10/java/java-io/IO-7-stream-rule-demo/">IO流 - 七、流的操作规律 - 需求体现</a>
     </h1>
   
 
@@ -87,118 +87,46 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h4 id="1、操作字节数组的流："><a href="#1、操作字节数组的流：" class="headerlink" title="1、操作字节数组的流："></a>1、操作字节数组的流：</h4><p>源和目的都是内存，没有调用底层资源，关闭流无效，关闭流后仍可用。</p>
-<p>ByteArrayInputStream与ByteArrayOutputStream</p>
-<pre><code>public class ArrayStreamDemo1 {
+        <h4 id="1、需求：复制一个文本文件"><a href="#1、需求：复制一个文本文件" class="headerlink" title="1、需求：复制一个文本文件"></a>1、需求：复制一个文本文件</h4><pre><code>FileReader fr = new FileReader(&quot;a.txt&quot;);
 
-    public static void main(String[] args) {
+FileWriter fw = new FileWriter(&quot;b.txt&quot;);
 
-        ByteArrayInputStream bis = new ByteArrayInputStream(&quot;abcde&quot;.getBytes());
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        int ch = 0;
-        while((ch = bis.read()) != -1) {
-            bos.write(ch);
-        }
-        System.out.println(bos.toString());
-    }
+BufferedReader bufr = new BufferedReader(fr);
 
-}
-</code></pre><p>操作字符数组的流：</p>
-<p>CharArrayInputStream与CharArrayOutputStream</p>
-<p>操作字符串的流</p>
-<p>StringReader与StringWriter</p>
+BufferedWriter bufw = new BufferedWriter(fw);
+</code></pre><h4 id="2、需求：读取键盘录入信息，写入到文件中"><a href="#2、需求：读取键盘录入信息，写入到文件中" class="headerlink" title="2、需求：读取键盘录入信息，写入到文件中"></a>2、需求：读取键盘录入信息，写入到文件中</h4><pre><code>源：InputStream in = System.in;
 
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-18-array/" data-id="cjhniujfr00412ufyzw46ph1f" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
+转换流：InputStreamReader isr = new InputStreamReader(in);
 
-    </footer>
-  </div>
-  
-</article>
+目的：FileWriter fw = new FileWriter(&quot;b.txt&quot;);
 
+高效：BufferedReader = new BufferedReader(isr);
 
-  
-    <article id="post-java/java-io/IO-12-sequenceInputStream" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/10/java/java-io/IO-12-sequenceInputStream/" class="article-date">
-  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/java/">java</a>
-  </div>
+     BufferedWriter = new BufferedWriter(fw);
+</code></pre><h4 id="3、需求：将一个文本文件显示在控制台上"><a href="#3、需求：将一个文本文件显示在控制台上" class="headerlink" title="3、需求：将一个文本文件显示在控制台上"></a>3、需求：将一个文本文件显示在控制台上</h4><pre><code>源：FileReader fr = new FileReader(&quot;a.txt&quot;);
 
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/10/java/java-io/IO-12-sequenceInputStream/">IO流 - 十二、序列流 - SequenceInputStream</a>
-    </h1>
-  
+读： String line = bufr.readLine();
 
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>对多个流进行合并</p>
-<h4 id="1、构造方法"><a href="#1、构造方法" class="headerlink" title="1、构造方法"></a>1、构造方法</h4><p>SequenceInputStream(Enumeration&lt;? extends InputStream&gt; e)</p>
-<pre><code>public class demo1 {
+目的：OutputStream out = System.out;
 
-    public static void main(String[] args) throws IOException {
-        /**
-         * 将1.txt，2.txt，3.txt文件中的数据合并到一个文件4.txt中
-         */
-        Vector&lt;FileInputStream&gt; v = new Vector&lt;FileInputStream&gt;();
-        v.add(new FileInputStream(&quot;1.txt&quot;));
-        v.add(new FileInputStream(&quot;2.txt&quot;));
-        v.add(new FileInputStream(&quot;3.txt&quot;));
+      OutputStreamWriter osw = new OutputStreamWriter(out);
 
-        Enumeration&lt;FileInputStream&gt; en = v.elements();
+高效：BufferedReader bufr = new BufferedReader(fr);
+     BufferedWriter bufw = new BufferedWriter(osw);
+</code></pre><h4 id="4、需求：读取键盘录入数据，显示在控制台上"><a href="#4、需求：读取键盘录入数据，显示在控制台上" class="headerlink" title="4、需求：读取键盘录入数据，显示在控制台上"></a>4、需求：读取键盘录入数据，显示在控制台上</h4><pre><code>源：InputStream in = System.in    ;
 
-        SequenceInputStream sis = new SequenceInputStream(en);
+目的：OutputStream out = System.out;
 
-        FileOutputStream fos = new FileOutputStream(&quot;4.txt&quot;);
+转换流：InputStreamReader isr = new InputStreamReader(in);
+        OutputStreamWriter isw = new OutputStreamWriter(out);
 
-        byte[] buf = new byte[1024];
-
-        int length = 0;
-
-        while((length = sis.read(buf)) != -1 ) {
-            fos.write(buf,0,length);
-        }
-
-        fos.close();
-        sis.close();
-    }
-
-}
-</code></pre><h4 id="2、枚举和迭代"><a href="#2、枚举和迭代" class="headerlink" title="2、枚举和迭代"></a>2、枚举和迭代</h4><pre><code>//Vctor集合效率低。
-
-Vector&lt;FileInputStream&gt; v = new Vector&lt;FileInputStream&gt;();
-v.add(new FileInputStream(&quot;1.txt&quot;));
-v.add(new FileInputStream(&quot;2.txt&quot;));
-v.add(new FileInputStream(&quot;3.txt&quot;));
-
-Enumeration&lt;FileInputStream&gt; en = v.elements();
-
-//ArrayList集合代替
-ArrayList&lt;FileInputStream&gt; al = new ArrayList&lt;FileInputStream&gt;();
-//用集合工具类中的方法，返回Enumeration类对象
-Enumeration&lt;FileInputStream&gt; en = Collections.enumeration(al);
+高效：BufferedReader bufr = new BufferedReader(isr);
+      BufferedWriter bufw = new BufferedWriter(isw);
 </code></pre>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-12-sequenceInputStream/" data-id="cjhniujed002k2ufy5eqhwzuy" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-7-stream-rule-demo/" data-id="cji15cnso003tu0fydyri6eew" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
@@ -210,9 +138,9 @@ Enumeration&lt;FileInputStream&gt; en = Collections.enumeration(al);
 
 
   
-    <article id="post-java/java-io/IO-10-properties" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-java/java-io/IO-11-printSream" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2018/01/10/java/java-io/IO-10-properties/" class="article-date">
+    <a href="/2018/01/10/java/java-io/IO-11-printSream/" class="article-date">
   <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
 </a>
     
@@ -228,7 +156,7 @@ Enumeration&lt;FileInputStream&gt; en = Collections.enumeration(al);
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/10/java/java-io/IO-10-properties/">IO流 - 十、IO流 - Properties集合</a>
+      <a class="article-title" href="/2018/01/10/java/java-io/IO-11-printSream/">IO流 - 十一、打印流</a>
     </h1>
   
 
@@ -236,281 +164,49 @@ Enumeration&lt;FileInputStream&gt; en = Collections.enumeration(al);
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h4 id="1、基本功能"><a href="#1、基本功能" class="headerlink" title="1、基本功能"></a>1、基本功能</h4><p>Map</p>
-<p>|—–Hashtable</p>
-<p>|————-Properties         </p>
-<p>Properties集合特点：</p>
-<p>1、该集合中的键和值都是字符串类型。</p>
-<p>2、集合中的数据可以保存流中，或者从流中获取。</p>
-<p>通常该集合用于操作以键值对形式存在的配置文件。</p>
-<pre><code>public class Demo1 {
-
-    public static void main(String[] args) {
-
-        Properties prop = new Properties();
-        //存储
-        prop.setProperty(&quot;zhangsan&quot;, &quot;32&quot;);
-        prop.setProperty(&quot;lisi&quot;, &quot;32&quot;);
-        prop.setProperty(&quot;wangwu&quot;, &quot;32&quot;);
-        prop.setProperty(&quot;zhaoliu&quot;, &quot;32&quot;);
-        //取出
-        Set&lt;String&gt; names = prop.stringPropertyNames();
-
-        for(String name:names) {
-            String value = prop.getProperty(name);
-            System.out.println(name+&quot;:&quot;+value);
-        }
-
-    }
-
-}
-</code></pre><h4 id="2、list方法"><a href="#2、list方法" class="headerlink" title="2、list方法"></a>2、list方法</h4><p>public void list(PrintStream out)    </p>
-<p>将属性列表输出到指定的输出流。此方法用于调试。</p>
-<pre><code>Properties prop = new Properties();
-//存储
-prop.setProperty(&quot;zhangsan&quot;, &quot;32&quot;);
-prop.setProperty(&quot;lisi&quot;, &quot;32&quot;);
-prop.setProperty(&quot;wangwu&quot;, &quot;32&quot;);
-prop.setProperty(&quot;zhaoliu&quot;, &quot;32&quot;);
-/*
-//取出
-Set&lt;String&gt; names = prop.stringPropertyNames();
-
-for(String name:names) {
-    String value = prop.getProperty(name);
-    System.out.println(name+&quot;:&quot;+value);
-}
+        <p>打印流字符流与字节流</p>
+<p>PrintWriter与PrintStream</p>
+<p>可以直接操作输出流和文件</p>
+<h4 id="1、PrintStream-字节打印流"><a href="#1、PrintStream-字节打印流" class="headerlink" title="1、PrintStream 字节打印流"></a>1、PrintStream 字节打印流</h4><pre><code>/**
+    PrintStream:
+    1、提供了打印方法可以对多种数据类型值进行打印，并保持数据的表现形式。
+    2、它不抛IOException
+    构造函数，接收三种类型的值：
+    1、字符串路径
+    2、File对象
+    3、字节输出流
 */
-//prop.list(System.out);
+610: 0000-0000 0000-0000 0000-0010 0110-0001
+PrintStream out = new PrintStream(&quot;print.txt&quot;);
+out.write(610);//b ,只写最低8位
+out.print(97);//97，将97先变成字符，保持原样形式打印到目的地。
+out.close;
+</code></pre><h4 id="2、PrintWriter-字符打印流"><a href="#2、PrintWriter-字符打印流" class="headerlink" title="2、PrintWriter 字符打印流"></a>2、PrintWriter 字符打印流</h4><pre><code>/**
+    构造函数参数：
+    1、字符串路径
+    2、File对象
+    3、字节输出流
+    4、字符输出流
+*/
 
-Properties props = System.getProperties();
-props.list(System.out);    
-</code></pre><h4 id="3、store方法"><a href="#3、store方法" class="headerlink" title="3、store方法"></a>3、store方法</h4><p>store(OutputStream out,String comments)</p>
-<p>Store(Writer writer,String comments)</p>
-<p>将集合中的字符串，键值信息持久化存储到硬盘的文件中。</p>
-<pre><code>public class Dmo2 {
 
-    public static void main(String[] args) throws IOException {
-
-        Properties prop = new Properties();
-        //存储
-        prop.setProperty(&quot;zhangsan&quot;, &quot;32&quot;);
-        prop.setProperty(&quot;lisi&quot;, &quot;32&quot;);
-        prop.setProperty(&quot;wangwu&quot;, &quot;32&quot;);
-        prop.setProperty(&quot;zhaoliu&quot;, &quot;32&quot;);
-
-        //将这些集合中的键值对信息持久化存储到文件中，需要关联输出流。
-        FileOutputStream fos = new FileOutputStream(&quot;info.txt&quot;);
-        prop.store(fos, &quot;name+age&quot;);
-
-        fos.close();
-
-    }
-
-}
-
-info.txt
-
-#name+age
-#Sat Jan 13 10:32:19 CST 2018
-zhangsan=32
-lisi=32
-zhaoliu=32
-wangwu=32
-</code></pre><h4 id="4、修改配置信息"><a href="#4、修改配置信息" class="headerlink" title="4、修改配置信息"></a>4、修改配置信息</h4><p>load(InputStream inStream)</p>
-<p>load(Reader reader)</p>
-<p>读取配置信息</p>
-<pre><code>public class Demo3 {
+public class PrintWriterDemo1 {
 
     public static void main(String[] args) throws IOException {
+        //键盘输入流
+        BufferedReader bufr = new BufferedReader(new InputStreamReader(System.in));
 
-        Properties prop = new Properties();
+        //打印流,自动刷新缓冲区
+        PrintWriter out = new PrintWriter(new FileWriter(&quot;out.txt&quot;),true);
 
-        FileInputStream fis = new FileInputStream(&quot;info.txt&quot;);
-
-        prop.load(fis);
-        prop.list(System.out);
-
-    }
-}
-
-输出结果：
--- listing properties --
-zhangsan=32
-lisi=32
-zhaoliu=32
-wangwu=32
-</code></pre><p>模拟load方法</p>
-<pre><code>public static void myLoad() throws IOException {
-    Properties prop = new Properties();
-
-    BufferedReader bufr = new BufferedReader(new FileReader(&quot;info.txt&quot;));
-
-    String line = null;
-    while((line = bufr.readLine()) != null) {
-        if(line.startsWith(&quot;#&quot;)) 
-            continue;
-        String[] arr = line.split(&quot;=&quot;);
-        System.out.println(arr[0]+&quot;::&quot;+arr[1]);
-    }
-
-}
-</code></pre><p>修改硬盘的文件中已有的配置信息</p>
-<pre><code>public class Demo4 {
-
-    /**
-     * 读取文件
-     * 键值对信息存储到集合中
-     * 通过集合方法修改数据
-     * 通过流将修改后的数据存储到文件
-     * @param args
-     * @throws IOException 
-     */
-
-    public static void main(String[] args) throws IOException {
-        //读取文件流，流可以直接操作File对象
-        File file = new File(&quot;info.txt&quot;);
-        if(!file.exists()) {
-            file.createNewFile();
+        String line = null;
+        while((line = bufr.readLine()) != null) {
+            if(&quot;over&quot;.equals(line))
+                break;
+            out.println(line.toUpperCase());
         }
-        FileReader fr = new FileReader(file);
-
-        //创建空集合
-        Properties prop = new Properties();
-
-        //集合加载流数据
-        prop.load(fr);
-        //prop.list(System.out);
-
-        //修改集合数据
-        prop.setProperty(&quot;zhangsan&quot;, &quot;20&quot;);
-
-        //写入文件流
-        FileWriter fw = new FileWriter(file);
-
-        //集合持久化存储文件流
-        prop.store(fw,&quot;&quot;);
-
-        //关闭流
-        fr.close();
-        fw.close();
-    }
-
-}
-</code></pre><h4 id="5、Properties集合-练习"><a href="#5、Properties集合-练习" class="headerlink" title="5、Properties集合 - 练习"></a>5、Properties集合 - 练习</h4><p>定义功能，获取应用程序的运行次数，超过5次，给出到期提示并退出程序。</p>
-<p>思路：使用计数器，并以文件形式保存在硬盘中。</p>
-<pre><code>public class Demo5 {
-    public static void main(String[] args) throws IOException {
-        //封装配置文件对象
-        File confile = new File(&quot;count.properties&quot;);
-        if(!confile.exists()) {
-            confile.createNewFile();
-        }
-
-        //输入流
-        FileInputStream fis = new FileInputStream(confile);
-
-        //创建空集合
-        Properties prop = new Properties();
-
-        //加载数据流
-        prop.load(fis);
-
-        //获取数据
-        String value = prop.getProperty(&quot;time&quot;);
-
-        //计数器
-        int count = 0;
-        if(value != null) {
-            count = Integer.parseInt(value);
-            if(count &gt;= 5) {
-                throw new RuntimeException(&quot;使用次数到期&quot;);
-            }
-        }
-        count++;
-
-        //计数
-        prop.setProperty(&quot;time&quot;, count+&quot;&quot;);
-
-        //输出流
-        FileOutputStream fos = new FileOutputStream(confile);
-
-        //存储
-        prop.store(fos, &quot;&quot;);
-
-        fis.close();
-        fos.close();
-
-    }
-}
-</code></pre><h4 id="6、Properties集合-练习-文件清单列表"><a href="#6、Properties集合-练习-文件清单列表" class="headerlink" title="6、Properties集合 - 练习 - 文件清单列表"></a>6、Properties集合 - 练习 - 文件清单列表</h4><p>获取指定目录下，指定扩展名的所有文件，把这些文件的绝对路径写入到一个文本中。</p>
-<pre><code>public class Demo6 {
-
-    public static void main(String[] args) {
-        //指定文件夹
-        File dir = new File(&quot;test&quot;);
-
-        //定义集合
-        List&lt;File&gt; list = new ArrayList&lt;File&gt;();
-
-        //定义过滤器
-        FilenameFilter filter = new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return name.endsWith(&quot;.md&quot;);
-            }
-        };
-
-        //深度遍历文件夹
-        getFiles(dir,filter,list);
-
-        //遍历list写入文件
-        File destfile = new File(&quot;markdownlist.txt&quot;);
-        writeToFile(list,destfile);
-
-
-    }
-    /**
-     * 深度遍历，找到所有的文件并过滤，把符合条件的文件存储到容器中
-     * @param dir
-     * @param filter
-     * @param list
-     */
-    public static void getFiles(File dir, FilenameFilter filter, List&lt;File&gt; list) {
-        File[] files = dir.listFiles();
-        for(File file:files) {
-            if(file.isDirectory()) {
-                //递归
-                getFiles(dir, filter, list);
-            } else {
-                //过滤并添加集合
-                if(filter.accept(dir, file.getName())) {
-                    list.add(file);
-                }
-            }
-        }
-    }
-
-    //写入到文件中
-    public static void writeToFile(List&lt;File&gt; list, File destFile) {
-        BufferedWriter bufw = null;
-        try {
-            bufw = new BufferedWriter(new FileWriter(destFile));
-            for(File file:list) {
-                bufw.write(file.getAbsolutePath());
-                bufw.flush();
-                bufw.newLine();
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(&quot;写入失败&quot;);
-        } finally {
-            if(bufw != null)
-                try {
-                    bufw.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(&quot;关闭失败&quot;);
-                }
-        }
-
+        out.close();
+        bufr.close();
     }
 
 }
@@ -518,7 +214,72 @@ wangwu=32
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-10-properties/" data-id="cjhniujef002n2ufylzp37av8" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-11-printSream/" data-id="cji15cnqs001zu0fyoi62c23z" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/java-io/IO-6-stream-rule" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/10/java/java-io/IO-6-stream-rule/" class="article-date">
+  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/10/java/java-io/IO-6-stream-rule/">IO流 - 六、流的操作基本规律</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>转换流：</p>
+<p>InputStreamReader:字节到字符的桥梁，解码。</p>
+<p>OutputStramWriter:节符到字节的桥梁，编码。</p>
+<p>操作规律：找到应该用哪些对象</p>
+<p>1、明确源和目的</p>
+<pre><code>源：InputStream Reader
+
+目的：OutputStream Writer
+</code></pre><p>2、明确数据是否是纯文本数据</p>
+<pre><code>源：是纯文本数据：Reader；不是纯文本数据：InputStream
+
+目的：是纯文本数据：Writer；是纯文本数据：OutputStream
+</code></pre><p>3、明确具体的设备</p>
+<p>源设备</p>
+<pre><code>硬盘：File
+键盘：System.in
+内存：数组
+网络：Socket流
+</code></pre><p>目的设备<br>    硬盘：File<br>    控制台：System.out<br>    内存：数组<br>    网络：Socket流</p>
+<p>4、是否需要其它功能（装饰类）</p>
+<pre><code>1、高效缓冲区：Buffer
+
+...
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-6-stream-rule/" data-id="cji15cnsh003mu0fyyyhi7lm4" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
@@ -750,309 +511,7 @@ public class SuffixFilter implements FilenameFilter {
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-13-file-coperate/" data-id="cjhniujej002q2ufy5udq4ax8" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/java-io/IO-17-dataStream" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/10/java/java-io/IO-17-dataStream/" class="article-date">
-  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/java/">java</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/10/java/java-io/IO-17-dataStream/">IO流 - 十七、操作基本数据类型的流对象 - DataStream</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>DataInputStream与DataOutputStream</p>
-<pre><code>public class DataStream {
-
-    public static void main(String[] args) throws IOException {
-
-        writeData();
-        readData();
-
-    }
-
-    private static void readData() throws IOException {
-        DataInputStream dis = new DataInputStream(new FileInputStream(&quot;abc.txt&quot;));
-        String str = dis.readUTF();
-        System.out.println(str);
-        dis.close();
-    }
-
-    private static void writeData() throws IOException {
-        DataOutputStream dos = new DataOutputStream(new FileOutputStream(&quot;abc.txt&quot;));
-        dos.writeUTF(&quot;你好&quot;);
-        dos.close();
-    }
-
-}
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-17-dataStream/" data-id="cjhniujel002t2ufyo9i1tz6l" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/java-io/IO-16-pipedStream" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/10/java/java-io/IO-16-pipedStream/" class="article-date">
-  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/java/">java</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/10/java/java-io/IO-16-pipedStream/">IO流 - 十六、管道流 - PipedStream</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>PipedInputStream和PipedOutputStream</p>
-<p>输入输出可以直接进行连接，通过结合线程使用。</p>
-<pre><code>public class PipedStreamDemo1 {
-
-    public static void main(String[] args) throws IOException {
-        PipedInputStream input = new PipedInputStream();
-        PipedOutputStream out = new PipedOutputStream();
-        input.connect(out);
-
-        new Thread(new Input(input)).start();
-        new Thread(new Output(out)).start();
-
-    }
-
-}
-
-class Input implements Runnable {
-    private PipedInputStream in;
-    Input(PipedInputStream in) {
-        this.in = in;
-    }
-
-    public void run() {
-        try {
-            byte[] buf = new byte[1024];
-            int length = in.read(buf);
-            String s = new String(buf,0,length);
-            System.out.println(&quot;s=&quot;+s);
-            in.close();
-        } catch (Exception e) {
-            // TODO: handle exception
-        }
-    }
-}
-
-class Output implements Runnable {
-    private PipedOutputStream out;
-    Output(PipedOutputStream out) {
-        this.out = out;
-    }
-
-    public void run() {
-        try {
-            out.write(&quot;aaaaaaaaa&quot;.getBytes());
-        } catch (Exception e) {
-            // TODO: handle exception
-        }
-    }
-}
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-16-pipedStream/" data-id="cjhniujeo002w2ufycxtvpm9s" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java/java-io/IO-2-buffered" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/01/10/java/java-io/IO-2-buffered/" class="article-date">
-  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/java/">java</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/10/java/java-io/IO-2-buffered/">IO流 - 二、缓冲区</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="二、缓冲区"><a href="#二、缓冲区" class="headerlink" title="二、缓冲区"></a>二、缓冲区</h3><p>提高了对数据的读写效率。</p>
-<p>对应类：</p>
-<p>BufferedWriter</p>
-<p>BufferedReader</p>
-<h4 id="1、缓冲区单个字符读写"><a href="#1、缓冲区单个字符读写" class="headerlink" title="1、缓冲区单个字符读写"></a>1、缓冲区单个字符读写</h4><pre><code>public class Demo6 {
-
-    public static void main(String[] args) throws IOException {
-        FileReader fr = new FileReader(&quot;demo.txt&quot;);
-        BufferedReader bufr = new BufferedReader(fr);
-
-        FileWriter fw = new FileWriter(&quot;buf_copy.txt&quot;);
-        BufferedWriter bufw = new BufferedWriter(fw);
-
-        int ch = 0;
-        while((ch = bufr.read())!=-1) {
-            bufw.write(ch);
-        }
-        bufw.close();
-        bufr.close();
-
-    }
-
-}
-</code></pre><h4 id="2、缓冲区逐行读写"><a href="#2、缓冲区逐行读写" class="headerlink" title="2、缓冲区逐行读写"></a>2、缓冲区逐行读写</h4><pre><code>public class Demo6 {
-
-    public static void main(String[] args) throws IOException {
-        FileReader fr = new FileReader(&quot;demo.txt&quot;);
-        BufferedReader bufr = new BufferedReader(fr);
-
-        FileWriter fw = new FileWriter(&quot;buf_copy.txt&quot;);
-        BufferedWriter bufw = new BufferedWriter(fw);
-
-        String line = null;
-
-        while((line = bufr.readLine())!=null) {
-            bufw.write(line);
-            bufw.newLine();
-            bufw.flush();
-        }
-
-        bufw.close();
-        bufr.close();
-
-    }
-
-}
-</code></pre><h4 id="3、缓冲区-装饰设计模式"><a href="#3、缓冲区-装饰设计模式" class="headerlink" title="3、缓冲区 - 装饰设计模式"></a>3、缓冲区 - 装饰设计模式</h4><p>装饰设计模式：</p>
-<p>对一组对象的功能进行增强时，就可以使用该模式解决问题。</p>
-<pre><code>public class Person {
-    public void eat() {
-        System.out.println(&quot;....eating...&quot;);
-    }
-}
-
-//通过继承进行功能扩展
-class NewPerson extends Person{
-    public void eat() {
-        System.out.println(&quot;befor...eating...&quot;);
-        super.eat();
-        System.out.println(&quot;after...eating&quot;);
-    }
-}
-
-//通过装饰类进行功能扩展
-class NewPerson2 {
-    private Person p;
-    NewPerson2(Person p){
-        this.p = p;
-    }
-    void eat() {        
-        System.out.println(&quot;befor...eating...&quot;);
-        p.eat();
-        System.out.println(&quot;after...eating&quot;);
-    }
-}
-</code></pre><p>装饰和继承的区别：</p>
-<p>Writer</p>
-<p>|– TextWriter:用于操作文本</p>
-<p>—– BufferedTextWriter:加入缓冲技术</p>
-<p>|– MediaWriter:用于操作媒体</p>
-<p>—– BufferedMediaWriter:加入缓冲技术</p>
-<p>继承导致原有类的体系越来越臃肿，不够灵活。</p>
-<p>class Buffered {<br>    Buffered(Writer w){<br>        …<br>    }<br>}</p>
-<p>装饰比继承更灵活。</p>
-<h4 id="4、缓冲区-装饰类-LineNumberReader"><a href="#4、缓冲区-装饰类-LineNumberReader" class="headerlink" title="4、缓冲区 - 装饰类 - LineNumberReader"></a>4、缓冲区 - 装饰类 - LineNumberReader</h4><pre><code>public class Demo7 {
-
-    public static void main(String[] args) throws IOException {
-
-        FileReader fr = new FileReader(&quot;demo.txt&quot;);
-        LineNumberReader lnr = new LineNumberReader(fr);
-
-        String line = null;
-        lnr.setLineNumber(100);
-        while((line = lnr.readLine()) != null) {
-            System.out.println(lnr.getLineNumber()+&quot;:&quot;+line);
-        }
-    }
-
-}
-
-输出结果：
-101:abc
-102:cde
-</code></pre>
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-2-buffered/" data-id="cjhniujeq002z2ufyumha1rjz" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-13-file-coperate/" data-id="cji15cnrj002gu0fy0mrhm0f4" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
@@ -1149,7 +608,7 @@ raf.close;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-15-randomAccessFile/" data-id="cjhniujeu00322ufy0cjevm0y" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-15-randomAccessFile/" data-id="cji15cnrl002ju0fyy32xg5pi" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
@@ -1161,9 +620,9 @@ raf.close;
 
 
   
-    <article id="post-java/java-io/IO-3-byte-stream" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-java/java-io/IO-16-pipedStream" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2018/01/10/java/java-io/IO-3-byte-stream/" class="article-date">
+    <a href="/2018/01/10/java/java-io/IO-16-pipedStream/" class="article-date">
   <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
 </a>
     
@@ -1179,7 +638,7 @@ raf.close;
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/10/java/java-io/IO-3-byte-stream/">IO流 - 三、字节流</a>
+      <a class="article-title" href="/2018/01/10/java/java-io/IO-16-pipedStream/">IO流 - 十六、管道流 - PipedStream</a>
     </h1>
   
 
@@ -1187,142 +646,60 @@ raf.close;
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h4 id="1、操作文件基本演示"><a href="#1、操作文件基本演示" class="headerlink" title="1、操作文件基本演示"></a>1、操作文件基本演示</h4><p>写</p>
-<pre><code>public class Demo8 {
+        <p>PipedInputStream和PipedOutputStream</p>
+<p>输入输出可以直接进行连接，通过结合线程使用。</p>
+<pre><code>public class PipedStreamDemo1 {
 
     public static void main(String[] args) throws IOException {
+        PipedInputStream input = new PipedInputStream();
+        PipedOutputStream out = new PipedOutputStream();
+        input.connect(out);
 
-        //创建字节输出流对象
-        FileOutputStream fos = new FileOutputStream(&quot;demo.txt&quot;);
-
-        //数据直接写入目标文件，没有缓冲区
-        fos.write(&quot;aaaaaddfsdss&quot;.getBytes());
-
-        fos.close();
+        new Thread(new Input(input)).start();
+        new Thread(new Output(out)).start();
 
     }
 
 }
-</code></pre><p>逐个字节读取</p>
-<p>public class Demo9 {</p>
-<pre><code>public static void main(String[] args) throws IOException {
 
-    FileInputStream fis = new FileInputStream(&quot;demo.txt&quot;);
-
-    int ch = 0;
-    while((ch = fis.read()) != -1) {
-        System.out.println((char)ch);
+class Input implements Runnable {
+    private PipedInputStream in;
+    Input(PipedInputStream in) {
+        this.in = in;
     }
 
-    fis.close();
-}
-</code></pre><p>}</p>
-<p>逐个数组读取</p>
-<pre><code>public class Demo10 {
-
-    public static void main(String[] args) throws IOException {
-
-        FileInputStream fis = new FileInputStream(&quot;demo.txt&quot;);
-
-        byte[] buf = new byte[1024];
-        int length = 0;
-
-        while((length = fis.read(buf, 0, length)) != -1) {
-            System.out.println(new String(buf,0,length));
+    public void run() {
+        try {
+            byte[] buf = new byte[1024];
+            int length = in.read(buf);
+            String s = new String(buf,0,length);
+            System.out.println(&quot;s=&quot;+s);
+            in.close();
+        } catch (Exception e) {
+            // TODO: handle exception
         }
+    }
+}
 
-        fis.close();
-
+class Output implements Runnable {
+    private PipedOutputStream out;
+    Output(PipedOutputStream out) {
+        this.out = out;
     }
 
-}
-</code></pre><h4 id="2、练习-复制mp3"><a href="#2、练习-复制mp3" class="headerlink" title="2、练习 - 复制mp3"></a>2、练习 - 复制mp3</h4><p>直接复制</p>
-<pre><code>public class Demo11 {
-
-    public static void main(String[] args) throws IOException {
-
-        FileInputStream fis = new FileInputStream(&quot;0.mp3&quot;);
-        FileOutputStream fos = new FileOutputStream(&quot;1.mp3&quot;);
-
-        byte[] buf = new byte[1024];
-        int length = 0;
-
-        while((length = fis.read()) != -1) {
-            fos.write(buf,0,length);
+    public void run() {
+        try {
+            out.write(&quot;aaaaaaaaa&quot;.getBytes());
+        } catch (Exception e) {
+            // TODO: handle exception
         }
-
-        fos.close();
-        fis.close();
     }
-
-}
-</code></pre><p>高效复制</p>
-<pre><code>public class Demo11 {
-
-    public static void main(String[] args) throws IOException {
-
-        FileInputStream fis = new FileInputStream(&quot;0.mp3&quot;);
-        BufferedInputStream bufis = new BufferedInputStream(fis);
-
-        FileOutputStream fos = new FileOutputStream(&quot;1.mp3&quot;);
-        BufferedOutputStream bufos = new BufferedOutputStream(fos);
-
-        byte[] buf = new byte[1024];
-
-        int length = 0;
-        while((length = bufis.read(buf)) != -1) {
-            bufos.write(buf, 0, length);
-        }
-
-        bufis.close();
-        bufos.close();
-
-    }
-}
-</code></pre><h4 id="3、演示键盘录入"><a href="#3、演示键盘录入" class="headerlink" title="3、演示键盘录入"></a>3、演示键盘录入</h4><p>读取键盘录入的一个数据，并打印在控制台上。</p>
-<p>键盘本身就是一个标准的输入设备。</p>
-<p>对于java而言，对于这种输入设备都有相应的对象。</p>
-<p>java.lang包里的 System类</p>
-<p>public static finael InputStream in</p>
-<p>“标准”输入流，不用关闭。</p>
-<p>键盘录入：</p>
-<pre><code>public class Demo12 {
-    public static void main(String[] args) throws IOException {
-        InputStream in = System.in;
-        int ch = in.read();
-        System.out.println(ch);
-    }
-}
-</code></pre><p>读取键盘录入：</p>
-<pre><code>public class Demo15 {
-
-    public static void main(String[] args) throws IOException {
-
-        InputStream in = System.in;
-        int ch = 0;
-        StringBuilder sb = new StringBuilder();
-        while((ch=in.read())!=-1) {
-            if(ch==&apos;\r&apos;) 
-                continue;
-            if(ch==&apos;\n&apos;) {
-                String temp = sb.toString();
-                if(&quot;over&quot;.equals(temp))
-                    break;
-                System.out.println(temp.toUpperCase());
-                sb.delete(0, sb.length());
-            } else {
-                sb.append((char)ch);
-            }
-        }
-
-    }
-
 }
 </code></pre>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-3-byte-stream/" data-id="cjhniujey00352ufyoo7krxsv" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-16-pipedStream/" data-id="cji15cnrn002nu0fy0807bnmk" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
@@ -1334,10 +711,10 @@ raf.close;
 
 
   
-    <article id="post-java/java-api/java-api-otherObjects" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-java/java-io/IO-17-dataStream" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2018/01/09/java/java-api/java-api-otherObjects/" class="article-date">
-  <time datetime="2018-01-09T07:16:19.000Z" itemprop="datePublished">2018-01-09</time>
+    <a href="/2018/01/10/java/java-io/IO-17-dataStream/" class="article-date">
+  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
 </a>
     
   <div class="article-category">
@@ -1352,7 +729,7 @@ raf.close;
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2018/01/09/java/java-api/java-api-otherObjects/">其它对象API</a>
+      <a class="article-title" href="/2018/01/10/java/java-io/IO-17-dataStream/">IO流 - 十七、操作基本数据类型的流对象 - DataStream</a>
     </h1>
   
 
@@ -1360,211 +737,27 @@ raf.close;
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h3 id="一、System类"><a href="#一、System类" class="headerlink" title="一、System类"></a>一、System类</h3><p>System类中的方法和属性都是静态的。</p>
-<p>常见方法：</p>
-<p>long currentTimeMillis():获取当前时间的毫秒值</p>
-<p>Properties getProperties():获取当前系统的属性信息    </p>
-<pre><code>public class SystemApi {
-    public static void main(String[] args) {
+        <p>DataInputStream与DataOutputStream</p>
+<pre><code>public class DataStream {
 
-        long millisTime = System.currentTimeMillis();
-        System.out.println(millisTime);
+    public static void main(String[] args) throws IOException {
 
-        Properties prop = System.getProperties();
-
-        Set&lt;String&gt; nameSet = prop.stringPropertyNames();
-
-        for(String name:nameSet) {
-            String value = prop.getProperty(name);
-            System.out.println(name+&quot;::&quot;+value);
-        }
-
-
-    }
-}
-</code></pre><h3 id="二、Runtime类"><a href="#二、Runtime类" class="headerlink" title="二、Runtime类"></a>二、Runtime类</h3><p>Runtime:</p>
-<p>没有构造方法摘要，说明该类不可以创建对象。</p>
-<p>又发现该类有非静态方法，说明该类应该有提供的静态的返回该类对象的方法。</p>
-<p>而且只有一个这种方法，说明Runtime类使用了单例设计模式。</p>
-<pre><code>public class RuntimeApi {
-
-    public static void main(String[] args) throws IOException, InterruptedException {
-
-        Runtime r = Runtime.getRuntime();
-
-        Process p = r.exec(&quot;open -a Safari.app http://www.baidu.com&quot;);
-        Thread.sleep(2000);
-        p.destroy();
-    }
-
-}
-</code></pre><h3 id="三、Math类"><a href="#三、Math类" class="headerlink" title="三、Math类"></a>三、Math类</h3><p>常用方法：</p>
-<p>double ceil():返回大于参数的最小整数。</p>
-<p>double floor():返回小于参数的最大整数。</p>
-<p>double round():返回四舍五入的整数。</p>
-<p>max(a,b):返回最大值</p>
-<p>pow(a,b):a的b次方</p>
-<p>double random():返回大于等于0.0小于1.0的随机double值，与java.util中的Random类相似。</p>
-<h3 id="四、Date类"><a href="#四、Date类" class="headerlink" title="四、Date类"></a>四、Date类</h3><h4 id="（一）、日期对象和毫秒值之间的转换"><a href="#（一）、日期对象和毫秒值之间的转换" class="headerlink" title="（一）、日期对象和毫秒值之间的转换"></a>（一）、日期对象和毫秒值之间的转换</h4><h5 id="毫秒值–-gt-日期对象"><a href="#毫秒值–-gt-日期对象" class="headerlink" title="毫秒值–&gt;日期对象"></a>毫秒值–&gt;日期对象</h5><p>1、通过Date对象的构造方法 new Date(timeMills);</p>
-<p>2、通过setTime方法。</p>
-<p>目的是通过Date对象的方法，对该日期中的年月日等字段进行操作。</p>
-<h5 id="日期对象–-gt-毫秒值"><a href="#日期对象–-gt-毫秒值" class="headerlink" title="日期对象–&gt;毫秒值"></a>日期对象–&gt;毫秒值</h5><p>1、通过getTime方法。</p>
-<p>目的是通过具体的数值进行运算。</p>
-<pre><code>public static void thord1() {
-        //long time = System.currentTimeMillis();//1515489394135
-
-        Date date1 = new Date();//将当前日期和时间封装成Date对象
-        System.out.println(date1);//Tue Jan 09 17:16:34 CST 2018
-
-        Date date2 = new Date(1515489367117l);//将指定毫秒封装成Date对象
-        System.out.println(date2);//Tue Jan 09 17:16:07 CST 2018
-}
-</code></pre><h4 id="（二）、日期对象转成字符串"><a href="#（二）、日期对象转成字符串" class="headerlink" title="（二）、日期对象转成字符串"></a>（二）、日期对象转成字符串</h4><pre><code>public class DateDemo {
-
-    public static void main(String[] args) {
-
-        Date date = new Date();
-
-        //获取日期格式对象。具备着默认的风格
-        DateFormat dateFormat = DateFormat.getDateInstance();
-        String str_date = dateFormat.format(date);
-        System.out.println(str_date); //Jan 9, 2018
-
-        DateFormat dateFormat2 = DateFormat.getDateTimeInstance();
-        String str_date2 = dateFormat2.format(date);
-        System.out.println(str_date2);//Jan 9, 2018 5:48:43 PM
-
-        //其它风格 FULL LONG SHORT MEDIUM
-        //DateFormat dateFormat3 = DateFormat.getDateInstance(DateFormat.FULL);//Tuesday, January 9, 2018
-
-        //DateFormat dateFormat3 = DateFormat.getDateInstance(DateFormat.LONG);//January 9, 2018
-
-        //DateFormat dateFormat3 = DateFormat.getDateInstance(DateFormat.SHORT);//1/9/18
-
-        DateFormat dateFormat3 = DateFormat.getDateInstance(DateFormat.MEDIUM);//Jan 9, 2018
-
-        String str_date3 = dateFormat3.format(date);
-        System.out.println(str_date3);
-
-        //日期和时间
-        DateFormat dateFormat4 = DateFormat.getDateTimeInstance(DateFormat.LONG,DateFormat.LONG);//Jan 9, 2018
-
-        String str_date4 = dateFormat4.format(date);
-        System.out.println(str_date4);
-
-        //自定义风格
-        DateFormat dateFormats = DateFormat.getDateInstance();
-        dateFormats = new SimpleDateFormat(&quot;yyyy-MM-dd&quot;);
-        String str_date5 = dateFormats.format(date);
-        System.out.println(str_date5);//2018-01-09
-
-
-    }
-}
-</code></pre><h4 id="（三）、字符串转成日期对象"><a href="#（三）、字符串转成日期对象" class="headerlink" title="（三）、字符串转成日期对象"></a>（三）、字符串转成日期对象</h4><p>使用的是DateFormat类中的parse方法。</p>
-<pre><code>public class DateFormatDemo {
-
-    public static void main(String[] args) throws ParseException {
-
-        //默认的日期字符串格式转成日期对象
-        String str_date = &quot;Jan 9, 2018 5:48:43 PM&quot;;
-        DateFormat dateFormat = DateFormat.getDateInstance();
-        Date date = dateFormat.parse(str_date);
-        System.out.println(date);
-
-        //将自定义的日期字符串格式转成日期对象
-        String str_date2 = &quot;2018--1--10&quot;;
-        DateFormat dateFormat2 = DateFormat.getDateInstance(DateFormat.LONG);
-        dateFormat2 = new SimpleDateFormat(&quot;yyyy--MM--dd&quot;);
-        Date date2 = dateFormat2.parse(str_date2);
-        System.out.println(date2);
+        writeData();
+        readData();
 
     }
 
-}
-</code></pre><h4 id="（四）、Date类-练习"><a href="#（四）、Date类-练习" class="headerlink" title="（四）、Date类 - 练习"></a>（四）、Date类 - 练习</h4><pre><code>public class Demo1 {
-
-    public static void main(String[] args) throws ParseException {
-
-        /**
-         * 练习：
-         * &quot;2017.12.20&quot;到&quot;2018.1.10&quot;中间相隔多少天
-         * 
-         * 思路：
-         * 1、日期字符串转日期对象
-         * 2、日期对象方法获取毫秒数
-         * 3、毫秒数相减，再计算天数
-         */
-
-        String str_date1 = &quot;2017.12.20&quot;;
-        String str_date2 = &quot;2018.1.10&quot;;
-
-        //DateFormat dateFormat = DateFormat.getDateInstance();
-        SimpleDateFormat dateFormat = new SimpleDateFormat(&quot;yyyy.MM.dd&quot;);
-        Date date1 = dateFormat.parse(str_date1);
-        Date date2 = dateFormat.parse(str_date2);
-
-        long date1Millis = date1.getTime();
-        long date2millis = date2.getTime();
-
-        int day = (int) Math.abs(date1Millis - date2millis)/1000/60/60/24;
-
-
-        System.out.println(day);
+    private static void readData() throws IOException {
+        DataInputStream dis = new DataInputStream(new FileInputStream(&quot;abc.txt&quot;));
+        String str = dis.readUTF();
+        System.out.println(str);
+        dis.close();
     }
 
-}
-</code></pre><h3 id="四、Calendar类"><a href="#四、Calendar类" class="headerlink" title="四、Calendar类"></a>四、Calendar类</h3><p>常见方法：</p>
-<p>set()</p>
-<p>get()</p>
-<p>add():偏移</p>
-<h5 id="一、基本演示"><a href="#一、基本演示" class="headerlink" title="一、基本演示"></a>一、基本演示</h5><pre><code>public class CalendarDemo {
-
-    public static void main(String[] args) {
-
-        Calendar c = Calendar.getInstance();
-        int year = c.get(Calendar.YEAR);
-        int month = c.get(Calendar.MONTH)+1;
-        int day = c.get(Calendar.DAY_OF_MONTH);
-        int week = c.get(Calendar.DAY_OF_WEEK);
-
-        System.out.println(year+&quot;年&quot;+month+&quot;月&quot;+day+&quot;日&quot;+getWeek(week));
-
-    }
-
-    private static String getWeek(int i) {
-        String[] weeks = {&quot;&quot;,&quot;星期日&quot;,&quot;星期一&quot;,&quot;星期二&quot;,&quot;星期三&quot;,&quot;星期四&quot;,&quot;星期五&quot;,&quot;星期六&quot;};
-        return weeks[i];
-    }
-}
-</code></pre><h5 id="二、练习"><a href="#二、练习" class="headerlink" title="二、练习"></a>二、练习</h5><pre><code>public class CalendarDemo {
-
-    public static void main(String[] args) {
-
-        Calendar c = Calendar.getInstance();
-        //指定日期
-        c.set(2018, 0, 20);
-        showDate(c);
-
-        //日期偏移
-        c.add(Calendar.YEAR, 2);
-        showDate(c);
-
-    }
-
-    public static void showDate(Calendar c) {
-        //Calendar c = Calendar.getInstance();
-        int year = c.get(Calendar.YEAR);
-        int month = c.get(Calendar.MONTH)+1;
-        int day = c.get(Calendar.DAY_OF_MONTH);
-        int week = c.get(Calendar.DAY_OF_WEEK);
-
-        System.out.println(year+&quot;年&quot;+month+&quot;月&quot;+day+&quot;日&quot;+getWeek(week));
-    }
-
-    private static String getWeek(int i) {
-        String[] weeks = {&quot;&quot;,&quot;星期日&quot;,&quot;星期一&quot;,&quot;星期二&quot;,&quot;星期三&quot;,&quot;星期四&quot;,&quot;星期五&quot;,&quot;星期六&quot;};
-        return weeks[i];
+    private static void writeData() throws IOException {
+        DataOutputStream dos = new DataOutputStream(new FileOutputStream(&quot;abc.txt&quot;));
+        dos.writeUTF(&quot;你好&quot;);
+        dos.close();
     }
 
 }
@@ -1572,10 +765,234 @@ raf.close;
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/01/09/java/java-api/java-api-otherObjects/" data-id="cjhniujda001u2ufy05c9ez74" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-17-dataStream/" data-id="cji15cnrp002qu0fyfecm63yj" class="article-share-link">Share</a>
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/api/">api</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/java-io/IO-18-array" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/10/java/java-io/IO-18-array/" class="article-date">
+  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/10/java/java-io/IO-18-array/">IO流 - 十八、操作数组的流</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="1、操作字节数组的流："><a href="#1、操作字节数组的流：" class="headerlink" title="1、操作字节数组的流："></a>1、操作字节数组的流：</h4><p>源和目的都是内存，没有调用底层资源，关闭流无效，关闭流后仍可用。</p>
+<p>ByteArrayInputStream与ByteArrayOutputStream</p>
+<pre><code>public class ArrayStreamDemo1 {
+
+    public static void main(String[] args) {
+
+        ByteArrayInputStream bis = new ByteArrayInputStream(&quot;abcde&quot;.getBytes());
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        int ch = 0;
+        while((ch = bis.read()) != -1) {
+            bos.write(ch);
+        }
+        System.out.println(bos.toString());
+    }
+
+}
+</code></pre><p>操作字符数组的流：</p>
+<p>CharArrayInputStream与CharArrayOutputStream</p>
+<p>操作字符串的流</p>
+<p>StringReader与StringWriter</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-18-array/" data-id="cji15cnrr002uu0fyuxlwi20u" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/java-io/IO-12-sequenceInputStream" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/10/java/java-io/IO-12-sequenceInputStream/" class="article-date">
+  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/10/java/java-io/IO-12-sequenceInputStream/">IO流 - 十二、序列流 - SequenceInputStream</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>对多个流进行合并</p>
+<h4 id="1、构造方法"><a href="#1、构造方法" class="headerlink" title="1、构造方法"></a>1、构造方法</h4><p>SequenceInputStream(Enumeration&lt;? extends InputStream&gt; e)</p>
+<pre><code>public class demo1 {
+
+    public static void main(String[] args) throws IOException {
+        /**
+         * 将1.txt，2.txt，3.txt文件中的数据合并到一个文件4.txt中
+         */
+        Vector&lt;FileInputStream&gt; v = new Vector&lt;FileInputStream&gt;();
+        v.add(new FileInputStream(&quot;1.txt&quot;));
+        v.add(new FileInputStream(&quot;2.txt&quot;));
+        v.add(new FileInputStream(&quot;3.txt&quot;));
+
+        Enumeration&lt;FileInputStream&gt; en = v.elements();
+
+        SequenceInputStream sis = new SequenceInputStream(en);
+
+        FileOutputStream fos = new FileOutputStream(&quot;4.txt&quot;);
+
+        byte[] buf = new byte[1024];
+
+        int length = 0;
+
+        while((length = sis.read(buf)) != -1 ) {
+            fos.write(buf,0,length);
+        }
+
+        fos.close();
+        sis.close();
+    }
+
+}
+</code></pre><h4 id="2、枚举和迭代"><a href="#2、枚举和迭代" class="headerlink" title="2、枚举和迭代"></a>2、枚举和迭代</h4><pre><code>//Vctor集合效率低。
+
+Vector&lt;FileInputStream&gt; v = new Vector&lt;FileInputStream&gt;();
+v.add(new FileInputStream(&quot;1.txt&quot;));
+v.add(new FileInputStream(&quot;2.txt&quot;));
+v.add(new FileInputStream(&quot;3.txt&quot;));
+
+Enumeration&lt;FileInputStream&gt; en = v.elements();
+
+//ArrayList集合代替
+ArrayList&lt;FileInputStream&gt; al = new ArrayList&lt;FileInputStream&gt;();
+//用集合工具类中的方法，返回Enumeration类对象
+Enumeration&lt;FileInputStream&gt; en = Collections.enumeration(al);
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-12-sequenceInputStream/" data-id="cji15cnqy0025u0fyx82kjmqe" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-java/java-io/IO-14-serializable" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/10/java/java-io/IO-14-serializable/" class="article-date">
+  <time datetime="2018-01-10T06:47:12.000Z" itemprop="datePublished">2018-01-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java/">java</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/10/java/java-io/IO-14-serializable/">IO流 - 十四、IO流 - 对象的序列化、反序列化</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>ObjectInputStream与ObjectOutputStream</p>
+<p>被操作的对象需要实现Serializable标记接口</p>
+<h4 id="1、ObjectOutputStream-对象序列化"><a href="#1、ObjectOutputStream-对象序列化" class="headerlink" title="1、ObjectOutputStream-对象序列化"></a>1、ObjectOutputStream-对象序列化</h4><p>将对象写到硬盘上。</p>
+<pre><code>FileOutputStream fos = new FileOutputStream(&quot;t.tmp&quot;);
+ObjectOutputStream oos = new ObjectOutputStream(fos);
+
+oos.writeInt(12345);
+oos.writeObject(&quot;Today&quot;);
+oos.writeObject(new Date());
+
+oos.close;
+</code></pre><p>存储自定义对象时，要实现对象序列化，对象要实现Serializable接口</p>
+<pre><code>class Person implements Serializable{
+    ...
+}
+
+ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(&quot;obj.object&quot;));
+oos.writeObject(new Person(&quot;小强&quot;,30));
+oos.close;
+</code></pre><h4 id="2、ObjectInputStream-对象反序列化"><a href="#2、ObjectInputStream-对象反序列化" class="headerlink" title="2、ObjectInputStream-对象反序列化"></a>2、ObjectInputStream-对象反序列化</h4><p>读取存储在硬盘上的对象。</p>
+<p>ObjectInputStream ois = new ObjectInputStream(new FileInputStream(“obj.object”));</p>
+<p>Person p = ois.readObject();<br>System.out.println(p.getName()+p.getAge());</p>
+<p>ois.close();</p>
+<h4 id="3、序列化接口-Seriallizable"><a href="#3、序列化接口-Seriallizable" class="headerlink" title="3、序列化接口 - Seriallizable"></a>3、序列化接口 - Seriallizable</h4><p>显示化序列号</p>
+<pre><code>class Person {
+    private static final long serialVersionUID = 97274;
+}
+</code></pre><p>将对象存储到硬盘后，即使改动了Person类，依然能识别该类和取出的对象是同一个版本。</p>
+<h4 id="4、关键字-transient"><a href="#4、关键字-transient" class="headerlink" title="4、关键字 - transient"></a>4、关键字 - transient</h4><p>静态属性不会加入序列化写入到硬盘中。</p>
+<p>非静态属性，如果不想写入到硬盘中，需要关键字transient（短暂的）修饰。</p>
+<p>private static int age;</p>
+<p>private transient String name;</p>
+<p>都不会被序列化写入硬盘中。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/01/10/java/java-io/IO-14-serializable/" data-id="cji15cns20031u0fyn37pk9r7" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/IO/">IO</a></li></ul>
 
     </footer>
   </div>
@@ -1597,7 +1014,7 @@ raf.close;
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/mybatis/">mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/springmvc/">springmvc</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/ssm/">ssm</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/maven/">maven</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/mybatis/">mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/springmvc/">springmvc</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/ssm/">ssm</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
     </div>
   </div>
 
@@ -1607,7 +1024,7 @@ raf.close;
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springmvc/">springmvc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssm/">ssm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springmvc/">springmvc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssm/">ssm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
     </div>
   </div>
 
@@ -1617,7 +1034,7 @@ raf.close;
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/mybatis/" style="font-size: 17.14px;">mybatis</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/springmvc/" style="font-size: 14.29px;">springmvc</a> <a href="/tags/ssm/" style="font-size: 10px;">ssm</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/maven/" style="font-size: 12.86px;">maven</a> <a href="/tags/mybatis/" style="font-size: 17.14px;">mybatis</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/springmvc/" style="font-size: 14.29px;">springmvc</a> <a href="/tags/ssm/" style="font-size: 10px;">ssm</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
     </div>
   </div>
 
@@ -1626,7 +1043,7 @@ raf.close;
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
     </div>
   </div>
 
@@ -1639,23 +1056,23 @@ raf.close;
       <ul>
         
           <li>
+            <a href="/2018/06/05/java/maven/maven-3/">第三章 maven拆分ssm</a>
+          </li>
+        
+          <li>
+            <a href="/2018/06/03/java/maven/maven-2/">第二章 maven整合smm</a>
+          </li>
+        
+          <li>
+            <a href="/2018/06/01/java/maven/maven-1/">第一章 maven管理工具</a>
+          </li>
+        
+          <li>
             <a href="/2018/05/26/java/ssm/ssm-1/">第一章 搭建SSM开发环境</a>
           </li>
         
           <li>
             <a href="/2018/05/24/java/springmvc/springmvc-4/">第四章 springmvc核心技术</a>
-          </li>
-        
-          <li>
-            <a href="/2018/05/23/java/springmvc/springmvc-3/">第三章 springmvc注解式开发</a>
-          </li>
-        
-          <li>
-            <a href="/2018/05/22/java/springmvc/springmvc-2/">第二章 springmvc配置式开发</a>
-          </li>
-        
-          <li>
-            <a href="/2018/05/22/java/springmvc/springmvc-1/">第一章 springmvc概述</a>
           </li>
         
       </ul>

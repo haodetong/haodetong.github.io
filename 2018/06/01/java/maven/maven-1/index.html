@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>第一章 maven管理工具 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="1.1 maven的核心依赖管理：对jar包统一管理 项目构建：对项目进行编译，测试，打包，部署 1.2 maven安装maven程序是java工发的，它的运行依赖jkd。 1、maven下载： http://maven.apache.org/download.cgi2、配置环境变量（1）、看看~/下是否有.bash_profile文件，如果没有就创建一个，环境变量要配置在这个文件中。 创建文件：">
+<meta name="keywords" content="maven">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第一章 maven管理工具">
+<meta property="og:url" content="http://yoursite.com/2018/06/01/java/maven/maven-1/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="1.1 maven的核心依赖管理：对jar包统一管理 项目构建：对项目进行编译，测试，打包，部署 1.2 maven安装maven程序是java工发的，它的运行依赖jkd。 1、maven下载： http://maven.apache.org/download.cgi2、配置环境变量（1）、看看~/下是否有.bash_profile文件，如果没有就创建一个，环境变量要配置在这个文件中。 创建文件：">
+<meta property="og:updated_time" content="2018-06-01T11:46:34.246Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="第一章 maven管理工具">
+<meta name="twitter:description" content="1.1 maven的核心依赖管理：对jar包统一管理 项目构建：对项目进行编译，测试，打包，部署 1.2 maven安装maven程序是java工发的，它的运行依赖jkd。 1、maven下载： http://maven.apache.org/download.cgi2、配置环境变量（1）、看看~/下是否有.bash_profile文件，如果没有就创建一个，环境变量要配置在这个文件中。 创建文件：">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-java/maven/maven-1" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/06/01/java/maven/maven-1/" class="article-date">
+  <time datetime="2018-06-01T08:52:37.000Z" itemprop="datePublished">2018-06-01</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/maven/">maven</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      第一章 maven管理工具
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="1-1-maven的核心"><a href="#1-1-maven的核心" class="headerlink" title="1.1 maven的核心"></a>1.1 maven的核心</h4><p>依赖管理：对jar包统一管理</p>
+<p>项目构建：对项目进行编译，测试，打包，部署</p>
+<h4 id="1-2-maven安装"><a href="#1-2-maven安装" class="headerlink" title="1.2 maven安装"></a>1.2 maven安装</h4><p>maven程序是java工发的，它的运行依赖jkd。</p>
+<h5 id="1、maven下载：-http-maven-apache-org-download-cgi"><a href="#1、maven下载：-http-maven-apache-org-download-cgi" class="headerlink" title="1、maven下载： http://maven.apache.org/download.cgi"></a>1、maven下载： <a href="http://maven.apache.org/download.cgi" target="_blank" rel="external">http://maven.apache.org/download.cgi</a></h5><h5 id="2、配置环境变量"><a href="#2、配置环境变量" class="headerlink" title="2、配置环境变量"></a>2、配置环境变量</h5><p>（1）、看看~/下是否有.bash_profile文件，如果没有就创建一个，环境变量要配置在这个文件中。</p>
+<p>创建文件：</p>
+<pre><code>touch ~/.bash_profile 
+</code></pre><p>（2）、编辑bash_profile文件：</p>
+<pre><code>vi ~/.bash_profile  
+</code></pre><p>（3）、配置如下四个环境变量：</p>
+<pre><code># maven所在的目录  
+export M2_HOME=/Users/haojie/Downloads/Java/maven/apache-maven-3.3.9  
+# maven bin所在的目录  
+export M2=$M2_HOME/bin  
+# 将maven bin加到PATH变量中  
+export PATH=$M2:$PATH  
+# 配置JAVA_HOME所在的目录，注意这个目录下应该有bin文件夹，bin下应该有java等命令  
+JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_151.jdk/Contents/Home
+export JAVA_HOME  
+</code></pre><p>（4）、在终端执行强制生效命令</p>
+<pre><code>source ~/.bash_profile  
+</code></pre><p>（5）、在新的命令行窗口执行mvn -v，如果正常显示了maven的版本等信息，就是配置成功了。</p>
+<h4 id="1-3-配置本地仓库"><a href="#1-3-配置本地仓库" class="headerlink" title="1.3 配置本地仓库"></a>1.3 配置本地仓库</h4><p>/conf/settings.xml</p>
+<pre><code>&lt;localRepository&gt;/Users/haojie/Downloads/Java/maven/maven_repository/&lt;/localRepository&gt;
+</code></pre><h4 id="1-4-maven的常用命令"><a href="#1-4-maven的常用命令" class="headerlink" title="1.4 maven的常用命令"></a>1.4 maven的常用命令</h4><ul>
+<li>clean:清理</li>
+</ul>
+<p>将项目根目录下target目录清理掉</p>
+<ul>
+<li>compile:编译</li>
+</ul>
+<p>将于项目中.java文件编译为.class文件</p>
+<ul>
+<li>test:测试</li>
+</ul>
+<p>单元测试类名有要求：XxxxTest.java</p>
+<p>将项目根目录下src/test/java目录下的单元测试类全部执行</p>
+<ul>
+<li>package:打包</li>
+</ul>
+<p>将项目打包到根目录下target目录</p>
+<ul>
+<li>install:安装</li>
+</ul>
+<p>打包jar包到本地仓库</p>
+<h4 id="1-5-maven生命周期"><a href="#1-5-maven生命周期" class="headerlink" title="1.5 maven生命周期"></a>1.5 maven生命周期</h4><p>在maven中存在三套生命周期，每一套生命周期相互独立，互不影响</p>
+<p>1、CleanLifeCycle:清理生命周期</p>
+<ul>
+<li>clean</li>
+</ul>
+<p>2、defaultLifeCycle:默认生命周期</p>
+<ul>
+<li>compile,test,package,install,deploy</li>
+</ul>
+<p>3、siteLifeCycle：站点生命周期</p>
+<ul>
+<li>site</li>
+</ul>
+<p>在一套生命周期内，执行后面的命令，前面操作会自动执行。</p>
+<h4 id="1-6-在eclipse中配置maven插件"><a href="#1-6-在eclipse中配置maven插件" class="headerlink" title="1.6 在eclipse中配置maven插件"></a>1.6 在eclipse中配置maven插件</h4><p>1、Preferences/Maven/Installations/add</p>
+<p>添加maven程序</p>
+<p>2、Preferences/Maven/User Settings </p>
+<p>添加maven settins.xml文件</p>
+<p>3、window/show view/other/maven</p>
+<p>右键Local Repository(….)/rebuild index构建索引</p>
+<h4 id="1-7-依赖范围"><a href="#1-7-依赖范围" class="headerlink" title="1.7 依赖范围"></a>1.7 依赖范围</h4><p>添加依赖范围：默认是compile</p>
+<p>如果将servlet-api设置为compile，打包后包含servlet-api.jar，部署到tomcat后，跟tomcat中存在的servlet-api.jar包冲突，会导致运行失败。</p>
+<p>因此，如果使用到tomcat自带jar包，需要将项目中依赖作用范围设置为:provided。</p>
+<h4 id="1-8-传递依赖冲突解决"><a href="#1-8-传递依赖冲突解决" class="headerlink" title="1.8 传递依赖冲突解决"></a>1.8 传递依赖冲突解决</h4><h5 id="1-8-1-maven自己调解原则"><a href="#1-8-1-maven自己调解原则" class="headerlink" title="1.8.1 maven自己调解原则"></a>1.8.1 maven自己调解原则</h5><ul>
+<li>第一声明者优先原则</li>
+</ul>
+<p>谁先定义的就用谁的传递依赖</p>
+<ul>
+<li>路径近者优先原则</li>
+</ul>
+<p>直接依赖级别高于传递依赖</p>
+<h5 id="1-8-2-排除依赖"><a href="#1-8-2-排除依赖" class="headerlink" title="1.8.2 排除依赖"></a>1.8.2 排除依赖</h5><p>排除掉冲突中的某一个依赖</p>
+<h5 id="1-8-3-版本锁定"><a href="#1-8-3-版本锁定" class="headerlink" title="1.8.3 版本锁定"></a>1.8.3 版本锁定</h5><pre><code>&lt;dependencyManagement&gt;
+    &lt;dependency&gt;
+        ...        
+    &lt;/dependency&gt;
+&lt;/dependencyManagement&gt;
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/06/01/java/maven/maven-1/" data-id="cji15cnte004nu0fygp6jke1v" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/maven/">maven</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/06/03/java/maven/maven-2/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          第二章 maven整合smm
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/05/26/java/ssm/ssm-1/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">第一章 搭建SSM开发环境</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/angularjs/">angularjs</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/bootstrap/">bootstrap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/github/">github</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/maven/">maven</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/mybatis/">mybatis</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/react/">react</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/">spring</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/springmvc/">springmvc</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/ssm/">ssm</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/转载/">转载</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/IO/">IO</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/angular/">angular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/api/">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/bootstrap/">bootstrap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/collecionsFramework/">collecionsFramework</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css-grid/">css-grid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/github/">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jsp/">jsp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/maven/">maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mybatis/">mybatis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/react/">react</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reflect/">reflect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regex/">regex</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/servlet/">servlet</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/session-cookie/">session cookie</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spring/">spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springmvc/">springmvc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssm/">ssm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/thread/">thread</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/足球/">足球</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/IO/" style="font-size: 20px;">IO</a> <a href="/tags/angular/" style="font-size: 17.14px;">angular</a> <a href="/tags/api/" style="font-size: 14.29px;">api</a> <a href="/tags/bootstrap/" style="font-size: 10px;">bootstrap</a> <a href="/tags/collecionsFramework/" style="font-size: 15.71px;">collecionsFramework</a> <a href="/tags/css-grid/" style="font-size: 10px;">css-grid</a> <a href="/tags/github/" style="font-size: 10px;">github</a> <a href="/tags/jsp/" style="font-size: 12.86px;">jsp</a> <a href="/tags/maven/" style="font-size: 12.86px;">maven</a> <a href="/tags/mybatis/" style="font-size: 17.14px;">mybatis</a> <a href="/tags/react/" style="font-size: 10px;">react</a> <a href="/tags/reflect/" style="font-size: 10px;">reflect</a> <a href="/tags/regex/" style="font-size: 10px;">regex</a> <a href="/tags/servlet/" style="font-size: 11.43px;">servlet</a> <a href="/tags/session-cookie/" style="font-size: 10px;">session cookie</a> <a href="/tags/spring/" style="font-size: 18.57px;">spring</a> <a href="/tags/springmvc/" style="font-size: 14.29px;">springmvc</a> <a href="/tags/ssm/" style="font-size: 10px;">ssm</a> <a href="/tags/thread/" style="font-size: 11.43px;">thread</a> <a href="/tags/足球/" style="font-size: 10px;">足球</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/06/05/java/maven/maven-3/">第三章 maven拆分ssm</a>
+          </li>
+        
+          <li>
+            <a href="/2018/06/03/java/maven/maven-2/">第二章 maven整合smm</a>
+          </li>
+        
+          <li>
+            <a href="/2018/06/01/java/maven/maven-1/">第一章 maven管理工具</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/26/java/ssm/ssm-1/">第一章 搭建SSM开发环境</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/24/java/springmvc/springmvc-4/">第四章 springmvc核心技术</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
